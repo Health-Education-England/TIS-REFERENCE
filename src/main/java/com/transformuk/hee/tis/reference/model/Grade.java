@@ -1,16 +1,25 @@
 package com.transformuk.hee.tis.reference.model;
 
+import io.swagger.annotations.ApiModel;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * A trainee doctor's current education grade
  *
  */
+@ApiModel(description = "Grade data")
+@Entity
+@Table(name = "Grade")
 public class Grade {
-
 	private String label;
+	@Id
 	private String abbreviation;
 	private boolean trainingGrade;
 	private boolean postGrade;
-	private boolean placementGrad;
+	private boolean placementGrade;
 
 	public String getLabel() {
 		return label;
@@ -44,11 +53,11 @@ public class Grade {
 		this.postGrade = postGrade;
 	}
 
-	public boolean isPlacementGrad() {
-		return placementGrad;
+	public boolean isPlacementGrade() {
+		return placementGrade;
 	}
 
-	public void setPlacementGrad(boolean placementGrad) {
-		this.placementGrad = placementGrad;
+	public void setPlacementGrade(boolean placementGrade) {
+		this.placementGrade = placementGrade;
 	}
 }

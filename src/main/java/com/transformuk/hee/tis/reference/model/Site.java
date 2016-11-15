@@ -1,10 +1,19 @@
 package com.transformuk.hee.tis.reference.model;
 
+import io.swagger.annotations.ApiModel;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * An nhs site, part of a {@link Trust}
  */
+@ApiModel(description = "Site data")
+@Entity
+@Table(name = "Site")
 public class Site {
-
+	@Id
 	private String siteCode;
 	private String trustCode;
 	private String siteName;

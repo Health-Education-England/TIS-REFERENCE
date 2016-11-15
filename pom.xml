@@ -66,6 +66,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.transformuk.hee</groupId>
+			<artifactId>tis-security-jwt</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 		<!--SpringFox dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
