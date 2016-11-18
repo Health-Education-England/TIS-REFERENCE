@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.api;
 
-import com.transformuk.hee.tis.reference.ReferenceDataService;
+import com.transformuk.hee.tis.reference.service.ReferenceDataService;
 import com.transformuk.hee.tis.reference.exception.ExceptionHandlerController;
 import com.transformuk.hee.tis.reference.model.Grade;
 import com.transformuk.hee.tis.reference.model.Site;
@@ -25,7 +25,6 @@ public class ReferenceDataControllerTest {
 
 	public static final String DBC = "DBC";
 	public static final String USER_ID = "James H";
-	private static final Long REV_ID = 1L;
 	public static final String SEARCH_STRING = "search me";
 	public static final String TRUST_CODE = "TS007";
 	public static final String TRUST_NAME = "NHS Staffordshire";
@@ -34,7 +33,7 @@ public class ReferenceDataControllerTest {
 	private ReferenceDataService service;
 
 	@InjectMocks
-	private ReferenceDataController controller;
+	private ReferenceDataController controller = new ReferenceDataController(service, 100);
 	private MockMvc mockMvc;
 
 	@Before
@@ -57,7 +56,7 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/cd/grades")
+		mockMvc.perform(get("/api/grades")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
@@ -78,13 +77,13 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/cd/sites")
+		mockMvc.perform(get("/api/sites")
 				.param("searchString", "search me")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
 				.andExpect(content()
-						.string("[{\"siteCode\":\"ST1\",\"trustCode\":\"TS007\",\"siteName\":\"Middle england\",\"address\":\"www.blah\",\"postCode\":\"IG11 6TY\"}]"));
+						.string("{\"total\":1,\"messageCode\":null,\"list\":[{\"siteCode\":\"ST1\",\"trustCode\":\"TS007\",\"siteName\":\"Middle england\",\"address\":\"www.blah\",\"postCode\":\"IG11 6TY\"}]}"));
 	}
 
 	@Test
@@ -100,13 +99,13 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/cd/sites/" + TRUST_CODE)
+		mockMvc.perform(get("/api/sites/" + TRUST_CODE)
 				.param("searchString", "search me")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
 				.andExpect(content()
-						.string("[{\"siteCode\":\"ST1\",\"trustCode\":\"TS007\",\"siteName\":\"Middle england\",\"address\":\"www.blah\",\"postCode\":\"IG11 6TY\"}]"));
+						.string("{\"total\":1,\"messageCode\":null,\"list\":[{\"siteCode\":\"ST1\",\"trustCode\":\"TS007\",\"siteName\":\"Middle england\",\"address\":\"www.blah\",\"postCode\":\"IG11 6TY\"}]}"));
 	}
 
 	@Test
@@ -119,7 +118,7 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/cd/trusts/" + TRUST_CODE)
+		mockMvc.perform(get("/api/trusts/" + TRUST_CODE)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
@@ -137,12 +136,12 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/cd/trusts")
+		mockMvc.perform(get("/api/trusts")
 				.param("searchString", SEARCH_STRING)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk())
 				.andExpect(content()
-						.string("[{\"code\":\"TS007\",\"name\":\"NHS Staffordshire\"}]"));
+						.string("{\"total\":1,\"messageCode\":null,\"list\":[{\"code\":\"TS007\",\"name\":\"NHS Staffordshire\"}]}"));
 	}
 }

@@ -20,7 +20,7 @@ public class SwaggerDocumentationConfig {
 
 	ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-				.title("TIS Concerns service REST API documentation")
+				.title("TIS Reference service REST API documentation")
 				.description("Please expand the options below to see the operation details")
 				.license("")
 				.licenseUrl("")

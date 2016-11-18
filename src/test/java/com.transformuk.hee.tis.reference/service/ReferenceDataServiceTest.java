@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service;
 
-import com.transformuk.hee.tis.reference.ReferenceDataService;
 import com.transformuk.hee.tis.reference.model.Site;
 import com.transformuk.hee.tis.reference.model.Trust;
 import com.transformuk.hee.tis.reference.repository.GradeRepository;
@@ -11,7 +10,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.util.Lists.emptyList;
@@ -23,7 +25,8 @@ import static org.mockito.Mockito.verify;
 public class ReferenceDataServiceTest {
 
 	public static final String SEARCH_STRING = "search me";
-	public static final List<Site> EMPTY_LIST = emptyList();
+	public static final Pageable LIMIT = new PageRequest(0, 100);
+	public static final List<Site> EMPTY_LIST = new ArrayList<>();
 	public static final String TRUST_CODE = "trust code";
 	@Mock
 	private GradeRepository gradeRepository;
@@ -35,7 +38,8 @@ public class ReferenceDataServiceTest {
 	private TrustRepository trustRepository;
 
 	@InjectMocks
-	private ReferenceDataService service;
+	private ReferenceDataService service =
+			new ReferenceDataService(gradeRepository, siteRepository, trustRepository, 100);
 
 	@Test
 	public void shouldGetAllGrades() {
@@ -51,7 +55,7 @@ public class ReferenceDataServiceTest {
 	@Test
 	public void shouldSearchSites() {
 		// given
-		given(siteRepository.findBySearchString(SEARCH_STRING)).willReturn(EMPTY_LIST);
+		given(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(EMPTY_LIST);
 
 		// when
 		List<Site> sites = service.searchSites(SEARCH_STRING);
@@ -75,7 +79,7 @@ public class ReferenceDataServiceTest {
 	@Test
 	public void shouldSearchSitesWithInATrust() {
 		// given
-		given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE)).willReturn(EMPTY_LIST);
+		given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT)).willReturn(EMPTY_LIST);
 
 		// when
 		List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, SEARCH_STRING);
@@ -87,7 +91,7 @@ public class ReferenceDataServiceTest {
 	@Test
 	public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
 		// given
-		given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE)).willReturn(EMPTY_LIST);
+		given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT)).willReturn(EMPTY_LIST);
 
 		// when
 		List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
@@ -112,7 +116,7 @@ public class ReferenceDataServiceTest {
 	@Test
 	public void shouldSearchTrusts() {
 		// given
-		given(trustRepository.findBySearchString(SEARCH_STRING)).willReturn(emptyList());
+		given(trustRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyList());
 
 		// when
 		List<Trust> trusts = service.searchTrusts(SEARCH_STRING);
@@ -124,7 +128,7 @@ public class ReferenceDataServiceTest {
 	@Test
 	public void shouldReturnAllTrustsIfSearchStringIsNullOrEmpty() {
 		// given
-		given(trustRepository.findBySearchString("")).willReturn(emptyList());
+		given(trustRepository.findBySearchString("", LIMIT)).willReturn(emptyList());
 
 		// when
 		List<Trust> trusts = service.searchTrusts("");

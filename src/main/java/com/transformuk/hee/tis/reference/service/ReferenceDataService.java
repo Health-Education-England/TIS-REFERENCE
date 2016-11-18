@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference;
+package com.transformuk.hee.tis.reference.service;
 
 import com.transformuk.hee.tis.reference.model.Grade;
 import com.transformuk.hee.tis.reference.model.Site;
@@ -7,6 +7,8 @@ import com.transformuk.hee.tis.reference.repository.GradeRepository;
 import com.transformuk.hee.tis.reference.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.repository.TrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +24,15 @@ public class ReferenceDataService {
 	private SiteRepository siteRepository;
 	private TrustRepository trustRepository;
 
+	private final int limit;
+
 	@Autowired
-	public ReferenceDataService(GradeRepository gradeRepository, SiteRepository siteRepository, TrustRepository trustRepository) {
+	public ReferenceDataService(GradeRepository gradeRepository, SiteRepository siteRepository,
+						TrustRepository trustRepository, @Value("${search.result.limit:100}") int limit) {
 		this.gradeRepository = gradeRepository;
 		this.siteRepository = siteRepository;
 		this.trustRepository = trustRepository;
+		this.limit = limit;
 	}
 
 	/**
@@ -44,7 +50,7 @@ public class ReferenceDataService {
 	 */
 	public List<Site> searchSites(String searchString) {
 		if(!isEmpty(searchString)) {
-			return siteRepository.findBySearchString(searchString);
+			return siteRepository.findBySearchString(searchString, new PageRequest(0, limit));
 		} else {
 			return siteRepository.findAll();
 		}
@@ -58,9 +64,9 @@ public class ReferenceDataService {
 	 */
 	public List<Site> searchSitesWithinTrust(String trustCode, String searchString) {
 		if(!isEmpty(searchString)) {
-			return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString);
+			return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString, new PageRequest(0, limit));
 		} else {
-			return siteRepository.findByTrustCode(trustCode);
+			return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
 		}
 	}
 
@@ -80,7 +86,7 @@ public class ReferenceDataService {
 	 */
 	public List<Trust> searchTrusts(String searchString) {
 		if(!isEmpty(searchString)) {
-			return trustRepository.findBySearchString(searchString);
+			return trustRepository.findBySearchString(searchString, new PageRequest(0, limit));
 		} else {
 			return trustRepository.findAll();
 		}
