@@ -43,6 +43,16 @@ public class ReferenceDataController {
 		return referenceDataService.getAllGrades();
 	}
 
+	@ApiOperation(value = "getGradeByCode()",
+			notes = "Returns a grade given it's code",
+			response = Grade.class, responseContainer = "Grade")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Grade", response = Grade.class)})
+	@RequestMapping(method = GET, value = "/grades/{gradeCode}")
+	public Grade getGradeByCode(@PathVariable(value = "gradeCode") String gradeCode) {
+		return referenceDataService.getGradeByCode(gradeCode);
+	}
+
 	@ApiOperation(value = "searchSites()",
 			notes = "Returns a list of sites matching given search string",
 			response = List.class, responseContainer = "Sites List")
@@ -54,26 +64,36 @@ public class ReferenceDataController {
 		return new LimitedListResponse<>(referenceDataService.searchSites(searchString), limit);
 	}
 
+	@ApiOperation(value = "getSiteByCode()",
+			notes = "Returns a site given it's code",
+			response = Grade.class, responseContainer = "Site")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Site", response = Site.class)})
+	@RequestMapping(method = GET, value = "/sites/{siteCode}")
+	public Site getSiteByCode(@PathVariable(value = "siteCode") String siteCode) {
+		return referenceDataService.getSiteByCode(siteCode);
+	}
+
 	@ApiOperation(value = "searchSitesWithinATrustCode()",
 			notes = "Returns a list of sites with a given trust code and given search string",
 			response = List.class, responseContainer = "Sites List")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Sites list", response = LimitedListResponse.class)})
-	@RequestMapping(method = GET, value = "/sites/{trustCode}")
+	@RequestMapping(method = GET, value = "/sites/search-by-trust/{trustCode}")
 	public LimitedListResponse<Site> searchSitesWithinATrustCode(@PathVariable(value = "trustCode") String trustCode,
 												  @RequestParam(value = "searchString", required = false)
 														  String searchString) throws Exception {
 		return new LimitedListResponse<> (referenceDataService.searchSitesWithinTrust(trustCode, searchString), limit);
 	}
 
-	@ApiOperation(value = "getTrust()",
+	@ApiOperation(value = "getTrustByCode()",
 			notes = "Returns trust with a given trust code",
 			response = Trust.class, responseContainer = "Trust")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Trust", response = Trust.class)})
 	@RequestMapping(method = GET, value = "/trusts/{trustCode}")
-	public Trust getTrust(@PathVariable(value = "trustCode") String trustCode) throws Exception {
-		return referenceDataService.getTrustWithCode(trustCode);
+	public Trust getTrustByCode(@PathVariable(value = "trustCode") String trustCode) throws Exception {
+		return referenceDataService.getTrustByCode(trustCode);
 	}
 
 	@ApiOperation(value = "searchTrusts()",

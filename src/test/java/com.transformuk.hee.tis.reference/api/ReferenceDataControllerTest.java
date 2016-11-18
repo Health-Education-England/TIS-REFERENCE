@@ -99,7 +99,7 @@ public class ReferenceDataControllerTest {
 
 
 		// when & then
-		mockMvc.perform(get("/api/sites/" + TRUST_CODE)
+		mockMvc.perform(get("/api/sites/search-by-trust/" + TRUST_CODE)
 				.param("searchString", "search me")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(APPLICATION_JSON_VALUE))
@@ -114,7 +114,7 @@ public class ReferenceDataControllerTest {
 		Trust trust = new Trust();
 		trust.setCode(TRUST_CODE);
 		trust.setName(TRUST_NAME);
-		given(service.getTrustWithCode(TRUST_CODE)).willReturn(trust);
+		given(service.getTrustByCode(TRUST_CODE)).willReturn(trust);
 
 
 		// when & then

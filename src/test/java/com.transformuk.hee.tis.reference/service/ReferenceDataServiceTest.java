@@ -107,7 +107,7 @@ public class ReferenceDataServiceTest {
 		given(trustRepository.findOne(TRUST_CODE)).willReturn(trust);
 
 		// when
-		Trust actualTrust = service.getTrustWithCode(TRUST_CODE);
+		Trust actualTrust = service.getTrustByCode(TRUST_CODE);
 
 		// then
 		assertEquals(trust, actualTrust);

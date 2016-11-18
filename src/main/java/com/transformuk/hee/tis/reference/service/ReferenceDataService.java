@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static org.springframework.util.StringUtils.isEmpty;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Service to fetch reference data like grades, sites, trust
@@ -44,6 +45,16 @@ public class ReferenceDataService {
 	}
 
 	/**
+	 * Finds a grade give it's code
+	 * @param gradeCode the grade code - NOT NULL
+	 * @return the grade if found, null otherwise
+	 */
+	public Grade getGradeByCode(String gradeCode) {
+		checkNotNull(gradeCode);
+		return gradeRepository.findOne(gradeCode);
+	}
+
+	/**
 	 * Searches all sites who have data containing given searchString
 	 * @param searchString search string to be searched for site data
 	 * @return List of {@link Site} matching searchString
@@ -54,6 +65,16 @@ public class ReferenceDataService {
 		} else {
 			return siteRepository.findAll();
 		}
+	}
+
+	/**
+	 * Finds a grade give it's code
+	 * @param siteCode the site code - NOT NULL
+	 * @return the site if found, null otherwise
+	 */
+	public Site getSiteByCode(String siteCode) {
+		checkNotNull(siteCode);
+		return siteRepository.findOne(siteCode);
 	}
 
 	/**
@@ -72,10 +93,11 @@ public class ReferenceDataService {
 
 	/**
 	 * Returns a trust with given code
-	 * @param trustCode Code for a trust
-	 * @return {@link Trust}
+	 * @param trustCode Code for a trust - NOT NULL
+	 * @return {@link Trust} if found, null otherwise
 	 */
-	public Trust getTrustWithCode(String trustCode) {
+	public Trust getTrustByCode(String trustCode) {
+		checkNotNull(trustCode);
 		return trustRepository.findOne(trustCode);
 	}
 
