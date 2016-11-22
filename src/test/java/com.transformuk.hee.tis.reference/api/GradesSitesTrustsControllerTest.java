@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.api;
 
-import com.transformuk.hee.tis.reference.service.ReferenceDataService;
+import com.transformuk.hee.tis.reference.service.GradesSitesTrustsService;
 import com.transformuk.hee.tis.reference.exception.ExceptionHandlerController;
 import com.transformuk.hee.tis.reference.model.Grade;
 import com.transformuk.hee.tis.reference.model.Site;
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-public class ReferenceDataControllerTest {
+public class GradesSitesTrustsControllerTest {
 
 	public static final String DBC = "DBC";
 	public static final String USER_ID = "James H";
@@ -30,10 +30,10 @@ public class ReferenceDataControllerTest {
 	public static final String TRUST_NAME = "NHS Staffordshire";
 
 	@Mock
-	private ReferenceDataService service;
+	private GradesSitesTrustsService service;
 
 	@InjectMocks
-	private ReferenceDataController controller = new ReferenceDataController(service, 100);
+	private GradesSitesTrustsController controller = new GradesSitesTrustsController(service, 100);
 	private MockMvc mockMvc;
 
 	@Before

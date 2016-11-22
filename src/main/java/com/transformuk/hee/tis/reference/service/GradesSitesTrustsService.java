@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Service to fetch reference data like grades, sites, trust
  */
 @Service
-public class ReferenceDataService {
+public class GradesSitesTrustsService {
 	private GradeRepository gradeRepository;
 	private SiteRepository siteRepository;
 	private TrustRepository trustRepository;
@@ -28,8 +28,8 @@ public class ReferenceDataService {
 	private final int limit;
 
 	@Autowired
-	public ReferenceDataService(GradeRepository gradeRepository, SiteRepository siteRepository,
-						TrustRepository trustRepository, @Value("${search.result.limit:100}") int limit) {
+	public GradesSitesTrustsService(GradeRepository gradeRepository, SiteRepository siteRepository,
+	                                TrustRepository trustRepository, @Value("${search.result.limit:100}") int limit) {
 		this.gradeRepository = gradeRepository;
 		this.siteRepository = siteRepository;
 		this.trustRepository = trustRepository;
@@ -45,7 +45,7 @@ public class ReferenceDataService {
 	}
 
 	/**
-	 * Finds a grade give it's code
+	 * Finds a grade given it's code
 	 * @param gradeCode the grade code - NOT NULL
 	 * @return the grade if found, null otherwise
 	 */
@@ -68,7 +68,7 @@ public class ReferenceDataService {
 	}
 
 	/**
-	 * Finds a grade give it's code
+	 * Finds a grade given it's code
 	 * @param siteCode the site code - NOT NULL
 	 * @return the site if found, null otherwise
 	 */

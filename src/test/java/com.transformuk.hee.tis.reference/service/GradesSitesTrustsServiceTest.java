@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReferenceDataServiceTest {
+public class GradesSitesTrustsServiceTest {
 
 	public static final String SEARCH_STRING = "search me";
 	public static final Pageable LIMIT = new PageRequest(0, 100);
@@ -38,8 +38,8 @@ public class ReferenceDataServiceTest {
 	private TrustRepository trustRepository;
 
 	@InjectMocks
-	private ReferenceDataService service =
-			new ReferenceDataService(gradeRepository, siteRepository, trustRepository, 100);
+	private GradesSitesTrustsService service =
+			new GradesSitesTrustsService(gradeRepository, siteRepository, trustRepository, 100);
 
 	@Test
 	public void shouldGetAllGrades() {
