@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.api;
 
 import com.transformuk.hee.tis.reference.model.DBC;
-import com.transformuk.hee.tis.reference.service.DBCService;
+import com.transformuk.hee.tis.reference.service.DbcService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -20,11 +20,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RestController
 @Api(value = "/api", description = "Search and list on designated boy codes")
 @RequestMapping("/api")
-public class DBCController {
+public class DbcController {
 
-	private DBCService dbcService;
+	private DbcService dbcService;
 
-	public DBCController(DBCService dbcService) {
+	public DbcController(DbcService dbcService) {
 		this.dbcService = dbcService;
 	}
 

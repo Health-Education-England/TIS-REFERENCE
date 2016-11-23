@@ -13,12 +13,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Service to fetch designated body codes
  */
 @Service
-public class DBCService {
+public class DbcService {
 
 	private DBCRepository dbcRepository;
 
 	@Autowired
-	public DBCService(DBCRepository dbcRepository) {
+	public DbcService(DBCRepository dbcRepository) {
 		this.dbcRepository = dbcRepository;
 	}
 
