@@ -17,6 +17,7 @@ public class DBC {
 	@Id
 	private String dbc;
 	private String name;
+	private String abbr;
 
 	public String getDbc() {
 		return dbc;
@@ -32,5 +33,13 @@ public class DBC {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getAbbr() {
+		return abbr;
+	}
+
+	public void setAbbr(String abbr) {
+		this.abbr = abbr;
 	}
 }
