@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 public class TestUtils {
 
 	private static final String DBC = "1-85KJU0";
@@ -17,7 +19,7 @@ public class TestUtils {
 	public static void mockUserprofile(String userName, String designatedBodyCode) {
 		UserProfile userProfile = new UserProfile();
 		userProfile.setUserName(userName);
-		userProfile.setDesignatedBodyCode(designatedBodyCode);
+		userProfile.setDesignatedBodyCodes(newHashSet(designatedBodyCode));
 		AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToekn", userProfile, null);
 		UsernamePasswordAuthenticationToken authenticationToken = new
 				UsernamePasswordAuthenticationToken(authenticatedUser, null);
@@ -28,7 +30,7 @@ public class TestUtils {
 	public static UserProfile mockWithPermissions(String userName,  String...permissions) {
 		UserProfile userProfile = new UserProfile();
 		userProfile.setUserName(userName);
-		userProfile.setDesignatedBodyCode(DBC);
+		userProfile.setDesignatedBodyCodes(newHashSet(DBC));
 		Set<String> permSet = new HashSet<>(Arrays.asList(permissions));
 		userProfile.setPermissions(permSet);
 		return userProfile;
