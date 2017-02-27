@@ -9,10 +9,9 @@
 		<version>1.0.0</version>
 		<relativePath />
 	</parent>
-	
-	<groupId>com.transformuk.hee</groupId>
+
 	<artifactId>reference</artifactId>
-	<version>0.0.5</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>HEE TIS REFERENCE DATA SERVICE</name>
