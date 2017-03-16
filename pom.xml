@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.transformuk.hee</groupId>
 		<artifactId>tis-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 		<relativePath />
 	</parent>
 
@@ -22,7 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<springfox-version>2.4.0</springfox-version>
-		<shared.modules.version>1.0.0</shared.modules.version>
+		<shared.modules.version>1.0.1</shared.modules.version>
 	</properties>
 
 	<scm>
