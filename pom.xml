@@ -12,7 +12,7 @@
 
     <groupId>com.transformuk.hee</groupId>
 	<artifactId>reference</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>HEE TIS REFERENCE DATA SERVICE</name>
