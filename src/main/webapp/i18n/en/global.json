@@ -8,13 +8,6 @@
 	  "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
 	  "entities": {
 		"main": "Entities",
-		"curriculumTisProgrammes": "Curriculum",
-		"gradeTisProgrammes": "Grade",
-		"programmeTisProgrammes": "Programme",
-		"programmeMembershipTisProgrammes": "Programme Membership",
-		"specialtyTisProgrammes": "Specialty",
-		"specialtyGroupTisProgrammes": "Specialty Group",
-		"trainingNumberTisProgrammes": "Training Number",
 		"jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
 	  },
 	  "account": {
