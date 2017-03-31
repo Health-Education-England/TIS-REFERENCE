@@ -1,0 +1,99 @@
+<div>
+	<h2>
+		<span jhiTranslate="referenceApp.site.home.title">Sites</span>
+		<button class="btn btn-primary float-right create-site"
+				[routerLink]="['/', { outlets: { popup: ['site-new'] } }]">
+			<span class="fa fa-plus"></span>
+			<span jhiTranslate="referenceApp.site.home.createLabel">
+            Create new Site
+            </span>
+		</button>
+	</h2>
+	<jhi-alert></jhi-alert>
+	<div class="row">
+	</div>
+	<br/>
+	<div class="table-responsive" *ngIf="sites">
+		<table class="table table-striped">
+			<thead>
+			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
+				<th jhiSortBy="siteCode"><span jhiTranslate="referenceApp.site.siteCode">Site Code</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="siteName"><span jhiTranslate="referenceApp.site.siteName">Site Name</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="address"><span jhiTranslate="referenceApp.site.address">Address</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="postCode"><span jhiTranslate="referenceApp.site.postCode">Post Code</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="siteKnownAs"><span jhiTranslate="referenceApp.site.siteKnownAs">Site Known As</span>
+					<span class="fa fa-sort"></span></th>
+				<th jhiSortBy="siteNumber"><span jhiTranslate="referenceApp.site.siteNumber">Site Number</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="organisationalUnit"><span jhiTranslate="referenceApp.site.organisationalUnit">Organisational Unit</span>
+					<span class="fa fa-sort"></span></th>
+				<th jhiSortBy="localOfficeId"><span jhiTranslate="referenceApp.site.localOffice">Local Office</span>
+					<span class="fa fa-sort"></span></th>
+				<th jhiSortBy="trustCodeId"><span jhiTranslate="referenceApp.site.trustCode">Trust Code</span> <span
+						class="fa fa-sort"></span></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr *ngFor="let site of sites ;trackBy: trackId">
+				<td><a [routerLink]="['../site', site.id ]">{{site.id}}</a></td>
+				<td>{{site.siteCode}}</td>
+				<td>{{site.siteName}}</td>
+				<td>{{site.address}}</td>
+				<td>{{site.postCode}}</td>
+				<td>{{site.siteKnownAs}}</td>
+				<td>{{site.siteNumber}}</td>
+				<td>{{site.organisationalUnit}}</td>
+				<td>
+					<div *ngIf="site.localOfficeId">
+						<a [routerLink]="['../local-office', site.localOfficeId  ]">{{site.localOfficeId}}</a>
+					</div>
+				</td>
+				<td>
+					<div *ngIf="site.trustCodeId">
+						<a [routerLink]="['../trust', site.trustCodeId  ]">{{site.trustCodeId}}</a>
+					</div>
+				</td>
+				<td class="text-right">
+					<div class="btn-group flex-btn-group-container">
+						<button type="submit"
+								[routerLink]="['../site', site.id ]"
+								class="btn btn-info btn-sm">
+							<span class="fa fa-eye"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.view">View</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'site/'+ site.id + '/edit'} }]"
+								replaceUrl="true"
+								class="btn btn-primary btn-sm">
+							<span class="fa fa-pencil"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.edit">Edit</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'site/'+ site.id + '/delete'} }]"
+								replaceUrl="true"
+								class="btn btn-danger btn-sm">
+							<span class="fa fa-remove"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.delete">Delete</span>
+						</button>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<div *ngIf="sites && sites.length">
+		<div class="row justify-content-center">
+			<jhi-item-count [page]="page" [total]="queryCount" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+		</div>
+		<div class="row justify-content-center">
+			<ngb-pagination [collectionSize]="totalItems" [(page)]="page"
+							(pageChange)="loadPage(page)"></ngb-pagination>
+		</div>
+	</div>
+</div>

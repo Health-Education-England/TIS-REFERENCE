@@ -70,7 +70,7 @@ And for the UI, if you have not done so already install http-server, then run:
 
     npm install http-server -g
 
-    http-server /Users/Alex/ws/hee_tis/TIS-CORE-SERVICES/ui-build -p 9088 -d false
+    http-server /Users/Alex/ws/hee_tis/TIS-REFERENCE/ui-build -p 9088 -d false
 
 With the proxy server up and configured, then navigate to [http://local.alxd.com/reference/](http://local.alxd.com/reference/) in your browser.
 

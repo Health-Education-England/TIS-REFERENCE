@@ -1,0 +1,59 @@
+<div>
+	<h2>
+		<span jhiTranslate="referenceApp.fundingType.home.title">Funding Types</span>
+		<button class="btn btn-primary float-right create-funding-type"
+				[routerLink]="['/', { outlets: { popup: ['funding-type-new'] } }]">
+			<span class="fa fa-plus"></span>
+			<span jhiTranslate="referenceApp.fundingType.home.createLabel">
+            Create new Funding Type
+            </span>
+		</button>
+	</h2>
+	<jhi-alert></jhi-alert>
+	<div class="row">
+	</div>
+	<br/>
+	<div class="table-responsive" *ngIf="fundingTypes">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th><span jhiTranslate="global.field.id">ID</span></th>
+				<th><span jhiTranslate="referenceApp.fundingType.code">Code</span></th>
+				<th><span jhiTranslate="referenceApp.fundingType.label">Label</span></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr *ngFor="let fundingType of fundingTypes ;trackBy: trackId">
+				<td><a [routerLink]="['../funding-type', fundingType.id ]">{{fundingType.id}}</a></td>
+				<td>{{fundingType.code}}</td>
+				<td>{{fundingType.label}}</td>
+				<td class="text-right">
+					<div class="btn-group flex-btn-group-container">
+						<button type="submit"
+								[routerLink]="['../funding-type', fundingType.id ]"
+								class="btn btn-info btn-sm">
+							<span class="fa fa-eye"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.view">View</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'funding-type/'+ fundingType.id + '/edit'} }]"
+								replaceUrl="true"
+								class="btn btn-primary btn-sm">
+							<span class="fa fa-pencil"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.edit">Edit</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'funding-type/'+ fundingType.id + '/delete'} }]"
+								replaceUrl="true"
+								class="btn btn-danger btn-sm">
+							<span class="fa fa-remove"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.delete">Delete</span>
+						</button>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

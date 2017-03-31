@@ -1,0 +1,28 @@
+<div *ngIf="status">
+	<h2><span jhiTranslate="referenceApp.status.detail.title">Status</span> {{status.id}}</h2>
+	<hr>
+	<jhi-alert-error></jhi-alert-error>
+	<dl class="row-md jh-entity-details">
+		<dt><span jhiTranslate="referenceApp.status.code">Code</span></dt>
+		<dd>
+			<span>{{status.code}}</span>
+		</dd>
+		<dt><span jhiTranslate="referenceApp.status.label">Label</span></dt>
+		<dd>
+			<span>{{status.label}}</span>
+		</dd>
+	</dl>
+
+	<button type="submit"
+			(click)="previousState()"
+			class="btn btn-info">
+		<span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+	</button>
+
+	<button type="button"
+			[routerLink]="['/', { outlets: { popup: 'status/'+ status.id + '/edit'} }]"
+			replaceUrl="true"
+			class="btn btn-primary">
+		<span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+	</button>
+</div>

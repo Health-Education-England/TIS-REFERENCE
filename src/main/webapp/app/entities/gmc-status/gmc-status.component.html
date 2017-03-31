@@ -1,0 +1,59 @@
+<div>
+	<h2>
+		<span jhiTranslate="referenceApp.gmcStatus.home.title">Gmc Statuses</span>
+		<button class="btn btn-primary float-right create-gmc-status"
+				[routerLink]="['/', { outlets: { popup: ['gmc-status-new'] } }]">
+			<span class="fa fa-plus"></span>
+			<span jhiTranslate="referenceApp.gmcStatus.home.createLabel">
+            Create new Gmc Status
+            </span>
+		</button>
+	</h2>
+	<jhi-alert></jhi-alert>
+	<div class="row">
+	</div>
+	<br/>
+	<div class="table-responsive" *ngIf="gmcStatuses">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th><span jhiTranslate="global.field.id">ID</span></th>
+				<th><span jhiTranslate="referenceApp.gmcStatus.code">Code</span></th>
+				<th><span jhiTranslate="referenceApp.gmcStatus.label">Label</span></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr *ngFor="let gmcStatus of gmcStatuses ;trackBy: trackId">
+				<td><a [routerLink]="['../gmc-status', gmcStatus.id ]">{{gmcStatus.id}}</a></td>
+				<td>{{gmcStatus.code}}</td>
+				<td>{{gmcStatus.label}}</td>
+				<td class="text-right">
+					<div class="btn-group flex-btn-group-container">
+						<button type="submit"
+								[routerLink]="['../gmc-status', gmcStatus.id ]"
+								class="btn btn-info btn-sm">
+							<span class="fa fa-eye"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.view">View</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'gmc-status/'+ gmcStatus.id + '/edit'} }]"
+								replaceUrl="true"
+								class="btn btn-primary btn-sm">
+							<span class="fa fa-pencil"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.edit">Edit</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'gmc-status/'+ gmcStatus.id + '/delete'} }]"
+								replaceUrl="true"
+								class="btn btn-danger btn-sm">
+							<span class="fa fa-remove"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.delete">Delete</span>
+						</button>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

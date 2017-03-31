@@ -1,0 +1,71 @@
+<div>
+	<h2>
+		<span jhiTranslate="referenceApp.localOffice.home.title">Local Offices</span>
+		<button class="btn btn-primary float-right create-local-office"
+				[routerLink]="['/', { outlets: { popup: ['local-office-new'] } }]">
+			<span class="fa fa-plus"></span>
+			<span jhiTranslate="referenceApp.localOffice.home.createLabel">
+            Create new Local Office
+            </span>
+		</button>
+	</h2>
+	<jhi-alert></jhi-alert>
+	<div class="row">
+	</div>
+	<br/>
+	<div class="table-responsive" *ngIf="localOffices">
+		<table class="table table-striped">
+			<thead>
+			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
+				<th jhiSortBy="abbreviation"><span
+						jhiTranslate="referenceApp.localOffice.abbreviation">Abbreviation</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="name"><span jhiTranslate="referenceApp.localOffice.name">Name</span> <span
+						class="fa fa-sort"></span></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr *ngFor="let localOffice of localOffices ;trackBy: trackId">
+				<td><a [routerLink]="['../local-office', localOffice.id ]">{{localOffice.id}}</a></td>
+				<td>{{localOffice.abbreviation}}</td>
+				<td>{{localOffice.name}}</td>
+				<td class="text-right">
+					<div class="btn-group flex-btn-group-container">
+						<button type="submit"
+								[routerLink]="['../local-office', localOffice.id ]"
+								class="btn btn-info btn-sm">
+							<span class="fa fa-eye"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.view">View</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'local-office/'+ localOffice.id + '/edit'} }]"
+								replaceUrl="true"
+								class="btn btn-primary btn-sm">
+							<span class="fa fa-pencil"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.edit">Edit</span>
+						</button>
+						<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'local-office/'+ localOffice.id + '/delete'} }]"
+								replaceUrl="true"
+								class="btn btn-danger btn-sm">
+							<span class="fa fa-remove"></span>
+							<span class="hidden-md-down" jhiTranslate="entity.action.delete">Delete</span>
+						</button>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<div *ngIf="localOffices && localOffices.length">
+		<div class="row justify-content-center">
+			<jhi-item-count [page]="page" [total]="queryCount" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+		</div>
+		<div class="row justify-content-center">
+			<ngb-pagination [collectionSize]="totalItems" [(page)]="page"
+							(pageChange)="loadPage(page)"></ngb-pagination>
+		</div>
+	</div>
+</div>

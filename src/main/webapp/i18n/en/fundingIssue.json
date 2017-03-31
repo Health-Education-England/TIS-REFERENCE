@@ -1,0 +1,21 @@
+{
+  "referenceApp": {
+	"fundingIssue": {
+	  "home": {
+		"title": "Funding Issues",
+		"createLabel": "Create a new Funding Issue",
+		"createOrEditLabel": "Create or edit a Funding Issue"
+	  },
+	  "created": "A new Funding Issue is created with identifier {{ param }}",
+	  "updated": "A Funding Issue is updated with identifier {{ param }}",
+	  "deleted": "A Funding Issue is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Funding Issue {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Funding Issue"
+	  },
+	  "code": "Code"
+	}
+  }
+}

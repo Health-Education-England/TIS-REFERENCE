@@ -1,0 +1,28 @@
+<div *ngIf="medicalSchool">
+	<h2><span jhiTranslate="referenceApp.medicalSchool.detail.title">Medical School</span> {{medicalSchool.id}}</h2>
+	<hr>
+	<jhi-alert-error></jhi-alert-error>
+	<dl class="row-md jh-entity-details">
+		<dt><span jhiTranslate="referenceApp.medicalSchool.code">Code</span></dt>
+		<dd>
+			<span>{{medicalSchool.code}}</span>
+		</dd>
+		<dt><span jhiTranslate="referenceApp.medicalSchool.label">Label</span></dt>
+		<dd>
+			<span>{{medicalSchool.label}}</span>
+		</dd>
+	</dl>
+
+	<button type="submit"
+			(click)="previousState()"
+			class="btn btn-info">
+		<span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+	</button>
+
+	<button type="button"
+			[routerLink]="['/', { outlets: { popup: 'medical-school/'+ medicalSchool.id + '/edit'} }]"
+			replaceUrl="true"
+			class="btn btn-primary">
+		<span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+	</button>
+</div>

@@ -1,0 +1,28 @@
+<div *ngIf="placementType">
+	<h2><span jhiTranslate="referenceApp.placementType.detail.title">Placement Type</span> {{placementType.id}}</h2>
+	<hr>
+	<jhi-alert-error></jhi-alert-error>
+	<dl class="row-md jh-entity-details">
+		<dt><span jhiTranslate="referenceApp.placementType.code">Code</span></dt>
+		<dd>
+			<span>{{placementType.code}}</span>
+		</dd>
+		<dt><span jhiTranslate="referenceApp.placementType.label">Label</span></dt>
+		<dd>
+			<span>{{placementType.label}}</span>
+		</dd>
+	</dl>
+
+	<button type="submit"
+			(click)="previousState()"
+			class="btn btn-info">
+		<span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+	</button>
+
+	<button type="button"
+			[routerLink]="['/', { outlets: { popup: 'placement-type/'+ placementType.id + '/edit'} }]"
+			replaceUrl="true"
+			class="btn btn-primary">
+		<span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+	</button>
+</div>

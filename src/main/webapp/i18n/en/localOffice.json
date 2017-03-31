@@ -1,0 +1,22 @@
+{
+  "referenceApp": {
+	"localOffice": {
+	  "home": {
+		"title": "Local Offices",
+		"createLabel": "Create a new Local Office",
+		"createOrEditLabel": "Create or edit a Local Office"
+	  },
+	  "created": "A new Local Office is created with identifier {{ param }}",
+	  "updated": "A Local Office is updated with identifier {{ param }}",
+	  "deleted": "A Local Office is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Local Office {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Local Office"
+	  },
+	  "abbreviation": "Abbreviation",
+	  "name": "Name"
+	}
+  }
+}

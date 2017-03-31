@@ -1,0 +1,22 @@
+{
+  "referenceApp": {
+	"religiousBelief": {
+	  "home": {
+		"title": "Religious Beliefs",
+		"createLabel": "Create a new Religious Belief",
+		"createOrEditLabel": "Create or edit a Religious Belief"
+	  },
+	  "created": "A new Religious Belief is created with identifier {{ param }}",
+	  "updated": "A Religious Belief is updated with identifier {{ param }}",
+	  "deleted": "A Religious Belief is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Religious Belief {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Religious Belief"
+	  },
+	  "code": "Code",
+	  "label": "Label"
+	}
+  }
+}

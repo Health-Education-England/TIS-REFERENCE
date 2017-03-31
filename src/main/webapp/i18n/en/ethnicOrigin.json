@@ -1,0 +1,21 @@
+{
+  "referenceApp": {
+	"ethnicOrigin": {
+	  "home": {
+		"title": "Ethnic Origins",
+		"createLabel": "Create a new Ethnic Origin",
+		"createOrEditLabel": "Create or edit a Ethnic Origin"
+	  },
+	  "created": "A new Ethnic Origin is created with identifier {{ param }}",
+	  "updated": "A Ethnic Origin is updated with identifier {{ param }}",
+	  "deleted": "A Ethnic Origin is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Ethnic Origin {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Ethnic Origin"
+	  },
+	  "code": "Code"
+	}
+  }
+}

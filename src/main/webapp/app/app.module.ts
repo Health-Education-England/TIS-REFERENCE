@@ -5,7 +5,7 @@ import {Ng2Webstorage} from "ng2-webstorage";
 import {ReferenceSharedModule, UserRouteAccessService} from "./shared";
 import {ReferenceHomeModule} from "./home/home.module";
 import {ReferenceAdminModule} from "./admin/admin.module";
-//import {ReferenceEntityModule} from "./entities/entity.module";
+import {ReferenceEntityModule} from "./entities/entity.module";
 import {
 	LayoutRoutingModule,
 	JhiMainComponent,
@@ -28,7 +28,7 @@ import {PaginationConfig} from "./blocks/config/uib-pagination.config";
 		ReferenceSharedModule,
 		ReferenceHomeModule,
 		ReferenceAdminModule,
-//		ReferenceEntityModule
+		ReferenceEntityModule
 	],
 	declarations: [
 		JhiMainComponent,

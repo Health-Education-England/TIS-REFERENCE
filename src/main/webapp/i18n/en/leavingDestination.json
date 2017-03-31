@@ -1,0 +1,22 @@
+{
+  "referenceApp": {
+	"leavingDestination": {
+	  "home": {
+		"title": "Leaving Destinations",
+		"createLabel": "Create a new Leaving Destination",
+		"createOrEditLabel": "Create or edit a Leaving Destination"
+	  },
+	  "created": "A new Leaving Destination is created with identifier {{ param }}",
+	  "updated": "A Leaving Destination is updated with identifier {{ param }}",
+	  "deleted": "A Leaving Destination is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Leaving Destination {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Leaving Destination"
+	  },
+	  "code": "Code",
+	  "label": "Label"
+	}
+  }
+}

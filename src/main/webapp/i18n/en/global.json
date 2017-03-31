@@ -8,6 +8,37 @@
 	  "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
 	  "entities": {
 		"main": "Entities",
+		"maritalStatus": "Marital Status",
+		"assessmentType": "Assessment Type",
+		"country": "Country",
+		"curriculumSubType": "Curriculum Sub Type",
+		"dbc": "DBC",
+		"ethnicOrigin": "Ethnic Origin",
+		"fundingIssue": "Funding Issue",
+		"fundingType": "Funding Type",
+		"gdcStatus": "Gdc Status",
+		"gender": "Gender",
+		"gmcStatus": "Gmc Status",
+		"grade": "Grade",
+		"inactiveReason": "Inactive Reason",
+		"leavingDestination": "Leaving Destination",
+		"localOffice": "Local Office",
+		"college": "College",
+		"medicalSchool": "Medical School",
+		"nationality": "Nationality",
+		"placementType": "Placement Type",
+		"programmeMembershipType": "Programme Membership Type",
+		"recordType": "Record Type",
+		"religiousBelief": "Religious Belief",
+		"role": "Role",
+		"settled": "Settled",
+		"sexualOrientation": "Sexual Orientation",
+		"site": "Site",
+		"status": "Status",
+		"tariffRate": "Tariff Rate",
+		"title": "Title",
+		"trainingNumberType": "Training Number Type",
+		"trust": "Trust",
 		"jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
 	  },
 	  "account": {
@@ -127,5 +158,5 @@
 	"emailexists": "E-mail is already in use!",
 	"idexists": "A new {{ entityName }} cannot already have an ID"
   },
-  "footer": "REFERENCE V.0.0.2"
+  "footer": "REFERENCE V.2.0.0"
 }

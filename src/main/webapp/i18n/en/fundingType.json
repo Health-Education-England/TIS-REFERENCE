@@ -1,0 +1,22 @@
+{
+  "referenceApp": {
+	"fundingType": {
+	  "home": {
+		"title": "Funding Types",
+		"createLabel": "Create a new Funding Type",
+		"createOrEditLabel": "Create or edit a Funding Type"
+	  },
+	  "created": "A new Funding Type is created with identifier {{ param }}",
+	  "updated": "A Funding Type is updated with identifier {{ param }}",
+	  "deleted": "A Funding Type is deleted with identifier {{ param }}",
+	  "delete": {
+		"question": "Are you sure you want to delete Funding Type {{ id }}?"
+	  },
+	  "detail": {
+		"title": "Funding Type"
+	  },
+	  "code": "Code",
+	  "label": "Label"
+	}
+  }
+}
