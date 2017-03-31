@@ -2,7 +2,7 @@
 
 	<div class="modal-header">
 		<h4 class="modal-title" id="myProgrammeMembershipLabel"
-			jhiTranslate="tcsApp.programmeMembership.home.createOrEditLabel">Create or edit a Programme Membership</h4>
+			jhiTranslate="referenceApp.programmeMembership.home.createOrEditLabel">Create or edit a Programme Membership</h4>
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
 				(click)="clear()">&times;</button>
 	</div>
@@ -14,26 +14,26 @@
 				   [(ngModel)]="programmeMembership.id" readonly/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeMembershipType"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeMembershipType"
 				   for="field_programmeMembershipType">Programme Membership Type</label>
 			<select class="form-control" name="programmeMembershipType"
 					[(ngModel)]="programmeMembership.programmeMembershipType" id="field_programmeMembershipType">
-				<option value="SUBSTANTIVE" jhiTranslate="tcsApp.ProgrammeMembershipType.SUBSTANTIVE">SUBSTANTIVE
+				<option value="SUBSTANTIVE" jhiTranslate="referenceApp.ProgrammeMembershipType.SUBSTANTIVE">SUBSTANTIVE
 				</option>
-				<option value="LAT" jhiTranslate="tcsApp.ProgrammeMembershipType.LAT">LAT</option>
-				<option value="FTSTA" jhiTranslate="tcsApp.ProgrammeMembershipType.FTSTA">FTSTA</option>
-				<option value="MILITARY" jhiTranslate="tcsApp.ProgrammeMembershipType.MILITARY">MILITARY</option>
-				<option value="VISITOR" jhiTranslate="tcsApp.ProgrammeMembershipType.VISITOR">VISITOR</option>
+				<option value="LAT" jhiTranslate="referenceApp.ProgrammeMembershipType.LAT">LAT</option>
+				<option value="FTSTA" jhiTranslate="referenceApp.ProgrammeMembershipType.FTSTA">FTSTA</option>
+				<option value="MILITARY" jhiTranslate="referenceApp.ProgrammeMembershipType.MILITARY">MILITARY</option>
+				<option value="VISITOR" jhiTranslate="referenceApp.ProgrammeMembershipType.VISITOR">VISITOR</option>
 			</select>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.rotation" for="field_rotation">Rotation</label>
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.rotation" for="field_rotation">Rotation</label>
 			<input type="text" class="form-control" name="rotation" id="field_rotation"
 				   [(ngModel)]="programmeMembership.rotation"
 			/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumStartDate"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumStartDate"
 				   for="field_curriculumStartDate">Curriculum Start Date</label>
 			<div class="input-group">
 				<input id="field_curriculumStartDate" type="text" class="form-control" name="curriculumStartDate"
@@ -47,7 +47,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumEndDate"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumEndDate"
 				   for="field_curriculumEndDate">Curriculum End Date</label>
 			<div class="input-group">
 				<input id="field_curriculumEndDate" type="text" class="form-control" name="curriculumEndDate"
@@ -61,14 +61,14 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.periodOfGrace"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.periodOfGrace"
 				   for="field_periodOfGrace">Period Of Grace</label>
 			<input type="number" class="form-control" name="periodOfGrace" id="field_periodOfGrace"
 				   [(ngModel)]="programmeMembership.periodOfGrace"
 			/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeStartDate"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeStartDate"
 				   for="field_programmeStartDate">Programme Start Date</label>
 			<div class="input-group">
 				<input id="field_programmeStartDate" type="text" class="form-control" name="programmeStartDate"
@@ -82,7 +82,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumCompletionDate"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumCompletionDate"
 				   for="field_curriculumCompletionDate">Curriculum Completion Date</label>
 			<div class="input-group">
 				<input id="field_curriculumCompletionDate" type="text" class="form-control"
@@ -96,7 +96,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeEndDate"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeEndDate"
 				   for="field_programmeEndDate">Programme End Date</label>
 			<div class="input-group">
 				<input id="field_programmeEndDate" type="text" class="form-control" name="programmeEndDate"
@@ -110,7 +110,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.leavingDestination"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.leavingDestination"
 				   for="field_leavingDestination">Leaving Destination</label>
 			<input type="text" class="form-control" name="leavingDestination" id="field_leavingDestination"
 				   [(ngModel)]="programmeMembership.leavingDestination"
@@ -118,7 +118,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programme" for="field_programme">Programme</label>
+			<label class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programme" for="field_programme">Programme</label>
 			<select class="form-control" id="field_programme" name="programme"
 					[(ngModel)]="programmeMembership.programmeId">
 				<option [ngValue]="null"></option>
@@ -128,7 +128,7 @@
 			</select>
 		</div>
 		<div class="form-group">
-			<label class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculum" for="field_curriculum">Curriculum</label>
+			<label class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculum" for="field_curriculum">Curriculum</label>
 			<select class="form-control" id="field_curriculum" name="curriculum"
 					[(ngModel)]="programmeMembership.curriculumId">
 				<option [ngValue]="null"></option>
@@ -138,7 +138,7 @@
 			</select>
 		</div>
 		<div class="form-group">
-			<label class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.trainingNumber" for="field_trainingNumber">Training
+			<label class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.trainingNumber" for="field_trainingNumber">Training
 				Number</label>
 			<select class="form-control" id="field_trainingNumber" name="trainingNumber"
 					[(ngModel)]="programmeMembership.trainingNumberId">

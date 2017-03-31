@@ -1,10 +1,10 @@
 <div>
 	<h2>
-		<span jhiTranslate="tcsApp.curriculum.home.title">Curricula</span>
+		<span jhiTranslate="referenceApp.curriculum.home.title">Curricula</span>
 		<button class="btn tis-btn-nhs-blue float-right create-curriculum-tis-programmes"
 				[routerLink]="['/', { outlets: { popup: ['curriculum-tis-programmes-new'] } }]">
 			<span class="fa fa-plus"></span>
-			<span jhiTranslate="tcsApp.curriculum.home.createLabel">
+			<span jhiTranslate="referenceApp.curriculum.home.createLabel">
             Create new Curriculum
             </span>
 		</button>
@@ -18,24 +18,24 @@
 			<thead>
 			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
-				<th jhiSortBy="name"><span jhiTranslate="tcsApp.curriculum.name">Name</span> <span
+				<th jhiSortBy="name"><span jhiTranslate="referenceApp.curriculum.name">Name</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="start"><span jhiTranslate="tcsApp.curriculum.start">Start</span> <span
+				<th jhiSortBy="start"><span jhiTranslate="referenceApp.curriculum.start">Start</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="end"><span jhiTranslate="tcsApp.curriculum.end">End</span> <span
+				<th jhiSortBy="end"><span jhiTranslate="referenceApp.curriculum.end">End</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="curriculumSubType"><span jhiTranslate="tcsApp.curriculum.curriculumSubType">Curriculum Sub Type</span>
+				<th jhiSortBy="curriculumSubType"><span jhiTranslate="referenceApp.curriculum.curriculumSubType">Curriculum Sub Type</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="assessmentType"><span
-						jhiTranslate="tcsApp.curriculum.assessmentType">Assessment Type</span> <span
+						jhiTranslate="referenceApp.curriculum.assessmentType">Assessment Type</span> <span
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="doesThisCurriculumLeadToCct"><span
-						jhiTranslate="tcsApp.curriculum.doesThisCurriculumLeadToCct">Does This Curriculum Lead To Cct</span>
+						jhiTranslate="referenceApp.curriculum.doesThisCurriculumLeadToCct">Does This Curriculum Lead To Cct</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="periodOfGrace"><span
-						jhiTranslate="tcsApp.curriculum.periodOfGrace">Period Of Grace</span> <span
+						jhiTranslate="referenceApp.curriculum.periodOfGrace">Period Of Grace</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="specialtyId"><span jhiTranslate="tcsApp.curriculum.specialty">Specialty</span> <span
+				<th jhiSortBy="specialtyId"><span jhiTranslate="referenceApp.curriculum.specialty">Specialty</span> <span
 						class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
@@ -46,10 +46,10 @@
 				<td>{{curriculum.name}}</td>
 				<td>{{curriculum.start | date:'mediumDate'}}</td>
 				<td>{{curriculum.end | date:'mediumDate'}}</td>
-				<td jhiTranslate="{{'tcsApp.CurriculumSubType.' + curriculum.curriculumSubType}}">
+				<td jhiTranslate="{{'referenceApp.CurriculumSubType.' + curriculum.curriculumSubType}}">
 					{{curriculum.curriculumSubType}}
 				</td>
-				<td jhiTranslate="{{'tcsApp.AssessmentType.' + curriculum.assessmentType}}">
+				<td jhiTranslate="{{'referenceApp.AssessmentType.' + curriculum.assessmentType}}">
 					{{curriculum.assessmentType}}
 				</td>
 				<td>{{curriculum.doesThisCurriculumLeadToCct}}</td>

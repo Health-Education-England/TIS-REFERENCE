@@ -16,14 +16,14 @@
 
 spring:
     application:
-        name: tcs
+        name: reference
     jackson:
         serialization.write_dates_as_timestamps: false
     cache:
         type: none
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:mem:tcs;DB_CLOSE_DELAY=-1;IGNORECASE=TRUE;MODE=MySQL
+        url: jdbc:h2:mem:reference;DB_CLOSE_DELAY=-1;IGNORECASE=TRUE;MODE=MySQL
         name:
         username: sa
         password:
@@ -67,7 +67,7 @@ flyway:
     placeholder-replacement:
     placeholder-suffix:
     placeholders.*:
-    schemas: ${DBNAME:tcs}
+    schemas: ${DBNAME:reference}
     sql-migration-prefix: V
     sql-migration-separator:
     sql-migration-suffix: .sql

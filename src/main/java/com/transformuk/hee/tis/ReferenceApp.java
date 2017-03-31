@@ -22,13 +22,13 @@ import java.util.Collection;
 @ComponentScan
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
 @EnableConfigurationProperties({ApplicationProperties.class})
-public class TcsApp {
+public class ReferenceApp {
 
-	private static final Logger log = LoggerFactory.getLogger(TcsApp.class);
+	private static final Logger log = LoggerFactory.getLogger(ReferenceApp.class);
 
 	private final Environment env;
 
-	public TcsApp(Environment env) {
+	public ReferenceApp(Environment env) {
 		this.env = env;
 	}
 
@@ -39,7 +39,7 @@ public class TcsApp {
 	 * @throws UnknownHostException if the local host name could not be resolved into an address
 	 */
 	public static void main(String[] args) throws UnknownHostException {
-		SpringApplication app = new SpringApplication(TcsApp.class);
+		SpringApplication app = new SpringApplication(ReferenceApp.class);
 		DefaultProfileUtil.addDefaultProfile(app);
 		Environment env = app.run(args).getEnvironment();
 		String protocol = "http";
@@ -61,7 +61,7 @@ public class TcsApp {
 	}
 
 	/**
-	 * Initializes tcs.
+	 * Initializes reference.
 	 * <p>
 	 * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
 	 * <p>

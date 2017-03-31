@@ -1,6 +1,6 @@
 import {NgModule, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {RouterModule} from "@angular/router";
-import {TcsSharedModule} from "../../shared";
+import {ReferenceSharedModule} from "../../shared";
 import {
 	GradeTisProgrammesService,
 	GradeTisProgrammesPopupService,
@@ -21,7 +21,7 @@ let ENTITY_STATES = [
 
 @NgModule({
 	imports: [
-		TcsSharedModule,
+		ReferenceSharedModule,
 		RouterModule.forRoot(ENTITY_STATES, {useHash: true})
 	],
 	declarations: [
@@ -45,5 +45,5 @@ let ENTITY_STATES = [
 	],
 	schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class TcsGradeTisProgrammesModule {
+export class ReferenceGradeTisProgrammesModule {
 }

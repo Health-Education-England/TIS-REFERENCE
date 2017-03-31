@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.ProgrammeMembership;
 import com.transformuk.hee.tis.domain.enumeration.ProgrammeMembershipType;
 import com.transformuk.hee.tis.repository.ProgrammeMembershipRepository;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see ProgrammeMembershipResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class ProgrammeMembershipResourceIntTest {
 
 	private static final ProgrammeMembershipType DEFAULT_PROGRAMME_MEMBERSHIP_TYPE = ProgrammeMembershipType.SUBSTANTIVE;

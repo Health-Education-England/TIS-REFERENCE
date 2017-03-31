@@ -1,10 +1,10 @@
 <div>
 	<h2>
-		<span jhiTranslate="tcsApp.specialty.home.title">Specialties</span>
+		<span jhiTranslate="referenceApp.specialty.home.title">Specialties</span>
 		<button class="btn tis-btn-nhs-blue float-right create-specialty-tis-programmes"
 				[routerLink]="['/', { outlets: { popup: ['specialty-tis-programmes-new'] } }]">
 			<span class="fa fa-plus"></span>
-			<span jhiTranslate="tcsApp.specialty.home.createLabel">
+			<span jhiTranslate="referenceApp.specialty.home.createLabel">
             Create new Specialty
             </span>
 		</button>
@@ -18,16 +18,16 @@
 			<thead>
 			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
-				<th jhiSortBy="status"><span jhiTranslate="tcsApp.specialty.status">Status</span> <span
+				<th jhiSortBy="status"><span jhiTranslate="referenceApp.specialty.status">Status</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="college"><span jhiTranslate="tcsApp.specialty.college">College</span> <span
+				<th jhiSortBy="college"><span jhiTranslate="referenceApp.specialty.college">College</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="nhsSpecialtyCode"><span jhiTranslate="tcsApp.specialty.nhsSpecialtyCode">Nhs Specialty Code</span>
+				<th jhiSortBy="nhsSpecialtyCode"><span jhiTranslate="referenceApp.specialty.nhsSpecialtyCode">Nhs Specialty Code</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="specialtyType"><span jhiTranslate="tcsApp.specialty.specialtyType">Specialty Type</span>
+				<th jhiSortBy="specialtyType"><span jhiTranslate="referenceApp.specialty.specialtyType">Specialty Type</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="specialtyGroupId"><span
-						jhiTranslate="tcsApp.specialty.specialtyGroup">Specialty Group</span> <span
+						jhiTranslate="referenceApp.specialty.specialtyGroup">Specialty Group</span> <span
 						class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
@@ -35,10 +35,10 @@
 			<tbody>
 			<tr *ngFor="let specialty of specialties ;trackBy: trackId">
 				<td><a [routerLink]="['../specialty-tis-programmes', specialty.id ]">{{specialty.id}}</a></td>
-				<td jhiTranslate="{{'tcsApp.Status.' + specialty.status}}">{{specialty.status}}</td>
+				<td jhiTranslate="{{'referenceApp.Status.' + specialty.status}}">{{specialty.status}}</td>
 				<td>{{specialty.college}}</td>
 				<td>{{specialty.nhsSpecialtyCode}}</td>
-				<td jhiTranslate="{{'tcsApp.SpecialtyType.' + specialty.specialtyType}}">{{specialty.specialtyType}}
+				<td jhiTranslate="{{'referenceApp.SpecialtyType.' + specialty.specialtyType}}">{{specialty.specialtyType}}
 				</td>
 				<td>
 					<div *ngIf="specialty.specialtyGroupId">

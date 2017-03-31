@@ -1,10 +1,10 @@
 <div>
 	<h2>
-		<span jhiTranslate="tcsApp.programme.home.title">Programmes</span>
+		<span jhiTranslate="referenceApp.programme.home.title">Programmes</span>
 		<button class="btn tis-btn-nhs-blue float-right create-programme-tis-programmes"
 				[routerLink]="['/', { outlets: { popup: ['programme-tis-programmes-new'] } }]">
 			<span class="fa fa-plus"></span>
-			<span jhiTranslate="tcsApp.programme.home.createLabel">
+			<span jhiTranslate="referenceApp.programme.home.createLabel">
             Create new Programme
             </span>
 		</button>
@@ -18,17 +18,17 @@
 			<thead>
 			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
-				<th jhiSortBy="status"><span jhiTranslate="tcsApp.programme.status">Status</span> <span
+				<th jhiSortBy="status"><span jhiTranslate="referenceApp.programme.status">Status</span> <span
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="managingDeanery"><span
-						jhiTranslate="tcsApp.programme.managingDeanery">Managing Deanery</span> <span
+						jhiTranslate="referenceApp.programme.managingDeanery">Managing Deanery</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="programmeName"><span jhiTranslate="tcsApp.programme.programmeName">Programme Name</span>
+				<th jhiSortBy="programmeName"><span jhiTranslate="referenceApp.programme.programmeName">Programme Name</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="programmeNumber"><span
-						jhiTranslate="tcsApp.programme.programmeNumber">Programme Number</span> <span
+						jhiTranslate="referenceApp.programme.programmeNumber">Programme Number</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="leadProvider"><span jhiTranslate="tcsApp.programme.leadProvider">Lead Provider</span>
+				<th jhiSortBy="leadProvider"><span jhiTranslate="referenceApp.programme.leadProvider">Lead Provider</span>
 					<span class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
@@ -36,7 +36,7 @@
 			<tbody>
 			<tr *ngFor="let programme of programmes ;trackBy: trackId">
 				<td><a [routerLink]="['../programme-tis-programmes', programme.id ]">{{programme.id}}</a></td>
-				<td jhiTranslate="{{'tcsApp.Status.' + programme.status}}">{{programme.status}}</td>
+				<td jhiTranslate="{{'referenceApp.Status.' + programme.status}}">{{programme.status}}</td>
 				<td>{{programme.managingDeanery}}</td>
 				<td>{{programme.programmeName}}</td>
 				<td>{{programme.programmeNumber}}</td>

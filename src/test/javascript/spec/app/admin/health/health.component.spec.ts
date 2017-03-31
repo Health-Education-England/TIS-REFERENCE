@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed, async} from "@angular/core/testing";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {TcsTestModule} from "../../../test.module";
+import {ReferenceTestModule} from "../../../test.module";
 import {JhiHealthCheckComponent} from "../../../../../../main/webapp/app/admin/health/health.component";
 import {JhiHealthService} from "../../../../../../main/webapp/app/admin/health/health.service";
 
@@ -15,7 +15,7 @@ describe('Component Tests', () => {
 
 		beforeEach(async(() => {
 			TestBed.configureTestingModule({
-				imports: [TcsTestModule],
+				imports: [ReferenceTestModule],
 				declarations: [JhiHealthCheckComponent],
 				providers: [
 					JhiHealthService,

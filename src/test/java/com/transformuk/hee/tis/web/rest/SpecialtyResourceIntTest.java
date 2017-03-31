@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.Specialty;
 import com.transformuk.hee.tis.domain.enumeration.SpecialtyType;
 import com.transformuk.hee.tis.domain.enumeration.Status;
@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see SpecialtyResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class SpecialtyResourceIntTest {
 
 	private static final Status DEFAULT_STATUS = Status.CURRENT;

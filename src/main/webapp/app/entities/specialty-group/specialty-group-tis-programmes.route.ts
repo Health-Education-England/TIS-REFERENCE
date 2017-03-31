@@ -11,14 +11,14 @@ export const specialtyGroupRoute: Routes = [
 		component: SpecialtyGroupTisProgrammesComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.specialtyGroup.home.title'
+			pageTitle: 'referenceApp.specialtyGroup.home.title'
 		}
 	}, {
 		path: 'specialty-group-tis-programmes/:id',
 		component: SpecialtyGroupTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.specialtyGroup.home.title'
+			pageTitle: 'referenceApp.specialtyGroup.home.title'
 		}
 	}
 ];
@@ -29,7 +29,7 @@ export const specialtyGroupPopupRoute: Routes = [
 		component: SpecialtyGroupTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.specialtyGroup.home.title'
+			pageTitle: 'referenceApp.specialtyGroup.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -38,7 +38,7 @@ export const specialtyGroupPopupRoute: Routes = [
 		component: SpecialtyGroupTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.specialtyGroup.home.title'
+			pageTitle: 'referenceApp.specialtyGroup.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -47,7 +47,7 @@ export const specialtyGroupPopupRoute: Routes = [
 		component: SpecialtyGroupTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.specialtyGroup.home.title'
+			pageTitle: 'referenceApp.specialtyGroup.home.title'
 		},
 		outlet: 'popup'
 	}

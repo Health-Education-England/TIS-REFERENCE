@@ -1,12 +1,12 @@
 {
   "project": {
 	"version": "1.0.0-beta.24",
-	"name": "tcs"
+	"name": "reference"
   },
   "apps": [
 	{
 	  "root": "src/main/webapp/",
-	  "outDir": "ui-build/tcs/app",
+	  "outDir": "ui-build/reference/app",
 	  "assets": [
 		"content",
 		"favicon.ico"

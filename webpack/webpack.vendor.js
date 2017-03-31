@@ -51,13 +51,13 @@ module.exports = {
 	},
 	output: {
 		filename: '[name].dll.js',
-		path: './ui-build/tcs',
+		path: './ui-build/reference',
 		library: '[name]'
 	},
 	plugins: [
 		new webpack.DllPlugin({
 			name: '[name]',
-			path: './ui-build/tcs/[name].json'
+			path: './ui-build/reference/[name].json'
 		})
 	]
 };

@@ -1,6 +1,6 @@
 import {NgModule, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {RouterModule} from "@angular/router";
-import {TcsSharedModule} from "../shared";
+import {ReferenceSharedModule} from "../shared";
 import {
 	adminState,
 	LogsComponent,
@@ -19,7 +19,7 @@ import {
 
 @NgModule({
 	imports: [
-		TcsSharedModule,
+		ReferenceSharedModule,
 		RouterModule.forRoot(adminState, {useHash: true})
 	],
 	declarations: [
@@ -43,5 +43,5 @@ import {
 	],
 	schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class TcsAdminModule {
+export class ReferenceAdminModule {
 }

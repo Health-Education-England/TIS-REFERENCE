@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
 
 	<div class="modal-header">
-		<h4 class="modal-title" id="myCurriculumLabel" jhiTranslate="tcsApp.curriculum.home.createOrEditLabel">Create or
+		<h4 class="modal-title" id="myCurriculumLabel" jhiTranslate="referenceApp.curriculum.home.createOrEditLabel">Create or
 			edit a Curriculum</h4>
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
 				(click)="clear()">&times;</button>
@@ -14,13 +14,13 @@
 					[(ngModel)]="curriculum.id" readonly/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.name" for="field_name">Name</label>
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.name" for="field_name">Name</label>
 			<input type="text" class="form-control" name="name" id="field_name"
 					[(ngModel)]="curriculum.name"
 			/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.start" for="field_start">Start</label>
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.start" for="field_start">Start</label>
 			<div class="input-group">
 				<input id="field_start" type="text" class="form-control" name="start" ngbDatepicker
 					#startDp="ngbDatepicker" [(ngModel)]="curriculum.start"
@@ -32,7 +32,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.end" for="field_end">End</label>
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.end" for="field_end">End</label>
 			<div class="input-group">
 				<input id="field_end" type="text" class="form-control" name="end" ngbDatepicker #endDp="ngbDatepicker"
 					[(ngModel)]="curriculum.end"
@@ -44,63 +44,63 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.curriculumSubType"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.curriculumSubType"
 					for="field_curriculumSubType">Curriculum Sub Type</label>
 			<select class="form-control" name="curriculumSubType" [(ngModel)]="curriculum.curriculumSubType"
 					id="field_curriculumSubType">
-				<option value="MEDICAL_CURRICULUM" jhiTranslate="tcsApp.CurriculumSubType.MEDICAL_CURRICULUM">
+				<option value="MEDICAL_CURRICULUM" jhiTranslate="referenceApp.CurriculumSubType.MEDICAL_CURRICULUM">
 					MEDICAL_CURRICULUM
 				</option>
-				<option value="MEDICAL_SPR" jhiTranslate="tcsApp.CurriculumSubType.MEDICAL_SPR">MEDICAL_SPR</option>
-				<option value="DENTAL_CURRICULUM" jhiTranslate="tcsApp.CurriculumSubType.DENTAL_CURRICULUM">
+				<option value="MEDICAL_SPR" jhiTranslate="referenceApp.CurriculumSubType.MEDICAL_SPR">MEDICAL_SPR</option>
+				<option value="DENTAL_CURRICULUM" jhiTranslate="referenceApp.CurriculumSubType.DENTAL_CURRICULUM">
 					DENTAL_CURRICULUM
 				</option>
-				<option value="DENTAL_SPR" jhiTranslate="tcsApp.CurriculumSubType.DENTAL_SPR">DENTAL_SPR</option>
-				<option value="SUB_SPECIALTY" jhiTranslate="tcsApp.CurriculumSubType.SUB_SPECIALTY">SUB_SPECIALTY
+				<option value="DENTAL_SPR" jhiTranslate="referenceApp.CurriculumSubType.DENTAL_SPR">DENTAL_SPR</option>
+				<option value="SUB_SPECIALTY" jhiTranslate="referenceApp.CurriculumSubType.SUB_SPECIALTY">SUB_SPECIALTY
 				</option>
-				<option value="DENTAL_POST_CCST" jhiTranslate="tcsApp.CurriculumSubType.DENTAL_POST_CCST">
+				<option value="DENTAL_POST_CCST" jhiTranslate="referenceApp.CurriculumSubType.DENTAL_POST_CCST">
 					DENTAL_POST_CCST
 				</option>
-				<option value="ACF_OTHER_FUNDING" jhiTranslate="tcsApp.CurriculumSubType.ACF_OTHER_FUNDING">
+				<option value="ACF_OTHER_FUNDING" jhiTranslate="referenceApp.CurriculumSubType.ACF_OTHER_FUNDING">
 					ACF_OTHER_FUNDING
 				</option>
-				<option value="ACL" jhiTranslate="tcsApp.CurriculumSubType.ACL">ACL</option>
-				<option value="AFT" jhiTranslate="tcsApp.CurriculumSubType.AFT">AFT</option>
-				<option value="ACL_OTHER_FUNDING" jhiTranslate="tcsApp.CurriculumSubType.ACL_OTHER_FUNDING">
+				<option value="ACL" jhiTranslate="referenceApp.CurriculumSubType.ACL">ACL</option>
+				<option value="AFT" jhiTranslate="referenceApp.CurriculumSubType.AFT">AFT</option>
+				<option value="ACL_OTHER_FUNDING" jhiTranslate="referenceApp.CurriculumSubType.ACL_OTHER_FUNDING">
 					ACL_OTHER_FUNDING
 				</option>
-				<option value="CLINICAL_LECTURER" jhiTranslate="tcsApp.CurriculumSubType.CLINICAL_LECTURER">
+				<option value="CLINICAL_LECTURER" jhiTranslate="referenceApp.CurriculumSubType.CLINICAL_LECTURER">
 					CLINICAL_LECTURER
 				</option>
 				<option value="CLINICAL_TEACHING_FELLOW"
-						jhiTranslate="tcsApp.CurriculumSubType.CLINICAL_TEACHING_FELLOW">CLINICAL_TEACHING_FELLOW
+						jhiTranslate="referenceApp.CurriculumSubType.CLINICAL_TEACHING_FELLOW">CLINICAL_TEACHING_FELLOW
 				</option>
 				<option value="CLINICAL_RESEARCH_FELLOW"
-						jhiTranslate="tcsApp.CurriculumSubType.CLINICAL_RESEARCH_FELLOW">CLINICAL_RESEARCH_FELLOW
+						jhiTranslate="referenceApp.CurriculumSubType.CLINICAL_RESEARCH_FELLOW">CLINICAL_RESEARCH_FELLOW
 				</option>
-				<option value="ACFNIHR_FUNDING" jhiTranslate="tcsApp.CurriculumSubType.ACFNIHR_FUNDING">
+				<option value="ACFNIHR_FUNDING" jhiTranslate="referenceApp.CurriculumSubType.ACFNIHR_FUNDING">
 					ACFNIHR_FUNDING
 				</option>
-				<option value="ACLNIHR_FUNDING" jhiTranslate="tcsApp.CurriculumSubType.ACLNIHR_FUNDING">
+				<option value="ACLNIHR_FUNDING" jhiTranslate="referenceApp.CurriculumSubType.ACLNIHR_FUNDING">
 					ACLNIHR_FUNDING
 				</option>
-				<option value="OTHER_FELLOWSHIP" jhiTranslate="tcsApp.CurriculumSubType.OTHER_FELLOWSHIP">
+				<option value="OTHER_FELLOWSHIP" jhiTranslate="referenceApp.CurriculumSubType.OTHER_FELLOWSHIP">
 					OTHER_FELLOWSHIP
 				</option>
 			</select>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.assessmentType"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.assessmentType"
 				   for="field_assessmentType">Assessment Type</label>
 			<select class="form-control" name="assessmentType" [(ngModel)]="curriculum.assessmentType"
 					id="field_assessmentType">
-				<option value="ARCP" jhiTranslate="tcsApp.AssessmentType.ARCP">ARCP</option>
-				<option value="RITA" jhiTranslate="tcsApp.AssessmentType.RITA">RITA</option>
-				<option value="ACADEMIC" jhiTranslate="tcsApp.AssessmentType.ACADEMIC">ACADEMIC</option>
+				<option value="ARCP" jhiTranslate="referenceApp.AssessmentType.ARCP">ARCP</option>
+				<option value="RITA" jhiTranslate="referenceApp.AssessmentType.RITA">RITA</option>
+				<option value="ACADEMIC" jhiTranslate="referenceApp.AssessmentType.ACADEMIC">ACADEMIC</option>
 			</select>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.doesThisCurriculumLeadToCct"
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.doesThisCurriculumLeadToCct"
 				   for="field_doesThisCurriculumLeadToCct">Does This Curriculum Lead To Cct</label>
 			<input type="checkbox" class="form-control" name="doesThisCurriculumLeadToCct"
 				   id="field_doesThisCurriculumLeadToCct"
@@ -108,7 +108,7 @@
 			/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.curriculum.periodOfGrace" for="field_periodOfGrace">Period
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.curriculum.periodOfGrace" for="field_periodOfGrace">Period
 				Of Grace</label>
 			<input type="number" class="form-control" name="periodOfGrace" id="field_periodOfGrace"
 					[(ngModel)]="curriculum.periodOfGrace"
@@ -116,7 +116,7 @@
 		</div>
 
 		<div class="form-group">
-			<label jhiTranslate="tcsApp.curriculum.grade" class="front-nhs-lb" for="field_grade">Grade</label>
+			<label jhiTranslate="referenceApp.curriculum.grade" class="front-nhs-lb" for="field_grade">Grade</label>
 			<select class="form-control" id="field_grade" multiple name="grade" [(ngModel)]="curriculum.grades">
 				<option [ngValue]="getSelected(curriculum.grades, gradeOption)"
 						*ngFor="let gradeOption of grades; trackBy: trackGradeById">{{gradeOption.id}}
@@ -124,7 +124,7 @@
 			</select>
 		</div>
 		<div class="form-group">
-			<label jhiTranslate="tcsApp.curriculum.specialty" class="front-nhs-lb" for="field_specialty">Specialty</label>
+			<label jhiTranslate="referenceApp.curriculum.specialty" class="front-nhs-lb" for="field_specialty">Specialty</label>
 			<select class="form-control" id="field_specialty" name="specialty" [(ngModel)]="curriculum.specialtyId">
 				<option [ngValue]="null"></option>
 				<option [ngValue]="specialtyOption.id"

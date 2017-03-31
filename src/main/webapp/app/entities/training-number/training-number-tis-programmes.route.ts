@@ -11,14 +11,14 @@ export const trainingNumberRoute: Routes = [
 		component: TrainingNumberTisProgrammesComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.trainingNumber.home.title'
+			pageTitle: 'referenceApp.trainingNumber.home.title'
 		}
 	}, {
 		path: 'training-number-tis-programmes/:id',
 		component: TrainingNumberTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.trainingNumber.home.title'
+			pageTitle: 'referenceApp.trainingNumber.home.title'
 		}
 	}
 ];
@@ -29,7 +29,7 @@ export const trainingNumberPopupRoute: Routes = [
 		component: TrainingNumberTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.trainingNumber.home.title'
+			pageTitle: 'referenceApp.trainingNumber.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -38,7 +38,7 @@ export const trainingNumberPopupRoute: Routes = [
 		component: TrainingNumberTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.trainingNumber.home.title'
+			pageTitle: 'referenceApp.trainingNumber.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -47,7 +47,7 @@ export const trainingNumberPopupRoute: Routes = [
 		component: TrainingNumberTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.trainingNumber.home.title'
+			pageTitle: 'referenceApp.trainingNumber.home.title'
 		},
 		outlet: 'popup'
 	}

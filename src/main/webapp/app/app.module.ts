@@ -2,10 +2,10 @@ import "./vendor.ts";
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {Ng2Webstorage} from "ng2-webstorage";
-import {TcsSharedModule, UserRouteAccessService} from "./shared";
-import {TcsHomeModule} from "./home/home.module";
-import {TcsAdminModule} from "./admin/admin.module";
-import {TcsEntityModule} from "./entities/entity.module";
+import {ReferenceSharedModule, UserRouteAccessService} from "./shared";
+import {ReferenceHomeModule} from "./home/home.module";
+import {ReferenceAdminModule} from "./admin/admin.module";
+import {ReferenceEntityModule} from "./entities/entity.module";
 import {
 	LayoutRoutingModule,
 	JhiMainComponent,
@@ -25,10 +25,10 @@ import {PaginationConfig} from "./blocks/config/uib-pagination.config";
 		BrowserModule,
 		LayoutRoutingModule,
 		Ng2Webstorage.forRoot({prefix: 'jhi', separator: '-'}),
-		TcsSharedModule,
-		TcsHomeModule,
-		TcsAdminModule,
-		TcsEntityModule
+		ReferenceSharedModule,
+		ReferenceHomeModule,
+		ReferenceAdminModule,
+		ReferenceEntityModule
 	],
 	declarations: [
 		JhiMainComponent,
@@ -48,5 +48,5 @@ import {PaginationConfig} from "./blocks/config/uib-pagination.config";
 	],
 	bootstrap: [JhiMainComponent]
 })
-export class TcsAppModule {
+export class ReferenceAppModule {
 }

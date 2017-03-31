@@ -32,14 +32,14 @@ export const programmeRoute: Routes = [
 		},
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programme.home.title'
+			pageTitle: 'referenceApp.programme.home.title'
 		}
 	}, {
 		path: 'programme-tis-programmes/:id',
 		component: ProgrammeTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programme.home.title'
+			pageTitle: 'referenceApp.programme.home.title'
 		}
 	}
 ];
@@ -50,7 +50,7 @@ export const programmePopupRoute: Routes = [
 		component: ProgrammeTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programme.home.title'
+			pageTitle: 'referenceApp.programme.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -59,7 +59,7 @@ export const programmePopupRoute: Routes = [
 		component: ProgrammeTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programme.home.title'
+			pageTitle: 'referenceApp.programme.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -68,7 +68,7 @@ export const programmePopupRoute: Routes = [
 		component: ProgrammeTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programme.home.title'
+			pageTitle: 'referenceApp.programme.home.title'
 		},
 		outlet: 'popup'
 	}

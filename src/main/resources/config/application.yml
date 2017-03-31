@@ -23,7 +23,7 @@ management:
             enabled: false # When using the MailService, configure an SMTP server and set this to true
 spring:
     application:
-        name: tcs
+        name: reference
     profiles:
         # The commented value for `active` can be replaced with valid Spring profiles to load.
         # Otherwise, it will be filled in by maven when building the WAR file
@@ -61,7 +61,7 @@ flyway:
     placeholder-replacement:
     placeholder-suffix:
     placeholders.*:
-    schemas: ${DBNAME:tcs}
+    schemas: ${DBNAME:reference}
     sql-migration-prefix: V
     sql-migration-separator:
     sql-migration-suffix: .sql
@@ -82,7 +82,7 @@ server:
     session:
         cookie:
             http-only: true
-    context-path: /tcs
+    context-path: /reference
 
 info:
     project:
@@ -109,8 +109,8 @@ jhipster:
         #max-age: 1800
     swagger:
         default-include-pattern: /api/.*
-        title: tcs API
-        description: tcs API documentation
+        title: reference API
+        description: reference API documentation
         version: 0.0.1
         terms-of-service-url:
         contact-name:

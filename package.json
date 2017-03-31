@@ -1,7 +1,7 @@
 {
-  "name": "tcs",
+  "name": "reference",
   "version": "0.0.0",
-  "description": "Description for tcs",
+  "description": "Description for reference",
   "private": true,
   "cacheDirectories": [
     "node_modules"

@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see ProfileInfoResource
  **/
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class ProfileInfoResourceIntTest {
 
 	@Mock

@@ -1,4 +1,4 @@
-# tcs
+# Reference
 This application was generated using JHipster 4.0.8, you can find documentation and help at [https://jhipster.github.io/documentation-archive/v4.0.8](https://jhipster.github.io/documentation-archive/v4.0.8).
 
 ## Setting up local proxy paths
@@ -9,14 +9,14 @@ You will need to set up your local proxy to work with the app. For nginx do:
     vi nginx.conf 
 Then copy paste in the following:
 
-    location ~ ^/tcs/(api|management|swagger-resources|v2) {
-        proxy_pass http://127.0.0.1:8093;
+    location ~ ^/reference/(api|management|swagger-resources|v2) {
+        proxy_pass http://127.0.0.1:8088;
         proxy_set_header OIDC_access_token $token;
         proxy_pass_request_headers on;
     }
 
-    location /tcs {
-        proxy_pass http://127.0.0.1:9093;
+    location /reference {
+        proxy_pass http://127.0.0.1:9088;
         proxy_pass_request_headers on;
     }
 
@@ -36,7 +36,7 @@ You will only need to run this command when dependencies change in [package.json
 
 We use yarn scripts and [Webpack][] as our build system.
 
-Before running the app you will need to create a database called "tcs" in your local MySql.
+Before running the app you will need to create a database called "reference" in your local MySql.
 
 Run the following commands in two separate terminals to create a blissful development experience where your browser
 auto-refreshes when files change on your hard drive.
@@ -52,7 +52,7 @@ The `yarn run` command will list all of the scripts available to run for this pr
 
 ## Building for production
 
-To optimize the tcs application for production, for the server side run:
+To optimize the reference application for production, for the server side run:
 
     ./mvnw -Pprod clean package
 
@@ -70,9 +70,9 @@ And for the UI, if you have not done so already install http-server, then run:
 
     npm install http-server -g
 
-    http-server /Users/Alex/ws/hee_tis/TIS-CORE-SERVICES/ui-build -p 9093 -d false
+    http-server /Users/Alex/ws/hee_tis/TIS-CORE-SERVICES/ui-build -p 9088 -d false
 
-With the proxy server up and configured, then navigate to [http://local.alxd.com/tcs/](http://local.alxd.com/tcs/) in your browser.
+With the proxy server up and configured, then navigate to [http://local.alxd.com/reference/](http://local.alxd.com/reference/) in your browser.
 
 Refer to [Using JHipster in production][] for more details.
 

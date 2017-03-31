@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.Curriculum;
 import com.transformuk.hee.tis.domain.enumeration.AssessmentType;
 import com.transformuk.hee.tis.domain.enumeration.CurriculumSubType;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see CurriculumResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class CurriculumResourceIntTest {
 
 	private static final String DEFAULT_NAME = "AAAAAAAAAA";

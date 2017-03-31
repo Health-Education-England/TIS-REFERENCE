@@ -11,14 +11,14 @@ export const gradeRoute: Routes = [
 		component: GradeTisProgrammesComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.grade.home.title'
+			pageTitle: 'referenceApp.grade.home.title'
 		}
 	}, {
 		path: 'grade-tis-programmes/:id',
 		component: GradeTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.grade.home.title'
+			pageTitle: 'referenceApp.grade.home.title'
 		}
 	}
 ];
@@ -29,7 +29,7 @@ export const gradePopupRoute: Routes = [
 		component: GradeTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.grade.home.title'
+			pageTitle: 'referenceApp.grade.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -38,7 +38,7 @@ export const gradePopupRoute: Routes = [
 		component: GradeTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.grade.home.title'
+			pageTitle: 'referenceApp.grade.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -47,7 +47,7 @@ export const gradePopupRoute: Routes = [
 		component: GradeTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.grade.home.title'
+			pageTitle: 'referenceApp.grade.home.title'
 		},
 		outlet: 'popup'
 	}

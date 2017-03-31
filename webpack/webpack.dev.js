@@ -8,7 +8,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const ENV = 'dev';
 const execSync = require('child_process').execSync;
 const fs = require('fs');
-const ddlPath = './ui-build/tcs/vendor.json';
+const ddlPath = './ui-build/reference/vendor.json';
 
 if (!fs.existsSync(ddlPath)) {
 	execSync('webpack --config webpack/webpack.vendor.js');
@@ -20,7 +20,7 @@ module.exports = webpackMerge(commonConfig({env: ENV}), {
 		contentBase: './ui-build'
 	},
 	output: {
-		path: path.resolve('ui-build/tcs'),
+		path: path.resolve('ui-build/reference'),
 		filename: '[name].bundle.js',
 		chunkFilename: '[id].chunk.js'
 	},
@@ -36,7 +36,7 @@ module.exports = webpackMerge(commonConfig({env: ENV}), {
 	plugins: [
 		new BrowserSyncPlugin({
 			host: 'localhost',
-			port: 9093,
+			port: 9088,
 			proxy: {
 				target: 'http://localhost:9060'
 			}

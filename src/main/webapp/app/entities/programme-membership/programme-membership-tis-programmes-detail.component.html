@@ -1,60 +1,60 @@
 <div *ngIf="programmeMembership">
-	<h2><span jhiTranslate="tcsApp.programmeMembership.detail.title">Programme Membership</span>
+	<h2><span jhiTranslate="referenceApp.programmeMembership.detail.title">Programme Membership</span>
 		{{programmeMembership.id}}</h2>
 	<hr>
 	<jhi-alert-error></jhi-alert-error>
 	<dl class="row-md jh-entity-details">
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeMembershipType">Programme Membership Type</span>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeMembershipType">Programme Membership Type</span>
 		</dt>
 		<dd>
-			<span jhiTranslate="{{'tcsApp.ProgrammeMembershipType.' + programmeMembership.programmeMembershipType}}">{{programmeMembership.programmeMembershipType}}</span>
+			<span jhiTranslate="{{'referenceApp.ProgrammeMembershipType.' + programmeMembership.programmeMembershipType}}">{{programmeMembership.programmeMembershipType}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.rotation">Rotation</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.rotation">Rotation</span></dt>
 		<dd>
 			<span>{{programmeMembership.rotation}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumStartDate">Curriculum Start Date</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumStartDate">Curriculum Start Date</span></dt>
 		<dd>
 			<span>{{programmeMembership.curriculumStartDate | date:'mediumDate'}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumEndDate">Curriculum End Date</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumEndDate">Curriculum End Date</span></dt>
 		<dd>
 			<span>{{programmeMembership.curriculumEndDate | date:'mediumDate'}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.periodOfGrace">Period Of Grace</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.periodOfGrace">Period Of Grace</span></dt>
 		<dd>
 			<span>{{programmeMembership.periodOfGrace}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeStartDate">Programme Start Date</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeStartDate">Programme Start Date</span></dt>
 		<dd>
 			<span>{{programmeMembership.programmeStartDate | date:'mediumDate'}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculumCompletionDate">Curriculum Completion Date</span>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculumCompletionDate">Curriculum Completion Date</span>
 		</dt>
 		<dd>
 			<span>{{programmeMembership.curriculumCompletionDate | date:'mediumDate'}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programmeEndDate">Programme End Date</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programmeEndDate">Programme End Date</span></dt>
 		<dd>
 			<span>{{programmeMembership.programmeEndDate | date:'mediumDate'}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.leavingDestination">Leaving Destination</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.leavingDestination">Leaving Destination</span></dt>
 		<dd>
 			<span>{{programmeMembership.leavingDestination}}</span>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.programme">Programme</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.programme">Programme</span></dt>
 		<dd>
 			<div *ngIf="programmeMembership.programmeId">
 				<a [routerLink]="['/programme-tis-programmes', programmeMembership.programmeId]">{{programmeMembership.programmeId}}</a>
 			</div>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.curriculum">Curriculum</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.curriculum">Curriculum</span></dt>
 		<dd>
 			<div *ngIf="programmeMembership.curriculumId">
 				<a [routerLink]="['/curriculum-tis-programmes', programmeMembership.curriculumId]">{{programmeMembership.curriculumId}}</a>
 			</div>
 		</dd>
-		<dt><span class="front-nhs-lb" jhiTranslate="tcsApp.programmeMembership.trainingNumber">Training Number</span></dt>
+		<dt><span class="front-nhs-lb" jhiTranslate="referenceApp.programmeMembership.trainingNumber">Training Number</span></dt>
 		<dd>
 			<div *ngIf="programmeMembership.trainingNumberId">
 				<a [routerLink]="['/training-number-tis-programmes', programmeMembership.trainingNumberId]">{{programmeMembership.trainingNumberId}}</a>

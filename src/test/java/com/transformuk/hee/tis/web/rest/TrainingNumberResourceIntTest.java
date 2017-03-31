@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.TrainingNumber;
 import com.transformuk.hee.tis.domain.enumeration.TrainingNumberType;
 import com.transformuk.hee.tis.repository.TrainingNumberRepository;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see TrainingNumberResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class TrainingNumberResourceIntTest {
 
 	private static final TrainingNumberType DEFAULT_TRAINING_NUMBER_TYPE = TrainingNumberType.NTN;

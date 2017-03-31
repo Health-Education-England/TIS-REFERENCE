@@ -11,15 +11,15 @@ public final class HeaderUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(HeaderUtil.class);
 
-	private static final String APPLICATION_NAME = "tcsApp";
+	private static final String APPLICATION_NAME = "referenceApp";
 
 	private HeaderUtil() {
 	}
 
 	public static HttpHeaders createAlert(String message, String param) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-tcsApp-alert", message);
-		headers.add("X-tcsApp-params", param);
+		headers.add("X-referenceApp-alert", message);
+		headers.add("X-referenceApp-params", param);
 		return headers;
 	}
 
@@ -38,8 +38,8 @@ public final class HeaderUtil {
 	public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
 		log.error("Entity creation failed, {}", defaultMessage);
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-tcsApp-error", "error." + errorKey);
-		headers.add("X-tcsApp-params", entityName);
+		headers.add("X-referenceApp-error", "error." + errorKey);
+		headers.add("X-referenceApp-params", entityName);
 		return headers;
 	}
 }

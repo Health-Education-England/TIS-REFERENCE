@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
 
 	<div class="modal-header">
-		<h4 class="modal-title" id="myGradeLabel" jhiTranslate="tcsApp.grade.home.createOrEditLabel">Create or edit a
+		<h4 class="modal-title" id="myGradeLabel" jhiTranslate="referenceApp.grade.home.createOrEditLabel">Create or edit a
 			Grade</h4>
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
 				(click)="clear()">&times;</button>
@@ -14,7 +14,7 @@
 				   [(ngModel)]="grade.id" readonly/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label front-nhs-lb" jhiTranslate="tcsApp.grade.name" for="field_name">Name</label>
+			<label class="form-control-label front-nhs-lb" jhiTranslate="referenceApp.grade.name" for="field_name">Name</label>
 			<input type="text" class="form-control" name="name" id="field_name"
 				   [(ngModel)]="grade.name"
 			/>

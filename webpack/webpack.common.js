@@ -90,7 +90,7 @@ module.exports = function (options) {
 			}),
 			new webpack.DllReferencePlugin({
 				context: './',
-				manifest: require(path.resolve('./ui-build/tcs/vendor.json')),
+				manifest: require(path.resolve('./ui-build/reference/vendor.json')),
 			}),
 			new CopyWebpackPlugin([
 				{from: './node_modules/swagger-ui/dist', to: 'swagger-ui/dist'},
@@ -110,7 +110,7 @@ module.exports = function (options) {
 				inject: 'body'
 			}),
 			new AddAssetHtmlPlugin([
-				{filepath: path.resolve('./ui-build/tcs/vendor.dll.js'), includeSourcemap: false}
+				{filepath: path.resolve('./ui-build/reference/vendor.dll.js'), includeSourcemap: false}
 			]),
 			new StringReplacePlugin()
 		]

@@ -32,14 +32,14 @@ export const curriculumRoute: Routes = [
 		},
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.curriculum.home.title'
+			pageTitle: 'referenceApp.curriculum.home.title'
 		}
 	}, {
 		path: 'curriculum-tis-programmes/:id',
 		component: CurriculumTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.curriculum.home.title'
+			pageTitle: 'referenceApp.curriculum.home.title'
 		}
 	}
 ];
@@ -50,7 +50,7 @@ export const curriculumPopupRoute: Routes = [
 		component: CurriculumTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.curriculum.home.title'
+			pageTitle: 'referenceApp.curriculum.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -59,7 +59,7 @@ export const curriculumPopupRoute: Routes = [
 		component: CurriculumTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.curriculum.home.title'
+			pageTitle: 'referenceApp.curriculum.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -68,7 +68,7 @@ export const curriculumPopupRoute: Routes = [
 		component: CurriculumTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.curriculum.home.title'
+			pageTitle: 'referenceApp.curriculum.home.title'
 		},
 		outlet: 'popup'
 	}

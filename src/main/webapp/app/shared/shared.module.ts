@@ -2,8 +2,8 @@ import {NgModule, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {DatePipe} from "@angular/common";
 import {CookieService} from "angular2-cookie/services/cookies.service";
 import {
-	TcsSharedLibsModule,
-	TcsSharedCommonModule,
+	ReferenceSharedLibsModule,
+	ReferenceSharedCommonModule,
 	CSRFService,
 	AuthService,
 	AuthServerProvider,
@@ -19,8 +19,8 @@ import {
 
 @NgModule({
 	imports: [
-		TcsSharedLibsModule,
-		TcsSharedCommonModule
+		ReferenceSharedLibsModule,
+		ReferenceSharedCommonModule
 	],
 	declarations: [
 		JhiLoginModalComponent,
@@ -41,7 +41,7 @@ import {
 	],
 	entryComponents: [JhiLoginModalComponent],
 	exports: [
-		TcsSharedCommonModule,
+		ReferenceSharedCommonModule,
 		JhiLoginModalComponent,
 		HasAnyAuthorityDirective,
 		DatePipe
@@ -49,5 +49,5 @@ import {
 	schemas: [CUSTOM_ELEMENTS_SCHEMA]
 
 })
-export class TcsSharedModule {
+export class ReferenceSharedModule {
 }

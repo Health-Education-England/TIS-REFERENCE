@@ -9,7 +9,7 @@ const ENV = 'prod';
 module.exports = webpackMerge(commonConfig({env: ENV}), {
 	devtool: 'source-map',
 	output: {
-		path: './ui-build/tcs',
+		path: './ui-build/reference',
 		filename: '[hash].[name].bundle.js',
 		chunkFilename: '[hash].[id].chunk.js'
 	},

@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.Programme;
 import com.transformuk.hee.tis.domain.enumeration.Status;
 import com.transformuk.hee.tis.repository.ProgrammeRepository;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see ProgrammeResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class ProgrammeResourceIntTest {
 
 	private static final Status DEFAULT_STATUS = Status.CURRENT;

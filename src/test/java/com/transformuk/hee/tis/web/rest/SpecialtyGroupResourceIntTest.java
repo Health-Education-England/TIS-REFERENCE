@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.SpecialtyGroup;
 import com.transformuk.hee.tis.repository.SpecialtyGroupRepository;
 import com.transformuk.hee.tis.service.SpecialtyGroupService;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see SpecialtyGroupResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class SpecialtyGroupResourceIntTest {
 
 	private static final String DEFAULT_NAME = "AAAAAAAAAA";

@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.web.rest;
 
-import com.transformuk.hee.tis.TcsApp;
+import com.transformuk.hee.tis.ReferenceApp;
 import com.transformuk.hee.tis.domain.Grade;
 import com.transformuk.hee.tis.repository.GradeRepository;
 import com.transformuk.hee.tis.service.dto.GradeDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see GradeResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TcsApp.class)
+@SpringBootTest(classes = ReferenceApp.class)
 public class GradeResourceIntTest {
 
 	private static final String DEFAULT_NAME = "AAAAAAAAAA";

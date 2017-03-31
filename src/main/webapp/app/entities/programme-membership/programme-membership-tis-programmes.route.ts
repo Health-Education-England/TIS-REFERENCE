@@ -32,14 +32,14 @@ export const programmeMembershipRoute: Routes = [
 		},
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programmeMembership.home.title'
+			pageTitle: 'referenceApp.programmeMembership.home.title'
 		}
 	}, {
 		path: 'programme-membership-tis-programmes/:id',
 		component: ProgrammeMembershipTisProgrammesDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programmeMembership.home.title'
+			pageTitle: 'referenceApp.programmeMembership.home.title'
 		}
 	}
 ];
@@ -50,7 +50,7 @@ export const programmeMembershipPopupRoute: Routes = [
 		component: ProgrammeMembershipTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programmeMembership.home.title'
+			pageTitle: 'referenceApp.programmeMembership.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -59,7 +59,7 @@ export const programmeMembershipPopupRoute: Routes = [
 		component: ProgrammeMembershipTisProgrammesPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programmeMembership.home.title'
+			pageTitle: 'referenceApp.programmeMembership.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -68,7 +68,7 @@ export const programmeMembershipPopupRoute: Routes = [
 		component: ProgrammeMembershipTisProgrammesDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'tcsApp.programmeMembership.home.title'
+			pageTitle: 'referenceApp.programmeMembership.home.title'
 		},
 		outlet: 'popup'
 	}

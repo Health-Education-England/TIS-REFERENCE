@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>com.transformuk.hee.tis</groupId>
-	<artifactId>tcs</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>reference</artifactId>
+	<version>2.0.0</version>
 	<packaging>war</packaging>
-	<name>Tcs</name>
+	<name>Reference</name>
 
 	<prerequisites>
 		<maven>${maven.version}</maven>
@@ -59,7 +59,7 @@
 		<sonar-maven-plugin.version>3.2</sonar-maven-plugin.version>
 
 		<sonar.exclusions>src/main/webapp/content/**/*.*, src/main/webapp/bower_components/**/*.*,
-			src/main/webapp/i18n/*.js, ui-build/tcs/**/*.*
+			src/main/webapp/i18n/*.js, ui-build/reference/**/*.*
 		</sonar.exclusions>
 
 		<sonar.issue.ignore.multicriteria>S3437,UndocumentedApi,BoldAndItalicTagsCheck
@@ -533,7 +533,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>${docker-maven-plugin.version}</version>
 				<configuration>
-					<imageName>tcs</imageName>
+					<imageName>reference</imageName>
 					<dockerDirectory>src/main/docker</dockerDirectory>
 					<resources>
 						<resource>

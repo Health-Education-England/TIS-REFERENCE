@@ -1,10 +1,10 @@
 <div>
 	<h2>
-		<span jhiTranslate="tcsApp.programmeMembership.home.title">Programme Memberships</span>
+		<span jhiTranslate="referenceApp.programmeMembership.home.title">Programme Memberships</span>
 		<button class="btn tis-btn-nhs-blue float-right create-programme-membership-tis-programmes"
 				[routerLink]="['/', { outlets: { popup: ['programme-membership-tis-programmes-new'] } }]">
 			<span class="fa fa-plus"></span>
-			<span jhiTranslate="tcsApp.programmeMembership.home.createLabel">
+			<span jhiTranslate="referenceApp.programmeMembership.home.createLabel">
             Create new Programme Membership
             </span>
 		</button>
@@ -19,31 +19,31 @@
 			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
 				<th jhiSortBy="programmeMembershipType"><span
-						jhiTranslate="tcsApp.programmeMembership.programmeMembershipType">Programme Membership Type</span>
+						jhiTranslate="referenceApp.programmeMembership.programmeMembershipType">Programme Membership Type</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="rotation"><span jhiTranslate="tcsApp.programmeMembership.rotation">Rotation</span> <span
+				<th jhiSortBy="rotation"><span jhiTranslate="referenceApp.programmeMembership.rotation">Rotation</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="curriculumStartDate"><span jhiTranslate="tcsApp.programmeMembership.curriculumStartDate">Curriculum Start Date</span>
+				<th jhiSortBy="curriculumStartDate"><span jhiTranslate="referenceApp.programmeMembership.curriculumStartDate">Curriculum Start Date</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="curriculumEndDate"><span jhiTranslate="tcsApp.programmeMembership.curriculumEndDate">Curriculum End Date</span>
+				<th jhiSortBy="curriculumEndDate"><span jhiTranslate="referenceApp.programmeMembership.curriculumEndDate">Curriculum End Date</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="periodOfGrace"><span jhiTranslate="tcsApp.programmeMembership.periodOfGrace">Period Of Grace</span>
+				<th jhiSortBy="periodOfGrace"><span jhiTranslate="referenceApp.programmeMembership.periodOfGrace">Period Of Grace</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="programmeStartDate"><span jhiTranslate="tcsApp.programmeMembership.programmeStartDate">Programme Start Date</span>
+				<th jhiSortBy="programmeStartDate"><span jhiTranslate="referenceApp.programmeMembership.programmeStartDate">Programme Start Date</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="curriculumCompletionDate"><span
-						jhiTranslate="tcsApp.programmeMembership.curriculumCompletionDate">Curriculum Completion Date</span>
+						jhiTranslate="referenceApp.programmeMembership.curriculumCompletionDate">Curriculum Completion Date</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="programmeEndDate"><span jhiTranslate="tcsApp.programmeMembership.programmeEndDate">Programme End Date</span>
+				<th jhiSortBy="programmeEndDate"><span jhiTranslate="referenceApp.programmeMembership.programmeEndDate">Programme End Date</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="leavingDestination"><span jhiTranslate="tcsApp.programmeMembership.leavingDestination">Leaving Destination</span>
+				<th jhiSortBy="leavingDestination"><span jhiTranslate="referenceApp.programmeMembership.leavingDestination">Leaving Destination</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="programmeId"><span jhiTranslate="tcsApp.programmeMembership.programme">Programme</span>
+				<th jhiSortBy="programmeId"><span jhiTranslate="referenceApp.programmeMembership.programme">Programme</span>
 					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="curriculumId"><span
-						jhiTranslate="tcsApp.programmeMembership.curriculum">Curriculum</span> <span
+						jhiTranslate="referenceApp.programmeMembership.curriculum">Curriculum</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="trainingNumberId"><span jhiTranslate="tcsApp.programmeMembership.trainingNumber">Training Number</span>
+				<th jhiSortBy="trainingNumberId"><span jhiTranslate="referenceApp.programmeMembership.trainingNumber">Training Number</span>
 					<span class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
@@ -52,7 +52,7 @@
 			<tr *ngFor="let programmeMembership of programmeMemberships ;trackBy: trackId">
 				<td><a [routerLink]="['../programme-membership-tis-programmes', programmeMembership.id ]">{{programmeMembership.id}}</a>
 				</td>
-				<td jhiTranslate="{{'tcsApp.ProgrammeMembershipType.' + programmeMembership.programmeMembershipType}}">
+				<td jhiTranslate="{{'referenceApp.ProgrammeMembershipType.' + programmeMembership.programmeMembershipType}}">
 					{{programmeMembership.programmeMembershipType}}
 				</td>
 				<td>{{programmeMembership.rotation}}</td>
