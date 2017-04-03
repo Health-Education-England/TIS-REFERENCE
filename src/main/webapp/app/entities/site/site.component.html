@@ -20,6 +20,10 @@
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
 				<th jhiSortBy="siteCode"><span jhiTranslate="referenceApp.site.siteCode">Site Code</span> <span
 						class="fa fa-sort"></span></th>
+				<th jhiSortBy="localOffice"><span jhiTranslate="referenceApp.site.localOffice">Local Office</span> <span
+						class="fa fa-sort"></span></th>
+				<th jhiSortBy="trustCode"><span jhiTranslate="referenceApp.site.trustCode">Trust Code</span> <span
+						class="fa fa-sort"></span></th>
 				<th jhiSortBy="siteName"><span jhiTranslate="referenceApp.site.siteName">Site Name</span> <span
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="address"><span jhiTranslate="referenceApp.site.address">Address</span> <span
@@ -32,10 +36,6 @@
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="organisationalUnit"><span jhiTranslate="referenceApp.site.organisationalUnit">Organisational Unit</span>
 					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="localOfficeId"><span jhiTranslate="referenceApp.site.localOffice">Local Office</span>
-					<span class="fa fa-sort"></span></th>
-				<th jhiSortBy="trustCodeId"><span jhiTranslate="referenceApp.site.trustCode">Trust Code</span> <span
-						class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
 			</thead>
@@ -43,22 +43,14 @@
 			<tr *ngFor="let site of sites ;trackBy: trackId">
 				<td><a [routerLink]="['../site', site.id ]">{{site.id}}</a></td>
 				<td>{{site.siteCode}}</td>
+				<td>{{site.localOffice}}</td>
+				<td>{{site.trustCode}}</td>
 				<td>{{site.siteName}}</td>
 				<td>{{site.address}}</td>
 				<td>{{site.postCode}}</td>
 				<td>{{site.siteKnownAs}}</td>
 				<td>{{site.siteNumber}}</td>
 				<td>{{site.organisationalUnit}}</td>
-				<td>
-					<div *ngIf="site.localOfficeId">
-						<a [routerLink]="['../local-office', site.localOfficeId  ]">{{site.localOfficeId}}</a>
-					</div>
-				</td>
-				<td>
-					<div *ngIf="site.trustCodeId">
-						<a [routerLink]="['../trust', site.trustCodeId  ]">{{site.trustCodeId}}</a>
-					</div>
-				</td>
 				<td class="text-right">
 					<div class="btn-group flex-btn-group-container">
 						<button type="submit"

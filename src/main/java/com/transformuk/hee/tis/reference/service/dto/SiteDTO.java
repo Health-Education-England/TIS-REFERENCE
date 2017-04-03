@@ -15,6 +15,10 @@ public class SiteDTO implements Serializable {
 	@NotNull
 	private String siteCode;
 
+	private String localOffice;
+
+	private String trustCode;
+
 	private String siteName;
 
 	private String address;
@@ -26,10 +30,6 @@ public class SiteDTO implements Serializable {
 	private String siteNumber;
 
 	private String organisationalUnit;
-
-	private Long localOfficeId;
-
-	private Long trustCodeId;
 
 	public Long getId() {
 		return id;
@@ -45,6 +45,22 @@ public class SiteDTO implements Serializable {
 
 	public void setSiteCode(String siteCode) {
 		this.siteCode = siteCode;
+	}
+
+	public String getLocalOffice() {
+		return localOffice;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
+	}
+
+	public String getTrustCode() {
+		return trustCode;
+	}
+
+	public void setTrustCode(String trustCode) {
+		this.trustCode = trustCode;
 	}
 
 	public String getSiteName() {
@@ -95,22 +111,6 @@ public class SiteDTO implements Serializable {
 		this.organisationalUnit = organisationalUnit;
 	}
 
-	public Long getLocalOfficeId() {
-		return localOfficeId;
-	}
-
-	public void setLocalOfficeId(Long localOfficeId) {
-		this.localOfficeId = localOfficeId;
-	}
-
-	public Long getTrustCodeId() {
-		return trustCodeId;
-	}
-
-	public void setTrustCodeId(Long trustId) {
-		this.trustCodeId = trustId;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -139,6 +139,8 @@ public class SiteDTO implements Serializable {
 		return "SiteDTO{" +
 				"id=" + id +
 				", siteCode='" + siteCode + "'" +
+				", localOffice='" + localOffice + "'" +
+				", trustCode='" + trustCode + "'" +
 				", siteName='" + siteName + "'" +
 				", address='" + address + "'" +
 				", postCode='" + postCode + "'" +

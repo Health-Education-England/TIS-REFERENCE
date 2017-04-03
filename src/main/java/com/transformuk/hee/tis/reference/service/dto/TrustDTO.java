@@ -15,6 +15,8 @@ public class TrustDTO implements Serializable {
 	@NotNull
 	private String code;
 
+	private String localOffice;
+
 	private String status;
 
 	private String trustKnownAs;
@@ -26,8 +28,6 @@ public class TrustDTO implements Serializable {
 	private String address;
 
 	private String postCode;
-
-	private Long localOfficeId;
 
 	public Long getId() {
 		return id;
@@ -43,6 +43,14 @@ public class TrustDTO implements Serializable {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getLocalOffice() {
+		return localOffice;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
 	}
 
 	public String getStatus() {
@@ -93,14 +101,6 @@ public class TrustDTO implements Serializable {
 		this.postCode = postCode;
 	}
 
-	public Long getLocalOfficeId() {
-		return localOfficeId;
-	}
-
-	public void setLocalOfficeId(Long localOfficeId) {
-		this.localOfficeId = localOfficeId;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -129,6 +129,7 @@ public class TrustDTO implements Serializable {
 		return "TrustDTO{" +
 				"id=" + id +
 				", code='" + code + "'" +
+				", localOffice='" + localOffice + "'" +
 				", status='" + status + "'" +
 				", trustKnownAs='" + trustKnownAs + "'" +
 				", trustName='" + trustName + "'" +

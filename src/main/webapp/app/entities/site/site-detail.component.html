@@ -7,6 +7,14 @@
 		<dd>
 			<span>{{site.siteCode}}</span>
 		</dd>
+		<dt><span jhiTranslate="referenceApp.site.localOffice">Local Office</span></dt>
+		<dd>
+			<span>{{site.localOffice}}</span>
+		</dd>
+		<dt><span jhiTranslate="referenceApp.site.trustCode">Trust Code</span></dt>
+		<dd>
+			<span>{{site.trustCode}}</span>
+		</dd>
 		<dt><span jhiTranslate="referenceApp.site.siteName">Site Name</span></dt>
 		<dd>
 			<span>{{site.siteName}}</span>
@@ -30,18 +38,6 @@
 		<dt><span jhiTranslate="referenceApp.site.organisationalUnit">Organisational Unit</span></dt>
 		<dd>
 			<span>{{site.organisationalUnit}}</span>
-		</dd>
-		<dt><span jhiTranslate="referenceApp.site.localOffice">Local Office</span></dt>
-		<dd>
-			<div *ngIf="site.localOfficeId">
-				<a [routerLink]="['/local-office', site.localOfficeId]">{{site.localOfficeId}}</a>
-			</div>
-		</dd>
-		<dt><span jhiTranslate="referenceApp.site.trustCode">Trust Code</span></dt>
-		<dd>
-			<div *ngIf="site.trustCodeId">
-				<a [routerLink]="['/trust', site.trustCodeId]">{{site.trustCodeId}}</a>
-			</div>
 		</dd>
 	</dl>
 

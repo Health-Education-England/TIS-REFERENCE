@@ -20,6 +20,8 @@
 				<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
 				<th jhiSortBy="code"><span jhiTranslate="referenceApp.trust.code">Code</span> <span
 						class="fa fa-sort"></span></th>
+				<th jhiSortBy="localOffice"><span jhiTranslate="referenceApp.trust.localOffice">Local Office</span>
+					<span class="fa fa-sort"></span></th>
 				<th jhiSortBy="status"><span jhiTranslate="referenceApp.trust.status">Status</span> <span
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="trustKnownAs"><span jhiTranslate="referenceApp.trust.trustKnownAs">Trust Known As</span>
@@ -32,8 +34,6 @@
 						class="fa fa-sort"></span></th>
 				<th jhiSortBy="postCode"><span jhiTranslate="referenceApp.trust.postCode">Post Code</span> <span
 						class="fa fa-sort"></span></th>
-				<th jhiSortBy="localOfficeId"><span jhiTranslate="referenceApp.trust.localOffice">Local Office</span>
-					<span class="fa fa-sort"></span></th>
 				<th></th>
 			</tr>
 			</thead>
@@ -41,17 +41,13 @@
 			<tr *ngFor="let trust of trusts ;trackBy: trackId">
 				<td><a [routerLink]="['../trust', trust.id ]">{{trust.id}}</a></td>
 				<td>{{trust.code}}</td>
+				<td>{{trust.localOffice}}</td>
 				<td>{{trust.status}}</td>
 				<td>{{trust.trustKnownAs}}</td>
 				<td>{{trust.trustName}}</td>
 				<td>{{trust.trustNumber}}</td>
 				<td>{{trust.address}}</td>
 				<td>{{trust.postCode}}</td>
-				<td>
-					<div *ngIf="trust.localOfficeId">
-						<a [routerLink]="['../local-office', trust.localOfficeId  ]">{{trust.localOfficeId}}</a>
-					</div>
-				</td>
 				<td class="text-right">
 					<div class="btn-group flex-btn-group-container">
 						<button type="submit"

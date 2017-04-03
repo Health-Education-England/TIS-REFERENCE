@@ -6,7 +6,6 @@ import {EventManager, AlertService, JhiLanguageService} from "ng-jhipster";
 import {Trust} from "./trust.model";
 import {TrustPopupService} from "./trust-popup.service";
 import {TrustService} from "./trust.service";
-import {LocalOffice, LocalOfficeService} from "../local-office";
 @Component({
 	selector: 'jhi-trust-dialog',
 	templateUrl: './trust-dialog.component.html'
@@ -17,13 +16,10 @@ export class TrustDialogComponent implements OnInit {
 	authorities: any[];
 	isSaving: boolean;
 
-	localoffices: LocalOffice[];
-
 	constructor(public activeModal: NgbActiveModal,
 				private jhiLanguageService: JhiLanguageService,
 				private alertService: AlertService,
 				private trustService: TrustService,
-				private localOfficeService: LocalOfficeService,
 				private eventManager: EventManager) {
 		this.jhiLanguageService.setLocations(['trust']);
 	}
@@ -31,10 +27,6 @@ export class TrustDialogComponent implements OnInit {
 	ngOnInit() {
 		this.isSaving = false;
 		this.authorities = ['ROLE_USER', 'ROLE_ADMIN'];
-		this.localOfficeService.query().subscribe(
-			(res: Response) => {
-				this.localoffices = res.json();
-			}, (res: Response) => this.onError(res.json()));
 	}
 
 	clear() {
@@ -67,10 +59,6 @@ export class TrustDialogComponent implements OnInit {
 
 	private onError(error) {
 		this.alertService.error(error.message, null, null);
-	}
-
-	trackLocalOfficeById(index: number, item: LocalOffice) {
-		return item.id;
 	}
 }
 

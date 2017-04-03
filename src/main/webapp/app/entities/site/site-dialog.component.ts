@@ -6,8 +6,6 @@ import {EventManager, AlertService, JhiLanguageService} from "ng-jhipster";
 import {Site} from "./site.model";
 import {SitePopupService} from "./site-popup.service";
 import {SiteService} from "./site.service";
-import {LocalOffice, LocalOfficeService} from "../local-office";
-import {Trust, TrustService} from "../trust";
 @Component({
 	selector: 'jhi-site-dialog',
 	templateUrl: './site-dialog.component.html'
@@ -18,16 +16,10 @@ export class SiteDialogComponent implements OnInit {
 	authorities: any[];
 	isSaving: boolean;
 
-	localoffices: LocalOffice[];
-
-	trusts: Trust[];
-
 	constructor(public activeModal: NgbActiveModal,
 				private jhiLanguageService: JhiLanguageService,
 				private alertService: AlertService,
 				private siteService: SiteService,
-				private localOfficeService: LocalOfficeService,
-				private trustService: TrustService,
 				private eventManager: EventManager) {
 		this.jhiLanguageService.setLocations(['site']);
 	}
@@ -35,14 +27,6 @@ export class SiteDialogComponent implements OnInit {
 	ngOnInit() {
 		this.isSaving = false;
 		this.authorities = ['ROLE_USER', 'ROLE_ADMIN'];
-		this.localOfficeService.query().subscribe(
-			(res: Response) => {
-				this.localoffices = res.json();
-			}, (res: Response) => this.onError(res.json()));
-		this.trustService.query().subscribe(
-			(res: Response) => {
-				this.trusts = res.json();
-			}, (res: Response) => this.onError(res.json()));
 	}
 
 	clear() {
@@ -75,14 +59,6 @@ export class SiteDialogComponent implements OnInit {
 
 	private onError(error) {
 		this.alertService.error(error.message, null, null);
-	}
-
-	trackLocalOfficeById(index: number, item: LocalOffice) {
-		return item.id;
-	}
-
-	trackTrustById(index: number, item: Trust) {
-		return item.id;
 	}
 }
 

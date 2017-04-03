@@ -26,6 +26,13 @@
 			</div>
 		</div>
 		<div class="form-group">
+			<label class="form-control-label" jhiTranslate="referenceApp.trust.localOffice" for="field_localOffice">Local
+				Office</label>
+			<input type="text" class="form-control" name="localOffice" id="field_localOffice"
+				   [(ngModel)]="trust.localOffice"
+			/>
+		</div>
+		<div class="form-group">
 			<label class="form-control-label" jhiTranslate="referenceApp.trust.status" for="field_status">Status</label>
 			<input type="text" class="form-control" name="status" id="field_status"
 				   [(ngModel)]="trust.status"
@@ -67,16 +74,6 @@
 			/>
 		</div>
 
-		<div class="form-group">
-			<label jhiTranslate="referenceApp.trust.localOffice" for="field_localOffice">Local Office</label>
-			<select class="form-control" id="field_localOffice" name="localOffice" [(ngModel)]="trust.localOfficeId">
-				<option [ngValue]="null"></option>
-				<option [ngValue]="localOfficeOption.id"
-						*ngFor="let localOfficeOption of localoffices; trackBy: trackLocalOfficeById">
-					{{localOfficeOption.id}}
-				</option>
-			</select>
-		</div>
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal" (click)="clear()">

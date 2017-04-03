@@ -16,13 +16,13 @@
 		"title": "Trust"
 	  },
 	  "code": "Code",
+	  "localOffice": "Local Office",
 	  "status": "Status",
 	  "trustKnownAs": "Trust Known As",
 	  "trustName": "Trust Name",
 	  "trustNumber": "Trust Number",
 	  "address": "Address",
-	  "postCode": "Post Code",
-	  "localOffice": "Local Office"
+	  "postCode": "Post Code"
 	}
   }
 }

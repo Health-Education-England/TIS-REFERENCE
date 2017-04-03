@@ -10,6 +10,7 @@ import java.util.Objects;
  * A Site.
  */
 @Entity
+@Table(name = "Site")
 public class Site implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -19,34 +20,23 @@ public class Site implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Column(name = "siteCode", nullable = false)
 	private String siteCode;
 
-	@Column(name = "siteName")
+	private String localOffice;
+
+	private String trustCode;
+
 	private String siteName;
 
-	@Column(name = "address")
 	private String address;
 
-	@Column(name = "postCode")
 	private String postCode;
 
-	@Column(name = "siteKnownAs")
 	private String siteKnownAs;
 
-	@Column(name = "siteNumber")
 	private String siteNumber;
 
-	@Column(name = "organisationalUnit")
 	private String organisationalUnit;
-
-	@ManyToOne
-	@JoinColumn(name = "localOfficeId")
-	private LocalOffice localOffice;
-
-	@ManyToOne
-	@JoinColumn(name = "trustCodeId")
-	private Trust trustCode;
 
 	public Long getId() {
 		return id;
@@ -60,21 +50,43 @@ public class Site implements Serializable {
 		return siteCode;
 	}
 
-	public void setSiteCode(String siteCode) {
-		this.siteCode = siteCode;
-	}
-
 	public Site siteCode(String siteCode) {
 		this.siteCode = siteCode;
 		return this;
 	}
 
-	public String getSiteName() {
-		return siteName;
+	public void setSiteCode(String siteCode) {
+		this.siteCode = siteCode;
 	}
 
-	public void setSiteName(String siteName) {
-		this.siteName = siteName;
+	public String getLocalOffice() {
+		return localOffice;
+	}
+
+	public Site localOffice(String localOffice) {
+		this.localOffice = localOffice;
+		return this;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
+	}
+
+	public String getTrustCode() {
+		return trustCode;
+	}
+
+	public Site trustCode(String trustCode) {
+		this.trustCode = trustCode;
+		return this;
+	}
+
+	public void setTrustCode(String trustCode) {
+		this.trustCode = trustCode;
+	}
+
+	public String getSiteName() {
+		return siteName;
 	}
 
 	public Site siteName(String siteName) {
@@ -82,12 +94,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public String getAddress() {
-		return address;
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public String getAddress() {
+		return address;
 	}
 
 	public Site address(String address) {
@@ -95,12 +107,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public String getPostCode() {
-		return postCode;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public void setPostCode(String postCode) {
-		this.postCode = postCode;
+	public String getPostCode() {
+		return postCode;
 	}
 
 	public Site postCode(String postCode) {
@@ -108,12 +120,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public String getSiteKnownAs() {
-		return siteKnownAs;
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
 	}
 
-	public void setSiteKnownAs(String siteKnownAs) {
-		this.siteKnownAs = siteKnownAs;
+	public String getSiteKnownAs() {
+		return siteKnownAs;
 	}
 
 	public Site siteKnownAs(String siteKnownAs) {
@@ -121,12 +133,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public String getSiteNumber() {
-		return siteNumber;
+	public void setSiteKnownAs(String siteKnownAs) {
+		this.siteKnownAs = siteKnownAs;
 	}
 
-	public void setSiteNumber(String siteNumber) {
-		this.siteNumber = siteNumber;
+	public String getSiteNumber() {
+		return siteNumber;
 	}
 
 	public Site siteNumber(String siteNumber) {
@@ -134,12 +146,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public String getOrganisationalUnit() {
-		return organisationalUnit;
+	public void setSiteNumber(String siteNumber) {
+		this.siteNumber = siteNumber;
 	}
 
-	public void setOrganisationalUnit(String organisationalUnit) {
-		this.organisationalUnit = organisationalUnit;
+	public String getOrganisationalUnit() {
+		return organisationalUnit;
 	}
 
 	public Site organisationalUnit(String organisationalUnit) {
@@ -147,30 +159,8 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public LocalOffice getLocalOffice() {
-		return localOffice;
-	}
-
-	public void setLocalOffice(LocalOffice localOffice) {
-		this.localOffice = localOffice;
-	}
-
-	public Site localOffice(LocalOffice localOffice) {
-		this.localOffice = localOffice;
-		return this;
-	}
-
-	public Trust getTrustCode() {
-		return trustCode;
-	}
-
-	public void setTrustCode(Trust trust) {
-		this.trustCode = trust;
-	}
-
-	public Site trustCode(Trust trust) {
-		this.trustCode = trust;
-		return this;
+	public void setOrganisationalUnit(String organisationalUnit) {
+		this.organisationalUnit = organisationalUnit;
 	}
 
 	@Override
@@ -198,6 +188,8 @@ public class Site implements Serializable {
 		return "Site{" +
 				"id=" + id +
 				", siteCode='" + siteCode + "'" +
+				", localOffice='" + localOffice + "'" +
+				", trustCode='" + trustCode + "'" +
 				", siteName='" + siteName + "'" +
 				", address='" + address + "'" +
 				", postCode='" + postCode + "'" +

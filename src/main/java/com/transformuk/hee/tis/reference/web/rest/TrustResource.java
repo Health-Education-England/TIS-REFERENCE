@@ -31,8 +31,10 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class TrustResource {
 
-	private static final String ENTITY_NAME = "trust";
 	private final Logger log = LoggerFactory.getLogger(TrustResource.class);
+
+	private static final String ENTITY_NAME = "trust";
+
 	private final TrustRepository trustRepository;
 
 	private final TrustMapper trustMapper;

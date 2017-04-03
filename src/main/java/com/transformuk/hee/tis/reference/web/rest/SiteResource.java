@@ -31,8 +31,10 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class SiteResource {
 
-	private static final String ENTITY_NAME = "site";
 	private final Logger log = LoggerFactory.getLogger(SiteResource.class);
+
+	private static final String ENTITY_NAME = "site";
+
 	private final SiteRepository siteRepository;
 
 	private final SiteMapper siteMapper;

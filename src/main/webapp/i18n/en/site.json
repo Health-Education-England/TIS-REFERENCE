@@ -16,14 +16,14 @@
 		"title": "Site"
 	  },
 	  "siteCode": "Site Code",
+	  "localOffice": "Local Office",
+	  "trustCode": "Trust Code",
 	  "siteName": "Site Name",
 	  "address": "Address",
 	  "postCode": "Post Code",
 	  "siteKnownAs": "Site Known As",
 	  "siteNumber": "Site Number",
-	  "organisationalUnit": "Organisational Unit",
-	  "localOffice": "Local Office",
-	  "trustCode": "Trust Code"
+	  "organisationalUnit": "Organisational Unit"
 	}
   }
 }

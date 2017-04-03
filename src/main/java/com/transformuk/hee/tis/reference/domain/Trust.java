@@ -10,6 +10,7 @@ import java.util.Objects;
  * A Trust.
  */
 @Entity
+@Table(name = "Trust")
 public class Trust implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -22,27 +23,19 @@ public class Trust implements Serializable {
 	@Column(name = "code", nullable = false)
 	private String code;
 
-	@Column(name = "status")
+	private String localOffice;
+
 	private String status;
 
-	@Column(name = "trustKnownAs")
 	private String trustKnownAs;
 
-	@Column(name = "trustName")
 	private String trustName;
 
-	@Column(name = "trustNumber")
 	private String trustNumber;
 
-	@Column(name = "address")
 	private String address;
 
-	@Column(name = "postCode")
 	private String postCode;
-
-	@ManyToOne
-	@JoinColumn(name = "localOfficeId")
-	private LocalOffice localOffice;
 
 	public Long getId() {
 		return id;
@@ -56,21 +49,30 @@ public class Trust implements Serializable {
 		return code;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public Trust code(String code) {
 		this.code = code;
 		return this;
 	}
 
-	public String getStatus() {
-		return status;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public String getLocalOffice() {
+		return localOffice;
+	}
+
+	public Trust localOffice(String localOffice) {
+		this.localOffice = localOffice;
+		return this;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
+	}
+
+	public String getStatus() {
+		return status;
 	}
 
 	public Trust status(String status) {
@@ -78,12 +80,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public String getTrustKnownAs() {
-		return trustKnownAs;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
-	public void setTrustKnownAs(String trustKnownAs) {
-		this.trustKnownAs = trustKnownAs;
+	public String getTrustKnownAs() {
+		return trustKnownAs;
 	}
 
 	public Trust trustKnownAs(String trustKnownAs) {
@@ -91,12 +93,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public String getTrustName() {
-		return trustName;
+	public void setTrustKnownAs(String trustKnownAs) {
+		this.trustKnownAs = trustKnownAs;
 	}
 
-	public void setTrustName(String trustName) {
-		this.trustName = trustName;
+	public String getTrustName() {
+		return trustName;
 	}
 
 	public Trust trustName(String trustName) {
@@ -104,12 +106,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public String getTrustNumber() {
-		return trustNumber;
+	public void setTrustName(String trustName) {
+		this.trustName = trustName;
 	}
 
-	public void setTrustNumber(String trustNumber) {
-		this.trustNumber = trustNumber;
+	public String getTrustNumber() {
+		return trustNumber;
 	}
 
 	public Trust trustNumber(String trustNumber) {
@@ -117,12 +119,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public String getAddress() {
-		return address;
+	public void setTrustNumber(String trustNumber) {
+		this.trustNumber = trustNumber;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public String getAddress() {
+		return address;
 	}
 
 	public Trust address(String address) {
@@ -130,12 +132,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public String getPostCode() {
-		return postCode;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public void setPostCode(String postCode) {
-		this.postCode = postCode;
+	public String getPostCode() {
+		return postCode;
 	}
 
 	public Trust postCode(String postCode) {
@@ -143,17 +145,8 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public LocalOffice getLocalOffice() {
-		return localOffice;
-	}
-
-	public void setLocalOffice(LocalOffice localOffice) {
-		this.localOffice = localOffice;
-	}
-
-	public Trust localOffice(LocalOffice localOffice) {
-		this.localOffice = localOffice;
-		return this;
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
 	}
 
 	@Override
@@ -181,6 +174,7 @@ public class Trust implements Serializable {
 		return "Trust{" +
 				"id=" + id +
 				", code='" + code + "'" +
+				", localOffice='" + localOffice + "'" +
 				", status='" + status + "'" +
 				", trustKnownAs='" + trustKnownAs + "'" +
 				", trustName='" + trustName + "'" +

@@ -40,6 +40,9 @@ public class TrustResourceIntTest {
 	private static final String DEFAULT_CODE = "AAAAAAAAAA";
 	private static final String UPDATED_CODE = "BBBBBBBBBB";
 
+	private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
+	private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
+
 	private static final String DEFAULT_STATUS = "AAAAAAAAAA";
 	private static final String UPDATED_STATUS = "BBBBBBBBBB";
 
@@ -80,6 +83,16 @@ public class TrustResourceIntTest {
 
 	private Trust trust;
 
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		TrustResource trustResource = new TrustResource(trustRepository, trustMapper);
+		this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
+				.setCustomArgumentResolvers(pageableArgumentResolver)
+				.setControllerAdvice(exceptionTranslator)
+				.setMessageConverters(jacksonMessageConverter).build();
+	}
+
 	/**
 	 * Create an entity for this test.
 	 * <p>
@@ -89,6 +102,7 @@ public class TrustResourceIntTest {
 	public static Trust createEntity(EntityManager em) {
 		Trust trust = new Trust()
 				.code(DEFAULT_CODE)
+				.localOffice(DEFAULT_LOCAL_OFFICE)
 				.status(DEFAULT_STATUS)
 				.trustKnownAs(DEFAULT_TRUST_KNOWN_AS)
 				.trustName(DEFAULT_TRUST_NAME)
@@ -96,16 +110,6 @@ public class TrustResourceIntTest {
 				.address(DEFAULT_ADDRESS)
 				.postCode(DEFAULT_POST_CODE);
 		return trust;
-	}
-
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		TrustResource trustResource = new TrustResource(trustRepository, trustMapper);
-		this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
-				.setCustomArgumentResolvers(pageableArgumentResolver)
-				.setControllerAdvice(exceptionTranslator)
-				.setMessageConverters(jacksonMessageConverter).build();
 	}
 
 	@Before
@@ -130,6 +134,7 @@ public class TrustResourceIntTest {
 		assertThat(trustList).hasSize(databaseSizeBeforeCreate + 1);
 		Trust testTrust = trustList.get(trustList.size() - 1);
 		assertThat(testTrust.getCode()).isEqualTo(DEFAULT_CODE);
+		assertThat(testTrust.getLocalOffice()).isEqualTo(DEFAULT_LOCAL_OFFICE);
 		assertThat(testTrust.getStatus()).isEqualTo(DEFAULT_STATUS);
 		assertThat(testTrust.getTrustKnownAs()).isEqualTo(DEFAULT_TRUST_KNOWN_AS);
 		assertThat(testTrust.getTrustName()).isEqualTo(DEFAULT_TRUST_NAME);
@@ -189,6 +194,7 @@ public class TrustResourceIntTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.[*].id").value(hasItem(trust.getId().intValue())))
 				.andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
+				.andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())))
 				.andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
 				.andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS.toString())))
 				.andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME.toString())))
@@ -209,6 +215,7 @@ public class TrustResourceIntTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id").value(trust.getId().intValue()))
 				.andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
+				.andExpect(jsonPath("$.localOffice").value(DEFAULT_LOCAL_OFFICE.toString()))
 				.andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
 				.andExpect(jsonPath("$.trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS.toString()))
 				.andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME.toString()))
@@ -236,6 +243,7 @@ public class TrustResourceIntTest {
 		Trust updatedTrust = trustRepository.findOne(trust.getId());
 		updatedTrust
 				.code(UPDATED_CODE)
+				.localOffice(UPDATED_LOCAL_OFFICE)
 				.status(UPDATED_STATUS)
 				.trustKnownAs(UPDATED_TRUST_KNOWN_AS)
 				.trustName(UPDATED_TRUST_NAME)
@@ -254,6 +262,7 @@ public class TrustResourceIntTest {
 		assertThat(trustList).hasSize(databaseSizeBeforeUpdate);
 		Trust testTrust = trustList.get(trustList.size() - 1);
 		assertThat(testTrust.getCode()).isEqualTo(UPDATED_CODE);
+		assertThat(testTrust.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
 		assertThat(testTrust.getStatus()).isEqualTo(UPDATED_STATUS);
 		assertThat(testTrust.getTrustKnownAs()).isEqualTo(UPDATED_TRUST_KNOWN_AS);
 		assertThat(testTrust.getTrustName()).isEqualTo(UPDATED_TRUST_NAME);

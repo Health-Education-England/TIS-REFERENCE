@@ -40,6 +40,12 @@ public class SiteResourceIntTest {
 	private static final String DEFAULT_SITE_CODE = "AAAAAAAAAA";
 	private static final String UPDATED_SITE_CODE = "BBBBBBBBBB";
 
+	private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
+	private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
+
+	private static final String DEFAULT_TRUST_CODE = "AAAAAAAAAA";
+	private static final String UPDATED_TRUST_CODE = "BBBBBBBBBB";
+
 	private static final String DEFAULT_SITE_NAME = "AAAAAAAAAA";
 	private static final String UPDATED_SITE_NAME = "BBBBBBBBBB";
 
@@ -80,6 +86,16 @@ public class SiteResourceIntTest {
 
 	private Site site;
 
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		SiteResource siteResource = new SiteResource(siteRepository, siteMapper);
+		this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
+				.setCustomArgumentResolvers(pageableArgumentResolver)
+				.setControllerAdvice(exceptionTranslator)
+				.setMessageConverters(jacksonMessageConverter).build();
+	}
+
 	/**
 	 * Create an entity for this test.
 	 * <p>
@@ -89,6 +105,8 @@ public class SiteResourceIntTest {
 	public static Site createEntity(EntityManager em) {
 		Site site = new Site()
 				.siteCode(DEFAULT_SITE_CODE)
+				.localOffice(DEFAULT_LOCAL_OFFICE)
+				.trustCode(DEFAULT_TRUST_CODE)
 				.siteName(DEFAULT_SITE_NAME)
 				.address(DEFAULT_ADDRESS)
 				.postCode(DEFAULT_POST_CODE)
@@ -96,16 +114,6 @@ public class SiteResourceIntTest {
 				.siteNumber(DEFAULT_SITE_NUMBER)
 				.organisationalUnit(DEFAULT_ORGANISATIONAL_UNIT);
 		return site;
-	}
-
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		SiteResource siteResource = new SiteResource(siteRepository, siteMapper);
-		this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
-				.setCustomArgumentResolvers(pageableArgumentResolver)
-				.setControllerAdvice(exceptionTranslator)
-				.setMessageConverters(jacksonMessageConverter).build();
 	}
 
 	@Before
@@ -130,6 +138,8 @@ public class SiteResourceIntTest {
 		assertThat(siteList).hasSize(databaseSizeBeforeCreate + 1);
 		Site testSite = siteList.get(siteList.size() - 1);
 		assertThat(testSite.getSiteCode()).isEqualTo(DEFAULT_SITE_CODE);
+		assertThat(testSite.getLocalOffice()).isEqualTo(DEFAULT_LOCAL_OFFICE);
+		assertThat(testSite.getTrustCode()).isEqualTo(DEFAULT_TRUST_CODE);
 		assertThat(testSite.getSiteName()).isEqualTo(DEFAULT_SITE_NAME);
 		assertThat(testSite.getAddress()).isEqualTo(DEFAULT_ADDRESS);
 		assertThat(testSite.getPostCode()).isEqualTo(DEFAULT_POST_CODE);
@@ -189,6 +199,8 @@ public class SiteResourceIntTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.[*].id").value(hasItem(site.getId().intValue())))
 				.andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE.toString())))
+				.andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())))
+				.andExpect(jsonPath("$.[*].trustCode").value(hasItem(DEFAULT_TRUST_CODE.toString())))
 				.andExpect(jsonPath("$.[*].siteName").value(hasItem(DEFAULT_SITE_NAME.toString())))
 				.andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS.toString())))
 				.andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE.toString())))
@@ -209,6 +221,8 @@ public class SiteResourceIntTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id").value(site.getId().intValue()))
 				.andExpect(jsonPath("$.siteCode").value(DEFAULT_SITE_CODE.toString()))
+				.andExpect(jsonPath("$.localOffice").value(DEFAULT_LOCAL_OFFICE.toString()))
+				.andExpect(jsonPath("$.trustCode").value(DEFAULT_TRUST_CODE.toString()))
 				.andExpect(jsonPath("$.siteName").value(DEFAULT_SITE_NAME.toString()))
 				.andExpect(jsonPath("$.address").value(DEFAULT_ADDRESS.toString()))
 				.andExpect(jsonPath("$.postCode").value(DEFAULT_POST_CODE.toString()))
@@ -236,6 +250,8 @@ public class SiteResourceIntTest {
 		Site updatedSite = siteRepository.findOne(site.getId());
 		updatedSite
 				.siteCode(UPDATED_SITE_CODE)
+				.localOffice(UPDATED_LOCAL_OFFICE)
+				.trustCode(UPDATED_TRUST_CODE)
 				.siteName(UPDATED_SITE_NAME)
 				.address(UPDATED_ADDRESS)
 				.postCode(UPDATED_POST_CODE)
@@ -254,6 +270,8 @@ public class SiteResourceIntTest {
 		assertThat(siteList).hasSize(databaseSizeBeforeUpdate);
 		Site testSite = siteList.get(siteList.size() - 1);
 		assertThat(testSite.getSiteCode()).isEqualTo(UPDATED_SITE_CODE);
+		assertThat(testSite.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
+		assertThat(testSite.getTrustCode()).isEqualTo(UPDATED_TRUST_CODE);
 		assertThat(testSite.getSiteName()).isEqualTo(UPDATED_SITE_NAME);
 		assertThat(testSite.getAddress()).isEqualTo(UPDATED_ADDRESS);
 		assertThat(testSite.getPostCode()).isEqualTo(UPDATED_POST_CODE);
