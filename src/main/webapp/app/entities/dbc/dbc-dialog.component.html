@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
 
 	<div class="modal-header">
-		<h4 class="modal-title" id="myDBCLabel" jhiTranslate="referenceApp.dBC.home.createOrEditLabel">Create or edit a
+		<h4 class="modal-title" id="myDBCLabel" jhiTranslate="referenceApp.dbc.home.createOrEditLabel">Create or edit a
 			DBC</h4>
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
 				(click)="clear()">&times;</button>
@@ -14,7 +14,7 @@
 				   [(ngModel)]="dBC.id" readonly/>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label" jhiTranslate="referenceApp.dBC.dbc" for="field_dbc">Dbc</label>
+			<label class="form-control-label" jhiTranslate="referenceApp.dbc.dbc" for="field_dbc">Dbc</label>
 			<input type="text" class="form-control" name="dbc" id="field_dbc"
 				   [(ngModel)]="dBC.dbc"
 				   required/>
@@ -26,7 +26,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label" jhiTranslate="referenceApp.dBC.name" for="field_name">Name</label>
+			<label class="form-control-label" jhiTranslate="referenceApp.dbc.name" for="field_name">Name</label>
 			<input type="text" class="form-control" name="name" id="field_name"
 				   [(ngModel)]="dBC.name"
 				   required/>
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="form-control-label" jhiTranslate="referenceApp.dBC.abbr" for="field_abbr">Abbr</label>
+			<label class="form-control-label" jhiTranslate="referenceApp.dbc.abbr" for="field_abbr">Abbr</label>
 			<input type="text" class="form-control" name="abbr" id="field_abbr"
 				   [(ngModel)]="dBC.abbr"
 				   required/>

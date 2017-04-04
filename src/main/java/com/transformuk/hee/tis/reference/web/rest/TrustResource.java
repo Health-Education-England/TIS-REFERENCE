@@ -3,15 +3,22 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.Trust;
 import com.transformuk.hee.tis.reference.repository.TrustRepository;
+import com.transformuk.hee.tis.reference.service.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.service.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.mapper.TrustMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +30,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * REST controller for managing Trust.
@@ -36,12 +45,17 @@ public class TrustResource {
 	private static final String ENTITY_NAME = "trust";
 
 	private final TrustRepository trustRepository;
-
 	private final TrustMapper trustMapper;
+	private final SitesTrustsService sitesTrustsService;
 
-	public TrustResource(TrustRepository trustRepository, TrustMapper trustMapper) {
+	private final int limit;
+
+	public TrustResource(TrustRepository trustRepository, TrustMapper trustMapper, SitesTrustsService sitesTrustsService,
+						 @Value("${search.result.limit:100}") int limit) {
 		this.trustRepository = trustRepository;
 		this.trustMapper = trustMapper;
+		this.sitesTrustsService = sitesTrustsService;
+		this.limit = limit;
 	}
 
 	/**
@@ -106,6 +120,18 @@ public class TrustResource {
 		return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "searchTrusts()",
+			notes = "Returns a list of trusts matching given search string",
+			response = List.class, responseContainer = "Trusts List")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Trusts list", response = LimitedListResponse.class)})
+	@RequestMapping(method = GET, value = "/trusts/search")
+	public LimitedListResponse<TrustDTO> searchTrusts(@RequestParam(value = "searchString") String searchString)
+			throws Exception {
+		List<TrustDTO> ret = trustMapper.trustsToTrustDTOs(sitesTrustsService.searchTrusts(searchString));
+		return new LimitedListResponse<> (ret, limit);
+	}
+
 	/**
 	 * GET  /trusts/:id : get the "id" trust.
 	 *
@@ -117,6 +143,21 @@ public class TrustResource {
 	public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
 		log.debug("REST request to get Trust : {}", id);
 		Trust trust = trustRepository.findOne(id);
+		TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
+		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
+	}
+
+	/**
+	 * GET  /trusts/code/:code : get the "code" trust.
+	 *
+	 * @param code the code of the trustDTO to retrieve
+	 * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
+	 */
+	@GetMapping("/trusts/code/{code}")
+	@Timed
+	public ResponseEntity<TrustDTO> getTrust(@PathVariable String code) {
+		log.debug("REST request to get Trust by code: {}", code);
+		Trust trust = trustRepository.findByCode(code);
 		TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
 		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
 	}

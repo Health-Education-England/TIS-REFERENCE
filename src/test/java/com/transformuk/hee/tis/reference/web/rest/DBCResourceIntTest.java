@@ -104,7 +104,7 @@ public class DBCResourceIntTest {
 
 		// Create the DBC
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
-		restDBCMockMvc.perform(post("/api/d-bcs")
+		restDBCMockMvc.perform(post("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isCreated());
@@ -128,7 +128,7 @@ public class DBCResourceIntTest {
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
 		// An entity with an existing ID cannot be created, so this API call must fail
-		restDBCMockMvc.perform(post("/api/d-bcs")
+		restDBCMockMvc.perform(post("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isBadRequest());
@@ -148,7 +148,7 @@ public class DBCResourceIntTest {
 		// Create the DBC, which fails.
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
-		restDBCMockMvc.perform(post("/api/d-bcs")
+		restDBCMockMvc.perform(post("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isBadRequest());
@@ -167,7 +167,7 @@ public class DBCResourceIntTest {
 		// Create the DBC, which fails.
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
-		restDBCMockMvc.perform(post("/api/d-bcs")
+		restDBCMockMvc.perform(post("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isBadRequest());
@@ -186,7 +186,7 @@ public class DBCResourceIntTest {
 		// Create the DBC, which fails.
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
-		restDBCMockMvc.perform(post("/api/d-bcs")
+		restDBCMockMvc.perform(post("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isBadRequest());
@@ -202,7 +202,7 @@ public class DBCResourceIntTest {
 		dBCRepository.saveAndFlush(dBC);
 
 		// Get all the dBCList
-		restDBCMockMvc.perform(get("/api/d-bcs?sort=id,desc"))
+		restDBCMockMvc.perform(get("/api/dbcs?sort=id,desc"))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.[*].id").value(hasItem(dBC.getId().intValue())))
@@ -218,7 +218,7 @@ public class DBCResourceIntTest {
 		dBCRepository.saveAndFlush(dBC);
 
 		// Get the dBC
-		restDBCMockMvc.perform(get("/api/d-bcs/{id}", dBC.getId()))
+		restDBCMockMvc.perform(get("/api/dbcs/{id}", dBC.getId()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id").value(dBC.getId().intValue()))
@@ -229,9 +229,24 @@ public class DBCResourceIntTest {
 
 	@Test
 	@Transactional
+	public void getDBCByCode() throws Exception {
+		// Initialize the database
+		dBCRepository.saveAndFlush(dBC);
+
+		// Get the dBC
+		restDBCMockMvc.perform(get("/api/dbcs/code/1-AIIDH1"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.dbc").value("1-AIIDH1"))
+				.andExpect(jsonPath("$.name").value("Health Education Thames Valley"))
+				.andExpect(jsonPath("$.abbr").value("TV"));
+	}
+
+	@Test
+	@Transactional
 	public void getNonExistingDBC() throws Exception {
 		// Get the dBC
-		restDBCMockMvc.perform(get("/api/d-bcs/{id}", Long.MAX_VALUE))
+		restDBCMockMvc.perform(get("/api/dbcs/{id}", Long.MAX_VALUE))
 				.andExpect(status().isNotFound());
 	}
 
@@ -250,7 +265,7 @@ public class DBCResourceIntTest {
 				.abbr(UPDATED_ABBR);
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(updatedDBC);
 
-		restDBCMockMvc.perform(put("/api/d-bcs")
+		restDBCMockMvc.perform(put("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isOk());
@@ -273,7 +288,7 @@ public class DBCResourceIntTest {
 		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
 		// If the entity doesn't have an ID, it will be created instead of just being updated
-		restDBCMockMvc.perform(put("/api/d-bcs")
+		restDBCMockMvc.perform(put("/api/dbcs")
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
 				.andExpect(status().isCreated());
@@ -291,7 +306,7 @@ public class DBCResourceIntTest {
 		int databaseSizeBeforeDelete = dBCRepository.findAll().size();
 
 		// Get the dBC
-		restDBCMockMvc.perform(delete("/api/d-bcs/{id}", dBC.getId())
+		restDBCMockMvc.perform(delete("/api/dbcs/{id}", dBC.getId())
 				.accept(TestUtil.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk());
 

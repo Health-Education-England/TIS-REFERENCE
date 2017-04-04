@@ -3,7 +3,7 @@ import {ReferenceMaritalStatusModule} from "./marital-status/marital-status.modu
 import {ReferenceAssessmentTypeModule} from "./assessment-type/assessment-type.module";
 import {ReferenceCountryModule} from "./country/country.module";
 import {ReferenceCurriculumSubTypeModule} from "./curriculum-sub-type/curriculum-sub-type.module";
-import {ReferenceDBCModule} from "./d-bc/dbc.module";
+import {ReferenceDBCModule} from "./dbc/dbc.module";
 import {ReferenceEthnicOriginModule} from "./ethnic-origin/ethnic-origin.module";
 import {ReferenceFundingIssueModule} from "./funding-issue/funding-issue.module";
 import {ReferenceFundingTypeModule} from "./funding-type/funding-type.module";

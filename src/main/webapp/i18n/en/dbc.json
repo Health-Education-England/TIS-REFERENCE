@@ -1,8 +1,8 @@
 {
   "referenceApp": {
-	"dBC": {
+	"dbc": {
 	  "home": {
-		"title": "DBCS",
+		"title": "Designated Body Codes",
 		"createLabel": "Create a new DBC",
 		"createOrEditLabel": "Create or edit a DBC"
 	  },
@@ -13,9 +13,9 @@
 		"question": "Are you sure you want to delete DBC {{ id }}?"
 	  },
 	  "detail": {
-		"title": "DBC"
+		"title": "Designated Body Code"
 	  },
-	  "dbc": "Dbc",
+	  "dbc": "dbc",
 	  "name": "Name",
 	  "abbr": "Abbr"
 	}

@@ -37,13 +37,13 @@ public class DBCResource {
 	}
 
 	/**
-	 * POST  /d-bcs : Create a new dBC.
+	 * POST  /dbcs : Create a new dBC.
 	 *
 	 * @param dBCDTO the dBCDTO to create
 	 * @return the ResponseEntity with status 201 (Created) and with body the new dBCDTO, or with status 400 (Bad Request) if the dBC has already an ID
 	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
-	@PostMapping("/d-bcs")
+	@PostMapping("/dbcs")
 	@Timed
 	public ResponseEntity<DBCDTO> createDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
 		log.debug("REST request to save DBC : {}", dBCDTO);
@@ -53,13 +53,13 @@ public class DBCResource {
 		DBC dBC = dBCMapper.dBCDTOToDBC(dBCDTO);
 		dBC = dBCRepository.save(dBC);
 		DBCDTO result = dBCMapper.dBCToDBCDTO(dBC);
-		return ResponseEntity.created(new URI("/api/d-bcs/" + result.getId()))
+		return ResponseEntity.created(new URI("/api/dbcs/" + result.getId()))
 				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
 				.body(result);
 	}
 
 	/**
-	 * PUT  /d-bcs : Updates an existing dBC.
+	 * PUT  /dbcs : Updates an existing dBC.
 	 *
 	 * @param dBCDTO the dBCDTO to update
 	 * @return the ResponseEntity with status 200 (OK) and with body the updated dBCDTO,
@@ -67,7 +67,7 @@ public class DBCResource {
 	 * or with status 500 (Internal Server Error) if the dBCDTO couldnt be updated
 	 * @throws URISyntaxException if the Location URI syntax is incorrect
 	 */
-	@PutMapping("/d-bcs")
+	@PutMapping("/dbcs")
 	@Timed
 	public ResponseEntity<DBCDTO> updateDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
 		log.debug("REST request to update DBC : {}", dBCDTO);
@@ -83,11 +83,11 @@ public class DBCResource {
 	}
 
 	/**
-	 * GET  /d-bcs : get all the dBCS.
+	 * GET  /dbcs : get all the dBCS.
 	 *
 	 * @return the ResponseEntity with status 200 (OK) and the list of dBCS in body
 	 */
-	@GetMapping("/d-bcs")
+	@GetMapping("/dbcs")
 	@Timed
 	public List<DBCDTO> getAllDBCS() {
 		log.debug("REST request to get all DBCS");
@@ -96,12 +96,12 @@ public class DBCResource {
 	}
 
 	/**
-	 * GET  /d-bcs/:id : get the "id" dBC.
+	 * GET  /dbcs/:id : get the "id" dBC.
 	 *
 	 * @param id the id of the dBCDTO to retrieve
 	 * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404 (Not Found)
 	 */
-	@GetMapping("/d-bcs/{id}")
+	@GetMapping("/dbcs/{id}")
 	@Timed
 	public ResponseEntity<DBCDTO> getDBC(@PathVariable Long id) {
 		log.debug("REST request to get DBC : {}", id);
@@ -111,12 +111,27 @@ public class DBCResource {
 	}
 
 	/**
-	 * DELETE  /d-bcs/:id : delete the "id" dBC.
+	 * GET  /dbcs/code/:code : get the "code" dBC.
+	 *
+	 * @param code the code of the dBCDTO to retrieve
+	 * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404 (Not Found)
+	 */
+	@GetMapping("/dbcs/code/{code}")
+	@Timed
+	public ResponseEntity<DBCDTO> getDBCByCode(@PathVariable String code) {
+		log.debug("REST request to get DBC by code: {}", code);
+		DBC dBC = dBCRepository.findByDbc(code);
+		DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
+		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(dBCDTO));
+	}
+
+	/**
+	 * DELETE  /dbcs/:id : delete the "id" dBC.
 	 *
 	 * @param id the id of the dBCDTO to delete
 	 * @return the ResponseEntity with status 200 (OK)
 	 */
-	@DeleteMapping("/d-bcs/{id}")
+	@DeleteMapping("/dbcs/{id}")
 	@Timed
 	public ResponseEntity<Void> deleteDBC(@PathVariable Long id) {
 		log.debug("REST request to delete DBC : {}", id);

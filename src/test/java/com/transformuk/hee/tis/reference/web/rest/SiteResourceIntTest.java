@@ -4,6 +4,7 @@ import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Site;
 import com.transformuk.hee.tis.reference.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.mapper.SiteMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
@@ -71,6 +72,9 @@ public class SiteResourceIntTest {
 	private SiteMapper siteMapper;
 
 	@Autowired
+	private SitesTrustsService sitesTrustsService;
+
+	@Autowired
 	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
 	@Autowired
@@ -89,7 +93,7 @@ public class SiteResourceIntTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		SiteResource siteResource = new SiteResource(siteRepository, siteMapper);
+		SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService, 100);
 		this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
 				.setCustomArgumentResolvers(pageableArgumentResolver)
 				.setControllerAdvice(exceptionTranslator)
@@ -207,6 +211,59 @@ public class SiteResourceIntTest {
 				.andExpect(jsonPath("$.[*].siteKnownAs").value(hasItem(DEFAULT_SITE_KNOWN_AS.toString())))
 				.andExpect(jsonPath("$.[*].siteNumber").value(hasItem(DEFAULT_SITE_NUMBER.toString())))
 				.andExpect(jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT.toString())));
+	}
+
+	@Test
+	@Transactional
+	public void searchForSite() throws Exception {
+		// Initialize the database
+		siteRepository.saveAndFlush(site);
+
+		// Get all the siteList
+		restSiteMockMvc.perform(get("/api/sites/search?searchString=R1AAA"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.total").value(1))
+				.andExpect(jsonPath("$.list[0].siteCode").value("R1AAA"))
+				.andExpect(jsonPath("$.list[0].trustCode").value("R1A"))
+				.andExpect(jsonPath("$.list[0].siteName").value("Malvern Friends Meeting House"))
+				.andExpect(jsonPath("$.list[0].address").value("1 Orchard Road Malvern Worcestershire"))
+				.andExpect(jsonPath("$.list[0].postCode").value("WR14 3DA"));
+	}
+
+	@Test
+	@Transactional
+	public void searchForSiteInTrust() throws Exception {
+		// Initialize the database
+		siteRepository.saveAndFlush(site);
+
+		// Get all the siteList
+		restSiteMockMvc.perform(get("/api/sites/search-by-trust/R1A?searchString=R1AAA"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.total").value(1))
+				.andExpect(jsonPath("$.list[0].siteCode").value("R1AAA"))
+				.andExpect(jsonPath("$.list[0].trustCode").value("R1A"))
+				.andExpect(jsonPath("$.list[0].siteName").value("Malvern Friends Meeting House"))
+				.andExpect(jsonPath("$.list[0].address").value("1 Orchard Road Malvern Worcestershire"))
+				.andExpect(jsonPath("$.list[0].postCode").value("WR14 3DA"));
+	}
+
+	@Test
+	@Transactional
+	public void getSiteByCode() throws Exception {
+		// Initialize the database
+		siteRepository.saveAndFlush(site);
+
+		// Get all the siteList
+		restSiteMockMvc.perform(get("/api/sites/code/R1AAA"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.siteCode").value("R1AAA"))
+				.andExpect(jsonPath("$.trustCode").value("R1A"))
+				.andExpect(jsonPath("$.siteName").value("Malvern Friends Meeting House"))
+				.andExpect(jsonPath("$.address").value("1 Orchard Road Malvern Worcestershire"))
+				.andExpect(jsonPath("$.postCode").value("WR14 3DA"));
 	}
 
 	@Test

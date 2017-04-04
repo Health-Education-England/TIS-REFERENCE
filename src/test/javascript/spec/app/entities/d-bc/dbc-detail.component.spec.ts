@@ -8,9 +8,9 @@ import {Observable} from "rxjs/Rx";
 import {DateUtils, DataUtils, JhiLanguageService} from "ng-jhipster";
 import {MockLanguageService} from "../../../helpers/mock-language.service";
 import {MockActivatedRoute} from "../../../helpers/mock-route.service";
-import {DBCDetailComponent} from "../../../../../../main/webapp/app/entities/d-bc/dbc-detail.component";
-import {DBCService} from "../../../../../../main/webapp/app/entities/d-bc/dbc.service";
-import {DBC} from "../../../../../../main/webapp/app/entities/d-bc/dbc.model";
+import {DBCDetailComponent} from "../../../../../../main/webapp/app/entities/dbc/dbc-detail.component";
+import {DBCService} from "../../../../../../main/webapp/app/entities/dbc/dbc.service";
+import {DBC} from "../../../../../../main/webapp/app/entities/dbc/dbc.model";
 
 describe('Component Tests', () => {
 

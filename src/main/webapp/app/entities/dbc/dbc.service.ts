@@ -5,7 +5,7 @@ import {DBC} from "./dbc.model";
 @Injectable()
 export class DBCService {
 
-	private resourceUrl = 'api/d-bcs';
+	private resourceUrl = 'api/dbcs';
 
 	constructor(private http: Http) {
 	}

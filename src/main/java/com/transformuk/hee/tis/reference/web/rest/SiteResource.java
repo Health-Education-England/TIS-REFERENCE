@@ -3,15 +3,23 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.Site;
 import com.transformuk.hee.tis.reference.repository.SiteRepository;
+import com.transformuk.hee.tis.reference.service.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.service.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.service.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.mapper.SiteMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +31,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * REST controller for managing Site.
@@ -36,12 +46,17 @@ public class SiteResource {
 	private static final String ENTITY_NAME = "site";
 
 	private final SiteRepository siteRepository;
-
 	private final SiteMapper siteMapper;
+	private final SitesTrustsService sitesTrustsService;
 
-	public SiteResource(SiteRepository siteRepository, SiteMapper siteMapper) {
+	private final int limit;
+
+	public SiteResource(SiteRepository siteRepository, SiteMapper siteMapper, SitesTrustsService sitesTrustsService,
+						@Value("${search.result.limit:100}") int limit) {
 		this.siteRepository = siteRepository;
 		this.siteMapper = siteMapper;
+		this.sitesTrustsService = sitesTrustsService;
+		this.limit = limit;
 	}
 
 	/**
@@ -106,6 +121,31 @@ public class SiteResource {
 		return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "searchSites()",
+			notes = "Returns a list of sites matching given search string",
+			response = List.class, responseContainer = "Sites List")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Sites list", response = LimitedListResponse.class)})
+	@RequestMapping(method = GET, value = "/sites/search")
+	public LimitedListResponse<SiteDTO> searchSites(
+			@RequestParam(value = "searchString", required = false) String searchString) throws Exception {
+		List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSites(searchString));
+		return new LimitedListResponse<> (ret, limit);
+	}
+
+	@ApiOperation(value = "searchSitesWithinATrustCode()",
+			notes = "Returns a list of sites with a given trust code and given search string",
+			response = List.class, responseContainer = "Sites List")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Sites list", response = LimitedListResponse.class)})
+	@RequestMapping(method = GET, value = "/sites/search-by-trust/{trustCode}")
+	public LimitedListResponse<SiteDTO> searchSitesWithinATrustCode(@PathVariable(value = "trustCode") String trustCode,
+																 @RequestParam(value = "searchString", required = false)
+																		 String searchString) throws Exception {
+		List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSitesWithinTrust(trustCode, searchString));
+		return new LimitedListResponse<> (ret, limit);
+	}
+
 	/**
 	 * GET  /sites/:id : get the "id" site.
 	 *
@@ -117,6 +157,21 @@ public class SiteResource {
 	public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
 		log.debug("REST request to get Site : {}", id);
 		Site site = siteRepository.findOne(id);
+		SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
+		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteDTO));
+	}
+
+	/**
+	 * GET  /sites/code/:code : get the "code" site.
+	 *
+	 * @param code the code of the siteDTO to retrieve
+	 * @return the ResponseEntity with status 200 (OK) and with body the siteDTO, or with status 404 (Not Found)
+	 */
+	@GetMapping("/sites/code/{code}")
+	@Timed
+	public ResponseEntity<SiteDTO> getSiteByCode(@PathVariable String code) {
+		log.debug("REST request to get Site by code : {}", code);
+		Site site = siteRepository.findBySiteCode(code);
 		SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
 		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteDTO));
 	}

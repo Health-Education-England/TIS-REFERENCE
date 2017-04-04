@@ -12,14 +12,14 @@ export const dBCRoute: Routes = [
 		component: DBCComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'referenceApp.dBC.home.title'
+			pageTitle: 'referenceApp.dbc.home.title'
 		}
 	}, {
 		path: 'dbc/:id',
 		component: DBCDetailComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'referenceApp.dBC.home.title'
+			pageTitle: 'referenceApp.dbc.home.title'
 		}
 	}
 ];
@@ -30,7 +30,7 @@ export const dBCPopupRoute: Routes = [
 		component: DBCPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'referenceApp.dBC.home.title'
+			pageTitle: 'referenceApp.dbc.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -39,7 +39,7 @@ export const dBCPopupRoute: Routes = [
 		component: DBCPopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'referenceApp.dBC.home.title'
+			pageTitle: 'referenceApp.dbc.home.title'
 		},
 		outlet: 'popup'
 	},
@@ -48,7 +48,7 @@ export const dBCPopupRoute: Routes = [
 		component: DBCDeletePopupComponent,
 		data: {
 			authorities: ['ROLE_USER'],
-			pageTitle: 'referenceApp.dBC.home.title'
+			pageTitle: 'referenceApp.dbc.home.title'
 		},
 		outlet: 'popup'
 	}

@@ -1,12 +1,17 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.domain.DBC;
 import com.transformuk.hee.tis.reference.domain.Grade;
 import com.transformuk.hee.tis.reference.repository.GradeRepository;
+import com.transformuk.hee.tis.reference.service.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.GradeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * REST controller for managing Grade.
@@ -106,6 +113,21 @@ public class GradeResource {
 	public ResponseEntity<GradeDTO> getGrade(@PathVariable Long id) {
 		log.debug("REST request to get Grade : {}", id);
 		Grade grade = gradeRepository.findOne(id);
+		GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
+		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
+	}
+
+	/**
+	 * GET  /grades/code/:code : get the "code" grade.
+	 *
+	 * @param code the code of the gradeDTO to retrieve
+	 * @return the ResponseEntity with status 200 (OK) and with body the gradeDTO, or with status 404 (Not Found)
+	 */
+	@GetMapping("/grades/code/{code}")
+	@Timed
+	public ResponseEntity<GradeDTO> getGradeByCode(@PathVariable String code) {
+		log.debug("REST request to get Grade by code: {}", code);
+		Grade grade = gradeRepository.findByAbbreviation(code);
 		GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
 		return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
 	}

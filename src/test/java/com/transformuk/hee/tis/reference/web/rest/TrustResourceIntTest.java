@@ -4,6 +4,7 @@ import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Trust;
 import com.transformuk.hee.tis.reference.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.mapper.TrustMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
@@ -68,6 +69,9 @@ public class TrustResourceIntTest {
 	private TrustMapper trustMapper;
 
 	@Autowired
+	private SitesTrustsService sitesTrustsService;
+
+	@Autowired
 	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
 	@Autowired
@@ -86,7 +90,7 @@ public class TrustResourceIntTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		TrustResource trustResource = new TrustResource(trustRepository, trustMapper);
+		TrustResource trustResource = new TrustResource(trustRepository, trustMapper, sitesTrustsService, 100);
 		this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
 				.setCustomArgumentResolvers(pageableArgumentResolver)
 				.setControllerAdvice(exceptionTranslator)
@@ -205,6 +209,21 @@ public class TrustResourceIntTest {
 
 	@Test
 	@Transactional
+	public void searchTrusts() throws Exception {
+		// Initialize the database
+		trustRepository.saveAndFlush(trust);
+
+		// Get all the trustList
+		restTrustMockMvc.perform(get("/api/trusts/search/?searchString=R1A"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.total").value(1))
+				.andExpect(jsonPath("$.list[0].code").value("R1A"))
+				.andExpect(jsonPath("$.list[0].trustName").value("Worcestershire Health and Care NHS Trust"));
+	}
+
+	@Test
+	@Transactional
 	public void getTrust() throws Exception {
 		// Initialize the database
 		trustRepository.saveAndFlush(trust);
@@ -222,6 +241,20 @@ public class TrustResourceIntTest {
 				.andExpect(jsonPath("$.trustNumber").value(DEFAULT_TRUST_NUMBER.toString()))
 				.andExpect(jsonPath("$.address").value(DEFAULT_ADDRESS.toString()))
 				.andExpect(jsonPath("$.postCode").value(DEFAULT_POST_CODE.toString()));
+	}
+
+	@Test
+	@Transactional
+	public void getTrustByCode() throws Exception {
+		// Initialize the database
+		trustRepository.saveAndFlush(trust);
+
+		// Get all the trustList
+		restTrustMockMvc.perform(get("/api/trusts/code/R1A"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.code").value("R1A"))
+				.andExpect(jsonPath("$.trustName").value("Worcestershire Health and Care NHS Trust"));
 	}
 
 	@Test
