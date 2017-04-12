@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.Trust;
-import com.transformuk.hee.tis.reference.service.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

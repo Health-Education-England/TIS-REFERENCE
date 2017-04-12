@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Country;
 import com.transformuk.hee.tis.reference.repository.CountryRepository;
-import com.transformuk.hee.tis.reference.service.dto.CountryDTO;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.service.mapper.CountryMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

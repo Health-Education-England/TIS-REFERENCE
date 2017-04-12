@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Grade;
 import com.transformuk.hee.tis.reference.repository.GradeRepository;
-import com.transformuk.hee.tis.reference.service.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.GradeMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

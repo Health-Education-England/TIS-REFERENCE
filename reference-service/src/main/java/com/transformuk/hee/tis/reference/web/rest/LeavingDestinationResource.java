@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.LeavingDestination;
 import com.transformuk.hee.tis.reference.repository.LeavingDestinationRepository;
-import com.transformuk.hee.tis.reference.service.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import com.transformuk.hee.tis.reference.service.mapper.LeavingDestinationMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

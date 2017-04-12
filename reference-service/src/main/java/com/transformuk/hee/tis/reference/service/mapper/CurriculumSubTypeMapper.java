@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.CurriculumSubType;
-import com.transformuk.hee.tis.reference.service.dto.CurriculumSubTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.ReligiousBelief;
 import com.transformuk.hee.tis.reference.repository.ReligiousBeliefRepository;
-import com.transformuk.hee.tis.reference.service.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.service.mapper.ReligiousBeliefMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

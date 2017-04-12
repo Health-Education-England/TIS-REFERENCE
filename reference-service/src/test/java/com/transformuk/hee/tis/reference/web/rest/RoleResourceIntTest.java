@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Role;
 import com.transformuk.hee.tis.reference.repository.RoleRepository;
-import com.transformuk.hee.tis.reference.service.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.service.mapper.RoleMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

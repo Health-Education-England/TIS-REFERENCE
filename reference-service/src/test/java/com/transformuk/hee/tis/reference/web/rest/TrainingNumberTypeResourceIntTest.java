@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.TrainingNumberType;
 import com.transformuk.hee.tis.reference.repository.TrainingNumberTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.TrainingNumberTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.TrainingNumberTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

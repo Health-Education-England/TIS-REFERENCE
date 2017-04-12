@@ -1,17 +1,13 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.domain.DBC;
 import com.transformuk.hee.tis.reference.domain.Grade;
 import com.transformuk.hee.tis.reference.repository.GradeRepository;
-import com.transformuk.hee.tis.reference.service.dto.DBCDTO;
-import com.transformuk.hee.tis.reference.service.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.GradeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * REST controller for managing Grade.

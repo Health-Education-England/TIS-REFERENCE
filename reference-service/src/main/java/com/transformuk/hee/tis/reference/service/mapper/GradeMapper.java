@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.Grade;
-import com.transformuk.hee.tis.reference.service.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

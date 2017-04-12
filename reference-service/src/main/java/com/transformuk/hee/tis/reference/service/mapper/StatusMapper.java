@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.Status;
-import com.transformuk.hee.tis.reference.service.dto.StatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

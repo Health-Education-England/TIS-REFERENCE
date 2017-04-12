@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.TariffRate;
 import com.transformuk.hee.tis.reference.repository.TariffRateRepository;
-import com.transformuk.hee.tis.reference.service.dto.TariffRateDTO;
+import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.service.mapper.TariffRateMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

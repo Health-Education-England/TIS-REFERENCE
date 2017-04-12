@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.TrainingNumberType;
 import com.transformuk.hee.tis.reference.repository.TrainingNumberTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.TrainingNumberTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.TrainingNumberTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.MedicalSchool;
 import com.transformuk.hee.tis.reference.repository.MedicalSchoolRepository;
-import com.transformuk.hee.tis.reference.service.dto.MedicalSchoolDTO;
+import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.mapper.MedicalSchoolMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

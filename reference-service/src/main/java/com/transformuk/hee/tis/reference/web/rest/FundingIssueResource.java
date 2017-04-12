@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.FundingIssue;
 import com.transformuk.hee.tis.reference.repository.FundingIssueRepository;
-import com.transformuk.hee.tis.reference.service.dto.FundingIssueDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
 import com.transformuk.hee.tis.reference.service.mapper.FundingIssueMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.MedicalSchool;
 import com.transformuk.hee.tis.reference.repository.MedicalSchoolRepository;
-import com.transformuk.hee.tis.reference.service.dto.MedicalSchoolDTO;
+import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.mapper.MedicalSchoolMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

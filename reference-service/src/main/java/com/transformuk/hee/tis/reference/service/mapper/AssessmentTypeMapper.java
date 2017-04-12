@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.AssessmentType;
-import com.transformuk.hee.tis.reference.service.dto.AssessmentTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

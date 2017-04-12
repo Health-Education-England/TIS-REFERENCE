@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.Gender;
-import com.transformuk.hee.tis.reference.service.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

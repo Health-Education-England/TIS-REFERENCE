@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.MedicalSchool;
-import com.transformuk.hee.tis.reference.service.dto.MedicalSchoolDTO;
+import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

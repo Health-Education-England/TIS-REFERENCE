@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.repository.ProgrammeMembershipTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.ProgrammeMembershipTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

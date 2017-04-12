@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.College;
 import com.transformuk.hee.tis.reference.repository.CollegeRepository;
-import com.transformuk.hee.tis.reference.service.dto.CollegeDTO;
+import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.CollegeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

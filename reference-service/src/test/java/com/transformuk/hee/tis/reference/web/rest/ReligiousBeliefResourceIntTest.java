@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.ReligiousBelief;
 import com.transformuk.hee.tis.reference.repository.ReligiousBeliefRepository;
-import com.transformuk.hee.tis.reference.service.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.service.mapper.ReligiousBeliefMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

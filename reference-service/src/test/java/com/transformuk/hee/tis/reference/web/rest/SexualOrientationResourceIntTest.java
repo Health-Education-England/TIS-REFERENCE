@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.SexualOrientation;
 import com.transformuk.hee.tis.reference.repository.SexualOrientationRepository;
-import com.transformuk.hee.tis.reference.service.dto.SexualOrientationDTO;
+import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.service.mapper.SexualOrientationMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

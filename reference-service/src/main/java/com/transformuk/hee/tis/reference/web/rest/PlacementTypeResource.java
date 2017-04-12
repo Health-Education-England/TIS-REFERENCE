@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.PlacementType;
 import com.transformuk.hee.tis.reference.repository.PlacementTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.PlacementTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

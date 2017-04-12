@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.repository.ProgrammeMembershipTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.ProgrammeMembershipTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

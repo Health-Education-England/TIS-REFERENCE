@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.ProgrammeMembershipType;
-import com.transformuk.hee.tis.reference.service.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.Site;
 import com.transformuk.hee.tis.reference.repository.SiteRepository;
-import com.transformuk.hee.tis.reference.service.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.mapper.SiteMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;

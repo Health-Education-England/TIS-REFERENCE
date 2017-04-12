@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.DBC;
-import com.transformuk.hee.tis.reference.service.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

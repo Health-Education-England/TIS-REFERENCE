@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.TariffRate;
-import com.transformuk.hee.tis.reference.service.dto.TariffRateDTO;
+import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

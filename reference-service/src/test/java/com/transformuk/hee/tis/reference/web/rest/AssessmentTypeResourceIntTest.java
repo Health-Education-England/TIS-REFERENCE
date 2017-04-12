@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.transformuk.hee.tis.reference.ReferenceApp;
 import com.transformuk.hee.tis.reference.domain.AssessmentType;
 import com.transformuk.hee.tis.reference.repository.AssessmentTypeRepository;
-import com.transformuk.hee.tis.reference.service.dto.AssessmentTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.service.mapper.AssessmentTypeMapper;
 import com.transformuk.hee.tis.reference.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;

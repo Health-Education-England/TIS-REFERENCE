@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.domain.InactiveReason;
 import com.transformuk.hee.tis.reference.repository.InactiveReasonRepository;
-import com.transformuk.hee.tis.reference.service.dto.InactiveReasonDTO;
+import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.service.mapper.InactiveReasonMapper;
 import com.transformuk.hee.tis.reference.web.rest.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.web.rest.util.PaginationUtil;

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.mapper;
 
 import com.transformuk.hee.tis.reference.domain.ReligiousBelief;
-import com.transformuk.hee.tis.reference.service.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;
