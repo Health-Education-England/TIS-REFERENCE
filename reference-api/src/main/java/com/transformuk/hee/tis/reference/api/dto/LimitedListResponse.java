@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference.service.dto;
+package com.transformuk.hee.tis.reference.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;

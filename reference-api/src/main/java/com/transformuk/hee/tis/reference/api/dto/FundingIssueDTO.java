@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference.service.dto;
+package com.transformuk.hee.tis.reference.api.dto;
 
 
 import javax.validation.constraints.NotNull;
