@@ -21,10 +21,9 @@ import static org.springframework.util.StringUtils.isEmpty;
 @Service
 public class SitesTrustsService {
 
+	private final int limit;
 	private SiteRepository siteRepository;
 	private TrustRepository trustRepository;
-
-	private final int limit;
 
 	@Autowired
 	public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
@@ -36,11 +35,12 @@ public class SitesTrustsService {
 
 	/**
 	 * Searches all sites who have data containing given searchString
+	 *
 	 * @param searchString search string to be searched for site data
 	 * @return List of {@link Site} matching searchString
 	 */
 	public List<Site> searchSites(String searchString) {
-		if(!isEmpty(searchString)) {
+		if (!isEmpty(searchString)) {
 			return siteRepository.findBySearchString(searchString, new PageRequest(0, limit));
 		} else {
 			return siteRepository.findAll();
@@ -49,6 +49,7 @@ public class SitesTrustsService {
 
 	/**
 	 * Finds a grade given it's code
+	 *
 	 * @param siteCode the site code - NOT NULL
 	 * @return the site if found, null otherwise
 	 */
@@ -58,13 +59,12 @@ public class SitesTrustsService {
 	}
 
 	/**
-	 *
-	 * @param trustCode Trust code for a trust inside which the sites have to be searched
+	 * @param trustCode    Trust code for a trust inside which the sites have to be searched
 	 * @param searchString search string to be searched for site data
 	 * @return List of {@link Site} matching searchString for given trustCode
 	 */
 	public List<Site> searchSitesWithinTrust(String trustCode, String searchString) {
-		if(!isEmpty(searchString)) {
+		if (!isEmpty(searchString)) {
 			return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString, new PageRequest(0, limit));
 		} else {
 			return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
@@ -73,6 +73,7 @@ public class SitesTrustsService {
 
 	/**
 	 * Returns a trust with given code
+	 *
 	 * @param trustCode Code for a trust - NOT NULL
 	 * @return {@link Trust} if found, null otherwise
 	 */
@@ -83,11 +84,12 @@ public class SitesTrustsService {
 
 	/**
 	 * Searches all trusts who have data containing given searchString
+	 *
 	 * @param searchString search string to be searched for trust data
 	 * @return List of {@link Trust} matching searchString
 	 */
 	public List<Trust> searchTrusts(String searchString) {
-		if(!isEmpty(searchString)) {
+		if (!isEmpty(searchString)) {
 			return trustRepository.findBySearchString(searchString, new PageRequest(0, limit));
 		} else {
 			return trustRepository.findAll();

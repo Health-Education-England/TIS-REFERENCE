@@ -40,10 +40,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/api")
 public class SiteResource {
 
-	private final Logger log = LoggerFactory.getLogger(SiteResource.class);
-
 	private static final String ENTITY_NAME = "site";
-
+	private final Logger log = LoggerFactory.getLogger(SiteResource.class);
 	private final SiteRepository siteRepository;
 	private final SiteMapper siteMapper;
 	private final SitesTrustsService sitesTrustsService;
@@ -129,7 +127,7 @@ public class SiteResource {
 	public LimitedListResponse<SiteDTO> searchSites(
 			@RequestParam(value = "searchString", required = false) String searchString) throws Exception {
 		List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSites(searchString));
-		return new LimitedListResponse<> (ret, limit);
+		return new LimitedListResponse<>(ret, limit);
 	}
 
 	@ApiOperation(value = "searchSitesWithinATrustCode()",
@@ -139,10 +137,10 @@ public class SiteResource {
 			@ApiResponse(code = 200, message = "Sites list", response = LimitedListResponse.class)})
 	@RequestMapping(method = GET, value = "/sites/search-by-trust/{trustCode}")
 	public LimitedListResponse<SiteDTO> searchSitesWithinATrustCode(@PathVariable(value = "trustCode") String trustCode,
-																 @RequestParam(value = "searchString", required = false)
-																		 String searchString) throws Exception {
+																	@RequestParam(value = "searchString", required = false)
+																			String searchString) throws Exception {
 		List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSitesWithinTrust(trustCode, searchString));
-		return new LimitedListResponse<> (ret, limit);
+		return new LimitedListResponse<>(ret, limit);
 	}
 
 	/**

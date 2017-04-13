@@ -39,10 +39,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/api")
 public class TrustResource {
 
-	private final Logger log = LoggerFactory.getLogger(TrustResource.class);
-
 	private static final String ENTITY_NAME = "trust";
-
+	private final Logger log = LoggerFactory.getLogger(TrustResource.class);
 	private final TrustRepository trustRepository;
 	private final TrustMapper trustMapper;
 	private final SitesTrustsService sitesTrustsService;
@@ -128,7 +126,7 @@ public class TrustResource {
 	public LimitedListResponse<TrustDTO> searchTrusts(@RequestParam(value = "searchString") String searchString)
 			throws Exception {
 		List<TrustDTO> ret = trustMapper.trustsToTrustDTOs(sitesTrustsService.searchTrusts(searchString));
-		return new LimitedListResponse<> (ret, limit);
+		return new LimitedListResponse<>(ret, limit);
 	}
 
 	/**

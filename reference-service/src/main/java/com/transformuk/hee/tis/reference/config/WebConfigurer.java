@@ -75,7 +75,7 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
 		setLocationForStaticAssets(container);
 
         /*
-         * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288
+		 * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288
          * HTTP/2 requires HTTPS, so HTTP requests will fallback to HTTP/1.1.
          * See the JHipsterProperties class and your application-*.yml configuration files
          * for more information.
@@ -116,7 +116,7 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
 	 * Initializes the caching HTTP Headers Filter.
 	 */
 	private void initCachingHttpHeadersFilter(ServletContext servletContext,
-	                                          EnumSet<DispatcherType> disps) {
+											  EnumSet<DispatcherType> disps) {
 		log.debug("Registering Caching HTTP Headers Filter");
 		FilterRegistration.Dynamic cachingHttpHeadersFilter =
 				servletContext.addFilter("cachingHttpHeadersFilter",

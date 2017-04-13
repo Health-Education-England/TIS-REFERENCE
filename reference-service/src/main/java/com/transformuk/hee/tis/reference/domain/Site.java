@@ -50,17 +50,21 @@ public class Site implements Serializable {
 		return siteCode;
 	}
 
+	public void setSiteCode(String siteCode) {
+		this.siteCode = siteCode;
+	}
+
 	public Site siteCode(String siteCode) {
 		this.siteCode = siteCode;
 		return this;
 	}
 
-	public void setSiteCode(String siteCode) {
-		this.siteCode = siteCode;
-	}
-
 	public String getLocalOffice() {
 		return localOffice;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
 	}
 
 	public Site localOffice(String localOffice) {
@@ -68,12 +72,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setLocalOffice(String localOffice) {
-		this.localOffice = localOffice;
-	}
-
 	public String getTrustCode() {
 		return trustCode;
+	}
+
+	public void setTrustCode(String trustCode) {
+		this.trustCode = trustCode;
 	}
 
 	public Site trustCode(String trustCode) {
@@ -81,12 +85,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setTrustCode(String trustCode) {
-		this.trustCode = trustCode;
-	}
-
 	public String getSiteName() {
 		return siteName;
+	}
+
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
 	}
 
 	public Site siteName(String siteName) {
@@ -94,12 +98,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setSiteName(String siteName) {
-		this.siteName = siteName;
-	}
-
 	public String getAddress() {
 		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public Site address(String address) {
@@ -107,12 +111,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 	public String getPostCode() {
 		return postCode;
+	}
+
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
 	}
 
 	public Site postCode(String postCode) {
@@ -120,12 +124,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setPostCode(String postCode) {
-		this.postCode = postCode;
-	}
-
 	public String getSiteKnownAs() {
 		return siteKnownAs;
+	}
+
+	public void setSiteKnownAs(String siteKnownAs) {
+		this.siteKnownAs = siteKnownAs;
 	}
 
 	public Site siteKnownAs(String siteKnownAs) {
@@ -133,12 +137,12 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setSiteKnownAs(String siteKnownAs) {
-		this.siteKnownAs = siteKnownAs;
-	}
-
 	public String getSiteNumber() {
 		return siteNumber;
+	}
+
+	public void setSiteNumber(String siteNumber) {
+		this.siteNumber = siteNumber;
 	}
 
 	public Site siteNumber(String siteNumber) {
@@ -146,21 +150,17 @@ public class Site implements Serializable {
 		return this;
 	}
 
-	public void setSiteNumber(String siteNumber) {
-		this.siteNumber = siteNumber;
-	}
-
 	public String getOrganisationalUnit() {
 		return organisationalUnit;
+	}
+
+	public void setOrganisationalUnit(String organisationalUnit) {
+		this.organisationalUnit = organisationalUnit;
 	}
 
 	public Site organisationalUnit(String organisationalUnit) {
 		this.organisationalUnit = organisationalUnit;
 		return this;
-	}
-
-	public void setOrganisationalUnit(String organisationalUnit) {
-		this.organisationalUnit = organisationalUnit;
 	}
 
 	@Override

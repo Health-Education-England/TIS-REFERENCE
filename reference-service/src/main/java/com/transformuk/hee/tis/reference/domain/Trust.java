@@ -49,17 +49,21 @@ public class Trust implements Serializable {
 		return code;
 	}
 
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public Trust code(String code) {
 		this.code = code;
 		return this;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public String getLocalOffice() {
 		return localOffice;
+	}
+
+	public void setLocalOffice(String localOffice) {
+		this.localOffice = localOffice;
 	}
 
 	public Trust localOffice(String localOffice) {
@@ -67,12 +71,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setLocalOffice(String localOffice) {
-		this.localOffice = localOffice;
-	}
-
 	public String getStatus() {
 		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Trust status(String status) {
@@ -80,12 +84,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
 	public String getTrustKnownAs() {
 		return trustKnownAs;
+	}
+
+	public void setTrustKnownAs(String trustKnownAs) {
+		this.trustKnownAs = trustKnownAs;
 	}
 
 	public Trust trustKnownAs(String trustKnownAs) {
@@ -93,12 +97,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setTrustKnownAs(String trustKnownAs) {
-		this.trustKnownAs = trustKnownAs;
-	}
-
 	public String getTrustName() {
 		return trustName;
+	}
+
+	public void setTrustName(String trustName) {
+		this.trustName = trustName;
 	}
 
 	public Trust trustName(String trustName) {
@@ -106,12 +110,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setTrustName(String trustName) {
-		this.trustName = trustName;
-	}
-
 	public String getTrustNumber() {
 		return trustNumber;
+	}
+
+	public void setTrustNumber(String trustNumber) {
+		this.trustNumber = trustNumber;
 	}
 
 	public Trust trustNumber(String trustNumber) {
@@ -119,12 +123,12 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setTrustNumber(String trustNumber) {
-		this.trustNumber = trustNumber;
-	}
-
 	public String getAddress() {
 		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public Trust address(String address) {
@@ -132,21 +136,17 @@ public class Trust implements Serializable {
 		return this;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 	public String getPostCode() {
 		return postCode;
+	}
+
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
 	}
 
 	public Trust postCode(String postCode) {
 		this.postCode = postCode;
 		return this;
-	}
-
-	public void setPostCode(String postCode) {
-		this.postCode = postCode;
 	}
 
 	@Override

@@ -96,6 +96,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.transformuk.hee</groupId>
+            <artifactId>reference-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate5</artifactId>
         </dependency>
@@ -140,11 +145,6 @@
                     <groupId>com.codahale.metrics</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.transformuk.hee</groupId>
-            <artifactId>reference-api</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
