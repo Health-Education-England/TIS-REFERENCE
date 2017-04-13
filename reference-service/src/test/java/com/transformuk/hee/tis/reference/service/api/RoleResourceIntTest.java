@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.Role;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

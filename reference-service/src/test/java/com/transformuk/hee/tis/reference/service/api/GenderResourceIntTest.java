@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

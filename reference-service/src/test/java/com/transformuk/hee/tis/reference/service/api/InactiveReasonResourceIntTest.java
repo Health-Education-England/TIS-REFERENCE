@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.InactiveReason;
 import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference.service.api.errors;
+package com.transformuk.hee.tis.reference.service.exception;
 
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.ConcurrencyFailureException;

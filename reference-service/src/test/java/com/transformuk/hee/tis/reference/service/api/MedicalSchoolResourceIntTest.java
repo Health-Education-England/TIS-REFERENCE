@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

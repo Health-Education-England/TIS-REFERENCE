@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.domain.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.GradeDTO;

@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference.service.api.errors;
+package com.transformuk.hee.tis.reference.service.exception;
 
 /**
  * Custom, parameterized exception, which can be translated on the client side.

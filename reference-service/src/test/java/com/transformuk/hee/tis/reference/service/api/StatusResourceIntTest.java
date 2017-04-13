@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.Status;
 import com.transformuk.hee.tis.reference.service.repository.StatusRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.StatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.StatusMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

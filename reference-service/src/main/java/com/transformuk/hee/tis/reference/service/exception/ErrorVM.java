@@ -1,4 +1,4 @@
-package com.transformuk.hee.tis.reference.service.api.errors;
+package com.transformuk.hee.tis.reference.service.exception;
 
 import java.io.Serializable;
 import java.util.ArrayList;

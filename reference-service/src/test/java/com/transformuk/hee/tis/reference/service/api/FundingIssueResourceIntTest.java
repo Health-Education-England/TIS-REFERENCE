@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.FundingIssueDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

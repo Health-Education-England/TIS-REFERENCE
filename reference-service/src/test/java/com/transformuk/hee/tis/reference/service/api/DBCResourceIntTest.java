@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

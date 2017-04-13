@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.Country;
 import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

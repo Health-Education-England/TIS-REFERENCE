@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.TariffRate;
 import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

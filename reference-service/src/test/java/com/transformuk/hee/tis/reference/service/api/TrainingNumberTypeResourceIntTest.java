@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.repository.TrainingNumberTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrainingNumberTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

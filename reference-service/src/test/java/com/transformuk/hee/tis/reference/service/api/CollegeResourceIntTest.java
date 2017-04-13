@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.College;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

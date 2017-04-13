@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

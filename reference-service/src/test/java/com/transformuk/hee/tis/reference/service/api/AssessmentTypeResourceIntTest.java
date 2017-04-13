@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.domain.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.errors.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
