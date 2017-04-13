@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @ApiModel(description = "A search response containing a limited number of results and a warning if the limit has been reached")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LimitedListResponse<T>{
+public class LimitedListResponse<T> {
 
 	public static final String LIMIT_REACHED_CODE = "LIMIT_REACHED";
 
@@ -22,7 +22,8 @@ public class LimitedListResponse<T>{
 	/**
 	 * Builds a response, populates the limit reached message if list size >= given limit
 	 * Please note this does not truncate the list if it's above the limit
-	 * @param list the list of entities - NOT NULL
+	 *
+	 * @param list  the list of entities - NOT NULL
 	 * @param limit the max limit > 0
 	 */
 	public LimitedListResponse(List<T> list, int limit) {
