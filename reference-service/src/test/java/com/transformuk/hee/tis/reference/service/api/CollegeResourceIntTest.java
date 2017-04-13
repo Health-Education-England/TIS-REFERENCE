@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.CollegeDTO;
+import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

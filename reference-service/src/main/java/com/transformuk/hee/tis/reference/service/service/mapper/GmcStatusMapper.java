@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.service.model.GmcStatus;
-import com.transformuk.hee.tis.reference.service.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

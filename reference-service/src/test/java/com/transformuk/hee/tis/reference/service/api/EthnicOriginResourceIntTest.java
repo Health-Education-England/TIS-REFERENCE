@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

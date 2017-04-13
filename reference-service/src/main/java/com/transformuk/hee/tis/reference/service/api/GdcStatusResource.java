@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

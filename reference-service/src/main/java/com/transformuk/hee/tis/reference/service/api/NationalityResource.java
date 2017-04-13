@@ -5,7 +5,7 @@ import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.service.model.Role;
-import com.transformuk.hee.tis.reference.service.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

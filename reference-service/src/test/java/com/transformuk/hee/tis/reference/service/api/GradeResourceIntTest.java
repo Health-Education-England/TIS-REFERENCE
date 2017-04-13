@@ -4,7 +4,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import org.junit.Before;
 import org.junit.Test;

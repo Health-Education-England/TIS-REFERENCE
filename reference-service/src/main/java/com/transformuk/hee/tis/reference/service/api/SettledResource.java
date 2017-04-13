@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.service.repository.SettledRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.SettledDTO;
+import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.SettledMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

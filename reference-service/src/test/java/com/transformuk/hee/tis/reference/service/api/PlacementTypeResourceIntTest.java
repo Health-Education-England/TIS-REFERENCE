@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

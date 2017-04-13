@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;

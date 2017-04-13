@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.Title;
 import com.transformuk.hee.tis.reference.service.repository.TitleRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.TitleDTO;
+import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TitleMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

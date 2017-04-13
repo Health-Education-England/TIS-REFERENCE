@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.TariffRate;
 import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.TariffRateDTO;
+import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;

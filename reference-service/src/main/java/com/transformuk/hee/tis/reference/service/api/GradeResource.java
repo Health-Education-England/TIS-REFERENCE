@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;

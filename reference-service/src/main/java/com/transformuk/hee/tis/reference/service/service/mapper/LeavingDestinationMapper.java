@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
-import com.transformuk.hee.tis.reference.service.api.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

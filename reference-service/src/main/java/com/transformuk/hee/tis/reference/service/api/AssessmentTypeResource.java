@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.AssessmentTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

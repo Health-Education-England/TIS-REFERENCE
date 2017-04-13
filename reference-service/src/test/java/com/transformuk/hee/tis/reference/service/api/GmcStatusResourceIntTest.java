@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GmcStatusRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GmcStatusMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

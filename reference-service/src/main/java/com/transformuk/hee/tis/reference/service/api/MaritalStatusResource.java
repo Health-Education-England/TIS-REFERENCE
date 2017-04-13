@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;

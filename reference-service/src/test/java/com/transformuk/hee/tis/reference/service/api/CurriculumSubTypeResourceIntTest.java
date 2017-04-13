@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.CurriculumSubTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

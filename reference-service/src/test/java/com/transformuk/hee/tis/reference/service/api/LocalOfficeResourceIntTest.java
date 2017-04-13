@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.LocalOfficeDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

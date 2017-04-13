@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.service.model.FundingType;
-import com.transformuk.hee.tis.reference.service.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

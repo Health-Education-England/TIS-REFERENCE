@@ -4,7 +4,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
 import org.junit.Before;
 import org.junit.Test;

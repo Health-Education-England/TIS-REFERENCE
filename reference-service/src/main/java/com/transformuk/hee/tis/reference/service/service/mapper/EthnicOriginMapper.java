@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
-import com.transformuk.hee.tis.reference.service.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;

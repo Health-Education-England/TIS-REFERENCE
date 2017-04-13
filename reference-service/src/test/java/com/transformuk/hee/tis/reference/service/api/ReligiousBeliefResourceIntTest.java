@@ -4,7 +4,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import org.junit.Before;
 import org.junit.Test;

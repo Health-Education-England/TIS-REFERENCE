@@ -3,7 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.repository.LeavingDestinationRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingDestinationMapper;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;

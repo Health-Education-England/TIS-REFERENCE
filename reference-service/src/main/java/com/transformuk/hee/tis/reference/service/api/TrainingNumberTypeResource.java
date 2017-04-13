@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.repository.TrainingNumberTypeRepository;
-import com.transformuk.hee.tis.reference.service.api.dto.TrainingNumberTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrainingNumberTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
