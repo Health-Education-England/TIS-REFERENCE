@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.FundingType;
 import com.transformuk.hee.tis.reference.repository.FundingTypeRepository;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see FundingTypeResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class FundingTypeResourceIntTest {
 
 	private static final String DEFAULT_CODE = "AAAAAAAAAA";

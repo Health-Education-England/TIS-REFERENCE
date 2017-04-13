@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.web.rest.vm.LoggerVM;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see LogsResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class LogsResourceIntTest {
 
 	private MockMvc restLogsMockMvc;

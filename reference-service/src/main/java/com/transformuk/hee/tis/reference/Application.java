@@ -22,13 +22,13 @@ import java.util.Collection;
 @ComponentScan
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
 @EnableConfigurationProperties({ApplicationProperties.class})
-public class ReferenceApp {
+public class Application {
 
-	private static final Logger log = LoggerFactory.getLogger(ReferenceApp.class);
+	private static final Logger log = LoggerFactory.getLogger(Application.class);
 
 	private final Environment env;
 
-	public ReferenceApp(Environment env) {
+	public Application(Environment env) {
 		this.env = env;
 	}
 
@@ -39,7 +39,7 @@ public class ReferenceApp {
 	 * @throws UnknownHostException if the local host name could not be resolved into an address
 	 */
 	public static void main(String[] args) throws UnknownHostException {
-		SpringApplication app = new SpringApplication(ReferenceApp.class);
+		SpringApplication app = new SpringApplication(Application.class);
 		DefaultProfileUtil.addDefaultProfile(app);
 		Environment env = app.run(args).getEnvironment();
 		String protocol = "http";

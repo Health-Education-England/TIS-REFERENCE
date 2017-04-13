@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.Site;
 import com.transformuk.hee.tis.reference.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see SiteResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class SiteResourceIntTest {
 
 	private static final String DEFAULT_SITE_CODE = "AAAAAAAAAA";

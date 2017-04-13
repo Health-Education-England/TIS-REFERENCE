@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.Nationality;
 import com.transformuk.hee.tis.reference.repository.NationalityRepository;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see NationalityResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class NationalityResourceIntTest {
 
 	private static final String DEFAULT_COUNTRY_NUMBER = "AAAAAAAAAA";

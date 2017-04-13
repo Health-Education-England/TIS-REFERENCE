@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.MedicalSchool;
 import com.transformuk.hee.tis.reference.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see MedicalSchoolResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class MedicalSchoolResourceIntTest {
 
 	private static final String DEFAULT_CODE = "AAAAAAAAAA";

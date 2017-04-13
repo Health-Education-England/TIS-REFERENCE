@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.Status;
 import com.transformuk.hee.tis.reference.repository.StatusRepository;
 import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see StatusResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class StatusResourceIntTest {
 
 	private static final String DEFAULT_CODE = "AAAAAAAAAA";

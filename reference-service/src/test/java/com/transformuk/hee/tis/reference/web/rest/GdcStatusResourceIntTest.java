@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.web.rest;
 
-import com.transformuk.hee.tis.reference.ReferenceApp;
+import com.transformuk.hee.tis.reference.Application;
 import com.transformuk.hee.tis.reference.domain.GdcStatus;
 import com.transformuk.hee.tis.reference.repository.GdcStatusRepository;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see GdcStatusResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReferenceApp.class)
+@SpringBootTest(classes = Application.class)
 public class GdcStatusResourceIntTest {
 
 	private static final String DEFAULT_CODE = "AAAAAAAAAA";
