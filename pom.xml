@@ -5,6 +5,7 @@
 
 	<modules>
 		<module>reference-api</module>
+		<module>reference-client</module>
 		<module>reference-service</module>
 	</modules>
 
