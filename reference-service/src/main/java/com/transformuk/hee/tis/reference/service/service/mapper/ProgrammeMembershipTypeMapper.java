@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.ProgrammeMembershipType;
+import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.api.dto.ProgrammeMembershipTypeDTO;
 import org.mapstruct.Mapper;
 

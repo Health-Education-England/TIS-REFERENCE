@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import com.transformuk.hee.tis.reference.service.domain.Site;
-import com.transformuk.hee.tis.reference.service.domain.Trust;
+import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import org.junit.Test;

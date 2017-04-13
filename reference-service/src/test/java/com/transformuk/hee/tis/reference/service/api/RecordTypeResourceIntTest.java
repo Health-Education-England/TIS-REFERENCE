@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.RecordType;
+import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.service.repository.RecordTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.RecordTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.RecordTypeMapper;

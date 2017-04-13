@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.ReligiousBelief;
+import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;

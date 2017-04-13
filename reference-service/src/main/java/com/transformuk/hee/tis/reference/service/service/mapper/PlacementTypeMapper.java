@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.PlacementType;
+import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.api.dto.PlacementTypeDTO;
 import org.mapstruct.Mapper;
 

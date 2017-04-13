@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.DBC;
+import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;

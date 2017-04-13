@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.TrainingNumberType;
+import com.transformuk.hee.tis.reference.service.model.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.api.dto.TrainingNumberTypeDTO;
 import org.mapstruct.Mapper;
 

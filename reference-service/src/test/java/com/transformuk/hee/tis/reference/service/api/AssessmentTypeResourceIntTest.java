@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.AssessmentType;
+import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;

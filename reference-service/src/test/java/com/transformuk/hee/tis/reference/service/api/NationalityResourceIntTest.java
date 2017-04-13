@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.Nationality;
+import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;

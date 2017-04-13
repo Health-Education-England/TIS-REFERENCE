@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.Site;
+import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;

@@ -2,7 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
-import com.transformuk.hee.tis.reference.service.domain.ProgrammeMembershipType;
+import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;

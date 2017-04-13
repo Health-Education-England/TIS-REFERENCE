@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.FundingIssue;
+import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.api.dto.FundingIssueDTO;
 import org.mapstruct.Mapper;
 

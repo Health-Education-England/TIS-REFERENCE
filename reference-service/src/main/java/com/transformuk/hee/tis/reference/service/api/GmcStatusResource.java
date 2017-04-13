@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.GmcStatus;
+import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GmcStatusRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.GmcStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GmcStatusMapper;

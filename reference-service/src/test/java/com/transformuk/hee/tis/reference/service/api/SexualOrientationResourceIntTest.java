@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.SexualOrientation;
+import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.SexualOrientationMapper;

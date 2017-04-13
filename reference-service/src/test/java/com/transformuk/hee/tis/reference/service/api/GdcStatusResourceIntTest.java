@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.GdcStatus;
+import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;

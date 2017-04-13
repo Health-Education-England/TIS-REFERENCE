@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.PlacementType;
+import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;

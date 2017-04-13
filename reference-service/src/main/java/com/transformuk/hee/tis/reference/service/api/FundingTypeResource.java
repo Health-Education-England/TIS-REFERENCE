@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.FundingType;
+import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;

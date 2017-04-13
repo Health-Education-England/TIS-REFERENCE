@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.InactiveReason;
+import com.transformuk.hee.tis.reference.service.model.InactiveReason;
 import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.TariffRate;
+import com.transformuk.hee.tis.reference.service.model.TariffRate;
 import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;

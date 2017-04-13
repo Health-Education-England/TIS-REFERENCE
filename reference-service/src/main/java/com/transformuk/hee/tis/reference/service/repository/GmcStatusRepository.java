@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
-import com.transformuk.hee.tis.reference.service.domain.GmcStatus;
+import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

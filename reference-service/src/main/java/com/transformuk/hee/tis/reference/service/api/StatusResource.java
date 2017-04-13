@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.domain.Status;
+import com.transformuk.hee.tis.reference.service.model.Status;
 import com.transformuk.hee.tis.reference.service.repository.StatusRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.StatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.StatusMapper;

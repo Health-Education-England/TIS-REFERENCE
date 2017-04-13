@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.service.Application;
-import com.transformuk.hee.tis.reference.service.domain.MedicalSchool;
+import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.service.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;

@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
-import com.transformuk.hee.tis.reference.service.domain.LocalOffice;
+import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

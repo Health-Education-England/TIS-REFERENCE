@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.Status;
+import com.transformuk.hee.tis.reference.service.model.Status;
 import com.transformuk.hee.tis.reference.service.api.dto.StatusDTO;
 import org.mapstruct.Mapper;
 

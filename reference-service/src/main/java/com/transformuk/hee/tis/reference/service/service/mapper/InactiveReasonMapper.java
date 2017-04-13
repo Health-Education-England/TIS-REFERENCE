@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.domain.InactiveReason;
+import com.transformuk.hee.tis.reference.service.model.InactiveReason;
 import com.transformuk.hee.tis.reference.service.api.dto.InactiveReasonDTO;
 import org.mapstruct.Mapper;
 

@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
-import com.transformuk.hee.tis.reference.service.domain.Grade;
+import com.transformuk.hee.tis.reference.service.model.Grade;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

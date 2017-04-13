@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
-import com.transformuk.hee.tis.reference.service.domain.FundingType;
+import com.transformuk.hee.tis.reference.service.model.FundingType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
