@@ -19,6 +19,9 @@ import javax.annotation.PostConstruct;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Metrics configuration
+ */
 @Configuration
 @EnableMetrics(proxyTargetClass = true)
 public class MetricsConfiguration extends MetricsConfigurerAdapter {

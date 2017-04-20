@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
+/**
+ * Datasource configuration when using springs cloud profile
+ */
 @Configuration
 @Profile(JHipsterConstants.SPRING_PROFILE_CLOUD)
 public class CloudDatabaseConfiguration extends AbstractCloudConfig {

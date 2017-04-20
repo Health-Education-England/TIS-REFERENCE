@@ -5,6 +5,9 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+/**
+ * Configuration for Date time format
+ */
 @Configuration
 public class DateTimeFormatConfiguration extends WebMvcConfigurerAdapter {
 

@@ -9,6 +9,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * Default database configuration
+ */
 @Configuration
 @EnableJpaRepositories("com.transformuk.hee.tis.reference.service.repository")
 @EnableTransactionManagement

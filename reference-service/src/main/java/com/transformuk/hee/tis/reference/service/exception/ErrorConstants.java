@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.exception;
 
+/**
+ * Wrapper for Error constants
+ */
 public final class ErrorConstants {
 
 	public static final String ERR_CONCURRENCY_FAILURE = "error.concurrencyFailure";

@@ -2,6 +2,9 @@ package com.transformuk.hee.tis.reference.service.exception;
 
 import java.io.Serializable;
 
+/**
+ * View Model field errors
+ */
 public class FieldErrorVM implements Serializable {
 
 	private static final long serialVersionUID = 1L;
