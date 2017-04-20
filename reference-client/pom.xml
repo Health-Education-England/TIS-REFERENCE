@@ -16,4 +16,17 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.transformuk.hee</groupId>
+			<artifactId>tis-parent-client</artifactId>
+			<version>1.0.2</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>com.transformuk.hee</groupId>
+			<artifactId>reference-api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
 </project>
