@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -64,6 +65,7 @@ public class TrustResource {
 	 */
 	@PostMapping("/trusts")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
 		log.debug("REST request to save Trust : {}", trustDTO);
 		if (trustDTO.getId() != null) {
@@ -88,6 +90,7 @@ public class TrustResource {
 	 */
 	@PutMapping("/trusts")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TrustDTO> updateTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
 		log.debug("REST request to update Trust : {}", trustDTO);
 		if (trustDTO.getId() == null) {
@@ -167,6 +170,7 @@ public class TrustResource {
 	 */
 	@DeleteMapping("/trusts/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteTrust(@PathVariable Long id) {
 		log.debug("REST request to delete Trust : {}", id);
 		trustRepository.delete(id);

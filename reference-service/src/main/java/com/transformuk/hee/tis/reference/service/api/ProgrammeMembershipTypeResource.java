@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class ProgrammeMembershipTypeResource {
 	 */
 	@PostMapping("/programme-membership-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<ProgrammeMembershipTypeDTO> createProgrammeMembershipType(@Valid @RequestBody ProgrammeMembershipTypeDTO programmeMembershipTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save ProgrammeMembershipType : {}", programmeMembershipTypeDTO);
 		if (programmeMembershipTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class ProgrammeMembershipTypeResource {
 	 */
 	@PutMapping("/programme-membership-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<ProgrammeMembershipTypeDTO> updateProgrammeMembershipType(@Valid @RequestBody ProgrammeMembershipTypeDTO programmeMembershipTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update ProgrammeMembershipType : {}", programmeMembershipTypeDTO);
 		if (programmeMembershipTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class ProgrammeMembershipTypeResource {
 	 */
 	@DeleteMapping("/programme-membership-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteProgrammeMembershipType(@PathVariable Long id) {
 		log.debug("REST request to delete ProgrammeMembershipType : {}", id);
 		programmeMembershipTypeRepository.delete(id);

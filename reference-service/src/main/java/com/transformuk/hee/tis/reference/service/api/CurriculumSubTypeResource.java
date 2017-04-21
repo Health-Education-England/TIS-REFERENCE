@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class CurriculumSubTypeResource {
 	 */
 	@PostMapping("/curriculum-sub-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CurriculumSubTypeDTO> createCurriculumSubType(@Valid @RequestBody CurriculumSubTypeDTO curriculumSubTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save CurriculumSubType : {}", curriculumSubTypeDTO);
 		if (curriculumSubTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class CurriculumSubTypeResource {
 	 */
 	@PutMapping("/curriculum-sub-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CurriculumSubTypeDTO> updateCurriculumSubType(@Valid @RequestBody CurriculumSubTypeDTO curriculumSubTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update CurriculumSubType : {}", curriculumSubTypeDTO);
 		if (curriculumSubTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class CurriculumSubTypeResource {
 	 */
 	@DeleteMapping("/curriculum-sub-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteCurriculumSubType(@PathVariable Long id) {
 		log.debug("REST request to delete CurriculumSubType : {}", id);
 		curriculumSubTypeRepository.delete(id);

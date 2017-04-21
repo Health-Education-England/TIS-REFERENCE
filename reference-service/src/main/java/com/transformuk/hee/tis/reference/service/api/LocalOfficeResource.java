@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class LocalOfficeResource {
 	 */
 	@PostMapping("/local-offices")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<LocalOfficeDTO> createLocalOffice(@Valid @RequestBody LocalOfficeDTO localOfficeDTO) throws URISyntaxException {
 		log.debug("REST request to save LocalOffice : {}", localOfficeDTO);
 		if (localOfficeDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class LocalOfficeResource {
 	 */
 	@PutMapping("/local-offices")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<LocalOfficeDTO> updateLocalOffice(@Valid @RequestBody LocalOfficeDTO localOfficeDTO) throws URISyntaxException {
 		log.debug("REST request to update LocalOffice : {}", localOfficeDTO);
 		if (localOfficeDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class LocalOfficeResource {
 	 */
 	@DeleteMapping("/local-offices/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteLocalOffice(@PathVariable Long id) {
 		log.debug("REST request to delete LocalOffice : {}", id);
 		localOfficeRepository.delete(id);

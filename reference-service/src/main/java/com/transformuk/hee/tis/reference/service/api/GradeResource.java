@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class GradeResource {
 	 */
 	@PostMapping("/grades")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GradeDTO> createGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
 		log.debug("REST request to save Grade : {}", gradeDTO);
 		if (gradeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class GradeResource {
 	 */
 	@PutMapping("/grades")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GradeDTO> updateGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
 		log.debug("REST request to update Grade : {}", gradeDTO);
 		if (gradeDTO.getId() == null) {
@@ -133,6 +136,7 @@ public class GradeResource {
 	 */
 	@DeleteMapping("/grades/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteGrade(@PathVariable Long id) {
 		log.debug("REST request to delete Grade : {}", id);
 		gradeRepository.delete(id);

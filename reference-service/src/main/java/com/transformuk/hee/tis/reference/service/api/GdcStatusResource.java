@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class GdcStatusResource {
 	 */
 	@PostMapping("/gdc-statuses")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GdcStatusDTO> createGdcStatus(@Valid @RequestBody GdcStatusDTO gdcStatusDTO) throws URISyntaxException {
 		log.debug("REST request to save GdcStatus : {}", gdcStatusDTO);
 		if (gdcStatusDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class GdcStatusResource {
 	 */
 	@PutMapping("/gdc-statuses")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GdcStatusDTO> updateGdcStatus(@Valid @RequestBody GdcStatusDTO gdcStatusDTO) throws URISyntaxException {
 		log.debug("REST request to update GdcStatus : {}", gdcStatusDTO);
 		if (gdcStatusDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class GdcStatusResource {
 	 */
 	@DeleteMapping("/gdc-statuses/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteGdcStatus(@PathVariable Long id) {
 		log.debug("REST request to delete GdcStatus : {}", id);
 		gdcStatusRepository.delete(id);

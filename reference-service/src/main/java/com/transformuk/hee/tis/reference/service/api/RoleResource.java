@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class RoleResource {
 	 */
 	@PostMapping("/roles")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<RoleDTO> createRole(@Valid @RequestBody RoleDTO roleDTO) throws URISyntaxException {
 		log.debug("REST request to save Role : {}", roleDTO);
 		if (roleDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class RoleResource {
 	 */
 	@PutMapping("/roles")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<RoleDTO> updateRole(@Valid @RequestBody RoleDTO roleDTO) throws URISyntaxException {
 		log.debug("REST request to update Role : {}", roleDTO);
 		if (roleDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class RoleResource {
 	 */
 	@DeleteMapping("/roles/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
 		log.debug("REST request to delete Role : {}", id);
 		roleRepository.delete(id);

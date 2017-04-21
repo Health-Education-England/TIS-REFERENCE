@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class AssessmentTypeResource {
 	 */
 	@PostMapping("/assessment-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<AssessmentTypeDTO> createAssessmentType(@Valid @RequestBody AssessmentTypeDTO assessmentTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save AssessmentType : {}", assessmentTypeDTO);
 		if (assessmentTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class AssessmentTypeResource {
 	 */
 	@PutMapping("/assessment-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<AssessmentTypeDTO> updateAssessmentType(@Valid @RequestBody AssessmentTypeDTO assessmentTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update AssessmentType : {}", assessmentTypeDTO);
 		if (assessmentTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class AssessmentTypeResource {
 	 */
 	@DeleteMapping("/assessment-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteAssessmentType(@PathVariable Long id) {
 		log.debug("REST request to delete AssessmentType : {}", id);
 		assessmentTypeRepository.delete(id);

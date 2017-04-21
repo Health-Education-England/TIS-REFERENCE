@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class CollegeResource {
 	 */
 	@PostMapping("/colleges")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CollegeDTO> createCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
 		log.debug("REST request to save College : {}", collegeDTO);
 		if (collegeDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class CollegeResource {
 	 */
 	@PutMapping("/colleges")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CollegeDTO> updateCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
 		log.debug("REST request to update College : {}", collegeDTO);
 		if (collegeDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class CollegeResource {
 	 */
 	@DeleteMapping("/colleges/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteCollege(@PathVariable Long id) {
 		log.debug("REST request to delete College : {}", id);
 		collegeRepository.delete(id);

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class TariffRateResource {
 	 */
 	@PostMapping("/tariff-rates")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TariffRateDTO> createTariffRate(@Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
 		log.debug("REST request to save TariffRate : {}", tariffRateDTO);
 		if (tariffRateDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class TariffRateResource {
 	 */
 	@PutMapping("/tariff-rates")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TariffRateDTO> updateTariffRate(@Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
 		log.debug("REST request to update TariffRate : {}", tariffRateDTO);
 		if (tariffRateDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class TariffRateResource {
 	 */
 	@DeleteMapping("/tariff-rates/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteTariffRate(@PathVariable Long id) {
 		log.debug("REST request to delete TariffRate : {}", id);
 		tariffRateRepository.delete(id);

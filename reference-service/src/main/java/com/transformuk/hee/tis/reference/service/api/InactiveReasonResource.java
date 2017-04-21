@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class InactiveReasonResource {
 	 */
 	@PostMapping("/inactive-reasons")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<InactiveReasonDTO> createInactiveReason(@Valid @RequestBody InactiveReasonDTO inactiveReasonDTO) throws URISyntaxException {
 		log.debug("REST request to save InactiveReason : {}", inactiveReasonDTO);
 		if (inactiveReasonDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class InactiveReasonResource {
 	 */
 	@PutMapping("/inactive-reasons")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<InactiveReasonDTO> updateInactiveReason(@Valid @RequestBody InactiveReasonDTO inactiveReasonDTO) throws URISyntaxException {
 		log.debug("REST request to update InactiveReason : {}", inactiveReasonDTO);
 		if (inactiveReasonDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class InactiveReasonResource {
 	 */
 	@DeleteMapping("/inactive-reasons/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteInactiveReason(@PathVariable Long id) {
 		log.debug("REST request to delete InactiveReason : {}", id);
 		inactiveReasonRepository.delete(id);

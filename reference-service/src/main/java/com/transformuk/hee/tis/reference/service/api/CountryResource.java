@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class CountryResource {
 	 */
 	@PostMapping("/countries")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CountryDTO> createCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
 		log.debug("REST request to save Country : {}", countryDTO);
 		if (countryDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class CountryResource {
 	 */
 	@PutMapping("/countries")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<CountryDTO> updateCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
 		log.debug("REST request to update Country : {}", countryDTO);
 		if (countryDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class CountryResource {
 	 */
 	@DeleteMapping("/countries/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
 		log.debug("REST request to delete Country : {}", id);
 		countryRepository.delete(id);

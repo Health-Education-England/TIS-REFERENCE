@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class EthnicOriginResource {
 	 */
 	@PostMapping("/ethnic-origins")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<EthnicOriginDTO> createEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
 		log.debug("REST request to save EthnicOrigin : {}", ethnicOriginDTO);
 		if (ethnicOriginDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class EthnicOriginResource {
 	 */
 	@PutMapping("/ethnic-origins")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<EthnicOriginDTO> updateEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
 		log.debug("REST request to update EthnicOrigin : {}", ethnicOriginDTO);
 		if (ethnicOriginDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class EthnicOriginResource {
 	 */
 	@DeleteMapping("/ethnic-origins/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteEthnicOrigin(@PathVariable Long id) {
 		log.debug("REST request to delete EthnicOrigin : {}", id);
 		ethnicOriginRepository.delete(id);

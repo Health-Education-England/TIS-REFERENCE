@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class ReligiousBeliefResource {
 	 */
 	@PostMapping("/religious-beliefs")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<ReligiousBeliefDTO> createReligiousBelief(@Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
 		log.debug("REST request to save ReligiousBelief : {}", religiousBeliefDTO);
 		if (religiousBeliefDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class ReligiousBeliefResource {
 	 */
 	@PutMapping("/religious-beliefs")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<ReligiousBeliefDTO> updateReligiousBelief(@Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
 		log.debug("REST request to update ReligiousBelief : {}", religiousBeliefDTO);
 		if (religiousBeliefDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class ReligiousBeliefResource {
 	 */
 	@DeleteMapping("/religious-beliefs/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteReligiousBelief(@PathVariable Long id) {
 		log.debug("REST request to delete ReligiousBelief : {}", id);
 		religiousBeliefRepository.delete(id);

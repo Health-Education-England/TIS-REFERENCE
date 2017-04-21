@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class NationalityResource {
 	 */
 	@PostMapping("/nationalities")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<NationalityDTO> createNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
 		log.debug("REST request to save Nationality : {}", nationalityDTO);
 		if (nationalityDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class NationalityResource {
 	 */
 	@PutMapping("/nationalities")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<NationalityDTO> updateNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
 		log.debug("REST request to update Nationality : {}", nationalityDTO);
 		if (nationalityDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class NationalityResource {
 	 */
 	@DeleteMapping("/nationalities/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteNationality(@PathVariable Long id) {
 		log.debug("REST request to delete Nationality : {}", id);
 		nationalityRepository.delete(id);

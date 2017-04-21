@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class TrainingNumberTypeResource {
 	 */
 	@PostMapping("/training-number-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TrainingNumberTypeDTO> createTrainingNumberType(@Valid @RequestBody TrainingNumberTypeDTO trainingNumberTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save TrainingNumberType : {}", trainingNumberTypeDTO);
 		if (trainingNumberTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class TrainingNumberTypeResource {
 	 */
 	@PutMapping("/training-number-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<TrainingNumberTypeDTO> updateTrainingNumberType(@Valid @RequestBody TrainingNumberTypeDTO trainingNumberTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update TrainingNumberType : {}", trainingNumberTypeDTO);
 		if (trainingNumberTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class TrainingNumberTypeResource {
 	 */
 	@DeleteMapping("/training-number-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteTrainingNumberType(@PathVariable Long id) {
 		log.debug("REST request to delete TrainingNumberType : {}", id);
 		trainingNumberTypeRepository.delete(id);

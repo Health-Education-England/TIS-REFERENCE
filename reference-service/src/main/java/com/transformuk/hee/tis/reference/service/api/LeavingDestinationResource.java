@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class LeavingDestinationResource {
 	 */
 	@PostMapping("/leaving-destinations")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<LeavingDestinationDTO> createLeavingDestination(@Valid @RequestBody LeavingDestinationDTO leavingDestinationDTO) throws URISyntaxException {
 		log.debug("REST request to save LeavingDestination : {}", leavingDestinationDTO);
 		if (leavingDestinationDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class LeavingDestinationResource {
 	 */
 	@PutMapping("/leaving-destinations")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<LeavingDestinationDTO> updateLeavingDestination(@Valid @RequestBody LeavingDestinationDTO leavingDestinationDTO) throws URISyntaxException {
 		log.debug("REST request to update LeavingDestination : {}", leavingDestinationDTO);
 		if (leavingDestinationDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class LeavingDestinationResource {
 	 */
 	@DeleteMapping("/leaving-destinations/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteLeavingDestination(@PathVariable Long id) {
 		log.debug("REST request to delete LeavingDestination : {}", id);
 		leavingDestinationRepository.delete(id);

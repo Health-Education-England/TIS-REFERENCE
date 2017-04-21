@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class MedicalSchoolResource {
 	 */
 	@PostMapping("/medical-schools")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<MedicalSchoolDTO> createMedicalSchool(@Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
 		log.debug("REST request to save MedicalSchool : {}", medicalSchoolDTO);
 		if (medicalSchoolDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class MedicalSchoolResource {
 	 */
 	@PutMapping("/medical-schools")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<MedicalSchoolDTO> updateMedicalSchool(@Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
 		log.debug("REST request to update MedicalSchool : {}", medicalSchoolDTO);
 		if (medicalSchoolDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class MedicalSchoolResource {
 	 */
 	@DeleteMapping("/medical-schools/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteMedicalSchool(@PathVariable Long id) {
 		log.debug("REST request to delete MedicalSchool : {}", id);
 		medicalSchoolRepository.delete(id);

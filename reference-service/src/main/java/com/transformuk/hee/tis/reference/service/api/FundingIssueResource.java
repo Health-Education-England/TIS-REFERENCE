@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class FundingIssueResource {
 	 */
 	@PostMapping("/funding-issues")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<FundingIssueDTO> createFundingIssue(@Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
 		log.debug("REST request to save FundingIssue : {}", fundingIssueDTO);
 		if (fundingIssueDTO.getId() != null) {
@@ -75,6 +77,7 @@ public class FundingIssueResource {
 	 */
 	@PutMapping("/funding-issues")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<FundingIssueDTO> updateFundingIssue(@Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
 		log.debug("REST request to update FundingIssue : {}", fundingIssueDTO);
 		if (fundingIssueDTO.getId() == null) {
@@ -127,6 +130,7 @@ public class FundingIssueResource {
 	 */
 	@DeleteMapping("/funding-issues/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteFundingIssue(@PathVariable Long id) {
 		log.debug("REST request to delete FundingIssue : {}", id);
 		fundingIssueRepository.delete(id);

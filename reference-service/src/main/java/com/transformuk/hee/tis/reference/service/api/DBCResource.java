@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class DBCResource {
 	 */
 	@PostMapping("/dbcs")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<DBCDTO> createDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
 		log.debug("REST request to save DBC : {}", dBCDTO);
 		if (dBCDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class DBCResource {
 	 */
 	@PutMapping("/dbcs")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<DBCDTO> updateDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
 		log.debug("REST request to update DBC : {}", dBCDTO);
 		if (dBCDTO.getId() == null) {
@@ -133,6 +136,7 @@ public class DBCResource {
 	 */
 	@DeleteMapping("/dbcs/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteDBC(@PathVariable Long id) {
 		log.debug("REST request to delete DBC : {}", id);
 		dBCRepository.delete(id);

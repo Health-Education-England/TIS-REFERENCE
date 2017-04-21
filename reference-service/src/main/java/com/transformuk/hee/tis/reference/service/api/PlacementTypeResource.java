@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class PlacementTypeResource {
 	 */
 	@PostMapping("/placement-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<PlacementTypeDTO> createPlacementType(@Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save PlacementType : {}", placementTypeDTO);
 		if (placementTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class PlacementTypeResource {
 	 */
 	@PutMapping("/placement-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<PlacementTypeDTO> updatePlacementType(@Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update PlacementType : {}", placementTypeDTO);
 		if (placementTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class PlacementTypeResource {
 	 */
 	@DeleteMapping("/placement-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deletePlacementType(@PathVariable Long id) {
 		log.debug("REST request to delete PlacementType : {}", id);
 		placementTypeRepository.delete(id);

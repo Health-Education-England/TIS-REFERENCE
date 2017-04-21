@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class FundingTypeResource {
 	 */
 	@PostMapping("/funding-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<FundingTypeDTO> createFundingType(@Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save FundingType : {}", fundingTypeDTO);
 		if (fundingTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class FundingTypeResource {
 	 */
 	@PutMapping("/funding-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<FundingTypeDTO> updateFundingType(@Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update FundingType : {}", fundingTypeDTO);
 		if (fundingTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class FundingTypeResource {
 	 */
 	@DeleteMapping("/funding-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteFundingType(@PathVariable Long id) {
 		log.debug("REST request to delete FundingType : {}", id);
 		fundingTypeRepository.delete(id);

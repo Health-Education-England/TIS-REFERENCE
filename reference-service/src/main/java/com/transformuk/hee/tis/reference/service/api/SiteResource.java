@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -64,6 +65,7 @@ public class SiteResource {
 	 */
 	@PostMapping("/sites")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<SiteDTO> createSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
 		log.debug("REST request to save Site : {}", siteDTO);
 		if (siteDTO.getId() != null) {
@@ -88,6 +90,7 @@ public class SiteResource {
 	 */
 	@PutMapping("/sites")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<SiteDTO> updateSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
 		log.debug("REST request to update Site : {}", siteDTO);
 		if (siteDTO.getId() == null) {
@@ -180,6 +183,7 @@ public class SiteResource {
 	 */
 	@DeleteMapping("/sites/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteSite(@PathVariable Long id) {
 		log.debug("REST request to delete Site : {}", id);
 		siteRepository.delete(id);

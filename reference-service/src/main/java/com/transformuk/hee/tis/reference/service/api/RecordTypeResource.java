@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class RecordTypeResource {
 	 */
 	@PostMapping("/record-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<RecordTypeDTO> createRecordType(@Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
 		log.debug("REST request to save RecordType : {}", recordTypeDTO);
 		if (recordTypeDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class RecordTypeResource {
 	 */
 	@PutMapping("/record-types")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<RecordTypeDTO> updateRecordType(@Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
 		log.debug("REST request to update RecordType : {}", recordTypeDTO);
 		if (recordTypeDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class RecordTypeResource {
 	 */
 	@DeleteMapping("/record-types/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteRecordType(@PathVariable Long id) {
 		log.debug("REST request to delete RecordType : {}", id);
 		recordTypeRepository.delete(id);

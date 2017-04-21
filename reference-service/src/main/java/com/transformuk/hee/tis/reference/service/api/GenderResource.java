@@ -10,6 +10,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class GenderResource {
 	 */
 	@PostMapping("/genders")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GenderDTO> createGender(@Valid @RequestBody GenderDTO genderDTO) throws URISyntaxException {
 		log.debug("REST request to save Gender : {}", genderDTO);
 		if (genderDTO.getId() != null) {
@@ -69,6 +71,7 @@ public class GenderResource {
 	 */
 	@PutMapping("/genders")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<GenderDTO> updateGender(@Valid @RequestBody GenderDTO genderDTO) throws URISyntaxException {
 		log.debug("REST request to update Gender : {}", genderDTO);
 		if (genderDTO.getId() == null) {
@@ -118,6 +121,7 @@ public class GenderResource {
 	 */
 	@DeleteMapping("/genders/{id}")
 	@Timed
+	@PreAuthorize("hasAuthority('reference:delete:entities')")
 	public ResponseEntity<Void> deleteGender(@PathVariable Long id) {
 		log.debug("REST request to delete Gender : {}", id);
 		genderRepository.delete(id);
