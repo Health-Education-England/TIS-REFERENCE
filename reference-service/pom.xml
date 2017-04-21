@@ -96,6 +96,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.transformuk.hee</groupId>
+            <artifactId>profile-client</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate5</artifactId>
         </dependency>
