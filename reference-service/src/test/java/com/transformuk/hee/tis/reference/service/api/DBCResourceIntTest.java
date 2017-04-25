@@ -239,7 +239,7 @@ public class DBCResourceIntTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.dbc").value("1-AIIDH1"))
 				.andExpect(jsonPath("$.name").value("Health Education Thames Valley"))
-				.andExpect(jsonPath("$.abbr").value("TV"));
+				.andExpect(jsonPath("$.abbr").value("HETV"));
 	}
 
 	@Test
