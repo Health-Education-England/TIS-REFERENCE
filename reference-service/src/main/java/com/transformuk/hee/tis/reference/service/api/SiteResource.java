@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
@@ -10,10 +11,12 @@ import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +33,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -188,6 +192,70 @@ public class SiteResource {
 		log.debug("REST request to delete Site : {}", id);
 		siteRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+
+	/**
+	 * POST  /bulk-sites : bulk creates a new site.
+	 *
+	 * @param siteDTOs the siteDTOs to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new siteDTOs, or with status 400 (Bad Request) if the site has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-sites")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<SiteDTO>> bulkCreateSite(@Valid @RequestBody List<SiteDTO> siteDTOs) throws URISyntaxException {
+		log.debug("REST request to bulk save Site : {}", siteDTOs);
+		if (!Collections.isEmpty(siteDTOs)) {
+			List<Long> entityIds = siteDTOs.stream().map(site -> site.getId()).collect(Collectors.toList());
+			if(!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new sites cannot already have an ID")).body(null);
+			}
+		}
+
+		List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
+		sites = siteRepository.save(sites);
+		List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
+		List<Long> ids = results.stream().map(site -> site.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
+
+	/**
+	 * PUT  /bulk-sites : Bulk updates an existing site.
+	 *
+	 * @param siteDTOs the siteDTOs to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated siteDTOs,
+	 * or with status 400 (Bad Request) if the siteDTOs is not valid,
+	 * or with status 500 (Internal Server Error) if the siteDTOs couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-sites")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<SiteDTO>> bulkUpdateSite(@Valid @RequestBody List<SiteDTO> siteDTOs) throws URISyntaxException {
+		log.debug("REST request to bulk update Site : {}", siteDTOs);
+		if(Collections.isEmpty(siteDTOs)){
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(siteDTOs)) {
+			List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId","The request body for this end point cannot be empty")).body(null);
+		}
+
+		List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
+		sites = siteRepository.save(sites);
+		List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
+		List<Long> ids = results.stream().map(site -> site.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }
