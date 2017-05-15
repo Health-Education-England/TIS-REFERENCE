@@ -161,7 +161,10 @@ public class GradeResource {
 	public ResponseEntity<List<GradeDTO>> bulkCreateGrade(@Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
 		log.debug("REST request to bulk save Grade : {}", gradeDTOs);
 		if (!Collections.isEmpty(gradeDTOs)) {
-			List<Long> entityIds = gradeDTOs.stream().map(grade -> grade.getId()).collect(Collectors.toList());
+			List<Long> entityIds = gradeDTOs.stream()
+					.filter(grade -> grade.getId() != null)
+					.map(grade -> grade.getId())
+					.collect(Collectors.toList());
 			if(!Collections.isEmpty(entityIds)) {
 				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new grades cannot already have an ID")).body(null);
 			}

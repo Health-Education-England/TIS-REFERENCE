@@ -146,7 +146,10 @@ public class CurriculumSubTypeResource {
 	public ResponseEntity<List<CurriculumSubTypeDTO>> bulkCreateCurriculumSubType(@Valid @RequestBody List<CurriculumSubTypeDTO> curriculumSubTypeDTOs) throws URISyntaxException {
 		log.debug("REST request to bulk save CurriculumSubType : {}", curriculumSubTypeDTOs);
 		if (!Collections.isEmpty(curriculumSubTypeDTOs)) {
-			List<Long> entityIds = curriculumSubTypeDTOs.stream().map(cst -> cst.getId()).collect(Collectors.toList());
+			List<Long> entityIds = curriculumSubTypeDTOs.stream()
+					.filter(cst -> cst.getId() != null)
+					.map(cst -> cst.getId())
+					.collect(Collectors.toList());
 			if(!Collections.isEmpty(entityIds)) {
 				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new curriculumSubTypes cannot already have an ID")).body(null);
 			}

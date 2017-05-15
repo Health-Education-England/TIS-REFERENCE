@@ -1,7 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
@@ -196,9 +195,12 @@ public class TrustResource {
 	@Timed
 	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<List<TrustDTO>> bulkCreateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
-		log.debug("REST request to bulk save Trust : {}", trustDTOs);
+		log.info("REST request to bulk save Trust : {}", trustDTOs);
 		if (!Collections.isEmpty(trustDTOs)) {
-			List<Long> entityIds = trustDTOs.stream().map(trust -> trust.getId()).collect(Collectors.toList());
+			List<Long> entityIds = trustDTOs .stream()
+					.filter(trust -> trust.getId() != null)
+					.map(trust -> trust.getId())
+					.collect(Collectors.toList());
 			if(!Collections.isEmpty(entityIds)) {
 				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new Trust cannot already have an ID")).body(null);
 			}
@@ -226,7 +228,7 @@ public class TrustResource {
 	@Timed
 	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<List<TrustDTO>> bulkUpdateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
-		log.debug("REST request to update Trust : {}", trustDTOs);
+		log.info("REST request to update Trust : {}", trustDTOs);
 		if(Collections.isEmpty(trustDTOs)){
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
 					"The request body for this end point cannot be empty")).body(null);

@@ -209,7 +209,10 @@ public class SiteResource {
 	public ResponseEntity<List<SiteDTO>> bulkCreateSite(@Valid @RequestBody List<SiteDTO> siteDTOs) throws URISyntaxException {
 		log.debug("REST request to bulk save Site : {}", siteDTOs);
 		if (!Collections.isEmpty(siteDTOs)) {
-			List<Long> entityIds = siteDTOs.stream().map(site -> site.getId()).collect(Collectors.toList());
+			List<Long> entityIds = siteDTOs.stream()
+					.filter(site -> site.getId() != null)
+					.map(site -> site.getId())
+					.collect(Collectors.toList());
 			if(!Collections.isEmpty(entityIds)) {
 				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new sites cannot already have an ID")).body(null);
 			}
