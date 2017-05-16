@@ -123,14 +123,19 @@ public class ReferenceServiceImpl implements ReferenceService {
 	 */
 	@Override
 	public List<GradeDTO> bulkUpdateGrade(List<GradeDTO> gradeDTOs) {
-		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<List<GradeDTO>> httpEntity = new HttpEntity<>(gradeDTOs, headers);
+		if (CollectionUtils.isEmpty(gradeDTOs)) {
+			LOG.info(COLLECTION_VALIDATION_MESSAGE);
+			return Collections.EMPTY_LIST;
+		} else {
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<List<GradeDTO>> httpEntity = new HttpEntity<>(gradeDTOs, headers);
 
-		ParameterizedTypeReference<List<GradeDTO>> typeReference = getGradeReference();
+			ParameterizedTypeReference<List<GradeDTO>> typeReference = getGradeReference();
 
-		ResponseEntity<List<GradeDTO>> response = referenceRestTemplate.exchange(serviceUrl + BULK_CREATE_UPDATE_GRADES,
-				HttpMethod.PUT, httpEntity, typeReference);
-		return response.getBody();
+			ResponseEntity<List<GradeDTO>> response = referenceRestTemplate.exchange(serviceUrl + BULK_CREATE_UPDATE_GRADES,
+					HttpMethod.PUT, httpEntity, typeReference);
+			return response.getBody();
+		}
 	}
 
 	/**
