@@ -30,10 +30,13 @@ import java.util.List;
 public class ReferenceServiceImpl implements ReferenceService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
-	private static final String BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES = "api/bulk-curriculum-sub-types";
+	private static final String BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES = "/api/bulk-curriculum-sub-types";
+	private static final String CREATE_UPDATE_GRADES = "/api/grades";
 	private static final String BULK_CREATE_UPDATE_GRADES = "/api/bulk-grades";
+	private static final String CREATE_UPDATE_SITES = "/api/sites";
 	private static final String BULK_CREATE_UPDATE_SITES = "/api/bulk-sites";
 	private static final String BULK_CREATE_UPDATE_TRUSTS = "/api/bulk-trusts";
+	private static final String CREATE_UPDATE_TRUSTS = "/api/trusts";
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
 
 	private RestTemplate referenceRestTemplate;
@@ -45,6 +48,27 @@ public class ReferenceServiceImpl implements ReferenceService {
 	public ReferenceServiceImpl(@Qualifier("referenceRestTemplate") RestTemplate referenceRestTemplate) {
 		this.referenceRestTemplate = referenceRestTemplate;
 	}
+
+	@Override
+	public CurriculumSubTypeDTO createCurriculumSubType(CurriculumSubTypeDTO curriculumSubTypeDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<CurriculumSubTypeDTO> httpEntity = new HttpEntity<>(curriculumSubTypeDTO, headers);
+
+		ResponseEntity<CurriculumSubTypeDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES, HttpMethod.POST, httpEntity, CurriculumSubTypeDTO.class);
+		return response.getBody();
+	}
+
+	@Override
+	public CurriculumSubTypeDTO updateCurriculumSubType(CurriculumSubTypeDTO curriculumSubTypeDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<CurriculumSubTypeDTO> httpEntity = new HttpEntity<>(curriculumSubTypeDTO, headers);
+
+		ResponseEntity<CurriculumSubTypeDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES, HttpMethod.PUT, httpEntity, CurriculumSubTypeDTO.class);
+		return response.getBody();
+	}
+
 
 	/**
 	 * Bulk create new CurriculumSubTypes Entities
@@ -90,6 +114,26 @@ public class ReferenceServiceImpl implements ReferenceService {
 					serviceUrl + BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES, HttpMethod.PUT, httpEntity, typeReference);
 			return response.getBody();
 		}
+	}
+
+	@Override
+	public GradeDTO createGrade(GradeDTO gradeDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<GradeDTO> httpEntity = new HttpEntity<>(gradeDTO, headers);
+
+		ResponseEntity<GradeDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_GRADES, HttpMethod.POST, httpEntity, GradeDTO.class);
+		return response.getBody();
+	}
+
+	@Override
+	public GradeDTO updateGrade(GradeDTO gradeDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<GradeDTO> httpEntity = new HttpEntity<>(gradeDTO, headers);
+
+		ResponseEntity<GradeDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_GRADES, HttpMethod.PUT, httpEntity, GradeDTO.class);
+		return response.getBody();
 	}
 
 	/**
@@ -138,6 +182,27 @@ public class ReferenceServiceImpl implements ReferenceService {
 		}
 	}
 
+
+	@Override
+	public SiteDTO createSite(SiteDTO siteDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<SiteDTO> httpEntity = new HttpEntity<>(siteDTO, headers);
+
+		ResponseEntity<SiteDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_SITES, HttpMethod.POST, httpEntity, SiteDTO.class);
+		return response.getBody();
+	}
+
+	@Override
+	public SiteDTO updateSite(SiteDTO siteDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<SiteDTO> httpEntity = new HttpEntity<>(siteDTO, headers);
+
+		ResponseEntity<SiteDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_SITES, HttpMethod.PUT, httpEntity, SiteDTO.class);
+		return response.getBody();
+	}
+
 	/**
 	 * Bulk create Site entities
 	 *
@@ -182,6 +247,26 @@ public class ReferenceServiceImpl implements ReferenceService {
 					HttpMethod.PUT, httpEntity, typeReference);
 			return response.getBody();
 		}
+	}
+
+	@Override
+	public TrustDTO createTrust(TrustDTO trustDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<TrustDTO> httpEntity = new HttpEntity<>(trustDTO, headers);
+
+		ResponseEntity<TrustDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_TRUSTS, HttpMethod.POST, httpEntity, TrustDTO.class);
+		return response.getBody();
+	}
+
+	@Override
+	public TrustDTO updateTrust(TrustDTO trustDTO) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<TrustDTO> httpEntity = new HttpEntity<>(trustDTO, headers);
+
+		ResponseEntity<TrustDTO> response = referenceRestTemplate.exchange(
+				serviceUrl + CREATE_UPDATE_TRUSTS, HttpMethod.PUT, httpEntity, TrustDTO.class);
+		return response.getBody();
 	}
 
 	/**
