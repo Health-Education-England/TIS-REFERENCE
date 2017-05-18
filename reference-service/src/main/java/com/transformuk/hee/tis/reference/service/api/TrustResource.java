@@ -10,10 +10,12 @@ import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -175,6 +178,74 @@ public class TrustResource {
 		log.debug("REST request to delete Trust : {}", id);
 		trustRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+
+
+
+	/**
+	 * POST  /bulk-trusts : Create a new trust.
+	 *
+	 * @param trustDTOs the trustDTOs to create
+	 * @return the ResponseEntity with status 201 (Created) and with body the new trustDTOs, or with status 400 (Bad Request) if the trust has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-trusts")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<TrustDTO>> bulkCreateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
+		log.info("REST request to bulk save Trust : {}", trustDTOs);
+		if (!Collections.isEmpty(trustDTOs)) {
+			List<Long> entityIds = trustDTOs .stream()
+					.filter(trust -> trust.getId() != null)
+					.map(trust -> trust.getId())
+					.collect(Collectors.toList());
+			if(!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new Trust cannot already have an ID")).body(null);
+			}
+		}
+		List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
+		trusts = trustRepository.save(trusts);
+		List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
+		List<Long> ids = results.stream().map(trust -> trust.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
+
+	/**
+	 * PUT  /bulk-trusts : Updates an existing trust.
+	 *
+	 * @param trustDTOs the trustDTOs to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTOs,
+	 * or with status 400 (Bad Request) if the trustDTOs is not valid,
+	 * or with status 500 (Internal Server Error) if the trustDTOs couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-trusts")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<TrustDTO>> bulkUpdateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
+		log.info("REST request to update Trust : {}", trustDTOs);
+		if(Collections.isEmpty(trustDTOs)){
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(trustDTOs)) {
+			List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId","The request body for this end point cannot be empty")).body(null);
+		}
+
+		List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
+		trusts = trustRepository.save(trusts);
+		List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
+		List<Long> ids = results.stream().map(trust -> trust.getId()).collect(Collectors.toList());
+
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }
