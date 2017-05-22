@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -41,6 +40,9 @@ public class ReferenceServiceImpl implements ReferenceService {
 	private static final String BULK_CREATE_UPDATE_TRUSTS = "/api/bulk-trusts";
 	private static final String CREATE_UPDATE_TRUSTS = "/api/trusts";
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
+
+	private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+
 
 	private RestTemplate referenceRestTemplate;
 
@@ -336,15 +338,6 @@ public class ReferenceServiceImpl implements ReferenceService {
 	private ParameterizedTypeReference<List<TrustDTO>> getTrustReference() {
 		return new ParameterizedTypeReference<List<TrustDTO>>() {
 		};
-	}
-	private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
-
-	private RestTemplate referenceRestTemplate;
-
-	private String serviceUrl;
-
-	public ReferenceServiceImpl(RestTemplate referenceRestTemplate) {
-		this.referenceRestTemplate = referenceRestTemplate;
 	}
 
 	public ResponseEntity<DBCDTO> getDBCByCode(String code) {
