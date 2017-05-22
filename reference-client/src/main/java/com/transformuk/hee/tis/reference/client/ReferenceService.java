@@ -7,6 +7,9 @@ import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 
 import java.util.List;
 
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import org.springframework.http.ResponseEntity;
+
 public interface ReferenceService {
 
 	CurriculumSubTypeDTO createCurriculumSubType(CurriculumSubTypeDTO curriculumSubTypeDTO);
@@ -31,4 +34,5 @@ public interface ReferenceService {
 	List<TrustDTO> bulkUpdateTrust(List<TrustDTO> trustDTOs);
 
 
+	ResponseEntity<DBCDTO> getDBCByCode(String code);
 }
