@@ -32,13 +32,6 @@ import org.springframework.http.ResponseEntity;
 public class ReferenceServiceImpl implements ReferenceService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
-	private static final String BULK_CREATE_UPDATE_CURRICULUM_SUB_TYPES = "/api/bulk-curriculum-sub-types";
-	private static final String CREATE_UPDATE_GRADES = "/api/grades";
-	private static final String BULK_CREATE_UPDATE_GRADES = "/api/bulk-grades";
-	private static final String CREATE_UPDATE_SITES = "/api/sites";
-	private static final String BULK_CREATE_UPDATE_SITES = "/api/bulk-sites";
-	private static final String BULK_CREATE_UPDATE_TRUSTS = "/api/bulk-trusts";
-	private static final String CREATE_UPDATE_TRUSTS = "/api/trusts";
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
 
 	private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
@@ -320,6 +313,62 @@ public class ReferenceServiceImpl implements ReferenceService {
 		}
 	}
 
+
+	@Override
+	public <DTO> DTO createDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
+
+		ResponseEntity<DTO> response = referenceRestTemplate.exchange(
+				serviceUrl + endpointUrl, HttpMethod.POST, httpEntity, dtoClass);
+		return response.getBody();
+	}
+
+	@Override
+	public <DTO> DTO updateDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
+
+		ResponseEntity<DTO> response = referenceRestTemplate.exchange(
+				serviceUrl + endpointUrl, HttpMethod.PUT, httpEntity, dtoClass);
+		return response.getBody();
+	}
+
+	@Override
+	public <DTO> List<DTO> bulkCreateDtos(List<DTO> objectDTOs, String endpointUrl) {
+		if (CollectionUtils.isEmpty(objectDTOs)) {
+			LOG.info(COLLECTION_VALIDATION_MESSAGE);
+			return Collections.EMPTY_LIST;
+		} else {
+			HttpHeaders headers = new HttpHeaders();
+
+			HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
+			ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
+
+			ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
+					HttpMethod.POST, httpEntity, typeReference);
+			return response.getBody();
+		}
+	}
+
+
+	@Override
+	public <DTO> List<DTO> bulkUpdateDtos(List<DTO> objectDTOs, String endpointUrl) {
+		if (CollectionUtils.isEmpty(objectDTOs)) {
+			LOG.info(COLLECTION_VALIDATION_MESSAGE);
+			return Collections.EMPTY_LIST;
+		} else {
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
+
+			ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
+
+			ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
+					HttpMethod.PUT, httpEntity, typeReference);
+			return response.getBody();
+		}
+	}
+
 	private ParameterizedTypeReference<List<CurriculumSubTypeDTO>> getCurriculumSubTypeReference() {
 		return new ParameterizedTypeReference<List<CurriculumSubTypeDTO>>() {
 		};
@@ -337,6 +386,11 @@ public class ReferenceServiceImpl implements ReferenceService {
 
 	private ParameterizedTypeReference<List<TrustDTO>> getTrustReference() {
 		return new ParameterizedTypeReference<List<TrustDTO>>() {
+		};
+	}
+
+	private <DTO> ParameterizedTypeReference<List<DTO>> getDTOReference() {
+		return new ParameterizedTypeReference<List<DTO>>() {
 		};
 	}
 
