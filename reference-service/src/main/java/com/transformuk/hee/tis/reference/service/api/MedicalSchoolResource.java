@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
-import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
+import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing MedicalSchool.
@@ -137,4 +140,64 @@ public class MedicalSchoolResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+	/**
+	 * POST  /bulk-medical-schools : Bulk create a new medical-schools.
+	 *
+	 * @param medicalSchoolDTOS List of the medicalSchoolDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new medicalSchoolDTOS, or with status 400 (Bad Request) if the MedicalSchoolDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-medical-schools")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<MedicalSchoolDTO>> bulkCreateMedicalSchool(@Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save MedicalSchools : {}", medicalSchoolDTOS);
+		if (!Collections.isEmpty(medicalSchoolDTOS)) {
+			List<Long> entityIds = medicalSchoolDTOS.stream()
+					.filter(medicalSchoolDTO -> medicalSchoolDTO.getId() != null)
+					.map(medicalSchoolDTO -> medicalSchoolDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new medicalSchools cannot already have an ID")).body(null);
+			}
+		}
+		List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
+		medicalSchools = medicalSchoolRepository.save(medicalSchools);
+		List<MedicalSchoolDTO> result = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
+		List<Long> ids = result.stream().map(medicalSchoolDTO -> medicalSchoolDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-medical-schools : Updates an existing medical-schools.
+	 *
+	 * @param medicalSchoolDTOS List of the medicalSchoolDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated medicalSchoolDTOS,
+	 * or with status 400 (Bad Request) if the medicalSchoolDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the medicalSchoolDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-medical-schools")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<MedicalSchoolDTO>> bulkUpdateMedicalSchool(@Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update MedicalSchools : {}", medicalSchoolDTOS);
+		if (Collections.isEmpty(medicalSchoolDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(medicalSchoolDTOS)) {
+			List<MedicalSchoolDTO> entitiesWithNoId = medicalSchoolDTOS.stream().filter(medicalSchoolDTO -> medicalSchoolDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
+		medicalSchools = medicalSchoolRepository.save(medicalSchools);
+		List<MedicalSchoolDTO> results = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
+		List<Long> ids = results.stream().map(medicalSchoolDTO -> medicalSchoolDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

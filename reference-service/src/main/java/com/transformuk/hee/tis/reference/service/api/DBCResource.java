@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing DBC.
@@ -143,4 +146,65 @@ public class DBCResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+
+	/**
+	 * POST  /bulk-dbcs : Bulk create a new dbcs.
+	 *
+	 * @param dbcdtos List of the dbcdtos to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new dbcdtos, or with status 400 (Bad Request) if the DBCDto has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-dbcs")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<DBCDTO>> bulkCreateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos) throws URISyntaxException {
+		log.debug("REST request to bulk save DBCs : {}", dbcdtos);
+		if (!Collections.isEmpty(dbcdtos)) {
+			List<Long> entityIds = dbcdtos.stream()
+					.filter(dbcdto -> dbcdto.getId() != null)
+					.map(dbc -> dbc.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new dbcs cannot already have an ID")).body(null);
+			}
+		}
+		List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
+		dbcs = dBCRepository.save(dbcs);
+		List<DBCDTO> result = dBCMapper.dBCSToDBCDTOs(dbcs);
+		List<Long> ids = result.stream().map(dbc -> dbc.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-dbcs : Updates an existing DBC.
+	 *
+	 * @param dbcdtos List of the dbcdtos to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated dbcdtos,
+	 * or with status 400 (Bad Request) if the dbcdtos is not valid,
+	 * or with status 500 (Internal Server Error) if the dbcdtos couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-dbcs")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<DBCDTO>> bulkUpdateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos) throws URISyntaxException {
+		log.debug("REST request to bulk update DBCs : {}", dbcdtos);
+		if (Collections.isEmpty(dbcdtos)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(dbcdtos)) {
+			List<DBCDTO> entitiesWithNoId = dbcdtos.stream().filter(dbc -> dbc.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
+		dbcs = dBCRepository.save(dbcs);
+		List<DBCDTO> results = dBCMapper.dBCSToDBCDTOs(dbcs);
+		List<Long> ids = results.stream().map(dbc -> dbc.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }
