@@ -1,10 +1,10 @@
 package com.transformuk.hee.tis.reference.client;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
+import java.util.List;
 
 public interface ReferenceService {
 
@@ -17,5 +17,6 @@ public interface ReferenceService {
 	<DTO> List<DTO> bulkCreateDtos(List<DTO> objectDTOs, String endpointUrl);
 
 	<DTO> List<DTO> bulkUpdateDtos(List<DTO> objectDTOs, String endpointUrl);
+
 	ResponseEntity<DBCDTO> getDBCByCode(String code);
 }

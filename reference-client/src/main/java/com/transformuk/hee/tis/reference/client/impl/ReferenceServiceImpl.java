@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.*;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.ResponseEntity;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
