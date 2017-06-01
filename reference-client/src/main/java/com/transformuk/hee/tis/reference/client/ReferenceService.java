@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReferenceService {
 
-	<DTO> List<DTO> getAllDto(String endpointUrl, Class<DTO> dtoClass) throws IOException;
+	<DTO> List<DTO> getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException;
 
 	<DTO> DTO createDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass);
 

@@ -82,10 +82,10 @@ public class ReferenceServiceImpl implements ReferenceService {
 	}
 
 	@Override
-	public <DTO> List getAllDto(String endpointUrl, Class<DTO> dtoClass) throws IOException {
+	public <DTO> List getAllDto(String endpointUrl,String pageSizeUrl, Class<DTO> dtoClass) throws IOException {
 		final ParameterizedTypeReference parameterizedTypeReference = classToParamTypeRefMap.get(dtoClass);
 		ResponseEntity<List> response = referenceRestTemplate.exchange(
-				serviceUrl + endpointUrl, HttpMethod.GET, null, parameterizedTypeReference);
+				serviceUrl + endpointUrl + pageSizeUrl, HttpMethod.GET, null, parameterizedTypeReference);
 		return response.getBody();
 	}
 
