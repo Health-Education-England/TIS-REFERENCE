@@ -1,38 +1,22 @@
 package com.transformuk.hee.tis.reference.client;
 
-import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
-import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
-import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
-
-import java.util.List;
-
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+import java.util.List;
+
 public interface ReferenceService {
 
-	CurriculumSubTypeDTO createCurriculumSubType(CurriculumSubTypeDTO curriculumSubTypeDTO);
-	CurriculumSubTypeDTO updateCurriculumSubType(CurriculumSubTypeDTO curriculumSubTypeDTO);
-	List<CurriculumSubTypeDTO> bulkCreateCurriculumSubType(List<CurriculumSubTypeDTO> curriculumSubTypeDTOs);
-	List<CurriculumSubTypeDTO> bulkUpdateCurriculumSubType(List<CurriculumSubTypeDTO> curriculumSubTypeDTOs);
+	<DTO> List<DTO> getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException;
 
-	GradeDTO createGrade(GradeDTO gradeDTO);
-	GradeDTO updateGrade(GradeDTO gradeDTO);
-	List<GradeDTO> bulkCreateGrade(List<GradeDTO> gradeDTOs);
-	List<GradeDTO> bulkUpdateGrade(List<GradeDTO> gradeDTOs);
+	<DTO> DTO createDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass);
 
-	SiteDTO createSite(SiteDTO siteDTO);
-	SiteDTO updateSite(SiteDTO siteDTO);
-	List<SiteDTO> bulkCreateSite(List<SiteDTO> siteDTOs);
-	List<SiteDTO> bulkUpdateSite(List<SiteDTO> siteDTOs);
+	<DTO> DTO updateDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass);
 
+	<DTO> List<DTO> bulkCreateDtos(List<DTO> objectDTOs, String endpointUrl);
 
-	TrustDTO createTrust(TrustDTO trustDTO);
-	TrustDTO updateTrust(TrustDTO trustDTO);
-	List<TrustDTO> bulkCreateTrust(List<TrustDTO> trustDTOs);
-	List<TrustDTO> bulkUpdateTrust(List<TrustDTO> trustDTOs);
-
+	<DTO> List<DTO> bulkUpdateDtos(List<DTO> objectDTOs, String endpointUrl);
 
 	ResponseEntity<DBCDTO> getDBCByCode(String code);
 }

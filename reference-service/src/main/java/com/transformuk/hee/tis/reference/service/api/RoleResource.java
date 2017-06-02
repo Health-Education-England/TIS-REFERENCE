@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Role;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
-import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Role.
@@ -126,6 +129,68 @@ public class RoleResource {
 		log.debug("REST request to delete Role : {}", id);
 		roleRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+	/**
+	 * POST  /bulk-roles : Bulk create a new roles.
+	 *
+	 * @param roleDTOS List of the roleDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new roleDTOS, or with status 400 (Bad Request) if the RoleDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-roles")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<RoleDTO>> bulkCreateRole(@Valid @RequestBody List<RoleDTO> roleDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save RoleDtos : {}", roleDTOS);
+		if (!Collections.isEmpty(roleDTOS)) {
+			List<Long> entityIds = roleDTOS.stream()
+					.filter(roleDTO -> roleDTO.getId() != null)
+					.map(roleDTO -> roleDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new roles cannot already have an ID")).body(null);
+			}
+		}
+		List<Role> roles = roleMapper.roleDTOsToRoles(roleDTOS);
+		roles = roleRepository.save(roles);
+		List<RoleDTO> result = roleMapper.rolesToRoleDTOs(roles);
+		List<Long> ids = result.stream().map(roleDTO -> roleDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-roles : Updates an existing roles.
+	 *
+	 * @param roleDTOS List of the roleDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated roleDTOS,
+	 * or with status 400 (Bad Request) if the roleDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the roleDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-roles")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<RoleDTO>> bulkUpdateRole(@Valid @RequestBody List<RoleDTO> roleDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update RoleDtos : {}", roleDTOS);
+		if (Collections.isEmpty(roleDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(roleDTOS)) {
+			List<RoleDTO> entitiesWithNoId = roleDTOS.stream().filter(roleDTO -> roleDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<Role> roleList = roleMapper.roleDTOsToRoles(roleDTOS);
+		roleList = roleRepository.save(roleList);
+		List<RoleDTO> results = roleMapper.rolesToRoleDTOs(roleList);
+		List<Long> ids = results.stream().map(roleDTO -> roleDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

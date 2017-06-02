@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.service.repository.RecordTypeRepository;
-import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.RecordTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing RecordType.
@@ -126,6 +129,68 @@ public class RecordTypeResource {
 		log.debug("REST request to delete RecordType : {}", id);
 		recordTypeRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+	/**
+	 * POST  /bulk-record-types : Bulk create a new record-types.
+	 *
+	 * @param recordTypeDTOS List of the recordTypeDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new recordTypeDTOS, or with status 400 (Bad Request) if the RecordTypeDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-record-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<RecordTypeDTO>> bulkCreateRecordType(@Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save RecordTypeDtos : {}", recordTypeDTOS);
+		if (!Collections.isEmpty(recordTypeDTOS)) {
+			List<Long> entityIds = recordTypeDTOS.stream()
+					.filter(rt -> rt.getId() != null)
+					.map(rt -> rt.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new recordTypes cannot already have an ID")).body(null);
+			}
+		}
+		List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
+		recordTypes = recordTypeRepository.save(recordTypes);
+		List<RecordTypeDTO> result = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
+		List<Long> ids = result.stream().map(rt -> rt.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-record-types : Updates an existing record-types.
+	 *
+	 * @param recordTypeDTOS List of the recordTypeDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated recordTypeDTOS,
+	 * or with status 400 (Bad Request) if the recordTypeDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the recordTypeDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-record-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<RecordTypeDTO>> bulkUpdateRecordType(@Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update RecordTypeDtos : {}", recordTypeDTOS);
+		if (Collections.isEmpty(recordTypeDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(recordTypeDTOS)) {
+			List<RecordTypeDTO> entitiesWithNoId = recordTypeDTOS.stream().filter(rt -> rt.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
+		recordTypes = recordTypeRepository.save(recordTypes);
+		List<RecordTypeDTO> results = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
+		List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
-import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing MaritalStatus.
@@ -126,6 +129,67 @@ public class MaritalStatusResource {
 		log.debug("REST request to delete MaritalStatus : {}", id);
 		maritalStatusRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+	/**
+	 * POST  /bulk-marital-statuses : Bulk create a new marital-statuses.
+	 *
+	 * @param maritalStatusDTOS List of the maritalStatusDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new maritalStatusDTOS, or with status 400 (Bad Request) if the MaritalStatusDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-marital-statuses")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<MaritalStatusDTO>> bulkCreateMaritalStatus(@Valid @RequestBody List<MaritalStatusDTO> maritalStatusDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save MaritalStatus : {}", maritalStatusDTOS);
+		if (!Collections.isEmpty(maritalStatusDTOS)) {
+			List<Long> entityIds = maritalStatusDTOS.stream()
+					.filter(maritalStatusDTO -> maritalStatusDTO.getId() != null)
+					.map(maritalStatusDTO -> maritalStatusDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new maritalStatuses cannot already have an ID")).body(null);
+			}
+		}
+		List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
+		maritalStatuses = maritalStatusRepository.save(maritalStatuses);
+		List<MaritalStatusDTO> result = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
+		List<Long> ids = result.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-marital-statuses : Updates an existing marital-statuses.
+	 *
+	 * @param maritalStatusDTOS List of the maritalStatusDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated maritalStatusDTOS,
+	 * or with status 400 (Bad Request) if the maritalStatusDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the maritalStatusDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-marital-statuses")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<MaritalStatusDTO>> bulkUpdateMaritalStatus(@Valid @RequestBody List<MaritalStatusDTO> maritalStatusDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update MaritalStatus : {}", maritalStatusDTOS);
+		if (Collections.isEmpty(maritalStatusDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(maritalStatusDTOS)) {
+			List<MaritalStatusDTO> entitiesWithNoId = maritalStatusDTOS.stream().filter(maritalStatusDTO -> maritalStatusDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
+		maritalStatuses = maritalStatusRepository.save(maritalStatuses);
+		List<MaritalStatusDTO> results = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
+		List<Long> ids = results.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

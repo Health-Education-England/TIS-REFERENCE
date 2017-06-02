@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.Country;
-import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.Country;
+import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Country.
@@ -135,6 +138,68 @@ public class CountryResource {
 		log.debug("REST request to delete Country : {}", id);
 		countryRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+	/**
+	 * POST  /bulk-countries : Bulk create a new countries.
+	 *
+	 * @param countryDTOS List of the countryDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new countryDTOS, or with status 400 (Bad Request) if the CountryDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-countries")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<CountryDTO>> bulkCreateCountry(@Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save CountryDTOs : {}", countryDTOS);
+		if (!Collections.isEmpty(countryDTOS)) {
+			List<Long> entityIds = countryDTOS.stream()
+					.filter(c -> c.getId() != null)
+					.map(c -> c.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new countries cannot already have an ID")).body(null);
+			}
+		}
+		List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
+		countries = countryRepository.save(countries);
+		List<CountryDTO> result = countryMapper.countriesToCountryDTOs(countries);
+		List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-countries : Updates an existing country.
+	 *
+	 * @param countryDTOS List of the countryDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated countryDTOS,
+	 * or with status 400 (Bad Request) if the countryDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the countryDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-countries")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<CountryDTO>> bulkUpdateCountry(@Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update CountryDTO : {}", countryDTOS);
+		if (Collections.isEmpty(countryDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(countryDTOS)) {
+			List<CountryDTO> entitiesWithNoId = countryDTOS.stream().filter(c -> c.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
+		countries = countryRepository.save(countries);
+		List<CountryDTO> results = countryMapper.countriesToCountryDTOs(countries);
+		List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
-import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing GdcStatus.
@@ -128,4 +131,64 @@ public class GdcStatusResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+	/**
+	 * POST  /bulk-gdc-statuses : Bulk create a new gdc-statuses.
+	 *
+	 * @param gdcStatusDTOS List of the gdcStatusDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new gdcStatusDTOS, or with status 400 (Bad Request) if the GdcStatusDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-gdc-statuses")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<GdcStatusDTO>> bulkCreateGdcStatus(@Valid @RequestBody List<GdcStatusDTO> gdcStatusDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save GdcStatus : {}", gdcStatusDTOS);
+		if (!Collections.isEmpty(gdcStatusDTOS)) {
+			List<Long> entityIds = gdcStatusDTOS.stream()
+					.filter(gdcStatusDTO -> gdcStatusDTO.getId() != null)
+					.map(gdcStatusDTO -> gdcStatusDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new gdcStatuses cannot already have an ID")).body(null);
+			}
+		}
+		List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
+		gdcStatuses = gdcStatusRepository.save(gdcStatuses);
+		List<GdcStatusDTO> result = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
+		List<Long> ids = result.stream().map(at -> at.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-gdc-statuses : Updates an existing gdc-statuses.
+	 *
+	 * @param gdcStatusDTOS List of the gdcStatusDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated gdcStatusDTOS,
+	 * or with status 400 (Bad Request) if the gdcStatusDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the gdcStatusDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-gdc-statuses")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<GdcStatusDTO>> bulkUpdateGdcStatus(@Valid @RequestBody List<GdcStatusDTO> gdcStatusDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update gdcStatus : {}", gdcStatusDTOS);
+		if (Collections.isEmpty(gdcStatusDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(gdcStatusDTOS)) {
+			List<GdcStatusDTO> entitiesWithNoId = gdcStatusDTOS.stream().filter(gdcStatusDTO -> gdcStatusDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
+		gdcStatuses = gdcStatusRepository.save(gdcStatuses);
+		List<GdcStatusDTO> results = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
+		List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

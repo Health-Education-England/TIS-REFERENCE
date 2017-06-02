@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.TariffRate;
-import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
 import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.TariffRate;
+import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing TariffRate.
@@ -137,4 +140,65 @@ public class TariffRateResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+
+	/**
+	 * POST  /bulk-tariff-rates : Bulk create a new tariff-rates.
+	 *
+	 * @param tariffRateDTOS List of the tariffRateDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new tariffRateDTOS, or with status 400 (Bad Request) if the TariffRateDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-tariff-rates")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<TariffRateDTO>> bulkCreateTariffRate(@Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save TariffRateDtos : {}", tariffRateDTOS);
+		if (!Collections.isEmpty(tariffRateDTOS)) {
+			List<Long> entityIds = tariffRateDTOS.stream()
+					.filter(tariffRateDTO -> tariffRateDTO.getId() != null)
+					.map(tariffRateDTO -> tariffRateDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new tariffRates cannot already have an ID")).body(null);
+			}
+		}
+		List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
+		tariffRates = tariffRateRepository.save(tariffRates);
+		List<TariffRateDTO> result = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
+		List<Long> ids = result.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-tariff-rates : Updates an existing tariff-rates.
+	 *
+	 * @param tariffRateDTOS List of the tariffRateDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated tariffRateDTOS,
+	 * or with status 400 (Bad Request) if the tariffRateDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the tariffRateDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-tariff-rates")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<TariffRateDTO>> bulkUpdateTariffRate(@Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update TariffRateDto : {}", tariffRateDTOS);
+		if (Collections.isEmpty(tariffRateDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(tariffRateDTOS)) {
+			List<TariffRateDTO> entitiesWithNoId = tariffRateDTOS.stream().filter(tariffRateDTO -> tariffRateDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
+		tariffRates = tariffRateRepository.save(tariffRates);
+		List<TariffRateDTO> results = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
+		List<Long> ids = results.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

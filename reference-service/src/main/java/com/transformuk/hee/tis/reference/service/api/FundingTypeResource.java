@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
-import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing FundingType.
@@ -128,4 +131,64 @@ public class FundingTypeResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+	/**
+	 * POST  /bulk-funding-types : Bulk create a new funding-types.
+	 *
+	 * @param fundingTypeDTOS List of the fundingTypeDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new fundingTypeDTOS, or with status 400 (Bad Request) if the FundingTypeDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-funding-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<FundingTypeDTO>> bulkCreateFundingType(@Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save FundingTypeDTOs : {}", fundingTypeDTOS);
+		if (!Collections.isEmpty(fundingTypeDTOS)) {
+			List<Long> entityIds = fundingTypeDTOS.stream()
+					.filter(fundingTypeDTO -> fundingTypeDTO.getId() != null)
+					.map(fundingTypeDTO -> fundingTypeDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new fundingTypes cannot already have an ID")).body(null);
+			}
+		}
+		List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
+		fundingTypes = fundingTypeRepository.save(fundingTypes);
+		List<FundingTypeDTO> result = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
+		List<Long> ids = result.stream().map(ft -> ft.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-funding-types : Updates an existing FundingType.
+	 *
+	 * @param fundingTypeDTOS List of the fundingTypeDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated fundingTypeDTOS,
+	 * or with status 400 (Bad Request) if the fundingTypeDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the fundingTypeDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-funding-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<FundingTypeDTO>> bulkUpdateFundingType(@Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update AssessmentTypesDTO : {}", fundingTypeDTOS);
+		if (Collections.isEmpty(fundingTypeDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(fundingTypeDTOS)) {
+			List<FundingTypeDTO> entitiesWithNoId = fundingTypeDTOS.stream().filter(ft -> ft.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
+		fundingTypes = fundingTypeRepository.save(fundingTypes);
+		List<FundingTypeDTO> results = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
+		List<Long> ids = results.stream().map(ft -> ft.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }
