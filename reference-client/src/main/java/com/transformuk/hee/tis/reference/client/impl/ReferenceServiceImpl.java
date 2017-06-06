@@ -32,7 +32,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
-	private static final  Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
+	private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
 
 	static{
 		classToParamTypeRefMap = Maps.newHashMap();
@@ -167,5 +167,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 	@Override
 	public String getServiceUrl() {
 		return this.serviceUrl;
+	}
+
+	@Override
+	public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
+		return classToParamTypeRefMap;
 	}
 }
