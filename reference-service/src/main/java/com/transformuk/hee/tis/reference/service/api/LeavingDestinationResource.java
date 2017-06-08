@@ -189,8 +189,10 @@ public class LeavingDestinationResource {
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(leavingDestinationDTOS)) {
 			List<LeavingDestinationDTO> entitiesWithNoId = leavingDestinationDTOS.stream().filter(leavingDestinationDTO -> leavingDestinationDTO.getId() == null).collect(Collectors.toList());
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+			if (!Collections.isEmpty(entitiesWithNoId)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+						"bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+			}
 		}
 		List<LeavingDestination> leavingDestinations = leavingDestinationMapper.leavingDestinationDTOsToLeavingDestinations(leavingDestinationDTOS);
 		leavingDestinations = leavingDestinationRepository.save(leavingDestinations);
