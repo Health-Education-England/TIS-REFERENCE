@@ -1,12 +1,13 @@
 package com.transformuk.hee.tis.reference.client;
 
+import com.transformuk.hee.tis.client.ClientService;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.List;
 
-public interface ReferenceService {
+public interface ReferenceService extends ClientService {
 
 	<DTO> List<DTO> getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException;
 

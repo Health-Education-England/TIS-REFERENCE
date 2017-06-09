@@ -231,8 +231,10 @@ public class TrustResource {
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(trustDTOs)) {
 			List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null).collect(Collectors.toList());
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+			if (!Collections.isEmpty(entitiesWithNoId)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+						"bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+			}
 		}
 
 		List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);

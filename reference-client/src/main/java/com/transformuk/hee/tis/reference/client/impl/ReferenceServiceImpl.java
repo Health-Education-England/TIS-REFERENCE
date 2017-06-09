@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
+import com.transformuk.hee.tis.client.impl.AbstractClientService;
 import com.transformuk.hee.tis.reference.api.dto.*;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
@@ -27,11 +28,11 @@ import java.util.Map;
  * the tis reference service
  */
 @Service
-public class ReferenceServiceImpl implements ReferenceService {
+public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
-	private static final  Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
+	private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
 
 	static{
 		classToParamTypeRefMap = Maps.newHashMap();
@@ -158,4 +159,18 @@ public class ReferenceServiceImpl implements ReferenceService {
 		this.serviceUrl = serviceUrl;
 	}
 
+	@Override
+	public RestTemplate getRestTemplate() {
+		return this.referenceRestTemplate;
+	}
+
+	@Override
+	public String getServiceUrl() {
+		return this.serviceUrl;
+	}
+
+	@Override
+	public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
+		return classToParamTypeRefMap;
+	}
 }

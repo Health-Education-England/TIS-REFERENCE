@@ -181,8 +181,10 @@ public class RecordTypeResource {
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(recordTypeDTOS)) {
 			List<RecordTypeDTO> entitiesWithNoId = recordTypeDTOS.stream().filter(rt -> rt.getId() == null).collect(Collectors.toList());
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+			if (!Collections.isEmpty(entitiesWithNoId)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+						"bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+			}
 		}
 		List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
 		recordTypes = recordTypeRepository.save(recordTypes);
