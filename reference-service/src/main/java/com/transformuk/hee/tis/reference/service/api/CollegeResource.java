@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.College;
-import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.College;
+import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing College.
@@ -135,6 +138,67 @@ public class CollegeResource {
 		log.debug("REST request to delete College : {}", id);
 		collegeRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+	/**
+	 * POST  /bulk-colleges : Bulk create a new colleges.
+	 *
+	 * @param collegeDTOS List of the collegeDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new collegeDTOS, or with status 400 (Bad Request) if the CollegeDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-colleges")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<CollegeDTO>> bulkCreateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save CollegeDTOs : {}", collegeDTOS);
+		if (!Collections.isEmpty(collegeDTOS)) {
+			List<Long> entityIds = collegeDTOS.stream()
+					.filter(collegeDTO -> collegeDTO.getId() != null)
+					.map(collegeDTO -> collegeDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new colleges cannot already have an ID")).body(null);
+			}
+		}
+		List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
+		colleges = collegeRepository.save(colleges);
+		List<CollegeDTO> result = collegeMapper.collegesToCollegeDTOs(colleges);
+		List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-colleges : Updates an existing curriculumSubType.
+	 *
+	 * @param collegeDTOS List of the collegeDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated collegeDTOS,
+	 * or with status 400 (Bad Request) if the collegeDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the collegeDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-colleges")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<CollegeDTO>> bulkUpdateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update CollegeDTO : {}", collegeDTOS);
+		if (Collections.isEmpty(collegeDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(collegeDTOS)) {
+			List<CollegeDTO> entitiesWithNoId = collegeDTOS.stream().filter(c -> c.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
+		colleges = collegeRepository.save(colleges);
+		List<CollegeDTO> results = collegeMapper.collegesToCollegeDTOs(colleges);
+		List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

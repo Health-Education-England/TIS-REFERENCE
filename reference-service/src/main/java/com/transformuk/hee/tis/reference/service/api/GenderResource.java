@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
-import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Gender.
@@ -128,4 +131,64 @@ public class GenderResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+	/**
+	 * POST  /bulk-genders : Bulk create a new genders.
+	 *
+	 * @param genderDTOS List of the genderDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new genderDTOS, or with status 400 (Bad Request) if the GenderDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-genders")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<GenderDTO>> bulkCreateGender(@Valid @RequestBody List<GenderDTO> genderDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save GenderDto : {}", genderDTOS);
+		if (!Collections.isEmpty(genderDTOS)) {
+			List<Long> entityIds = genderDTOS.stream()
+					.filter(genderDTO -> genderDTO.getId() != null)
+					.map(genderDTO -> genderDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new genders cannot already have an ID")).body(null);
+			}
+		}
+		List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
+		genders = genderRepository.save(genders);
+		List<GenderDTO> result = genderMapper.gendersToGenderDTOs(genders);
+		List<Long> ids = result.stream().map(genderDTO -> genderDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-genders : Updates an existing genders.
+	 *
+	 * @param genderDTOS List of the genderDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated genderDTOS,
+	 * or with status 400 (Bad Request) if the genderDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the genderDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-genders")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<GenderDTO>> bulkUpdateGender(@Valid @RequestBody List<GenderDTO> genderDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update GenderDto : {}", genderDTOS);
+		if (Collections.isEmpty(genderDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(genderDTOS)) {
+			List<GenderDTO> entitiesWithNoId = genderDTOS.stream().filter(g -> g.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
+		genders = genderRepository.save(genders);
+		List<GenderDTO> results = genderMapper.gendersToGenderDTOs(genders);
+		List<Long> ids = results.stream().map(g -> g.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

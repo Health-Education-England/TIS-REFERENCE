@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
-import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
+import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing ReligiousBelief.
@@ -137,4 +140,65 @@ public class ReligiousBeliefResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+
+	/**
+	 * POST  /bulk-religious-beliefs : Bulk create a new religious-beliefs.
+	 *
+	 * @param religiousBeliefDTOS List of the religiousBeliefDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new religiousBeliefDTOS, or with status 400 (Bad Request) if the ReligiousBeliefDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-religious-beliefs")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<ReligiousBeliefDTO>> bulkCreateReligiousBelief(@Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save ReligiousBelief : {}", religiousBeliefDTOS);
+		if (!Collections.isEmpty(religiousBeliefDTOS)) {
+			List<Long> entityIds = religiousBeliefDTOS.stream()
+					.filter(rb -> rb.getId() != null)
+					.map(rb -> rb.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new religiousBeliefs cannot already have an ID")).body(null);
+			}
+		}
+		List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
+		religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+		List<ReligiousBeliefDTO> result = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
+		List<Long> ids = result.stream().map(rb -> rb.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-religious-beliefs : Updates an existing religious-beliefs.
+	 *
+	 * @param religiousBeliefDTOS List of the religiousBeliefDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated religiousBeliefDTOS,
+	 * or with status 400 (Bad Request) if the religiousBeliefDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the religiousBeliefDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-religious-beliefs")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<ReligiousBeliefDTO>> bulkUpdateReligiousBelief(@Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update ReligiousBeliefDtos : {}", religiousBeliefDTOS);
+		if (Collections.isEmpty(religiousBeliefDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(religiousBeliefDTOS)) {
+			List<ReligiousBeliefDTO> entitiesWithNoId = religiousBeliefDTOS.stream().filter(rb -> rb.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
+		religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+		List<ReligiousBeliefDTO> results = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
+		List<Long> ids = results.stream().map(rb -> rb.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

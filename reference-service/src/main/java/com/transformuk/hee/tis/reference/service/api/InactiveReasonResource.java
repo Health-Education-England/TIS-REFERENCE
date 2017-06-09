@@ -1,14 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.service.model.InactiveReason;
-import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
-import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.InactiveReason;
+import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
+import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing InactiveReason.
@@ -137,4 +140,64 @@ public class InactiveReasonResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+	/**
+	 * POST  /bulk-inactive-reasons : Bulk create a new inactive-reasons.
+	 *
+	 * @param inactiveReasonDTOS List of the inactiveReasonDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new inactiveReasonDTOS, or with status 400 (Bad Request) if the InactiveReasonDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-inactive-reasons")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<InactiveReasonDTO>> bulkCreateInactiveReason(@Valid @RequestBody List<InactiveReasonDTO> inactiveReasonDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save InactiveReason : {}", inactiveReasonDTOS);
+		if (!Collections.isEmpty(inactiveReasonDTOS)) {
+			List<Long> entityIds = inactiveReasonDTOS.stream()
+					.filter(inactiveReasonDTO -> inactiveReasonDTO.getId() != null)
+					.map(inactiveReasonDTO -> inactiveReasonDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new inactiveReasons cannot already have an ID")).body(null);
+			}
+		}
+		List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
+		inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
+		List<InactiveReasonDTO> result = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
+		List<Long> ids = result.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-inactive-reasons : Updates an existing inactive-reasons.
+	 *
+	 * @param inactiveReasonDTOS List of the inactiveReasonDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated inactiveReasonDTOS,
+	 * or with status 400 (Bad Request) if the inactiveReasonDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the inactiveReasonDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-inactive-reasons")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<InactiveReasonDTO>> bulkUpdateInactiveReason(@Valid @RequestBody List<InactiveReasonDTO> inactiveReasonDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update InactiveReason : {}", inactiveReasonDTOS);
+		if (Collections.isEmpty(inactiveReasonDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(inactiveReasonDTOS)) {
+			List<InactiveReasonDTO> entitiesWithNoId = inactiveReasonDTOS.stream().filter(inactiveReasonDTO -> inactiveReasonDTO.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
+		inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
+		List<InactiveReasonDTO> results = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
+		List<Long> ids = results.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

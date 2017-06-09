@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
-import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing AssessmentType.
@@ -128,4 +131,65 @@ public class AssessmentTypeResource {
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
 	}
 
+
+	/**
+	 * POST  /bulk-assessment-types : Bulk create a new assessment-types.
+	 *
+	 * @param assessmentTypeDTOS List of the assessmentTypeDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new assessmentTypeDTOS, or with status 400 (Bad Request) if the AssessmentTypeDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-assessment-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<AssessmentTypeDTO>> bulkCreateAssessmentType(@Valid @RequestBody List<AssessmentTypeDTO> assessmentTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save AssessmentTypes : {}", assessmentTypeDTOS);
+		if (!Collections.isEmpty(assessmentTypeDTOS)) {
+			List<Long> entityIds = assessmentTypeDTOS.stream()
+					.filter(assessmentTypeDTO -> assessmentTypeDTO.getId() != null)
+					.map(assessmentTypeDTO -> assessmentTypeDTO.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new assessmentTypes cannot already have an ID")).body(null);
+			}
+		}
+		List<AssessmentType> assessmentTypes = assessmentTypeMapper.assessmentTypeDTOsToAssessmentTypes(assessmentTypeDTOS);
+		assessmentTypes = assessmentTypeRepository.save(assessmentTypes);
+		List<AssessmentTypeDTO> result = assessmentTypeMapper.assessmentTypesToAssessmentTypeDTOs(assessmentTypes);
+		List<Long> ids = result.stream().map(at -> at.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-assessment-types : Updates an existing AssessmentType.
+	 *
+	 * @param assessmentTypeDTOS List of the assessmentTypeDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated assessmentTypeDTOS,
+	 * or with status 400 (Bad Request) if the assessmentTypeDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the assessmentTypeDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-assessment-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<AssessmentTypeDTO>> bulkUpdateAssessmentType(@Valid @RequestBody List<AssessmentTypeDTO> assessmentTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update AssessmentTypesDTO : {}", assessmentTypeDTOS);
+		if (Collections.isEmpty(assessmentTypeDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(assessmentTypeDTOS)) {
+			List<AssessmentTypeDTO> entitiesWithNoId = assessmentTypeDTOS.stream().filter(at -> at.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<AssessmentType> assessmentTypes = assessmentTypeMapper.assessmentTypeDTOsToAssessmentTypes(assessmentTypeDTOS);
+		assessmentTypes = assessmentTypeRepository.save(assessmentTypes);
+		List<AssessmentTypeDTO> results = assessmentTypeMapper.assessmentTypesToAssessmentTypeDTOs(assessmentTypes);
+		List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
+	}
 }

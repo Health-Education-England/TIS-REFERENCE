@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
-import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
-import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing ProgrammeMembershipType.
@@ -126,6 +129,68 @@ public class ProgrammeMembershipTypeResource {
 		log.debug("REST request to delete ProgrammeMembershipType : {}", id);
 		programmeMembershipTypeRepository.delete(id);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+	}
+
+
+	/**
+	 * POST  /bulk-programme-membership-types : Bulk create a new programme-membership-types.
+	 *
+	 * @param programmeMembershipTypeDTOS List of the programmeMembershipTypeDTOS to create
+	 * @return the ResponseEntity with status 200 (Created) and with body the new programmeMembershipTypeDTOS, or with status 400 (Bad Request) if the ProgrammeMembershipTypeDTO has already an ID
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PostMapping("/bulk-programme-membership-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<ProgrammeMembershipTypeDTO>> bulkCreateProgrammeMembershipType(@Valid @RequestBody List<ProgrammeMembershipTypeDTO> programmeMembershipTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk save ProgrammeMembershipTypeDtos : {}", programmeMembershipTypeDTOS);
+		if (!Collections.isEmpty(programmeMembershipTypeDTOS)) {
+			List<Long> entityIds = programmeMembershipTypeDTOS.stream()
+					.filter(pmt -> pmt.getId() != null)
+					.map(pmt -> pmt.getId())
+					.collect(Collectors.toList());
+			if (!Collections.isEmpty(entityIds)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new programmeMembershipTypes cannot already have an ID")).body(null);
+			}
+		}
+		List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
+		programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
+		List<ProgrammeMembershipTypeDTO> result = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
+		List<Long> ids = result.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(result);
+	}
+
+	/**
+	 * PUT  /bulk-programme-membership-types : Updates an existing programme-membership-types.
+	 *
+	 * @param programmeMembershipTypeDTOS List of the programmeMembershipTypeDTOS to update
+	 * @return the ResponseEntity with status 200 (OK) and with body the updated programmeMembershipTypeDTOS,
+	 * or with status 400 (Bad Request) if the programmeMembershipTypeDTOS is not valid,
+	 * or with status 500 (Internal Server Error) if the programmeMembershipTypeDTOS couldnt be updated
+	 * @throws URISyntaxException if the Location URI syntax is incorrect
+	 */
+	@PutMapping("/bulk-programme-membership-types")
+	@Timed
+	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
+	public ResponseEntity<List<ProgrammeMembershipTypeDTO>> bulkUpdateProgrammeMembershipType(@Valid @RequestBody List<ProgrammeMembershipTypeDTO> programmeMembershipTypeDTOS) throws URISyntaxException {
+		log.debug("REST request to bulk update ProgrammeMembershipTypeDtos : {}", programmeMembershipTypeDTOS);
+		if (Collections.isEmpty(programmeMembershipTypeDTOS)) {
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+					"The request body for this end point cannot be empty")).body(null);
+		} else if (!Collections.isEmpty(programmeMembershipTypeDTOS)) {
+			List<ProgrammeMembershipTypeDTO> entitiesWithNoId = programmeMembershipTypeDTOS.stream().filter(pmt -> pmt.getId() == null).collect(Collectors.toList());
+			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+		}
+		List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
+		programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
+		List<ProgrammeMembershipTypeDTO> results = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
+		List<Long> ids = results.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
+		return ResponseEntity.ok()
+				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+				.body(results);
 	}
 
 }

@@ -1,15 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
-import com.transformuk.hee.tis.reference.service.model.Site;
-import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
-import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
-import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
+import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
@@ -195,7 +194,6 @@ public class SiteResource {
 	}
 
 
-
 	/**
 	 * POST  /bulk-sites : bulk creates a new site.
 	 *
@@ -213,7 +211,7 @@ public class SiteResource {
 					.filter(site -> site.getId() != null)
 					.map(site -> site.getId())
 					.collect(Collectors.toList());
-			if(!Collections.isEmpty(entityIds)) {
+			if (!Collections.isEmpty(entityIds)) {
 				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new sites cannot already have an ID")).body(null);
 			}
 		}
@@ -242,13 +240,13 @@ public class SiteResource {
 	@PreAuthorize("hasAuthority('reference:add:modify:entities')")
 	public ResponseEntity<List<SiteDTO>> bulkUpdateSite(@Valid @RequestBody List<SiteDTO> siteDTOs) throws URISyntaxException {
 		log.debug("REST request to bulk update Site : {}", siteDTOs);
-		if(Collections.isEmpty(siteDTOs)){
+		if (Collections.isEmpty(siteDTOs)) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(siteDTOs)) {
 			List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getId() == null).collect(Collectors.toList());
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId","The request body for this end point cannot be empty")).body(null);
+					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
 		}
 
 		List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
