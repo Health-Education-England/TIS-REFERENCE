@@ -180,8 +180,10 @@ public class GmcStatusResource {
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(gmcStatusDTOS)) {
 			List<GmcStatusDTO> entitiesWithNoId = gmcStatusDTOS.stream().filter(status -> status.getId() == null).collect(Collectors.toList());
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+			if (!Collections.isEmpty(entitiesWithNoId)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+						"bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+			}
 		}
 		List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
 		gmcStatuses = gmcStatusRepository.save(gmcStatuses);

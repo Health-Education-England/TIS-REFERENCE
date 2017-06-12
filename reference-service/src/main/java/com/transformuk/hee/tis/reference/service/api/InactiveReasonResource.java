@@ -189,8 +189,10 @@ public class InactiveReasonResource {
 					"The request body for this end point cannot be empty")).body(null);
 		} else if (!Collections.isEmpty(inactiveReasonDTOS)) {
 			List<InactiveReasonDTO> entitiesWithNoId = inactiveReasonDTOS.stream().filter(inactiveReasonDTO -> inactiveReasonDTO.getId() == null).collect(Collectors.toList());
-			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-					"bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
+			if (!Collections.isEmpty(entitiesWithNoId)) {
+				return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+						"bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+			}
 		}
 		List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
 		inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
