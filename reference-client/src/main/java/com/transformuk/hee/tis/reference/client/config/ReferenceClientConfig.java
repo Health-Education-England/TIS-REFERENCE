@@ -1,9 +1,11 @@
 package com.transformuk.hee.tis.reference.client.config;
 
+import com.transformuk.hee.tis.security.client.KeycloakClientRequestFactory;
+import com.transformuk.hee.tis.security.client.KeycloakRestTemplate;
+import com.transformuk.hee.tis.security.config.KeycloakClientConfig;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.keycloak.admin.client.Keycloak;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -15,11 +17,9 @@ import org.springframework.web.client.RestTemplate;
  * on behalf of itself, where there is no interaction if a browser or end client.
  * e.g. during an ETL, some batch processing etc.
  * <p>
- * This rest template hacks in a token without needing to communicate with keycloak
  */
-@Configuration
-@Profile("local")
-public class ReferenceClientLocalConfig {
+@Import(KeycloakClientConfig.class)
+public class ReferenceClientConfig {
 
 	private static class LocalClientRequestFactory extends HttpComponentsClientHttpRequestFactory implements ClientHttpRequestFactory {
 
@@ -35,14 +35,25 @@ public class ReferenceClientLocalConfig {
 		}
 	}
 
-	@Bean
-	public RestTemplate referenceRestTemplate(ClientHttpRequestFactory factory) {
-		return new RestTemplate(factory);
+	/**
+	 * This rest template makes requests to other services for back end services such as ETLs
+	 * <p>
+	 * It adds auth headers to the request before sending it. This one is used for all environments but production
+	 *
+	 * @return
+	 */
+	public RestTemplate defaultReferenceRestTemplate() {
+		return new RestTemplate(new LocalClientRequestFactory());
 	}
 
-	@Bean
-	public ClientHttpRequestFactory factory() {
-		return new LocalClientRequestFactory();
+	/**
+	 * This rest template adds auth headers retrieved from the keycloak service. its for use in prod
+	 *
+	 * @param keycloak
+	 * @return
+	 */
+	public RestTemplate prodReferenceRestTemplate(Keycloak keycloak) {
+		final KeycloakClientRequestFactory keycloakClientRequestFactory = new KeycloakClientRequestFactory(keycloak);
+		return new KeycloakRestTemplate(keycloakClientRequestFactory);
 	}
-
 }
