@@ -7,6 +7,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -20,7 +21,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 @Import(KeycloakClientConfig.class)
-public class ReferenceClientConfig {
+@Profile("prod")
+public class ReferenceClientProdConfig {
 
 	@Bean
 	public RestTemplate referenceRestTemplate(Keycloak keycloak) {
