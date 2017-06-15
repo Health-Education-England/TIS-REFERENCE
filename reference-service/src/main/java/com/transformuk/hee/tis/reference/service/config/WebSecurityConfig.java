@@ -1,6 +1,6 @@
 package com.transformuk.hee.tis.reference.service.config;
 
-import com.transformuk.hee.tis.profile.client.config.ProfileClientConfig;
+import com.transformuk.hee.tis.profile.client.config.JwtSpringSecurityConfig;
 import com.transformuk.hee.tis.security.JwtAuthenticationEntryPoint;
 import com.transformuk.hee.tis.security.JwtAuthenticationProvider;
 import com.transformuk.hee.tis.security.JwtAuthenticationSuccessHandler;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 @EnableWebSecurity
 @EnableAutoConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@Import(ProfileClientConfig.class)
+@Import(JwtSpringSecurityConfig.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -53,19 +53,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
-			// we don't need CSRF because our token is invulnerable
-			.csrf().disable()
-			.authorizeRequests()
-			// permit static content - non REST endpoints
-			.antMatchers("/scripts/**/*", "/styles/**/*", "/images/**/*", "/bower_components/**/*",
-				"/app/**/*", "/index.html").permitAll()
-			.and()
-			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler)
-			.and()
-			// don't create session
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //.and()
+				// we don't need CSRF because our token is invulnerable
+				.csrf().disable()
+				.authorizeRequests()
+				// permit static content - non REST endpoints
+				.antMatchers("/scripts/**/*", "/styles/**/*", "/images/**/*", "/bower_components/**/*",
+						"/app/**/*", "/index.html").permitAll()
+				.and()
+				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler)
+				.and()
+				// don't create session
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //.and()
 		// Custom JWT based security filter
 		httpSecurity
-			.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
 	}
 }
