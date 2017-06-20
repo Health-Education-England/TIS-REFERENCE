@@ -2,10 +2,9 @@ package com.transformuk.hee.tis.reference.client.config;
 
 import com.transformuk.hee.tis.security.client.KeycloakClientRequestFactory;
 import com.transformuk.hee.tis.security.client.KeycloakRestTemplate;
-import com.transformuk.hee.tis.security.config.KeycloakClientConfig;
+import com.transformuk.hee.tis.security.factory.InternalClientRequestFactory;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.keycloak.admin.client.Keycloak;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
  * e.g. during an ETL, some batch processing etc.
  * <p>
  */
-@Import(KeycloakClientConfig.class)
 public class ReferenceClientConfig {
 
 	private static class LocalClientRequestFactory extends HttpComponentsClientHttpRequestFactory implements ClientHttpRequestFactory {
@@ -55,5 +53,16 @@ public class ReferenceClientConfig {
 	public RestTemplate prodReferenceRestTemplate(Keycloak keycloak) {
 		final KeycloakClientRequestFactory keycloakClientRequestFactory = new KeycloakClientRequestFactory(keycloak);
 		return new KeycloakRestTemplate(keycloakClientRequestFactory);
+	}
+
+	/**
+	 * This rest template adds auth headers retrieved from the Spring security context. its for use in prod when making
+	 * rest calls that were initiated by a browser
+	 *
+	 * @return
+	 */
+	public RestTemplate prodBrowserInitiatedReferenceRestTemplate() {
+		InternalClientRequestFactory internalClientRequestFactory = new InternalClientRequestFactory();
+		return new RestTemplate(internalClientRequestFactory);
 	}
 }
