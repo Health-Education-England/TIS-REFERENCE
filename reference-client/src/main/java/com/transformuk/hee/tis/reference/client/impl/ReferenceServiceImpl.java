@@ -28,7 +28,7 @@ import java.util.Map;
  * the tis reference service
  */
 @Service
-public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
+public class ReferenceServiceImpl implements ReferenceService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
@@ -111,7 +111,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 	}
 
 	@Override
-	public <DTO> List<DTO> bulkCreateDtos(List<DTO> objectDTOs, String endpointUrl) {
+	public <DTO> List<DTO> bulkCreateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
 		if (CollectionUtils.isEmpty(objectDTOs)) {
 			LOG.info(COLLECTION_VALIDATION_MESSAGE);
 			return Collections.EMPTY_LIST;
@@ -128,7 +128,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 	}
 
 	@Override
-	public <DTO> List<DTO> bulkUpdateDtos(List<DTO> objectDTOs, String endpointUrl) {
+	public <DTO> List<DTO> bulkUpdateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
 		if (CollectionUtils.isEmpty(objectDTOs)) {
 			LOG.info(COLLECTION_VALIDATION_MESSAGE);
 			return Collections.EMPTY_LIST;
@@ -142,6 +142,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 					HttpMethod.PUT, httpEntity, typeReference);
 			return response.getBody();
 		}
+	}
+
+	@Override
+	public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO){
+		ParameterizedTypeReference<List<JsonPatchDTO>> typeReference = getJsonPatchDtoReference();
+		ResponseEntity<List<JsonPatchDTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl + objectDTO.getSimpleName(),
+				HttpMethod.GET, null, typeReference);
+		return response.getBody();
+	}
+
+	private ParameterizedTypeReference<List<JsonPatchDTO>> getJsonPatchDtoReference() {
+		return new ParameterizedTypeReference<List<JsonPatchDTO>>() {
+		};
 	}
 
 	private <DTO> ParameterizedTypeReference<List<DTO>> getDTOReference() {

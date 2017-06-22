@@ -60,7 +60,7 @@ flyway:
     encoding: #
     ignore-failed-future-migration: #
     init-sqls: # SQL statements to execute to initialize a connection immediately after obtaining it.
-    locations: classpath:db/migration
+    locations: classpath:db/migration/
     out-of-order: true
     password:
     placeholder-prefix:
@@ -74,7 +74,7 @@ flyway:
     table:  #
     url: ${spring.datasource.url}
     user: sa
-    validate-on-migrate:  #
+    validate-on-migrate: false
     initOnMigrate: true
 
 security:
