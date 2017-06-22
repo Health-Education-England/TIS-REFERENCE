@@ -124,21 +124,6 @@ public class JsonPatchResource {
 
 	}
 
-//	/**
-//	 * GET //jsonPatches/insertType/:tableDtoName : get the "insertType" and "tableDtoName" jsonPatches
-//	 * @param tableDtoName
-//	 * @return
-//	 */
-//	@GetMapping("/jsonPatches/insertType/{tableDtoName}")
-//	@Timed
-//	public ResponseEntity<List<JsonPatchDTO>> getJsonPatchesByInsertTypeAndTableName(@PathVariable String tableDtoName) {
-//		log.debug("REST request to get a page of jsonPatches");
-//		List<JsonPatch> jsonPatches = jsonPatchRepository.findByTableDtoNameAndEnabledTrueAndPatchIdIsNullOrderByDateAddedAsc(
-//				tableDtoName);
-//		return new ResponseEntity<>(jsonPatchMapper.jsonPatchesToJsonPatchDTOs(jsonPatches), HttpStatus.OK);
-//
-//	}
-
 	/**
 	 * GET  /jsonPatches/:id : get the "id" jsonPatch.
 	 *
@@ -204,6 +189,5 @@ public class JsonPatchResource {
 				.headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
 				.body(results);
 	}
-
 
 }
