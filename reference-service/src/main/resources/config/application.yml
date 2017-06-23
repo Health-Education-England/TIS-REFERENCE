@@ -110,17 +110,6 @@ jhipster:
         #exposed-headers:
         #allow-credentials: true
         #max-age: 1800
-    swagger:
-        default-include-pattern: /api/.*
-        title: reference API
-        description: reference API documentation
-        version: 0.0.1
-        terms-of-service-url:
-        contact-name:
-        contact-url:
-        contact-email:
-        license:
-        license-url:
     ribbon:
         display-on-active-profiles: dev
 
