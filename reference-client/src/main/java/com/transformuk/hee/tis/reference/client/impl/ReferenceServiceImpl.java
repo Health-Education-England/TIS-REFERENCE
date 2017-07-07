@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.client.impl;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
 import com.transformuk.hee.tis.reference.api.dto.*;
-import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import java.util.Map;
  * the tis reference service
  */
 @Service
-public class ReferenceServiceImpl implements ReferenceService {
+public class ReferenceServiceImpl extends AbstractClientService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
 	private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
