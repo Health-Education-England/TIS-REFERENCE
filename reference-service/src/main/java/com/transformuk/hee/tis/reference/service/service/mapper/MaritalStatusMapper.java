@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface MaritalStatusMapper {
 
-	MaritalStatusDTO maritalStatusToMaritalStatusDTO(MaritalStatus maritalStatus);
+  MaritalStatusDTO maritalStatusToMaritalStatusDTO(MaritalStatus maritalStatus);
 
-	List<MaritalStatusDTO> maritalStatusesToMaritalStatusDTOs(List<MaritalStatus> maritalStatuses);
+  List<MaritalStatusDTO> maritalStatusesToMaritalStatusDTOs(List<MaritalStatus> maritalStatuses);
 
-	MaritalStatus maritalStatusDTOToMaritalStatus(MaritalStatusDTO maritalStatusDTO);
+  MaritalStatus maritalStatusDTOToMaritalStatus(MaritalStatusDTO maritalStatusDTO);
 
-	List<MaritalStatus> maritalStatusDTOsToMaritalStatuses(List<MaritalStatusDTO> maritalStatusDTOs);
+  List<MaritalStatus> maritalStatusDTOsToMaritalStatuses(List<MaritalStatusDTO> maritalStatusDTOs);
 }

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface ReligiousBeliefMapper {
 
-	ReligiousBeliefDTO religiousBeliefToReligiousBeliefDTO(ReligiousBelief religiousBelief);
+  ReligiousBeliefDTO religiousBeliefToReligiousBeliefDTO(ReligiousBelief religiousBelief);
 
-	List<ReligiousBeliefDTO> religiousBeliefsToReligiousBeliefDTOs(List<ReligiousBelief> religiousBeliefs);
+  List<ReligiousBeliefDTO> religiousBeliefsToReligiousBeliefDTOs(List<ReligiousBelief> religiousBeliefs);
 
-	ReligiousBelief religiousBeliefDTOToReligiousBelief(ReligiousBeliefDTO religiousBeliefDTO);
+  ReligiousBelief religiousBeliefDTOToReligiousBelief(ReligiousBeliefDTO religiousBeliefDTO);
 
-	List<ReligiousBelief> religiousBeliefDTOsToReligiousBeliefs(List<ReligiousBeliefDTO> religiousBeliefDTOs);
+  List<ReligiousBelief> religiousBeliefDTOsToReligiousBeliefs(List<ReligiousBeliefDTO> religiousBeliefDTOs);
 }

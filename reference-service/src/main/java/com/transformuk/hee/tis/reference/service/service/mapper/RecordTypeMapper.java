@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
+import com.transformuk.hee.tis.reference.service.model.RecordType;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface RecordTypeMapper {
 
-	RecordTypeDTO recordTypeToRecordTypeDTO(RecordType recordType);
+  RecordTypeDTO recordTypeToRecordTypeDTO(RecordType recordType);
 
-	List<RecordTypeDTO> recordTypesToRecordTypeDTOs(List<RecordType> recordTypes);
+  List<RecordTypeDTO> recordTypesToRecordTypeDTOs(List<RecordType> recordTypes);
 
-	RecordType recordTypeDTOToRecordType(RecordTypeDTO recordTypeDTO);
+  RecordType recordTypeDTOToRecordType(RecordTypeDTO recordTypeDTO);
 
-	List<RecordType> recordTypeDTOsToRecordTypes(List<RecordTypeDTO> recordTypeDTOs);
+  List<RecordType> recordTypeDTOsToRecordTypes(List<RecordTypeDTO> recordTypeDTOs);
 }

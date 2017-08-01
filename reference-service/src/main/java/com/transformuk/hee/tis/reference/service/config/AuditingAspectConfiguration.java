@@ -11,13 +11,13 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy
 public class AuditingAspectConfiguration {
 
-	@Bean
-	public AuditEventRepository auditEventRepository() {
-		return new TisAuditRepository();
-	}
+  @Bean
+  public AuditEventRepository auditEventRepository() {
+    return new TisAuditRepository();
+  }
 
-	@Bean
-	public AuditingAspect auditingAspect(){
-		return new AuditingAspect(auditEventRepository());
-	}
+  @Bean
+  public AuditingAspect auditingAspect() {
+    return new AuditingAspect(auditEventRepository());
+  }
 }

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.service.model.Nationality;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface NationalityMapper {
 
-	NationalityDTO nationalityToNationalityDTO(Nationality nationality);
+  NationalityDTO nationalityToNationalityDTO(Nationality nationality);
 
-	List<NationalityDTO> nationalitiesToNationalityDTOs(List<Nationality> nationalities);
+  List<NationalityDTO> nationalitiesToNationalityDTOs(List<Nationality> nationalities);
 
-	Nationality nationalityDTOToNationality(NationalityDTO nationalityDTO);
+  Nationality nationalityDTOToNationality(NationalityDTO nationalityDTO);
 
-	List<Nationality> nationalityDTOsToNationalities(List<NationalityDTO> nationalityDTOs);
+  List<Nationality> nationalityDTOsToNationalities(List<NationalityDTO> nationalityDTOs);
 }

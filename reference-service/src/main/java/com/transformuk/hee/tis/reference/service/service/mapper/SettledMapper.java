@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
+import com.transformuk.hee.tis.reference.service.model.Settled;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface SettledMapper {
 
-	SettledDTO settledToSettledDTO(Settled settled);
+  SettledDTO settledToSettledDTO(Settled settled);
 
-	List<SettledDTO> settledsToSettledDTOs(List<Settled> settleds);
+  List<SettledDTO> settledsToSettledDTOs(List<Settled> settleds);
 
-	Settled settledDTOToSettled(SettledDTO settledDTO);
+  Settled settledDTOToSettled(SettledDTO settledDTO);
 
-	List<Settled> settledDTOsToSettleds(List<SettledDTO> settledDTOs);
+  List<Settled> settledDTOsToSettleds(List<SettledDTO> settledDTOs);
 }

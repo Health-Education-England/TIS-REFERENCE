@@ -10,55 +10,55 @@ import java.util.Objects;
  */
 public class EthnicOriginDTO implements Serializable {
 
-	private Long id;
+  private Long id;
 
-	@NotNull
-	private String code;
+  @NotNull
+  private String code;
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getCode() {
-		return code;
-	}
+  public String getCode() {
+    return code;
+  }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-		EthnicOriginDTO ethnicOriginDTO = (EthnicOriginDTO) o;
+    EthnicOriginDTO ethnicOriginDTO = (EthnicOriginDTO) o;
 
-		if (!Objects.equals(id, ethnicOriginDTO.id)) {
-			return false;
-		}
+    if (!Objects.equals(id, ethnicOriginDTO.id)) {
+      return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-	@Override
-	public String toString() {
-		return "EthnicOriginDTO{" +
-				"id=" + id +
-				", code='" + code + "'" +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "EthnicOriginDTO{" +
+        "id=" + id +
+        ", code='" + code + "'" +
+        '}';
+  }
 }

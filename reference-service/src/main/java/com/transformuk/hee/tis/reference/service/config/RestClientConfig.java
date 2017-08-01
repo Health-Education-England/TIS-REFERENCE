@@ -8,8 +8,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestClientConfig extends HeeProfileClientConfig {
 
-	@Bean
-	public RestTemplate profileRestTemplate() {
-		return super.createProfileRestTemplate();
-	}
+  @Bean
+  public RestTemplate profileRestTemplate() {
+    return super.createProfileRestTemplate();
+  }
 }

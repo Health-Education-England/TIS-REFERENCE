@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.service.model.FundingType;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface FundingTypeMapper {
 
-	FundingTypeDTO fundingTypeToFundingTypeDTO(FundingType fundingType);
+  FundingTypeDTO fundingTypeToFundingTypeDTO(FundingType fundingType);
 
-	List<FundingTypeDTO> fundingTypesToFundingTypeDTOs(List<FundingType> fundingTypes);
+  List<FundingTypeDTO> fundingTypesToFundingTypeDTOs(List<FundingType> fundingTypes);
 
-	FundingType fundingTypeDTOToFundingType(FundingTypeDTO fundingTypeDTO);
+  FundingType fundingTypeDTOToFundingType(FundingTypeDTO fundingTypeDTO);
 
-	List<FundingType> fundingTypeDTOsToFundingTypes(List<FundingTypeDTO> fundingTypeDTOs);
+  List<FundingType> fundingTypeDTOsToFundingTypes(List<FundingTypeDTO> fundingTypeDTOs);
 }

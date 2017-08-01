@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface GmcStatusMapper {
 
-	GmcStatusDTO gmcStatusToGmcStatusDTO(GmcStatus gmcStatus);
+  GmcStatusDTO gmcStatusToGmcStatusDTO(GmcStatus gmcStatus);
 
-	List<GmcStatusDTO> gmcStatusesToGmcStatusDTOs(List<GmcStatus> gmcStatuses);
+  List<GmcStatusDTO> gmcStatusesToGmcStatusDTOs(List<GmcStatus> gmcStatuses);
 
-	GmcStatus gmcStatusDTOToGmcStatus(GmcStatusDTO gmcStatusDTO);
+  GmcStatus gmcStatusDTOToGmcStatus(GmcStatusDTO gmcStatusDTO);
 
-	List<GmcStatus> gmcStatusDTOsToGmcStatuses(List<GmcStatusDTO> gmcStatusDTOs);
+  List<GmcStatus> gmcStatusDTOsToGmcStatuses(List<GmcStatusDTO> gmcStatusDTOs);
 }

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.service.model.Gender;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface GenderMapper {
 
-	GenderDTO genderToGenderDTO(Gender gender);
+  GenderDTO genderToGenderDTO(Gender gender);
 
-	List<GenderDTO> gendersToGenderDTOs(List<Gender> genders);
+  List<GenderDTO> gendersToGenderDTOs(List<Gender> genders);
 
-	Gender genderDTOToGender(GenderDTO genderDTO);
+  Gender genderDTOToGender(GenderDTO genderDTO);
 
-	List<Gender> genderDTOsToGenders(List<GenderDTO> genderDTOs);
+  List<Gender> genderDTOsToGenders(List<GenderDTO> genderDTOs);
 }

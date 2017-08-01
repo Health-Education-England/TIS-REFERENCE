@@ -10,67 +10,67 @@ import java.util.Objects;
  */
 public class NationalityDTO implements Serializable {
 
-	private Long id;
+  private Long id;
 
-	@NotNull
-	private String countryNumber;
+  @NotNull
+  private String countryNumber;
 
-	@NotNull
-	private String nationality;
+  @NotNull
+  private String nationality;
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getCountryNumber() {
-		return countryNumber;
-	}
+  public String getCountryNumber() {
+    return countryNumber;
+  }
 
-	public void setCountryNumber(String countryNumber) {
-		this.countryNumber = countryNumber;
-	}
+  public void setCountryNumber(String countryNumber) {
+    this.countryNumber = countryNumber;
+  }
 
-	public String getNationality() {
-		return nationality;
-	}
+  public String getNationality() {
+    return nationality;
+  }
 
-	public void setNationality(String nationality) {
-		this.nationality = nationality;
-	}
+  public void setNationality(String nationality) {
+    this.nationality = nationality;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-		NationalityDTO nationalityDTO = (NationalityDTO) o;
+    NationalityDTO nationalityDTO = (NationalityDTO) o;
 
-		if (!Objects.equals(id, nationalityDTO.id)) {
-			return false;
-		}
+    if (!Objects.equals(id, nationalityDTO.id)) {
+      return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-	@Override
-	public String toString() {
-		return "NationalityDTO{" +
-				"id=" + id +
-				", countryNumber='" + countryNumber + "'" +
-				", nationality='" + nationality + "'" +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "NationalityDTO{" +
+        "id=" + id +
+        ", countryNumber='" + countryNumber + "'" +
+        ", nationality='" + nationality + "'" +
+        '}';
+  }
 }

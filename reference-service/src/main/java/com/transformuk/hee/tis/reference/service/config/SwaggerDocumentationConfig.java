@@ -18,24 +18,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerDocumentationConfig {
 
-	ApiInfo apiInfo() {
-		return new ApiInfoBuilder()
-				.title("TIS Reference API")
-				.description("Reference Service REST API")
-				.license("")
-				.licenseUrl("")
-				.termsOfServiceUrl("")
-				.version("1.0.0")
-				.contact(new Contact("Transform","http://transformuk.com/", "info@transformuk,com"))
-				.build();
-	}
+  ApiInfo apiInfo() {
+    return new ApiInfoBuilder()
+        .title("TIS Reference API")
+        .description("Reference Service REST API")
+        .license("")
+        .licenseUrl("")
+        .termsOfServiceUrl("")
+        .version("1.0.0")
+        .contact(new Contact("Transform", "http://transformuk.com/", "info@transformuk,com"))
+        .build();
+  }
 
-	@Bean
-	public Docket customImplementation(){
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.transformuk.hee.tis.reference.service.api"))
-				.build()
-				.apiInfo(apiInfo());
-	}
+  @Bean
+  public Docket customImplementation() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .select()
+        .apis(RequestHandlerSelectors.basePackage("com.transformuk.hee.tis.reference.service.api"))
+        .build()
+        .apiInfo(apiInfo());
+  }
 }

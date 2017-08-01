@@ -14,18 +14,18 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface SiteRepository extends JpaRepository<Site, Long> {
 
-	Site findBySiteCode(String code);
+  Site findBySiteCode(String code);
 
-	@Query("SELECT s FROM Site s WHERE s.siteCode like %:param% or s.trustCode like %:param% " +
-			"or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%")
-	List<Site> findBySearchString(@Param("param") String searchString, Pageable pageable);
+  @Query("SELECT s FROM Site s WHERE s.siteCode like %:param% or s.trustCode like %:param% " +
+      "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%")
+  List<Site> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
-	@Query("SELECT s FROM Site s WHERE s.trustCode =:trust and (s.siteCode like %:param% " +
-			"or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%)")
-	List<Site> findBySearchStringAndTrustCode(@Param("trust") String trustCode, @Param("param") String searchString,
-											  Pageable pageable);
+  @Query("SELECT s FROM Site s WHERE s.trustCode =:trust and (s.siteCode like %:param% " +
+      "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%)")
+  List<Site> findBySearchStringAndTrustCode(@Param("trust") String trustCode, @Param("param") String searchString,
+                                            Pageable pageable);
 
-	@Query("SELECT s FROM Site s WHERE s.trustCode =:trust")
-	List<Site> findByTrustCode(@Param("trust") String trustCode, Pageable pageable);
+  @Query("SELECT s FROM Site s WHERE s.trustCode =:trust")
+  List<Site> findByTrustCode(@Param("trust") String trustCode, Pageable pageable);
 
 }

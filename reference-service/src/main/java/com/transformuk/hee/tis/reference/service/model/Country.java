@@ -1,7 +1,11 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,80 +16,80 @@ import java.util.Objects;
 @Entity
 public class Country implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@NotNull
-	@Column(name = "countryNumber", nullable = false)
-	private String countryNumber;
+  @NotNull
+  @Column(name = "countryNumber", nullable = false)
+  private String countryNumber;
 
-	@NotNull
-	@Column(name = "nationality", nullable = false)
-	private String nationality;
+  @NotNull
+  @Column(name = "nationality", nullable = false)
+  private String nationality;
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getCountryNumber() {
-		return countryNumber;
-	}
+  public String getCountryNumber() {
+    return countryNumber;
+  }
 
-	public void setCountryNumber(String countryNumber) {
-		this.countryNumber = countryNumber;
-	}
+  public void setCountryNumber(String countryNumber) {
+    this.countryNumber = countryNumber;
+  }
 
-	public Country countryNumber(String countryNumber) {
-		this.countryNumber = countryNumber;
-		return this;
-	}
+  public Country countryNumber(String countryNumber) {
+    this.countryNumber = countryNumber;
+    return this;
+  }
 
-	public String getNationality() {
-		return nationality;
-	}
+  public String getNationality() {
+    return nationality;
+  }
 
-	public void setNationality(String nationality) {
-		this.nationality = nationality;
-	}
+  public void setNationality(String nationality) {
+    this.nationality = nationality;
+  }
 
-	public Country nationality(String nationality) {
-		this.nationality = nationality;
-		return this;
-	}
+  public Country nationality(String nationality) {
+    this.nationality = nationality;
+    return this;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Country country = (Country) o;
-		if (country.id == null || id == null) {
-			return false;
-		}
-		return Objects.equals(id, country.id);
-	}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Country country = (Country) o;
+    if (country.id == null || id == null) {
+      return false;
+    }
+    return Objects.equals(id, country.id);
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-	@Override
-	public String toString() {
-		return "Country{" +
-				"id=" + id +
-				", countryNumber='" + countryNumber + "'" +
-				", nationality='" + nationality + "'" +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "Country{" +
+        "id=" + id +
+        ", countryNumber='" + countryNumber + "'" +
+        ", nationality='" + nationality + "'" +
+        '}';
+  }
 }

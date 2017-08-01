@@ -14,9 +14,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface TrustRepository extends JpaRepository<Trust, Long> {
 
-	Trust findByCode(String code);
+  Trust findByCode(String code);
 
-	@Query("SELECT t FROM Trust t WHERE t.code like %:param% or t.trustName like %:param%")
-	List<Trust> findBySearchString(@Param("param") String searchString, Pageable pageable);
+  @Query("SELECT t FROM Trust t WHERE t.code like %:param% or t.trustName like %:param%")
+  List<Trust> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
 }

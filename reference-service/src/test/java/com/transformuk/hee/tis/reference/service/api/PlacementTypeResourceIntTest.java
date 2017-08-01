@@ -1,11 +1,11 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
-import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;
-import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,8 +25,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the PlacementTypeResource REST controller.
@@ -37,244 +42,244 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 public class PlacementTypeResourceIntTest {
 
-	private static final String DEFAULT_CODE = "AAAAAAAAAA";
-	private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String DEFAULT_CODE = "AAAAAAAAAA";
+  private static final String UPDATED_CODE = "BBBBBBBBBB";
 
-	private static final String DEFAULT_LABEL = "AAAAAAAAAA";
-	private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String DEFAULT_LABEL = "AAAAAAAAAA";
+  private static final String UPDATED_LABEL = "BBBBBBBBBB";
 
-	@Autowired
-	private PlacementTypeRepository placementTypeRepository;
+  @Autowired
+  private PlacementTypeRepository placementTypeRepository;
 
-	@Autowired
-	private PlacementTypeMapper placementTypeMapper;
+  @Autowired
+  private PlacementTypeMapper placementTypeMapper;
 
-	@Autowired
-	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+  @Autowired
+  private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-	@Autowired
-	private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
+  @Autowired
+  private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-	@Autowired
-	private ExceptionTranslator exceptionTranslator;
+  @Autowired
+  private ExceptionTranslator exceptionTranslator;
 
-	@Autowired
-	private EntityManager em;
+  @Autowired
+  private EntityManager em;
 
-	private MockMvc restPlacementTypeMockMvc;
+  private MockMvc restPlacementTypeMockMvc;
 
-	private PlacementType placementType;
+  private PlacementType placementType;
 
-	/**
-	 * Create an entity for this test.
-	 * <p>
-	 * This is a static method, as tests for other entities might also need it,
-	 * if they test an entity which requires the current entity.
-	 */
-	public static PlacementType createEntity(EntityManager em) {
-		PlacementType placementType = new PlacementType()
-				.code(DEFAULT_CODE)
-				.label(DEFAULT_LABEL);
-		return placementType;
-	}
+  /**
+   * Create an entity for this test.
+   * <p>
+   * This is a static method, as tests for other entities might also need it,
+   * if they test an entity which requires the current entity.
+   */
+  public static PlacementType createEntity(EntityManager em) {
+    PlacementType placementType = new PlacementType()
+        .code(DEFAULT_CODE)
+        .label(DEFAULT_LABEL);
+    return placementType;
+  }
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		PlacementTypeResource placementTypeResource = new PlacementTypeResource(placementTypeRepository, placementTypeMapper);
-		this.restPlacementTypeMockMvc = MockMvcBuilders.standaloneSetup(placementTypeResource)
-				.setCustomArgumentResolvers(pageableArgumentResolver)
-				.setControllerAdvice(exceptionTranslator)
-				.setMessageConverters(jacksonMessageConverter).build();
-	}
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    PlacementTypeResource placementTypeResource = new PlacementTypeResource(placementTypeRepository, placementTypeMapper);
+    this.restPlacementTypeMockMvc = MockMvcBuilders.standaloneSetup(placementTypeResource)
+        .setCustomArgumentResolvers(pageableArgumentResolver)
+        .setControllerAdvice(exceptionTranslator)
+        .setMessageConverters(jacksonMessageConverter).build();
+  }
 
-	@Before
-	public void initTest() {
-		placementType = createEntity(em);
-	}
+  @Before
+  public void initTest() {
+    placementType = createEntity(em);
+  }
 
-	@Test
-	@Transactional
-	public void createPlacementType() throws Exception {
-		int databaseSizeBeforeCreate = placementTypeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void createPlacementType() throws Exception {
+    int databaseSizeBeforeCreate = placementTypeRepository.findAll().size();
 
-		// Create the PlacementType
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
-		restPlacementTypeMockMvc.perform(post("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isCreated());
+    // Create the PlacementType
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    restPlacementTypeMockMvc.perform(post("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isCreated());
 
-		// Validate the PlacementType in the database
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeCreate + 1);
-		PlacementType testPlacementType = placementTypeList.get(placementTypeList.size() - 1);
-		assertThat(testPlacementType.getCode()).isEqualTo(DEFAULT_CODE);
-		assertThat(testPlacementType.getLabel()).isEqualTo(DEFAULT_LABEL);
-	}
+    // Validate the PlacementType in the database
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeCreate + 1);
+    PlacementType testPlacementType = placementTypeList.get(placementTypeList.size() - 1);
+    assertThat(testPlacementType.getCode()).isEqualTo(DEFAULT_CODE);
+    assertThat(testPlacementType.getLabel()).isEqualTo(DEFAULT_LABEL);
+  }
 
-	@Test
-	@Transactional
-	public void createPlacementTypeWithExistingId() throws Exception {
-		int databaseSizeBeforeCreate = placementTypeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void createPlacementTypeWithExistingId() throws Exception {
+    int databaseSizeBeforeCreate = placementTypeRepository.findAll().size();
 
-		// Create the PlacementType with an existing ID
-		placementType.setId(1L);
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    // Create the PlacementType with an existing ID
+    placementType.setId(1L);
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
 
-		// An entity with an existing ID cannot be created, so this API call must fail
-		restPlacementTypeMockMvc.perform(post("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isBadRequest());
+    // An entity with an existing ID cannot be created, so this API call must fail
+    restPlacementTypeMockMvc.perform(post("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isBadRequest());
 
-		// Validate the Alice in the database
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeCreate);
-	}
+    // Validate the Alice in the database
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeCreate);
+  }
 
-	@Test
-	@Transactional
-	public void checkCodeIsRequired() throws Exception {
-		int databaseSizeBeforeTest = placementTypeRepository.findAll().size();
-		// set the field null
-		placementType.setCode(null);
+  @Test
+  @Transactional
+  public void checkCodeIsRequired() throws Exception {
+    int databaseSizeBeforeTest = placementTypeRepository.findAll().size();
+    // set the field null
+    placementType.setCode(null);
 
-		// Create the PlacementType, which fails.
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    // Create the PlacementType, which fails.
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
 
-		restPlacementTypeMockMvc.perform(post("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isBadRequest());
+    restPlacementTypeMockMvc.perform(post("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isBadRequest());
 
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeTest);
-	}
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeTest);
+  }
 
-	@Test
-	@Transactional
-	public void checkLabelIsRequired() throws Exception {
-		int databaseSizeBeforeTest = placementTypeRepository.findAll().size();
-		// set the field null
-		placementType.setLabel(null);
+  @Test
+  @Transactional
+  public void checkLabelIsRequired() throws Exception {
+    int databaseSizeBeforeTest = placementTypeRepository.findAll().size();
+    // set the field null
+    placementType.setLabel(null);
 
-		// Create the PlacementType, which fails.
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    // Create the PlacementType, which fails.
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
 
-		restPlacementTypeMockMvc.perform(post("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isBadRequest());
+    restPlacementTypeMockMvc.perform(post("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isBadRequest());
 
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeTest);
-	}
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeTest);
+  }
 
-	@Test
-	@Transactional
-	public void getAllPlacementTypes() throws Exception {
-		// Initialize the database
-		placementTypeRepository.saveAndFlush(placementType);
+  @Test
+  @Transactional
+  public void getAllPlacementTypes() throws Exception {
+    // Initialize the database
+    placementTypeRepository.saveAndFlush(placementType);
 
-		// Get all the placementTypeList
-		restPlacementTypeMockMvc.perform(get("/api/placement-types?sort=id,desc"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-				.andExpect(jsonPath("$.[*].id").value(hasItem(placementType.getId().intValue())))
-				.andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-				.andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
-	}
+    // Get all the placementTypeList
+    restPlacementTypeMockMvc.perform(get("/api/placement-types?sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(placementType.getId().intValue())))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
 
-	@Test
-	@Transactional
-	public void getPlacementType() throws Exception {
-		// Initialize the database
-		placementTypeRepository.saveAndFlush(placementType);
+  @Test
+  @Transactional
+  public void getPlacementType() throws Exception {
+    // Initialize the database
+    placementTypeRepository.saveAndFlush(placementType);
 
-		// Get the placementType
-		restPlacementTypeMockMvc.perform(get("/api/placement-types/{id}", placementType.getId()))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-				.andExpect(jsonPath("$.id").value(placementType.getId().intValue()))
-				.andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-				.andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
-	}
+    // Get the placementType
+    restPlacementTypeMockMvc.perform(get("/api/placement-types/{id}", placementType.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id").value(placementType.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+  }
 
-	@Test
-	@Transactional
-	public void getNonExistingPlacementType() throws Exception {
-		// Get the placementType
-		restPlacementTypeMockMvc.perform(get("/api/placement-types/{id}", Long.MAX_VALUE))
-				.andExpect(status().isNotFound());
-	}
+  @Test
+  @Transactional
+  public void getNonExistingPlacementType() throws Exception {
+    // Get the placementType
+    restPlacementTypeMockMvc.perform(get("/api/placement-types/{id}", Long.MAX_VALUE))
+        .andExpect(status().isNotFound());
+  }
 
-	@Test
-	@Transactional
-	public void updatePlacementType() throws Exception {
-		// Initialize the database
-		placementTypeRepository.saveAndFlush(placementType);
-		int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void updatePlacementType() throws Exception {
+    // Initialize the database
+    placementTypeRepository.saveAndFlush(placementType);
+    int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
 
-		// Update the placementType
-		PlacementType updatedPlacementType = placementTypeRepository.findOne(placementType.getId());
-		updatedPlacementType
-				.code(UPDATED_CODE)
-				.label(UPDATED_LABEL);
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(updatedPlacementType);
+    // Update the placementType
+    PlacementType updatedPlacementType = placementTypeRepository.findOne(placementType.getId());
+    updatedPlacementType
+        .code(UPDATED_CODE)
+        .label(UPDATED_LABEL);
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(updatedPlacementType);
 
-		restPlacementTypeMockMvc.perform(put("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isOk());
+    restPlacementTypeMockMvc.perform(put("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isOk());
 
-		// Validate the PlacementType in the database
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeUpdate);
-		PlacementType testPlacementType = placementTypeList.get(placementTypeList.size() - 1);
-		assertThat(testPlacementType.getCode()).isEqualTo(UPDATED_CODE);
-		assertThat(testPlacementType.getLabel()).isEqualTo(UPDATED_LABEL);
-	}
+    // Validate the PlacementType in the database
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeUpdate);
+    PlacementType testPlacementType = placementTypeList.get(placementTypeList.size() - 1);
+    assertThat(testPlacementType.getCode()).isEqualTo(UPDATED_CODE);
+    assertThat(testPlacementType.getLabel()).isEqualTo(UPDATED_LABEL);
+  }
 
-	@Test
-	@Transactional
-	public void updateNonExistingPlacementType() throws Exception {
-		int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void updateNonExistingPlacementType() throws Exception {
+    int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
 
-		// Create the PlacementType
-		PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    // Create the PlacementType
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
 
-		// If the entity doesn't have an ID, it will be created instead of just being updated
-		restPlacementTypeMockMvc.perform(put("/api/placement-types")
-				.contentType(TestUtil.APPLICATION_JSON_UTF8)
-				.content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
-				.andExpect(status().isCreated());
+    // If the entity doesn't have an ID, it will be created instead of just being updated
+    restPlacementTypeMockMvc.perform(put("/api/placement-types")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
+        .andExpect(status().isCreated());
 
-		// Validate the PlacementType in the database
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeUpdate + 1);
-	}
+    // Validate the PlacementType in the database
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeUpdate + 1);
+  }
 
-	@Test
-	@Transactional
-	public void deletePlacementType() throws Exception {
-		// Initialize the database
-		placementTypeRepository.saveAndFlush(placementType);
-		int databaseSizeBeforeDelete = placementTypeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void deletePlacementType() throws Exception {
+    // Initialize the database
+    placementTypeRepository.saveAndFlush(placementType);
+    int databaseSizeBeforeDelete = placementTypeRepository.findAll().size();
 
-		// Get the placementType
-		restPlacementTypeMockMvc.perform(delete("/api/placement-types/{id}", placementType.getId())
-				.accept(TestUtil.APPLICATION_JSON_UTF8))
-				.andExpect(status().isOk());
+    // Get the placementType
+    restPlacementTypeMockMvc.perform(delete("/api/placement-types/{id}", placementType.getId())
+        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .andExpect(status().isOk());
 
-		// Validate the database is empty
-		List<PlacementType> placementTypeList = placementTypeRepository.findAll();
-		assertThat(placementTypeList).hasSize(databaseSizeBeforeDelete - 1);
-	}
+    // Validate the database is empty
+    List<PlacementType> placementTypeList = placementTypeRepository.findAll();
+    assertThat(placementTypeList).hasSize(databaseSizeBeforeDelete - 1);
+  }
 
-	@Test
-	@Transactional
-	public void equalsVerifier() throws Exception {
-		TestUtil.equalsVerifier(PlacementType.class);
-	}
+  @Test
+  @Transactional
+  public void equalsVerifier() throws Exception {
+    TestUtil.equalsVerifier(PlacementType.class);
+  }
 }

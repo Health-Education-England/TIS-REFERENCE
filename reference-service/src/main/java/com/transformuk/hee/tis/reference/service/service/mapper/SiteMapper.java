@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.service.model.Site;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface SiteMapper {
 
-	SiteDTO siteToSiteDTO(Site site);
+  SiteDTO siteToSiteDTO(Site site);
 
-	List<SiteDTO> sitesToSiteDTOs(List<Site> sites);
+  List<SiteDTO> sitesToSiteDTOs(List<Site> sites);
 
-	Site siteDTOToSite(SiteDTO siteDTO);
+  Site siteDTOToSite(SiteDTO siteDTO);
 
-	List<Site> siteDTOsToSites(List<SiteDTO> siteDTOs);
+  List<Site> siteDTOsToSites(List<SiteDTO> siteDTOs);
 }

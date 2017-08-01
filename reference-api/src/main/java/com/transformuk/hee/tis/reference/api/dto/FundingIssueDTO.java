@@ -10,55 +10,55 @@ import java.util.Objects;
  */
 public class FundingIssueDTO implements Serializable {
 
-	private Long id;
+  private Long id;
 
-	@NotNull
-	private String code;
+  @NotNull
+  private String code;
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getCode() {
-		return code;
-	}
+  public String getCode() {
+    return code;
+  }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-		FundingIssueDTO fundingIssueDTO = (FundingIssueDTO) o;
+    FundingIssueDTO fundingIssueDTO = (FundingIssueDTO) o;
 
-		if (!Objects.equals(id, fundingIssueDTO.id)) {
-			return false;
-		}
+    if (!Objects.equals(id, fundingIssueDTO.id)) {
+      return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-	@Override
-	public String toString() {
-		return "FundingIssueDTO{" +
-				"id=" + id +
-				", code='" + code + "'" +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "FundingIssueDTO{" +
+        "id=" + id +
+        ", code='" + code + "'" +
+        '}';
+  }
 }

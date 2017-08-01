@@ -20,32 +20,32 @@ import static org.mockito.Mockito.verify;
 )
 public class ReferenceServiceImplTest {
 
-	private static final String DBC = "1-DGBODY";
-	private static final String REFERENCE_URL = "http://localhost:8088/reference";
+  private static final String DBC = "1-DGBODY";
+  private static final String REFERENCE_URL = "http://localhost:8088/reference";
 
 
-	@Mock
-	private RestTemplate referenceRestTemplate;
-	@InjectMocks
-	private ReferenceServiceImpl referenceServiceImpl;
+  @Mock
+  private RestTemplate referenceRestTemplate;
+  @InjectMocks
+  private ReferenceServiceImpl referenceServiceImpl;
 
-	@Before
-	public void setUp() throws Exception {
-		referenceServiceImpl.setServiceUrl(REFERENCE_URL);
-	}
+  @Before
+  public void setUp() throws Exception {
+    referenceServiceImpl.setServiceUrl(REFERENCE_URL);
+  }
 
 
-	@Test
-	public void shouldGetDBCByCode() {
-		// given
-		ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-		given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), any())).willReturn(responseEntity);
+  @Test
+  public void shouldGetDBCByCode() {
+    // given
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), any())).willReturn(responseEntity);
 
-		// when
-		referenceServiceImpl.getDBCByCode(DBC);
+    // when
+    referenceServiceImpl.getDBCByCode(DBC);
 
-		// then
-		verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
-	}
+    // then
+    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
+  }
 
 }

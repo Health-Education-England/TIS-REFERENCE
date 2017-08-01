@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface EthnicOriginMapper {
 
-	EthnicOriginDTO ethnicOriginToEthnicOriginDTO(EthnicOrigin ethnicOrigin);
+  EthnicOriginDTO ethnicOriginToEthnicOriginDTO(EthnicOrigin ethnicOrigin);
 
-	List<EthnicOriginDTO> ethnicOriginsToEthnicOriginDTOs(List<EthnicOrigin> ethnicOrigins);
+  List<EthnicOriginDTO> ethnicOriginsToEthnicOriginDTOs(List<EthnicOrigin> ethnicOrigins);
 
-	EthnicOrigin ethnicOriginDTOToEthnicOrigin(EthnicOriginDTO ethnicOriginDTO);
+  EthnicOrigin ethnicOriginDTOToEthnicOrigin(EthnicOriginDTO ethnicOriginDTO);
 
-	List<EthnicOrigin> ethnicOriginDTOsToEthnicOrigins(List<EthnicOriginDTO> ethnicOriginDTOs);
+  List<EthnicOrigin> ethnicOriginDTOsToEthnicOrigins(List<EthnicOriginDTO> ethnicOriginDTOs);
 }

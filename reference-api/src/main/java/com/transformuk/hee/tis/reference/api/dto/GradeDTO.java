@@ -10,113 +10,113 @@ import java.util.Objects;
  */
 public class GradeDTO implements Serializable {
 
-	private Long id;
+  private Long id;
 
-	@NotNull
-	private String abbreviation;
+  @NotNull
+  private String abbreviation;
 
-	private String name;
+  private String name;
 
-	private String label;
+  private String label;
 
-	@NotNull
-	private Boolean trainingGrade;
+  @NotNull
+  private Boolean trainingGrade;
 
-	@NotNull
-	private Boolean postGrade;
+  @NotNull
+  private Boolean postGrade;
 
-	@NotNull
-	private Boolean placementGrade;
+  @NotNull
+  private Boolean placementGrade;
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getAbbreviation() {
-		return abbreviation;
-	}
+  public String getAbbreviation() {
+    return abbreviation;
+  }
 
-	public void setAbbreviation(String abbreviation) {
-		this.abbreviation = abbreviation;
-	}
+  public void setAbbreviation(String abbreviation) {
+    this.abbreviation = abbreviation;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public String getLabel() {
-		return label;
-	}
+  public String getLabel() {
+    return label;
+  }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-	public Boolean getTrainingGrade() {
-		return trainingGrade;
-	}
+  public Boolean getTrainingGrade() {
+    return trainingGrade;
+  }
 
-	public void setTrainingGrade(Boolean trainingGrade) {
-		this.trainingGrade = trainingGrade;
-	}
+  public void setTrainingGrade(Boolean trainingGrade) {
+    this.trainingGrade = trainingGrade;
+  }
 
-	public Boolean getPostGrade() {
-		return postGrade;
-	}
+  public Boolean getPostGrade() {
+    return postGrade;
+  }
 
-	public void setPostGrade(Boolean postGrade) {
-		this.postGrade = postGrade;
-	}
+  public void setPostGrade(Boolean postGrade) {
+    this.postGrade = postGrade;
+  }
 
-	public Boolean getPlacementGrade() {
-		return placementGrade;
-	}
+  public Boolean getPlacementGrade() {
+    return placementGrade;
+  }
 
-	public void setPlacementGrade(Boolean placementGrade) {
-		this.placementGrade = placementGrade;
-	}
+  public void setPlacementGrade(Boolean placementGrade) {
+    this.placementGrade = placementGrade;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-		GradeDTO gradeDTO = (GradeDTO) o;
+    GradeDTO gradeDTO = (GradeDTO) o;
 
-		if (!Objects.equals(id, gradeDTO.id)) {
-			return false;
-		}
+    if (!Objects.equals(id, gradeDTO.id)) {
+      return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-	@Override
-	public String toString() {
-		return "GradeDTO{" +
-				"id=" + id +
-				", abbreviation='" + abbreviation + "'" +
-				", name='" + name + "'" +
-				", label='" + label + "'" +
-				", trainingGrade='" + trainingGrade + "'" +
-				", postGrade='" + postGrade + "'" +
-				", placementGrade='" + placementGrade + "'" +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "GradeDTO{" +
+        "id=" + id +
+        ", abbreviation='" + abbreviation + "'" +
+        ", name='" + name + "'" +
+        ", label='" + label + "'" +
+        ", trainingGrade='" + trainingGrade + "'" +
+        ", postGrade='" + postGrade + "'" +
+        ", placementGrade='" + placementGrade + "'" +
+        '}';
+  }
 }

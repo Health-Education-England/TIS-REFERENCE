@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @SuppressWarnings("unused")
 public interface DBCRepository extends JpaRepository<DBC, Long> {
 
-	DBC findByDbc(String code);
+  DBC findByDbc(String code);
 
 }

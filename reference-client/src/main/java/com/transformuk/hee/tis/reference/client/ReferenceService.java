@@ -6,5 +6,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface ReferenceService extends ClientService {
 
-	ResponseEntity<DBCDTO> getDBCByCode(String code);
+  ResponseEntity<DBCDTO> getDBCByCode(String code);
 }

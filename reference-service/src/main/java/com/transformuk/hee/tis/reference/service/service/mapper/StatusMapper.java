@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.Status;
 import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
+import com.transformuk.hee.tis.reference.service.model.Status;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface StatusMapper {
 
-	StatusDTO statusToStatusDTO(Status status);
+  StatusDTO statusToStatusDTO(Status status);
 
-	List<StatusDTO> statusesToStatusDTOs(List<Status> statuses);
+  List<StatusDTO> statusesToStatusDTOs(List<Status> statuses);
 
-	Status statusDTOToStatus(StatusDTO statusDTO);
+  Status statusDTOToStatus(StatusDTO statusDTO);
 
-	List<Status> statusDTOsToStatuses(List<StatusDTO> statusDTOs);
+  List<Status> statusDTOsToStatuses(List<StatusDTO> statusDTOs);
 }

@@ -1,7 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {})
 public interface PlacementTypeMapper {
 
-	PlacementTypeDTO placementTypeToPlacementTypeDTO(PlacementType placementType);
+  PlacementTypeDTO placementTypeToPlacementTypeDTO(PlacementType placementType);
 
-	List<PlacementTypeDTO> placementTypesToPlacementTypeDTOs(List<PlacementType> placementTypes);
+  List<PlacementTypeDTO> placementTypesToPlacementTypeDTOs(List<PlacementType> placementTypes);
 
-	PlacementType placementTypeDTOToPlacementType(PlacementTypeDTO placementTypeDTO);
+  PlacementType placementTypeDTOToPlacementType(PlacementTypeDTO placementTypeDTO);
 
-	List<PlacementType> placementTypeDTOsToPlacementTypes(List<PlacementTypeDTO> placementTypeDTOs);
+  List<PlacementType> placementTypeDTOsToPlacementTypes(List<PlacementTypeDTO> placementTypeDTOs);
 }
