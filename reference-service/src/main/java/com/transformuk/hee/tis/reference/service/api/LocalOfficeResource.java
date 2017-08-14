@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.transformuk.hee.tis.reference.service.service.mapper.DbcToLocalOfficeMapper;
+import com.transformuk.hee.tis.security.model.UserProfile;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
@@ -33,7 +35,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
 /**
  * REST controller for managing LocalOffice.
@@ -116,6 +121,25 @@ public class LocalOfficeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
     return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
+
+	/**
+	 * GET  /local-offices/user : get all the allowed local offices for the logged in user.
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the list of localOffices in body
+	 * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+	 */
+	@GetMapping("/local-offices/user")
+	@Timed
+	public ResponseEntity<List<LocalOfficeDTO>> getUserLocalOffices(){
+		log.debug("REST request to get page of Local Offices for current user");
+		UserProfile userProfile = getProfileFromContext();
+		Set<String> allowedBodyCodes = userProfile.getDesignatedBodyCodes();
+		Set<String> allowedLocalOffices = DbcToLocalOfficeMapper.map(allowedBodyCodes);
+		List<LocalOffice> localOfficeList = localOfficeRepository.findByNameIn(allowedLocalOffices);
+		List<LocalOfficeDTO> loDtoList = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOfficeList);
+		return new ResponseEntity<>(loDtoList, HttpStatus.OK);
+	}
+
 
   /**
    * GET  /local-offices/:id : get the "id" localOffice.

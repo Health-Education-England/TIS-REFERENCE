@@ -6,6 +6,7 @@ import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
+import net.sf.cglib.core.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,6 +51,14 @@ public class LocalOfficeResourceIntTest {
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
+
+  private static final String HENE_NAME = "Health Education England North East";
+  private static final String HENWL_NAME = "Health Education England North West London";
+  private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
+
+  private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};
+	//private static String[] localOfficeArray = new String[]{HENE_NAME};
+
 
   @Autowired
   private LocalOfficeRepository localOfficeRepository;
@@ -91,6 +103,8 @@ public class LocalOfficeResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
+		TestUtil.mockUserProfile("jamesh", "1-AIIDR8", "1-AIIDWA");
+		// jamesh has dbcs for North West London and Kent, Surrey & Sussex
   }
 
   @Before
@@ -190,6 +204,58 @@ public class LocalOfficeResourceIntTest {
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
   }
+
+	@Test
+	@Transactional
+	public void getAllLocalOfficesUserAndCheckOnlyAllowedLOsAreReturned() throws Exception {
+	// Given
+  	// Create some variables for localOfficeRepository size comparison
+		int localOfficeRepositoryPreSize, localOfficeRepositoryPostSize;
+		// Find the initial size of the localOfficeRepository
+		localOfficeRepositoryPreSize = localOfficeRepository.findAll().size();
+
+		// Add the static localOffice object
+		localOfficeRepository.saveAndFlush(localOffice);
+
+		// Create some more localOffices - with real Codes etc
+		// Use counter to change abbreviation to satisfy check constraint on table
+
+		Integer count = 1;
+		for (String lo : localOfficeArray) {
+			LocalOffice localOfficeReal = new LocalOffice()
+					.abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
+					.name(lo);
+			localOfficeRepository.saveAndFlush(localOfficeReal);
+			count++;
+		}
+
+// Check the localRepository contains the expected values
+		assertThat(localOfficeRepository.findAll()).extracting("name").contains(HEKSS_NAME,HENE_NAME,HENWL_NAME,DEFAULT_NAME);
+		// Check that the localOfficeRepository now has 4 more rows
+		localOfficeRepositoryPostSize = localOfficeRepository.findAll().size();
+		assertThat(localOfficeRepositoryPostSize-localOfficeRepositoryPreSize == 4);
+
+// Get a valid ID that the user has access to from the localOfficeRepository
+		int testID = 0; // initialise it in case no local office is found
+		List<LocalOffice> allLocalOffices = localOfficeRepository.findAll();
+		for (LocalOffice lo : allLocalOffices) {
+			if (lo.getName().equals("Health Education England North West London")) {
+				testID = lo.getId().intValue();
+				break;
+			}
+		}
+		// When & Then
+		// Get the local offices
+		ResultActions resultActions = restLocalOfficeMockMvc.perform(get("/api/local-offices/user"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
+				.andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA3")))
+				.andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA2")))
+				.andExpect(jsonPath("$.[*].name").value(hasItem(HEKSS_NAME)))
+				.andExpect(jsonPath("$.[*].name").value(hasItem(HENWL_NAME)))
+				.andExpect(jsonPath("$.[*].name").value(not(contains(HENE_NAME))));
+	}
 
   @Test
   @Transactional
