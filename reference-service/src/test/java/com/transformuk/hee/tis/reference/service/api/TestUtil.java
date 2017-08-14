@@ -3,9 +3,13 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.transformuk.hee.tis.security.model.AuthenticatedUser;
+import com.transformuk.hee.tis.security.model.UserProfile;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,11 +17,23 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.internal.util.collections.Sets.newSet;
 
 /**
  * Utility class for testing REST controllers.
  */
 public class TestUtil {
+
+	public static void mockUserProfile(String userName, String... designatedBodyCodes) {
+		UserProfile userProfile = new UserProfile();
+		userProfile.setUserName(userName);
+		userProfile.setDesignatedBodyCodes(newSet(designatedBodyCodes));
+		AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToken", userProfile, null);
+		UsernamePasswordAuthenticationToken authenticationToken = new
+				UsernamePasswordAuthenticationToken(authenticatedUser, null);
+
+		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+	}
 
   /**
    * MediaType for JSON UTF8
