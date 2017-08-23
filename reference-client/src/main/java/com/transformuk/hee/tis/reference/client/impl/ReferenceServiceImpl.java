@@ -142,68 +142,6 @@ public class ReferenceServiceImpl extends AbstractClientService {
   }
 
   @Override
-  public <DTO> List getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException {
-    final ParameterizedTypeReference parameterizedTypeReference = classToParamTypeRefMap.get(dtoClass);
-    ResponseEntity<List> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl + pageSizeUrl, HttpMethod.GET, null, parameterizedTypeReference);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> DTO createDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
-    HttpHeaders headers = new HttpHeaders();
-    HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
-
-    ResponseEntity<DTO> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl, HttpMethod.POST, httpEntity, dtoClass);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> DTO updateDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
-    HttpHeaders headers = new HttpHeaders();
-    HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
-
-    ResponseEntity<DTO> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl, HttpMethod.PUT, httpEntity, dtoClass);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> List<DTO> bulkCreateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
-    if (CollectionUtils.isEmpty(objectDTOs)) {
-      LOG.info(COLLECTION_VALIDATION_MESSAGE);
-      return Collections.EMPTY_LIST;
-    } else {
-      HttpHeaders headers = new HttpHeaders();
-
-      HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
-      ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
-
-      ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
-          HttpMethod.POST, httpEntity, typeReference);
-      return response.getBody();
-    }
-  }
-
-  @Override
-  public <DTO> List<DTO> bulkUpdateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
-    if (CollectionUtils.isEmpty(objectDTOs)) {
-      LOG.info(COLLECTION_VALIDATION_MESSAGE);
-      return Collections.EMPTY_LIST;
-    } else {
-      HttpHeaders headers = new HttpHeaders();
-      HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
-
-      ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
-
-      ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
-          HttpMethod.PUT, httpEntity, typeReference);
-      return response.getBody();
-    }
-  }
-
-  @Override
   public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO) {
     ParameterizedTypeReference<List<JsonPatchDTO>> typeReference = getJsonPatchDtoReference();
     ResponseEntity<List<JsonPatchDTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl + objectDTO.getSimpleName(),
