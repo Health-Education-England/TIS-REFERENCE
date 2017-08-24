@@ -42,6 +42,8 @@ public class Trust implements Serializable {
 
   private String postCode;
 
+  private String intrepidId;
+
   public Long getId() {
     return id;
   }
@@ -154,6 +156,19 @@ public class Trust implements Serializable {
     return this;
   }
 
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+  }
+
+  public Trust intrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -186,6 +201,7 @@ public class Trust implements Serializable {
         ", trustNumber='" + trustNumber + "'" +
         ", address='" + address + "'" +
         ", postCode='" + postCode + "'" +
+        ", intrepidId='" + intrepidId + "'" +
         '}';
   }
 }

@@ -2,54 +2,18 @@ package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
-import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
-import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
-import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
-import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
-import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
-import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
-import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
-import com.transformuk.hee.tis.reference.api.dto.JsonPatchDTO;
-import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
-import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
-import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
-import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
-import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
-import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
-import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
-import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
-import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
-import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
-import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
-import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,8 +31,6 @@ public class ReferenceServiceImpl extends AbstractClientService {
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
-    classToParamTypeRefMap.put(AssessmentTypeDTO.class, new ParameterizedTypeReference<List<AssessmentTypeDTO>>() {
-    });
     classToParamTypeRefMap.put(CollegeDTO.class, new ParameterizedTypeReference<List<CollegeDTO>>() {
     });
     classToParamTypeRefMap.put(CountryDTO.class, new ParameterizedTypeReference<List<CountryDTO>>() {
