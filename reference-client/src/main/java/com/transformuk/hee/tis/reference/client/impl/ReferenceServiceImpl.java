@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
+import com.sun.org.apache.xml.internal.utils.DefaultErrorHandler;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
@@ -34,6 +35,8 @@ import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.client.ReferenceService;
+import io.github.jhipster.config.JHipsterProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +46,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -58,12 +65,14 @@ import java.util.Map;
  * the tis reference service
  */
 @Service
-public class ReferenceServiceImpl extends AbstractClientService {
+public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+  private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/code/";
+  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/code/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -139,6 +148,13 @@ public class ReferenceServiceImpl extends AbstractClientService {
   @Autowired
   public ReferenceServiceImpl(@Qualifier("referenceRestTemplate") RestTemplate referenceRestTemplate) {
     this.referenceRestTemplate = referenceRestTemplate;
+
+    referenceRestTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
+      @Override
+      protected boolean hasError(HttpStatus statusCode) {
+        return false;
+      }
+    });
   }
 
   @Override
@@ -225,6 +241,18 @@ public class ReferenceServiceImpl extends AbstractClientService {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
     return responseEntity;
+  }
+
+  public HttpStatus getTrustByCodeHttpStatus(String trustCode){
+    String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT + trustCode;
+    HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, TrustDTO.class).getStatusCode();
+    return httpStatusValue;
+  }
+
+  public HttpStatus getSiteByCodeHttpStatus(String siteCode){
+    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + siteCode;
+    HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, SiteDTO.class).getStatusCode();
+    return httpStatusValue;
   }
 
   @Override
