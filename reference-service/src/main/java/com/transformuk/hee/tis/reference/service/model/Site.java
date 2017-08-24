@@ -42,6 +42,8 @@ public class Site implements Serializable {
 
   private String organisationalUnit;
 
+  private String intrepidId;
+
   public Long getId() {
     return id;
   }
@@ -167,6 +169,19 @@ public class Site implements Serializable {
     return this;
   }
 
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+  }
+
+  public Site intrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -200,6 +215,7 @@ public class Site implements Serializable {
         ", siteKnownAs='" + siteKnownAs + "'" +
         ", siteNumber='" + siteNumber + "'" +
         ", organisationalUnit='" + organisationalUnit + "'" +
+        ", intrepidId='" + intrepidId + "'" +
         '}';
   }
 }

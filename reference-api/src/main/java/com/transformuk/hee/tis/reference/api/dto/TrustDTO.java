@@ -29,6 +29,8 @@ public class TrustDTO implements Serializable {
 
   private String postCode;
 
+  private String intrepidId;
+
   public Long getId() {
     return id;
   }
@@ -101,6 +103,14 @@ public class TrustDTO implements Serializable {
     this.postCode = postCode;
   }
 
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -136,6 +146,7 @@ public class TrustDTO implements Serializable {
         ", trustNumber='" + trustNumber + "'" +
         ", address='" + address + "'" +
         ", postCode='" + postCode + "'" +
+        ", intrepidId='" + intrepidId + "'" +
         '}';
   }
 }
