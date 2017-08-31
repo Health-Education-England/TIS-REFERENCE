@@ -2,7 +2,37 @@ package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
-import com.transformuk.hee.tis.reference.api.dto.*;
+import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
+import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
+import com.transformuk.hee.tis.reference.api.dto.JsonPatchDTO;
+import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
+import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
+import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
+import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
+import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
+import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +58,8 @@ public class ReferenceServiceImpl extends AbstractClientService {
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
-  private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/";
-  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/";
+  private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
+  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -127,22 +157,14 @@ public class ReferenceServiceImpl extends AbstractClientService {
 
   public boolean gradeExists(Long Id) {
     String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT + Id;
-    try {
-      ResponseEntity<GradeDTO> responseEntity = referenceRestTemplate.getForEntity(url, GradeDTO.class);
-      return (responseEntity.getBody() != null ? true : false);
-    } catch (HttpClientErrorException e) {
-    }
-    return false;
+    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url,HttpMethod.GET,null,Boolean.class);
+    return responseEntity.getBody();
   }
 
   public boolean siteExists(Long Id) {
     String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + Id;
-    try {
-      ResponseEntity<SiteDTO> responseEntity = referenceRestTemplate.getForEntity(url, SiteDTO.class);
-      return (responseEntity.getBody() != null ? true : false);
-    } catch (HttpClientErrorException e) {
-    }
-    return false;
+    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url,HttpMethod.GET,null,Boolean.class);
+    return responseEntity.getBody();
   }
 
   @Override
@@ -163,4 +185,5 @@ public class ReferenceServiceImpl extends AbstractClientService {
   public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
     return classToParamTypeRefMap;
   }
+
 }

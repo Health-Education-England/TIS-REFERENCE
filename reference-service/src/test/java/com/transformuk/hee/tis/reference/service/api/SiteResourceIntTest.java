@@ -295,6 +295,29 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
+  public void shouldReturnTrueIfSiteExists() throws Exception{
+    // Initialize the database
+    siteRepository.saveAndFlush(site);
+    restSiteMockMvc.perform(get("/api/sites/exists/" + site.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string("true"));
+
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseIfSiteNotExists() throws Exception{
+    // Initialize the database
+    restSiteMockMvc.perform(get("/api/sites/exists/" + 121222))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string("false"));
+
+  }
+
+  @Test
+  @Transactional
   public void getNonExistingSite() throws Exception {
     // Get the site
     restSiteMockMvc.perform(get("/api/sites/{id}", Long.MAX_VALUE))

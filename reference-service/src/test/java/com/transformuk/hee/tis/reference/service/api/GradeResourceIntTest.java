@@ -255,6 +255,29 @@ public class GradeResourceIntTest {
 
   @Test
   @Transactional
+  public void shouldReturnTrueIfGradeExists() throws Exception{
+    // Initialize the database
+    gradeRepository.saveAndFlush(grade);
+    restGradeMockMvc.perform(get("/api/grades/exists/" + grade.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string("true"));
+
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseIfGradeNotExists() throws Exception{
+    // Initialize the database
+    restGradeMockMvc.perform(get("/api/grades/exists/" + 121222))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string("false"));
+
+  }
+
+  @Test
+  @Transactional
   public void getGrade() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);

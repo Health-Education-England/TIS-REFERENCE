@@ -139,6 +139,19 @@ public class GradeResource {
   }
 
   /**
+   * EXISTS /grades/exists/:id : check is grade exists
+   * @param id the id of the gradeDTO to check
+   * @return boolen true if exists otherwise false
+   */
+  @GetMapping("/grades/exists/{id}")
+  @Timed
+  public ResponseEntity<Boolean> gradeExists(@PathVariable Long id) {
+    log.debug("REST request to check Grade exists : {}", id);
+    boolean exists = gradeRepository.exists(id);
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(exists));
+  }
+
+  /**
    * DELETE  /grades/:id : delete the "id" grade.
    *
    * @param id the id of the gradeDTO to delete

@@ -187,6 +187,19 @@ public class SiteResource {
   }
 
   /**
+   * EXISTS /grades/exists/:id : check is site exists
+   * @param id the id of the siteDTO to check
+   * @return boolen true if exists otherwise false
+   */
+  @GetMapping("/sites/exists/{id}")
+  @Timed
+  public ResponseEntity<Boolean> siteExists(@PathVariable Long id) {
+    log.debug("REST request to check Site exists : {}", id);
+    boolean exists = siteRepository.exists(id);
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(exists));
+  }
+
+  /**
    * DELETE  /sites/:id : delete the "id" site.
    *
    * @param id the id of the siteDTO to delete
