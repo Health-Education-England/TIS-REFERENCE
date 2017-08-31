@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Grade;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -139,16 +142,27 @@ public class GradeResource {
   }
 
   /**
-   * EXISTS /grades/exists/:id : check is grade exists
-   * @param id the id of the gradeDTO to check
-   * @return boolen true if exists otherwise false
+   * EXISTS /grades/exists/ : check is site exists
+   * @param ids the ids of the gradeDTO to check
+   * @return boolean true if exists otherwise false
    */
-  @GetMapping("/grades/exists/{id}")
+  @PostMapping("/grades/exists/")
   @Timed
-  public ResponseEntity<Boolean> gradeExists(@PathVariable Long id) {
-    log.debug("REST request to check Grade exists : {}", id);
-    boolean exists = gradeRepository.exists(id);
-    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(exists));
+  public ResponseEntity<Map<Long,Boolean>> gradeExists(@RequestBody List<Long> ids) {
+    Map<Long,Boolean> gradeExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Grade exists : {}", ids);
+    if(!CollectionUtils.isEmpty(ids)){
+      List<Long> dbGradeIds = gradeRepository.findByIdsIn(ids);
+      ids.forEach(id -> {
+        if(dbGradeIds.contains(id)){
+          gradeExistsMap.put(id,true);
+        }
+        else {
+          gradeExistsMap.put(id,false);
+        }
+      });
+    }
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeExistsMap));
   }
 
   /**
