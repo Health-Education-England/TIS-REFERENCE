@@ -6,12 +6,12 @@ import com.transformuk.hee.tis.reference.api.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -28,6 +28,8 @@ public class ReferenceServiceImpl extends AbstractClientService {
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+  private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/";
+  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -93,15 +95,11 @@ public class ReferenceServiceImpl extends AbstractClientService {
     });
   }
 
+  @Autowired
   private RestTemplate referenceRestTemplate;
 
   @Value("${reference.service.url}")
   private String serviceUrl;
-
-  @Autowired
-  public ReferenceServiceImpl(@Qualifier("referenceRestTemplate") RestTemplate referenceRestTemplate) {
-    this.referenceRestTemplate = referenceRestTemplate;
-  }
 
   @Override
   public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO) {
@@ -125,6 +123,26 @@ public class ReferenceServiceImpl extends AbstractClientService {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
     return responseEntity;
+  }
+
+  public boolean gradeExists(Long Id) {
+    String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT + Id;
+    try {
+      ResponseEntity<GradeDTO> responseEntity = referenceRestTemplate.getForEntity(url, GradeDTO.class);
+      return (responseEntity.getBody() != null ? true : false);
+    } catch (HttpClientErrorException e) {
+    }
+    return false;
+  }
+
+  public boolean siteExists(Long Id) {
+    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + Id;
+    try {
+      ResponseEntity<SiteDTO> responseEntity = referenceRestTemplate.getForEntity(url, SiteDTO.class);
+      return (responseEntity.getBody() != null ? true : false);
+    } catch (HttpClientErrorException e) {
+    }
+    return false;
   }
 
   @Override

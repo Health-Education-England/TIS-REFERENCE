@@ -7,4 +7,8 @@ import org.springframework.http.ResponseEntity;
 public interface ReferenceService extends ClientService {
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
+
+  boolean gradeExists(Long Id);
+
+  boolean siteExists(Long Id);
 }
