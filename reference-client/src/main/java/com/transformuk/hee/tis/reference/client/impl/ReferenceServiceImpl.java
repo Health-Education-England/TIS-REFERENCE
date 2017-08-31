@@ -33,15 +33,16 @@ import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -52,7 +53,7 @@ import java.util.Map;
  * the tis reference service
  */
 @Service
-public class ReferenceServiceImpl extends AbstractClientService {
+public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
@@ -149,22 +150,35 @@ public class ReferenceServiceImpl extends AbstractClientService {
     };
   }
 
+  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
+    return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
+  private Map<Long, Boolean> exists(String url, List<Long> ids) {
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getBody();
+  }
+
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
     return responseEntity;
   }
 
-  public boolean gradeExists(Long Id) {
-    String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT + Id;
-    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url,HttpMethod.GET,null,Boolean.class);
-    return responseEntity.getBody();
+  @Override
+  public Map<Long, Boolean> gradeExists(List<Long> ids) {
+    String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
   }
 
-  public boolean siteExists(Long Id) {
-    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + Id;
-    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url,HttpMethod.GET,null,Boolean.class);
-    return responseEntity.getBody();
+  @Override
+  public Map<Long, Boolean> siteExists(List<Long> ids) {
+    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
   }
 
   @Override
