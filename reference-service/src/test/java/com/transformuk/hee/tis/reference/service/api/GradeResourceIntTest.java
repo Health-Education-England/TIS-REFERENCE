@@ -1,11 +1,13 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
+import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -251,6 +254,22 @@ public class GradeResourceIntTest {
         .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE.booleanValue())))
         .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE.booleanValue())))
         .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE.booleanValue())));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueIfGradeExists() throws Exception{
+    // Initialize the database
+    gradeRepository.saveAndFlush(grade);
+    Map<Long, Boolean> expectedMap = Maps.newHashMap(grade.getId(), true);
+    expectedMap.put(12345678L, false);
+    List<Long> ids = Lists.newArrayList(grade.getId(), 12345678L);
+    restGradeMockMvc.perform(post("/api/grades/exists/")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(ids)))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
   @Test
