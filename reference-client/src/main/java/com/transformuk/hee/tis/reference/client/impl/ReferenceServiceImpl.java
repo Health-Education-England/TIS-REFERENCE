@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.client.impl;
 import com.google.common.collect.Maps;
 import com.sun.org.apache.xml.internal.utils.DefaultErrorHandler;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
-import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
@@ -18,6 +17,7 @@ import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.api.dto.JsonPatchDTO;
 import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -73,11 +74,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/code/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/code/";
+  private static final String SITES_TRUST_MAPPINGS_ENDPOINT = "/api/sites/search-by-trust/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
-    classToParamTypeRefMap.put(AssessmentTypeDTO.class, new ParameterizedTypeReference<List<AssessmentTypeDTO>>() {
-    });
     classToParamTypeRefMap.put(CollegeDTO.class, new ParameterizedTypeReference<List<CollegeDTO>>() {
     });
     classToParamTypeRefMap.put(CountryDTO.class, new ParameterizedTypeReference<List<CountryDTO>>() {
@@ -140,22 +140,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     });
   }
 
+  @Autowired
   private RestTemplate referenceRestTemplate;
 
   @Value("${reference.service.url}")
   private String serviceUrl;
-
-  @Autowired
-  public ReferenceServiceImpl(@Qualifier("referenceRestTemplate") RestTemplate referenceRestTemplate) {
-    this.referenceRestTemplate = referenceRestTemplate;
-
-    referenceRestTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
-      @Override
-      protected boolean hasError(HttpStatus statusCode) {
-        return false;
-      }
-    });
-  }
 
   @Override
   public <DTO> List getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException {
@@ -243,16 +232,31 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity;
   }
 
-  public HttpStatus getTrustByCodeHttpStatus(String trustCode){
+  @Override
+  public HttpStatus getTrustByCodeHttpStatus(String trustCode) {
     String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT + trustCode;
     HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, TrustDTO.class).getStatusCode();
     return httpStatusValue;
   }
 
-  public HttpStatus getSiteByCodeHttpStatus(String siteCode){
+  @Override
+  public HttpStatus getSiteByCodeHttpStatus(String siteCode) {
     String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + siteCode;
     HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, SiteDTO.class).getStatusCode();
     return httpStatusValue;
+  }
+
+  private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference(){
+    return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
+    };
+  }
+
+  @Override
+  public LimitedListResponse<SiteDTO> getSitesByTrustCode(String trustCode) {
+    ParameterizedTypeReference<LimitedListResponse<SiteDTO>> responseType = getSiteDtoReference();
+    String url = serviceUrl + SITES_TRUST_MAPPINGS_ENDPOINT + trustCode;
+    ResponseEntity<LimitedListResponse<SiteDTO>> siteDTOLimitedListResponse = referenceRestTemplate.exchange(url, HttpMethod.GET, null,responseType);
+    return siteDTOLimitedListResponse.getBody();
   }
 
   @Override

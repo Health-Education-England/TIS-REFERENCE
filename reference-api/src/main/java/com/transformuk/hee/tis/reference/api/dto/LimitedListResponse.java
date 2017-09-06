@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -11,13 +12,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @ApiModel(description = "A search response containing a limited number of results and a warning if the limit has been reached")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LimitedListResponse<T> {
+public class LimitedListResponse<T> implements Serializable{
 
   public static final String LIMIT_REACHED_CODE = "LIMIT_REACHED";
+  private static final long serialVersionUID =1L;
 
   private int total;
   private String messageCode;
   private List<T> list;
+
+  public LimitedListResponse() {
+     }
 
   /**
    * Builds a response, populates the limit reached message if list size >= given limit

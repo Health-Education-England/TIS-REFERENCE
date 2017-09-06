@@ -1,9 +1,8 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
 /**
- * Created by Simon Meredith on 09/08/2017.
+ * Tests the Designated Body Code to Local Office Mapper class
  */
-
 import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.Sets;
 
