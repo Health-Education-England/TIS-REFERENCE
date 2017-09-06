@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 public interface ReferenceService extends ClientService {
 
@@ -17,5 +18,8 @@ public interface ReferenceService extends ClientService {
   HttpStatus getTrustByCodeHttpStatus(String trustCode);
   HttpStatus getSiteByCodeHttpStatus(String siteCode);
   LimitedListResponse<SiteDTO> getSitesByTrustCode(String trustCode);
-}
 
+  Map<Long,Boolean> gradeExists(List<Long> Ids);
+
+  Map<Long,Boolean> siteExists(List<Long> Ids);
+}

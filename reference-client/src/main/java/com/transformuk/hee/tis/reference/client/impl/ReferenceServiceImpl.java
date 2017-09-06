@@ -37,14 +37,13 @@ import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
 import io.github.jhipster.config.JHipsterProperties;
+import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,8 +54,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,9 +69,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
-  private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/code/";
-  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/code/";
+  private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/code/";
+  private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/code/";
   private static final String SITES_TRUST_MAPPINGS_ENDPOINT = "/api/sites/search-by-trust/";
+  private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
+  private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -147,68 +146,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private String serviceUrl;
 
   @Override
-  public <DTO> List getAllDto(String endpointUrl, String pageSizeUrl, Class<DTO> dtoClass) throws IOException {
-    final ParameterizedTypeReference parameterizedTypeReference = classToParamTypeRefMap.get(dtoClass);
-    ResponseEntity<List> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl + pageSizeUrl, HttpMethod.GET, null, parameterizedTypeReference);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> DTO createDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
-    HttpHeaders headers = new HttpHeaders();
-    HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
-
-    ResponseEntity<DTO> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl, HttpMethod.POST, httpEntity, dtoClass);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> DTO updateDto(DTO objectDTO, String endpointUrl, Class<DTO> dtoClass) {
-    HttpHeaders headers = new HttpHeaders();
-    HttpEntity<DTO> httpEntity = new HttpEntity<>(objectDTO, headers);
-
-    ResponseEntity<DTO> response = referenceRestTemplate.exchange(
-        serviceUrl + endpointUrl, HttpMethod.PUT, httpEntity, dtoClass);
-    return response.getBody();
-  }
-
-  @Override
-  public <DTO> List<DTO> bulkCreateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
-    if (CollectionUtils.isEmpty(objectDTOs)) {
-      LOG.info(COLLECTION_VALIDATION_MESSAGE);
-      return Collections.EMPTY_LIST;
-    } else {
-      HttpHeaders headers = new HttpHeaders();
-
-      HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
-      ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
-
-      ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
-          HttpMethod.POST, httpEntity, typeReference);
-      return response.getBody();
-    }
-  }
-
-  @Override
-  public <DTO> List<DTO> bulkUpdateDto(List<DTO> objectDTOs, String endpointUrl, Class<DTO> dtoClass) {
-    if (CollectionUtils.isEmpty(objectDTOs)) {
-      LOG.info(COLLECTION_VALIDATION_MESSAGE);
-      return Collections.EMPTY_LIST;
-    } else {
-      HttpHeaders headers = new HttpHeaders();
-      HttpEntity<List<DTO>> httpEntity = new HttpEntity<>(objectDTOs, headers);
-
-      ParameterizedTypeReference<List<DTO>> typeReference = getDTOReference();
-
-      ResponseEntity<List<DTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl,
-          HttpMethod.PUT, httpEntity, typeReference);
-      return response.getBody();
-    }
-  }
-
-  @Override
   public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO) {
     ParameterizedTypeReference<List<JsonPatchDTO>> typeReference = getJsonPatchDtoReference();
     ResponseEntity<List<JsonPatchDTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl + objectDTO.getSimpleName(),
@@ -226,6 +163,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
+    return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
+  private Map<Long, Boolean> exists(String url, List<Long> ids) {
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getBody();
+  }
+
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
@@ -233,15 +183,27 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public Map<Long, Boolean> gradeExists(List<Long> ids) {
+    String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
+  }
+
+  @Override
+  public Map<Long, Boolean> siteExists(List<Long> ids) {
+    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
+  }
+
+  @Override
   public HttpStatus getTrustByCodeHttpStatus(String trustCode) {
-    String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT + trustCode;
+    String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT + trustCode;
     HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, TrustDTO.class).getStatusCode();
     return httpStatusValue;
   }
 
   @Override
   public HttpStatus getSiteByCodeHttpStatus(String siteCode) {
-    String url = serviceUrl + SITES_MAPPINGS_ENDPOINT + siteCode;
+    String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT + siteCode;
     HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, SiteDTO.class).getStatusCode();
     return httpStatusValue;
   }

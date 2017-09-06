@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
@@ -15,12 +16,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -41,6 +48,7 @@ public class ReferenceServiceImplTest {
   private static final SiteDTO TEST_SITE_DTO_1 = new SiteDTO();
   private static final SiteDTO TEST_SITE_DTO_2 = new SiteDTO();
 
+  private List<Long> ids = Lists.newArrayList(10L, 20L);
 
   @Mock
   private RestTemplate referenceRestTemplate;
@@ -154,4 +162,46 @@ public class ReferenceServiceImplTest {
     Assert.assertEquals(siteDtoResponse.getBody(), response);
 
   }
+  @Test
+  public void shouldGetGradeExists() {
+    // given
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/grades/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.gradeExists(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/grades/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetSiteExists() {
+    // given
+
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteExists(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
+    return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
 }

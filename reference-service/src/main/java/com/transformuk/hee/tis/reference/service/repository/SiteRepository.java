@@ -28,4 +28,7 @@ public interface SiteRepository extends JpaRepository<Site, Long> {
   @Query("SELECT s FROM Site s WHERE s.trustCode =:trust")
   List<Site> findByTrustCode(@Param("trust") String trustCode, Pageable pageable);
 
+  @Query("SELECT s.id from Site s WHERE s.id in :ids")
+  List<Long> findByIdsIn(@Param("ids") List<Long> ids);
+
 }
