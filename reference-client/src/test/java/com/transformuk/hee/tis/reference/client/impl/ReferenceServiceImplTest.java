@@ -140,7 +140,7 @@ public class ReferenceServiceImplTest {
     siteDTOS.add(TEST_SITE_DTO_2);
     LimitedListResponse<SiteDTO> dtos = new LimitedListResponse<>();
     dtos.setList(siteDTOS);
-    ResponseEntity<LimitedListResponse<SiteDTO>> siteDtoResponse = new ResponseEntity<LimitedListResponse<SiteDTO>>(dtos,HttpStatus.OK);
+    ResponseEntity<LimitedListResponse<SiteDTO>> siteDtoResponse = new ResponseEntity<>(dtos,HttpStatus.OK);
     ParameterizedTypeReference<LimitedListResponse<SiteDTO>> responseType = new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
 
     };
