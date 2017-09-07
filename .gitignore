@@ -4,3 +4,4 @@
 **/*.iml
 reference-ui/target
 reference-ui/ui-build
+/target/
