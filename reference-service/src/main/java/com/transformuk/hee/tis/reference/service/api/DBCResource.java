@@ -11,6 +11,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,12 +22,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
+import com.transformuk.hee.tis.security.model.UserProfile;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -121,6 +126,23 @@ public class DBCResource {
     DBC dBC = dBCRepository.findOne(id);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(dBCDTO));
+  }
+
+  /**
+   * GET  /dbcs/user : get all the allowed dbcs for the logged in user.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of localOffices in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/dbcs/user")
+  @Timed
+  public ResponseEntity<List<DBCDTO>> getUserDbcs(){
+    log.debug("REST request to get page of DBCs for current user");
+    UserProfile userProfile = getProfileFromContext();
+    Set<String> allowedBodyCodes = userProfile.getDesignatedBodyCodes();
+    List<DBC> dbcList  = dBCRepository.findByDbcIn(allowedBodyCodes);
+    List<DBCDTO> dbcDtoList = dBCMapper.dBCSToDBCDTOs(dbcList);
+    return new ResponseEntity<>(dbcDtoList, HttpStatus.OK);
   }
 
   /**
