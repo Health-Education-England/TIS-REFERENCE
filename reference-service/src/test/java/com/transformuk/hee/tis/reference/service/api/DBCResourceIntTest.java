@@ -304,13 +304,10 @@ public class DBCResourceIntTest {
     public void getDbcsUserAndCheckOnlyAllowedDbcsAreReturned() throws Exception {
       // Given
       // Create some variables for DBCRepository size comparison
-      int dbcRepositoryPreSize, dbcRepositoryPostSize, addedRecords;
-      // Find the initial size of the dbcRepository
-      dbcRepositoryPreSize = dBCRepository.findAll().size();
+      int dbcRepositorySize;
 
       // Add the static DBC object
       dBCRepository.saveAndFlush(dBC);
-      addedRecords = 1;
 
     // Create some more DBCs - with real Codes etc
     // Use counter to change abbreviation to satisfy check constraint on table
@@ -321,25 +318,21 @@ public class DBCResourceIntTest {
           .dbc(dbc)
           .name(dbc)
           .abbr("AAA" + count.toString());
-      // Only insert the new DBC record if one doesn't already exist
-      if (!dbc.equals(dBCRepository.findByDbc(dbc).getDbc())) {
         dBCRepository.saveAndFlush(dbcReal);
-        addedRecords++;
-      }
       count++;
     }
 
     // Check the dbcRepository contains the expected values
     assertThat(dBCRepository.findAll()).extracting("dbc").contains(HEKSS_DBC_CODE,HENE_DBC_CODE,HEKSS_DBC_CODE);
     // Check that the dbcRepository now has the correct number of additions
-    dbcRepositoryPostSize = dBCRepository.findAll().size();
-    assertThat(dbcRepositoryPostSize-dbcRepositoryPreSize == addedRecords);
+    dbcRepositorySize = dBCRepository.findAll().size();
+    assertThat(dbcRepositorySize == 4);
 
     // Get a valid ID that the user has access to from the dbcRepository
     int testID = 0; // initialise it in case no dbc is found
     List<DBC> allDbcs = dBCRepository.findAll();
     for (DBC dbc : allDbcs) {
-      if (dbc.getDbc().equals("1-AIIDWA")) {
+      if (dbc.getDbc().equals(HENWL_DBC_CODE)) {
         testID = dbc.getId().intValue();
         break;
       }
