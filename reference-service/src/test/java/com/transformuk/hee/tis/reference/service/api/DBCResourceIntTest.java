@@ -24,7 +24,9 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.IsNot.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,6 +52,12 @@ public class DBCResourceIntTest {
 
   private static final String DEFAULT_ABBR = "AAAAAAAAAA";
   private static final String UPDATED_ABBR = "BBBBBBBBBB";
+
+  private static final String HENE_DBC_CODE = "1-AIIDSI";
+  private static final String HENWL_DBC_CODE = "1-AIIDWA";
+  private static final String HEKSS_DBC_CODE = "1-AIIDR8";
+
+  private static String[] dbcArray = new String[]{HENE_DBC_CODE,HENWL_DBC_CODE,HEKSS_DBC_CODE};
 
   @Autowired
   private DBCRepository dBCRepository;
@@ -79,7 +87,7 @@ public class DBCResourceIntTest {
    * This is a static method, as tests for other entities might also need it,
    * if they test an entity which requires the current entity.
    */
-  public static DBC createEntity(EntityManager em) {
+  public static DBC createEntity() {
     DBC dBC = new DBC()
         .dbc(DEFAULT_DBC)
         .name(DEFAULT_NAME)
@@ -95,18 +103,14 @@ public class DBCResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
-  }
-
-  @Before
-  public void initTest() {
-    dBC = createEntity(em);
+    dBC = createEntity();
+    dBCRepository.deleteAllInBatch();
+    TestUtil.mockUserProfile("jamesh", HENWL_DBC_CODE, HEKSS_DBC_CODE);
   }
 
   @Test
   @Transactional
   public void createDBC() throws Exception {
-    int databaseSizeBeforeCreate = dBCRepository.findAll().size();
-
     // Create the DBC
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
     restDBCMockMvc.perform(post("/api/dbcs")
@@ -116,7 +120,7 @@ public class DBCResourceIntTest {
 
     // Validate the DBC in the database
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeCreate + 1);
+    assertThat(dBCList).hasSize(1);
     DBC testDBC = dBCList.get(dBCList.size() - 1);
     assertThat(testDBC.getDbc()).isEqualTo(DEFAULT_DBC);
     assertThat(testDBC.getName()).isEqualTo(DEFAULT_NAME);
@@ -126,8 +130,6 @@ public class DBCResourceIntTest {
   @Test
   @Transactional
   public void createDBCWithExistingId() throws Exception {
-    int databaseSizeBeforeCreate = dBCRepository.findAll().size();
-
     // Create the DBC with an existing ID
     dBC.setId(1L);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
@@ -140,13 +142,12 @@ public class DBCResourceIntTest {
 
     // Validate the Alice in the database
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeCreate);
+    assertThat(dBCList).hasSize(0);
   }
 
   @Test
   @Transactional
   public void checkDbcIsRequired() throws Exception {
-    int databaseSizeBeforeTest = dBCRepository.findAll().size();
     // set the field null
     dBC.setDbc(null);
 
@@ -159,13 +160,12 @@ public class DBCResourceIntTest {
         .andExpect(status().isBadRequest());
 
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeTest);
+    assertThat(dBCList).hasSize(0);
   }
 
   @Test
   @Transactional
   public void checkNameIsRequired() throws Exception {
-    int databaseSizeBeforeTest = dBCRepository.findAll().size();
     // set the field null
     dBC.setName(null);
 
@@ -178,13 +178,12 @@ public class DBCResourceIntTest {
         .andExpect(status().isBadRequest());
 
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeTest);
+    assertThat(dBCList).hasSize(0);
   }
 
   @Test
   @Transactional
   public void checkAbbrIsRequired() throws Exception {
-    int databaseSizeBeforeTest = dBCRepository.findAll().size();
     // set the field null
     dBC.setAbbr(null);
 
@@ -197,7 +196,7 @@ public class DBCResourceIntTest {
         .andExpect(status().isBadRequest());
 
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeTest);
+    assertThat(dBCList).hasSize(0);
   }
 
   @Test
@@ -239,12 +238,12 @@ public class DBCResourceIntTest {
     dBCRepository.saveAndFlush(dBC);
 
     // Get the dBC
-    restDBCMockMvc.perform(get("/api/dbcs/code/1-AIIDH1"))
+    restDBCMockMvc.perform(get("/api/dbcs/code/" + DEFAULT_DBC))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.dbc").value("1-AIIDH1"))
-        .andExpect(jsonPath("$.name").value("Health Education Thames Valley"))
-        .andExpect(jsonPath("$.abbr").value("HETV"));
+        .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
+        .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
   }
 
   @Test
@@ -260,7 +259,6 @@ public class DBCResourceIntTest {
   public void updateDBC() throws Exception {
     // Initialize the database
     dBCRepository.saveAndFlush(dBC);
-    int databaseSizeBeforeUpdate = dBCRepository.findAll().size();
 
     // Update the dBC
     DBC updatedDBC = dBCRepository.findOne(dBC.getId());
@@ -277,7 +275,7 @@ public class DBCResourceIntTest {
 
     // Validate the DBC in the database
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeUpdate);
+    assertThat(dBCList).hasSize(1);
     DBC testDBC = dBCList.get(dBCList.size() - 1);
     assertThat(testDBC.getDbc()).isEqualTo(UPDATED_DBC);
     assertThat(testDBC.getName()).isEqualTo(UPDATED_NAME);
@@ -287,8 +285,6 @@ public class DBCResourceIntTest {
   @Test
   @Transactional
   public void updateNonExistingDBC() throws Exception {
-    int databaseSizeBeforeUpdate = dBCRepository.findAll().size();
-
     // Create the DBC
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
@@ -300,15 +296,64 @@ public class DBCResourceIntTest {
 
     // Validate the DBC in the database
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeUpdate + 1);
+    assertThat(dBCList).hasSize(1);
   }
+
+    @Test
+    @Transactional
+    public void getDbcsUserAndCheckOnlyAllowedDbcsAreReturned() throws Exception {
+      // Given
+      // Create some variables for DBCRepository size comparison
+      int dbcRepositorySize;
+
+      // Add the static DBC object
+      dBCRepository.saveAndFlush(dBC);
+
+    // Create some more DBCs - with real Codes etc
+    // Use counter to change abbreviation to satisfy check constraint on table
+
+    Integer count = 1;
+    for (String dbc : dbcArray) {
+      DBC dbcReal = new DBC()
+          .dbc(dbc)
+          .name(dbc)
+          .abbr("AAA" + count.toString());
+        dBCRepository.saveAndFlush(dbcReal);
+      count++;
+    }
+
+    // Check the dbcRepository contains the expected values
+    assertThat(dBCRepository.findAll()).extracting("dbc").contains(HEKSS_DBC_CODE,HENE_DBC_CODE,HEKSS_DBC_CODE);
+    // Check that the dbcRepository now has the correct number of additions
+    dbcRepositorySize = dBCRepository.findAll().size();
+    assertThat(dbcRepositorySize == 4);
+
+    // Get a valid ID that the user has access to from the dbcRepository
+    int testID = 0; // initialise it in case no dbc is found
+    List<DBC> allDbcs = dBCRepository.findAll();
+    for (DBC dbc : allDbcs) {
+      if (dbc.getDbc().equals(HENWL_DBC_CODE)) {
+        testID = dbc.getId().intValue();
+        break;
+      }
+    }
+    // When & Then
+    // Get the local offices
+    restDBCMockMvc.perform(get("/api/dbcs/user"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
+        .andExpect(jsonPath("$.[*].dbc").value(hasItem(HEKSS_DBC_CODE)))
+        .andExpect(jsonPath("$.[*].dbc").value(hasItem(HENWL_DBC_CODE)))
+        .andExpect(jsonPath("$.[*].dbc").value(not(contains(HENE_DBC_CODE))));
+  }
+
 
   @Test
   @Transactional
   public void deleteDBC() throws Exception {
     // Initialize the database
     dBCRepository.saveAndFlush(dBC);
-    int databaseSizeBeforeDelete = dBCRepository.findAll().size();
 
     // Get the dBC
     restDBCMockMvc.perform(delete("/api/dbcs/{id}", dBC.getId())
@@ -317,7 +362,7 @@ public class DBCResourceIntTest {
 
     // Validate the database is empty
     List<DBC> dBCList = dBCRepository.findAll();
-    assertThat(dBCList).hasSize(databaseSizeBeforeDelete - 1);
+    assertThat(dBCList).hasSize(0);
   }
 
   @Test

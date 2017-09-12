@@ -57,7 +57,6 @@ public class LocalOfficeResourceIntTest {
   private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
 
   private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};
-	//private static String[] localOfficeArray = new String[]{HENE_NAME};
 
 
   @Autowired
