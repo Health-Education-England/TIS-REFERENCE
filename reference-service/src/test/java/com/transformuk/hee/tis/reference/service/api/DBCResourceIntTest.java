@@ -104,8 +104,7 @@ public class DBCResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
-    TestUtil.mockUserProfile("jamesh", "1-AIIDR8", "1-AIIDWA");
-    // jamesh has dbcs for North West London and Kent, Surrey & Sussex
+    TestUtil.mockUserProfile("jamesh", HENWL_DBC_CODE, HEKSS_DBC_CODE);
   }
 
   @Before
