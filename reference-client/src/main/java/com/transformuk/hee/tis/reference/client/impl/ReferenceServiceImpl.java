@@ -69,11 +69,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
-  private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/code/";
-  private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/code/";
-  private static final String SITES_TRUST_MAPPINGS_ENDPOINT = "/api/sites/search-by-trust/";
+  private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
+  private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
+  private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
+  private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -168,12 +169,38 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<HttpStatus> getCodeExistsReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
+  private ParameterizedTypeReference<HttpStatus> getSiteTrustMatchReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
   private Map<Long, Boolean> exists(String url, List<Long> ids) {
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
     ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getBody();
+  }
+
+  private HttpStatus codeExists(String url, String code){
+    HttpEntity<String> requestEntity = new HttpEntity<>(code);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getStatusCode();
+  }
+
+  private HttpStatus siteTrustMatchExists(String url, String siteCode) {
+    HttpEntity<String> requestEntity = new HttpEntity<>(siteCode);
+    ParameterizedTypeReference<HttpStatus> responseType = getSiteTrustMatchReference();
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getStatusCode();
   }
 
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
@@ -194,31 +221,33 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return exists(url, ids);
   }
 
-  @Override
-  public HttpStatus getTrustByCodeHttpStatus(String trustCode) {
-    String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT + trustCode;
-    HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, TrustDTO.class).getStatusCode();
-    return httpStatusValue;
-  }
-
-  @Override
-  public HttpStatus getSiteByCodeHttpStatus(String siteCode) {
-    String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT + siteCode;
-    HttpStatus httpStatusValue = referenceRestTemplate.getForEntity(url, SiteDTO.class).getStatusCode();
-    return httpStatusValue;
-  }
-
   private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference(){
     return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
     };
   }
 
   @Override
-  public LimitedListResponse<SiteDTO> getSitesByTrustCode(String trustCode) {
-    ParameterizedTypeReference<LimitedListResponse<SiteDTO>> responseType = getSiteDtoReference();
-    String url = serviceUrl + SITES_TRUST_MAPPINGS_ENDPOINT + trustCode;
-    ResponseEntity<LimitedListResponse<SiteDTO>> siteDTOLimitedListResponse = referenceRestTemplate.exchange(url, HttpMethod.GET, null,responseType);
-    return siteDTOLimitedListResponse.getBody();
+  public Map<Long, Boolean> trustExists(List<Long> ids) {
+    String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
+  }
+
+  @Override
+  public HttpStatus trustCodeExists(String code){
+    String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT;
+    return codeExists(url, code);
+  }
+
+  @Override
+  public HttpStatus siteCodeExists(String code){
+    String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT;
+    return codeExists(url, code);
+  }
+
+  @Override
+  public HttpStatus siteTrustMatch (String siteCode, String trustCode) {
+    String url = serviceUrl + SITE_TRUST_MATCH_ENDPOINT + trustCode;
+    return siteTrustMatchExists(url, siteCode);
   }
 
   @Override

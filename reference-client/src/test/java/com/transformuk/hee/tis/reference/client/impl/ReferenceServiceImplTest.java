@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import java.util.List;
 import java.util.Map;
@@ -58,8 +59,8 @@ public class ReferenceServiceImplTest {
   @Before
   public void setUp() throws Exception {
     referenceServiceImpl.setServiceUrl(REFERENCE_URL);
-  }
 
+  }
 
   @Test
   public void shouldGetDBCByCode() {
@@ -74,94 +75,6 @@ public class ReferenceServiceImplTest {
     verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
   }
 
-  @Test
-  public void shouldGetHttpStatusOkGetTrustByCode() {
-    // given
-    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/trusts/code/" + TRUST_CODE),any())).willReturn(responseEntity);
-
-    // when
-    referenceServiceImpl.getTrustByCodeHttpStatus(TRUST_CODE);
-
-    // then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/trusts/code/" + TRUST_CODE), eq(TrustDTO.class));
-  }
-
-  @Test
-  public void shouldGetHttpStatusOkGetSiteByCode() {
-    // given
-    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/sites/code/" + SITE_CODE),any())).willReturn(responseEntity);
-
-    // when
-    referenceServiceImpl.getSiteByCodeHttpStatus(SITE_CODE);
-
-    // then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/sites/code/" + SITE_CODE), eq(SiteDTO.class));
-  }
-
-  @Test
-  public void shouldGetHttpStatusNotFoundGetTrustByCode() {
-    // given
-    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
-    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/trusts/code/" + UNKNOWN_CODE),any())).willReturn(responseEntity);
-
-    // when
-    referenceServiceImpl.getTrustByCodeHttpStatus(UNKNOWN_CODE);
-
-    // then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/trusts/code/" + UNKNOWN_CODE), eq(TrustDTO.class));
-  }
-
-  @Test
-  public void shouldGetHttpStatusNotFoundGetSiteByCode() {
-    // given
-    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
-    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/sites/code/" + UNKNOWN_CODE),any())).willReturn(responseEntity);
-
-    // when
-    referenceServiceImpl.getSiteByCodeHttpStatus(UNKNOWN_CODE);
-
-    // then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/sites/code/" + UNKNOWN_CODE), eq(SiteDTO.class));
-  }
-
-  @Test
-  public void shouldGetSitesByTrustCode() {
-    // given
-    TEST_SITE_DTO_1.setSiteCode(SITE_CODE);
-    TEST_SITE_DTO_1.setId(6344L);
-    TEST_SITE_DTO_1.setTrustCode("RJ7");
-    TEST_SITE_DTO_1.setSiteName("Bolingbroke Hospital");
-    TEST_SITE_DTO_1.setAddress("Bolingbroke Grove London Greater London");
-    TEST_SITE_DTO_1.setPostCode("SW11 6HN");
-
-    TEST_SITE_DTO_2.setSiteCode(OTHER_SITE_CODE);
-    TEST_SITE_DTO_2.setId(6346L);
-    TEST_SITE_DTO_2.setTrustCode("RJ7");
-    TEST_SITE_DTO_2.setSiteName("St Georges At Kingston Hospital");
-    TEST_SITE_DTO_2.setAddress("Galsworthy Road Kingston Upon Thames Surrey");
-    TEST_SITE_DTO_2.setPostCode("KT2 7QB");
-
-    List<SiteDTO> siteDTOS = new ArrayList<>();
-    siteDTOS.add(TEST_SITE_DTO_1);
-    siteDTOS.add(TEST_SITE_DTO_2);
-    LimitedListResponse<SiteDTO> dtos = new LimitedListResponse<>();
-    dtos.setList(siteDTOS);
-    ResponseEntity<LimitedListResponse<SiteDTO>> siteDtoResponse = new ResponseEntity<>(dtos,HttpStatus.OK);
-    ParameterizedTypeReference<LimitedListResponse<SiteDTO>> responseType = new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
-
-    };
-    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/search-by-trust/" + TRUST_CODE, HttpMethod.GET,
-        null,responseType)).willReturn(siteDtoResponse);
-
-    // when
-    LimitedListResponse<SiteDTO> response = referenceServiceImpl.getSitesByTrustCode(TRUST_CODE);
-
-    // then
-    Assert.assertEquals(siteDtoResponse.getBody(), response);
-
-  }
   @Test
   public void shouldGetGradeExists() {
     // given
@@ -199,9 +112,88 @@ public class ReferenceServiceImplTest {
         HttpMethod.POST, requestEntity, responseType);
   }
 
+  @Test
+  public void shouldGetTrustExists() {
+    // given
+
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.trustExists(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/trusts/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
   private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
     };
   }
+
+  private ParameterizedTypeReference<HttpStatus>  getCodeExistsReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
+  @Test
+  public void shouldGetSiteCodeExists() {
+    // given
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(SITE_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteCodeExists(SITE_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetTrustCodeExists() {
+    // given
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(TRUST_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.trustCodeExists(TRUST_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+//  @Test
+//  public void shouldGetSiteTrustMatch() {
+//    // given
+//
+//    HttpEntity<String> requestEntity = new HttpEntity<>(TRUST_CODE);
+//    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+//    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+//    given(referenceRestTemplate.exchange(REFERENCE_URL + "api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST, requestEntity, responseType)).willReturn(responseEntity);
+//
+//    // when
+//    HttpStatus response = referenceServiceImpl.siteTrustMatch(SITE_CODE, TRUST_CODE);
+//
+//    // then
+//    Assert.assertEquals(response, HttpStatus.FOUND);
+//
+//  }
 
 }

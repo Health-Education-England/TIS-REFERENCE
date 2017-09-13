@@ -215,6 +215,45 @@ public class SiteResource {
   }
 
   /**
+   * EXISTS /sites/exists/ : check if site code exists
+   * @param code site code to check
+   * @return HttpStatus FOUND if exists or NOT_FOUND if doesn't exist
+   */
+  @PostMapping("/sites/codeexists/")
+  @Timed
+  public HttpStatus siteCodeExists(@RequestBody String code) {
+    log.debug("REST request to check Site exists : {}", code);
+    HttpStatus siteFound = HttpStatus.NOT_FOUND;
+    if (!code.isEmpty()) {
+      Long id = siteRepository.findIdBySiteCode(code);
+      if (id != null){
+        siteFound = HttpStatus.FOUND;
+      }
+    }
+    return siteFound;
+  }
+
+  /**
+   * EXISTS /sites/trustmatch/{trustCode} : check is site exists
+   * @param siteCode the code of the site to check
+   * @Param trustCode the code of the trust to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/sites/trustmatch/{trustCode}")
+  @Timed
+  public HttpStatus siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
+    log.debug("REST request to check Site exists : {}", siteCode + " " + trustCode);
+    HttpStatus siteTrustMatch = HttpStatus.NOT_FOUND;
+    if(!siteCode.isEmpty() && !trustCode.isEmpty()){
+      List<Long> dbIds = siteRepository.findSiteTrustMatch(siteCode, trustCode);
+      if (!dbIds.isEmpty()){
+        siteTrustMatch = HttpStatus.FOUND;
+      }
+    }
+    return siteTrustMatch;
+  }
+
+  /**
    * DELETE  /sites/:id : delete the "id" site.
    *
    * @param id the id of the siteDTO to delete
