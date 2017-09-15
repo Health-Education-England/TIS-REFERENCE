@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
+import com.sun.org.apache.xml.internal.utils.DefaultErrorHandler;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
@@ -16,6 +17,7 @@ import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.api.dto.JsonPatchDTO;
 import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
+import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
@@ -34,6 +36,8 @@ import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
+import io.github.jhipster.config.JHipsterProperties;
+import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +45,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -59,8 +69,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+  private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
+  private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
+  private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
+  private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -155,12 +169,38 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<HttpStatus> getCodeExistsReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
+  private ParameterizedTypeReference<HttpStatus> getSiteTrustMatchReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
   private Map<Long, Boolean> exists(String url, List<Long> ids) {
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
     ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getBody();
+  }
+
+  private HttpStatus codeExists(String url, String code){
+    HttpEntity<String> requestEntity = new HttpEntity<>(code);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getStatusCode();
+  }
+
+  private HttpStatus siteTrustMatchExists(String url, String siteCode) {
+    HttpEntity<String> requestEntity = new HttpEntity<>(siteCode);
+    ParameterizedTypeReference<HttpStatus> responseType = getSiteTrustMatchReference();
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getStatusCode();
   }
 
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
@@ -181,6 +221,35 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return exists(url, ids);
   }
 
+  private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference(){
+    return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
+    };
+  }
+
+  @Override
+  public Map<Long, Boolean> trustExists(List<Long> ids) {
+    String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT;
+    return exists(url, ids);
+  }
+
+  @Override
+  public HttpStatus trustCodeExists(String code){
+    String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT;
+    return codeExists(url, code);
+  }
+
+  @Override
+  public HttpStatus siteCodeExists(String code){
+    String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT;
+    return codeExists(url, code);
+  }
+
+  @Override
+  public HttpStatus siteTrustMatch (String siteCode, String trustCode) {
+    String url = serviceUrl + SITE_TRUST_MATCH_ENDPOINT + trustCode;
+    return siteTrustMatchExists(url, siteCode);
+  }
+
   @Override
   public RestTemplate getRestTemplate() {
     return this.referenceRestTemplate;
@@ -199,5 +268,4 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
     return classToParamTypeRefMap;
   }
-
 }

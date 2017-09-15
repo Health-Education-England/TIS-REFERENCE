@@ -9,8 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +29,10 @@ public class ReferenceServiceImplTest {
 
   private static final String DBC = "1-DGBODY";
   private static final String REFERENCE_URL = "http://localhost:8088/reference";
+  private static final String TRUST_CODE = "RJ7";
+  private static final String SITE_CODE = "RJ706";
+  private static final String UNKNOWN_CODE = "XXX";
+
   private List<Long> ids = Lists.newArrayList(10L, 20L);
 
   @Mock
@@ -39,8 +43,8 @@ public class ReferenceServiceImplTest {
   @Before
   public void setUp() throws Exception {
     referenceServiceImpl.setServiceUrl(REFERENCE_URL);
-  }
 
+  }
 
   @Test
   public void shouldGetDBCByCode() {
@@ -76,7 +80,6 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldGetSiteExists() {
     // given
-
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
     ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
     ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
@@ -92,9 +95,136 @@ public class ReferenceServiceImplTest {
         HttpMethod.POST, requestEntity, responseType);
   }
 
+  @Test
+  public void shouldGetTrustExists() {
+    // given
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.trustExists(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/trusts/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
   private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
     };
+  }
+
+  private ParameterizedTypeReference<HttpStatus>  getCodeExistsReference() {
+    return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
+  @Test
+  public void shouldGetSiteCodeExists() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(SITE_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteCodeExists(SITE_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetSiteCodeDoesNotExist() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(UNKNOWN_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteCodeExists(UNKNOWN_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetTrustCodeExists() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(TRUST_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.trustCodeExists(TRUST_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetTrustCodeDoesNotExist() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(UNKNOWN_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.trustCodeExists(UNKNOWN_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/trusts/codeexists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetSiteTrustMatch() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(SITE_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE,
+        HttpMethod.POST, requestEntity, responseType)).willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteTrustMatch(SITE_CODE, TRUST_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldNotGetSiteTrustMatchIfThereIsNoSiteTrustRelationship() {
+    // given
+    HttpEntity<String> requestEntity = new HttpEntity<>(UNKNOWN_CODE);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
+    ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE,
+        HttpMethod.POST, requestEntity, responseType)).willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.siteTrustMatch(UNKNOWN_CODE, TRUST_CODE);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST, requestEntity, responseType);
   }
 
 }

@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -255,4 +258,46 @@ public class TrustResource {
         .body(results);
   }
 
+  /**
+   * EXISTS /trusts/exists/ : check if trust exists
+   * @param ids the ids of the trustDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/trusts/exists/")
+  @Timed
+  public ResponseEntity<Map<Long,Boolean>> trustExists(@RequestBody List<Long> ids) {
+    Map<Long,Boolean> trustExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Trust exists : {}", ids);
+    if(!CollectionUtils.isEmpty(ids)){
+      List<Long> dbIds = trustRepository.findByIdsIn(ids);
+      ids.forEach(id -> {
+        if(dbIds.contains(id)){
+          trustExistsMap.put(id,true);
+        }
+        else {
+          trustExistsMap.put(id,false);
+        }
+      });
+    }
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustExistsMap));
+  }
+
+  /**
+   * EXISTS /trusts/codeexists/ : check if trust code exists
+   * @param code trust code to check
+   * @return HttpStatus FOUND if exists or NOT_FOUND if doesn't exist
+   */
+  @PostMapping("/trusts/codeexists/")
+  @Timed
+  public HttpStatus trustCodeExists(@RequestBody String code) {
+    log.debug("REST request to check Trust exists : {}", code);
+    HttpStatus trustFound = HttpStatus.NOT_FOUND;
+    if (!code.isEmpty()) {
+      Long id = trustRepository.findIdByTrustCode(code);
+      if (id != null){
+        trustFound = HttpStatus.FOUND;
+      }
+    }
+    return trustFound;
+  }
 }

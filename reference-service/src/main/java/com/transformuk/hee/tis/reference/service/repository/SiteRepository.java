@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.method.P;
 
 import java.util.List;
 
@@ -31,4 +32,12 @@ public interface SiteRepository extends JpaRepository<Site, Long> {
   @Query("SELECT s.id from Site s WHERE s.id in :ids")
   List<Long> findByIdsIn(@Param("ids") List<Long> ids);
 
+  @Query("SELECT s.trustCode FROM Site s WHERE s.siteCode =:siteCode")
+  String findTrustCodeBySiteCode(@Param("siteCode") String siteCode);
+
+  @Query("SELECT s.id FROM Site s WHERE s.siteCode =:siteCode AND s.trustCode =:trustCode")
+  List<Long> findSiteTrustMatch (@Param("siteCode") String siteCode, @Param("trustCode") String trustCode);
+
+  @Query("SELECT s.id FROM Site s WHERE s.siteCode =:siteCode")
+  Long findIdBySiteCode(@Param("siteCode") String siteCode);
 }
