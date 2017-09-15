@@ -187,20 +187,20 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity.getBody();
   }
 
-  private HttpStatus codeExists(String url, String code){
+  private ResponseEntity<HttpStatus> codeExists(String url, String code){
     HttpEntity<String> requestEntity = new HttpEntity<>(code);
     ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
     ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
-    return responseEntity.getStatusCode();
+    return responseEntity;
   }
 
-  private HttpStatus siteTrustMatchExists(String url, String siteCode) {
+  private ResponseEntity<HttpStatus> siteTrustMatchExists(String url, String siteCode) {
     HttpEntity<String> requestEntity = new HttpEntity<>(siteCode);
     ParameterizedTypeReference<HttpStatus> responseType = getSiteTrustMatchReference();
     ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
-    return responseEntity.getStatusCode();
+    return responseEntity;
   }
 
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
@@ -233,19 +233,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public HttpStatus trustCodeExists(String code){
+  public ResponseEntity<HttpStatus> trustCodeExists(String code){
     String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT;
     return codeExists(url, code);
   }
 
   @Override
-  public HttpStatus siteCodeExists(String code){
+  public ResponseEntity<HttpStatus> siteCodeExists(String code){
     String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT;
     return codeExists(url, code);
   }
 
   @Override
-  public HttpStatus siteTrustMatch (String siteCode, String trustCode) {
+  public ResponseEntity<HttpStatus> siteTrustMatch (String siteCode, String trustCode) {
     String url = serviceUrl + SITE_TRUST_MATCH_ENDPOINT + trustCode;
     return siteTrustMatchExists(url, siteCode);
   }

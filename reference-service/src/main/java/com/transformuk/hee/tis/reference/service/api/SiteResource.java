@@ -221,7 +221,7 @@ public class SiteResource {
    */
   @PostMapping("/sites/codeexists/")
   @Timed
-  public HttpStatus siteCodeExists(@RequestBody String code) {
+  public ResponseEntity<HttpStatus> siteCodeExists(@RequestBody String code) {
     log.debug("REST request to check Site exists : {}", code);
     HttpStatus siteFound = HttpStatus.NOT_FOUND;
     if (!code.isEmpty()) {
@@ -230,7 +230,8 @@ public class SiteResource {
         siteFound = HttpStatus.FOUND;
       }
     }
-    return siteFound;
+    ResponseEntity<HttpStatus> httpStatusResponseEntity = new ResponseEntity<HttpStatus>(siteFound);
+    return httpStatusResponseEntity;
   }
 
   /**
@@ -241,7 +242,7 @@ public class SiteResource {
    */
   @PostMapping("/sites/trustmatch/{trustCode}")
   @Timed
-  public HttpStatus siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
+  public ResponseEntity<HttpStatus> siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
     log.debug("REST request to check Site exists : {}", siteCode + " " + trustCode);
     HttpStatus siteTrustMatch = HttpStatus.NOT_FOUND;
     if(!siteCode.isEmpty() && !trustCode.isEmpty()){
@@ -250,7 +251,8 @@ public class SiteResource {
         siteTrustMatch = HttpStatus.FOUND;
       }
     }
-    return siteTrustMatch;
+    ResponseEntity<HttpStatus> httpStatusResponseEntity = new ResponseEntity<HttpStatus>(siteTrustMatch);
+    return httpStatusResponseEntity;
   }
 
   /**

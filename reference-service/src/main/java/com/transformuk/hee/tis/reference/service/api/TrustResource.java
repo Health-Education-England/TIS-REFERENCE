@@ -289,7 +289,7 @@ public class TrustResource {
    */
   @PostMapping("/trusts/codeexists/")
   @Timed
-  public HttpStatus trustCodeExists(@RequestBody String code) {
+  public ResponseEntity<HttpStatus> trustCodeExists(@RequestBody String code) {
     log.debug("REST request to check Trust exists : {}", code);
     HttpStatus trustFound = HttpStatus.NOT_FOUND;
     if (!code.isEmpty()) {
@@ -298,6 +298,7 @@ public class TrustResource {
         trustFound = HttpStatus.FOUND;
       }
     }
-    return trustFound;
+    ResponseEntity<HttpStatus> httpStatusResponseEntity = new ResponseEntity<HttpStatus>(trustFound);
+    return httpStatusResponseEntity;
   }
 }
