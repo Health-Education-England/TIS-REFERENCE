@@ -16,10 +16,10 @@ import java.util.Map;
 public interface ReferenceService extends ClientService {
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
-  ResponseEntity<HttpStatus> siteTrustMatch (String siteCode, String trustCode);
+  HttpStatus siteTrustMatch (String siteCode, String trustCode);
   Map<Long,Boolean> gradeExists(List<Long> Ids);
   Map<Long,Boolean> trustExists(List<Long> Ids);
   Map<Long,Boolean> siteExists(List<Long> Ids);
-  ResponseEntity<HttpStatus> trustCodeExists(String Code);
-  ResponseEntity<HttpStatus> siteCodeExists(String Code);
+  HttpStatus trustCodeExists(String Code);
+  HttpStatus siteCodeExists(String Code);
 }

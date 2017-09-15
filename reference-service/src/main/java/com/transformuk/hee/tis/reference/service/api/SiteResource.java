@@ -221,7 +221,7 @@ public class SiteResource {
    */
   @PostMapping("/sites/codeexists/")
   @Timed
-  public ResponseEntity<HttpStatus> siteCodeExists(@RequestBody String code) {
+  public HttpStatus siteCodeExists(@RequestBody String code) {
     log.debug("REST request to check Site exists : {}", code);
     HttpStatus siteFound = HttpStatus.NOT_FOUND;
     if (!code.isEmpty()) {
@@ -230,19 +230,18 @@ public class SiteResource {
         siteFound = HttpStatus.FOUND;
       }
     }
-    ResponseEntity<HttpStatus> httpStatusResponseEntity = new ResponseEntity<HttpStatus>(siteFound);
-    return httpStatusResponseEntity;
+    return siteFound;
   }
 
   /**
    * EXISTS /sites/trustmatch/{trustCode} : check is site exists
    * @param siteCode the code of the site to check
    * @Param trustCode the code of the trust to check
-   * @return boolean true if exists otherwise false
+   * @return HttpStatus FOUND if matched, NOT_FOUND if no match
    */
   @PostMapping("/sites/trustmatch/{trustCode}")
   @Timed
-  public ResponseEntity<HttpStatus> siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
+  public HttpStatus siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
     log.debug("REST request to check Site exists : {}", siteCode + " " + trustCode);
     HttpStatus siteTrustMatch = HttpStatus.NOT_FOUND;
     if(!siteCode.isEmpty() && !trustCode.isEmpty()){
@@ -251,8 +250,7 @@ public class SiteResource {
         siteTrustMatch = HttpStatus.FOUND;
       }
     }
-    ResponseEntity<HttpStatus> httpStatusResponseEntity = new ResponseEntity<HttpStatus>(siteTrustMatch);
-    return httpStatusResponseEntity;
+    return siteTrustMatch;
   }
 
   /**
