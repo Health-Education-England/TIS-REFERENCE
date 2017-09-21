@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -72,6 +73,9 @@ public class SiteResourceIntTest {
 
   private static final String DEFAULT_ORGANISATIONAL_UNIT = "AAAAAAAAAA";
   private static final String UPDATED_ORGANISATIONAL_UNIT = "BBBBBBBBBB";
+
+  private static final String SITE_CODE_NOT_IN_DB = "X1G5H9V";
+  private static final String TRUST_CODE_NOT_IN_DB = "J8D4VTF";
 
   @Autowired
   private SiteRepository siteRepository;
@@ -310,6 +314,89 @@ public class SiteResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFoundIfSiteCodeExists() throws Exception {
+    // given
+    // Initialise the DB
+    siteRepository.saveAndFlush(site);
+    HttpStatus expectedStatus = HttpStatus.FOUND;
+    String siteCode = site.getSiteCode();
+
+    // when and then
+    restSiteMockMvc.perform(post("/api/sites/codeexists/")
+    .contentType(TestUtil.APPLICATION_JSON_UTF8)
+    .content(TestUtil.convertObjectToJson(siteCode)))
+        .andExpect(status().isFound());
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnNoContentIfSiteCodeNotExists() throws Exception {
+    // given
+    // Initialise the DB
+    siteRepository.saveAndFlush(site);
+    HttpStatus expectedStatus = HttpStatus.NO_CONTENT;
+    String siteCode = SITE_CODE_NOT_IN_DB;
+
+    // when and then
+    restSiteMockMvc.perform(post("/api/sites/codeexists/")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(siteCode)))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFoundIfSiteTrustMatchExists() throws Exception {
+    // given
+    // Initialise the DB
+    siteRepository.saveAndFlush(site);
+    HttpStatus expectedStatus = HttpStatus.FOUND;
+    String siteCode = site.getSiteCode();
+    String trustCode = site.getTrustCode();
+
+    // when and then
+    restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(siteCode)))
+        .andExpect(status().isFound());
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnNoContentIfSiteTrustMatchNotExistsBadSite() throws Exception {
+    // given
+    // Initialise the DB
+    siteRepository.saveAndFlush(site);
+    HttpStatus expectedStatus = HttpStatus.NO_CONTENT;
+    String siteCode = SITE_CODE_NOT_IN_DB;
+    String trustCode = site.getTrustCode();
+
+    // when and then
+    restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(siteCode)))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnNoContentIfSiteTrustMatchNotExistsBadTrust() throws Exception {
+    // given
+    // Initialise the DB
+    siteRepository.saveAndFlush(site);
+    HttpStatus expectedStatus = HttpStatus.NO_CONTENT;
+    String siteCode = site.getSiteCode();
+    String trustCode = TRUST_CODE_NOT_IN_DB;
+
+    // when and then
+    restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(siteCode)))
+        .andExpect(status().isNoContent());
   }
 
   @Test
