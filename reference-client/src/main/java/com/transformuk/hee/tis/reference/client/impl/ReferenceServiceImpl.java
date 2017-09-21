@@ -1,7 +1,6 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
-import com.sun.org.apache.xml.internal.utils.DefaultErrorHandler;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
@@ -36,8 +35,6 @@ import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
-import io.github.jhipster.config.JHipsterProperties;
-import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +44,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -75,6 +67,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
+  private static final String MEDICAL_SCHOOLS_MAPPINGS_ENDPOINT = "/api/medical-schools/exists/";
+  private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -169,6 +163,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Map<String, Boolean>> getExistsStringReference() {
+    return new ParameterizedTypeReference<Map<String, Boolean>>() {
+    };
+  }
+
   private ParameterizedTypeReference<HttpStatus> getCodeExistsReference() {
     return new ParameterizedTypeReference<HttpStatus>() {
     };
@@ -187,7 +186,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity.getBody();
   }
 
-  private HttpStatus codeExists(String url, String code){
+  private Map<String, Boolean> valuesExists(String url, List<String> values) {
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(values);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getBody();
+  }
+
+  private HttpStatus codeExists(String url, String code) {
     HttpEntity<String> requestEntity = new HttpEntity<>(code);
     ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
     ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
@@ -221,8 +228,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return exists(url, ids);
   }
 
-  private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference(){
-    return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>(){
+
+  private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference() {
+    return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>() {
     };
   }
 
@@ -233,19 +241,31 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public HttpStatus trustCodeExists(String code){
+  public HttpStatus trustCodeExists(String code) {
     String url = serviceUrl + TRUSTS_MAPPINGS_CODE_ENDPOINT;
     return codeExists(url, code);
   }
 
   @Override
-  public HttpStatus siteCodeExists(String code){
+  public HttpStatus siteCodeExists(String code) {
     String url = serviceUrl + SITES_MAPPINGS_CODE_ENDPOINT;
     return codeExists(url, code);
   }
 
   @Override
-  public HttpStatus siteTrustMatch (String siteCode, String trustCode) {
+  public Map<String, Boolean> medicalSchoolsExists(List<String> values) {
+    String url = serviceUrl + MEDICAL_SCHOOLS_MAPPINGS_ENDPOINT;
+    return valuesExists(url, values);
+  }
+
+  @Override
+  public Map<String, Boolean> countryExists(List<String> values) {
+    String url = serviceUrl + COUNTRIES_MAPPINGS_ENDPOINT;
+    return valuesExists(url, values);
+  }
+
+  @Override
+  public HttpStatus siteTrustMatch(String siteCode, String trustCode) {
     String url = serviceUrl + SITE_TRUST_MATCH_ENDPOINT + trustCode;
     return siteTrustMatchExists(url, siteCode);
   }

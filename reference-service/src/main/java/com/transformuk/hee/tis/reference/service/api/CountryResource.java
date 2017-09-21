@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -115,6 +118,31 @@ public class CountryResource {
     Page<Country> page = countryRepository.findAll(pageable);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/countries");
     return new ResponseEntity<>(countryMapper.countriesToCountryDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
+   * EXISTS /countries/exists/ : check is countries exists
+   *
+   * @param values the values of the countryDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/countries/exists/")
+  @Timed
+  public ResponseEntity<Map<String, Boolean>> countriesExists(@RequestBody List<String> values) {
+    Map<String, Boolean> countriesExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Countries exists : {}", values);
+    if (!CollectionUtils.isEmpty(values)) {
+      List<String> dbLabels = countryRepository.findByNationality(values);
+      values.forEach(label -> {
+        if (dbLabels.contains(label)) {
+          countriesExistsMap.put(label, true);
+        } else {
+          countriesExistsMap.put(label, false);
+        }
+      });
+    }
+
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(countriesExistsMap));
   }
 
   /**

@@ -34,6 +34,8 @@ public class ReferenceServiceImplTest {
   private static final String UNKNOWN_CODE = "XXX";
 
   private List<Long> ids = Lists.newArrayList(10L, 20L);
+  private List<String> medicalSchoolValues = Lists.newArrayList("University of London", "United Medical & Dental School, London");
+  private List<String> countryValues = Lists.newArrayList("United Kingdom");
 
   @Mock
   private RestTemplate referenceRestTemplate;
@@ -96,6 +98,42 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldGetMedicalSchoolExists() {
+    // given
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(medicalSchoolValues);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/medical-schools/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.medicalSchoolsExists(medicalSchoolValues);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/medical-schools/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetCountriesExists() {
+    // given
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(countryValues);
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/countries/exists/",
+        HttpMethod.POST, requestEntity, responseType)).
+        willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.countryExists(countryValues);
+
+    // then
+    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/countries/exists/",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
   public void shouldGetTrustExists() {
     // given
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
@@ -115,6 +153,11 @@ public class ReferenceServiceImplTest {
 
   private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
+  private ParameterizedTypeReference<Map<String, Boolean>> getExistsStringReference() {
+    return new ParameterizedTypeReference<Map<String, Boolean>>() {
     };
   }
 
