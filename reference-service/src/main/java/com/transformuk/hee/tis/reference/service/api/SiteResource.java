@@ -223,7 +223,7 @@ public class SiteResource {
   @Timed
   public ResponseEntity siteCodeExists(@RequestBody String code) {
     log.debug("REST request to check Site exists : {}", code);
-    HttpStatus siteFound = HttpStatus.NOT_FOUND;
+    HttpStatus siteFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
       Long id = siteRepository.findIdBySiteCode(code);
       if (id != null){
@@ -243,7 +243,7 @@ public class SiteResource {
   @Timed
   public ResponseEntity siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
     log.debug("REST request to check Site exists : {}", siteCode + " " + trustCode);
-    HttpStatus siteTrustMatchFound = HttpStatus.NOT_FOUND;
+    HttpStatus siteTrustMatchFound = HttpStatus.NO_CONTENT;
     if(!siteCode.isEmpty() && !trustCode.isEmpty()){
       List<Long> dbIds = siteRepository.findSiteTrustMatch(siteCode, trustCode);
       if (!dbIds.isEmpty()){

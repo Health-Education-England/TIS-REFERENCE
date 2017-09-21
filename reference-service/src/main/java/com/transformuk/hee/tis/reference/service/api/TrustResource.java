@@ -291,7 +291,7 @@ public class TrustResource {
   @Timed
   public ResponseEntity trustCodeExists(@RequestBody String code) {
     log.debug("REST request to check Trust exists : {}", code);
-    HttpStatus trustFound = HttpStatus.NOT_FOUND;
+    HttpStatus trustFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
       Long id = trustRepository.findIdByTrustCode(code);
       if (id != null){
