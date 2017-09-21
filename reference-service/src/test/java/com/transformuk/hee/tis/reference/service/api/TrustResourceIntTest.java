@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -66,6 +67,8 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
+
+  private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
   @Autowired
   private TrustRepository trustRepository;
@@ -260,6 +263,39 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.code").value("R1A"))
         .andExpect(jsonPath("$.trustName").value("Worcestershire Health and Care NHS Trust"));
+  }
+
+
+  @Test
+  @Transactional
+  public void shouldReturnFoundIfTrustCodeExists() throws Exception {
+    // given
+    // Initialise the DB
+    trustRepository.saveAndFlush(trust);
+    HttpStatus expectedStatus = HttpStatus.FOUND;
+    String trustCode = trust.getCode();
+
+    // when and then
+    restTrustMockMvc.perform(post("/api/trusts/codeexists/")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(trustCode)))
+        .andExpect(status().isFound());
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnNoContentIfTrustCodeNotExists() throws Exception {
+    // given
+    // Initialise the DB
+    trustRepository.saveAndFlush(trust);
+    HttpStatus expectedStatus = HttpStatus.NO_CONTENT;
+    String trustCode = NON_EXISTING_TRUST_CODE;
+
+    // when and then
+    restTrustMockMvc.perform(post("/api/trusts/codeexists/")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJson(trustCode)))
+        .andExpect(status().isNoContent());
   }
 
   @Test
