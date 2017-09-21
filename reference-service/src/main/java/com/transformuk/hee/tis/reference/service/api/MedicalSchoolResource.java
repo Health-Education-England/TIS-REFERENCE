@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -130,6 +133,31 @@ public class MedicalSchoolResource {
     MedicalSchool medicalSchool = medicalSchoolRepository.findOne(id);
     MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(medicalSchoolDTO));
+  }
+
+  /**
+   * EXISTS /medical-schools/exists/ : check is medical schools exists
+   *
+   * @param values the values of the medicalSchoolDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/medical-schools/exists/")
+  @Timed
+  public ResponseEntity<Map<String, Boolean>> medicalSchoolExists(@RequestBody List<String> values) {
+    Map<String, Boolean> medicalSchoolExistsMap = Maps.newHashMap();
+    log.debug("REST request to check MedicalSchool exists : {}", values);
+    if (!CollectionUtils.isEmpty(values)) {
+      List<String> dbLabels = medicalSchoolRepository.findByLabel(values);
+      values.forEach(label -> {
+        if (dbLabels.contains(label)) {
+          medicalSchoolExistsMap.put(label, true);
+        } else {
+          medicalSchoolExistsMap.put(label, false);
+        }
+      });
+    }
+
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(medicalSchoolExistsMap));
   }
 
   /**
