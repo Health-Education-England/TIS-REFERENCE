@@ -197,6 +197,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private HttpStatus codeExists(String url, String code) {
     HttpEntity<String> requestEntity = new HttpEntity<>(code);
     ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
+    LOG.info("Trying codeExists with URL: {}", url);
     ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getStatusCode();
