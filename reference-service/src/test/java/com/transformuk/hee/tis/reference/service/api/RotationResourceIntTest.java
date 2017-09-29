@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -125,6 +126,38 @@ public class RotationResourceIntTest {
     assertThat(testRotation.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testRotation.getLabel()).isEqualTo(DEFAULT_LABEL);
     assertThat(testRotation.getLocalOffice()).isEqualTo(DEFAULT_LOCAL_OFFICE);
+  }
+
+  @Test
+  @Transactional
+  public void shouldValidateMandatoryFieldsWhenCreating() throws Exception {
+    //given
+    RotationDTO rotationDTO = new RotationDTO();
+
+    //when & then
+    restRotationMockMvc.perform(post("/api/rotations")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(rotationDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("error.validation"))
+        .andExpect(jsonPath("$.fieldErrors[*].field").
+            value(containsInAnyOrder("code","label","localOffice")));
+  }
+
+  @Test
+  @Transactional
+  public void shouldValidateMandatoryFieldsWhenUpdating() throws Exception {
+    //given
+    RotationDTO rotationDTO = new RotationDTO();
+
+    //when & then
+    restRotationMockMvc.perform(put("/api/rotations")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(rotationDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("error.validation"))
+        .andExpect(jsonPath("$.fieldErrors[*].field").
+            value(containsInAnyOrder("id", "code","label","localOffice")));
   }
 
   @Test
