@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -45,6 +48,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -119,7 +123,7 @@ public class SiteResource {
   }
 
   /**
-   * GET  /sites : get all the sites.
+   * GET  /sites : get all the sites or search for sites
    *
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of sites in body
@@ -127,11 +131,24 @@ public class SiteResource {
    */
   @GetMapping("/sites")
   @Timed
-  public ResponseEntity<List<SiteDTO>> getAllSites(@ApiParam Pageable pageable) {
+  public ResponseEntity<List<SiteDTO>> getAllSites(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Sites");
-    Page<Site> page = siteRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
-    return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
+    searchQuery = sanitize(searchQuery);
+    List<SiteDTO> results;
+    Page<Site> page = new PageImpl<Site>(Lists.newArrayList());
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = siteRepository.findAll(pageable);
+      results = siteMapper.sitesToSiteDTOs(page.getContent());
+    } else {
+      List<Site> sites = sitesTrustsService.searchSites(searchQuery);
+      results = siteMapper.sitesToSiteDTOs(sites);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/posts");
+    return new ResponseEntity<>(results, headers, HttpStatus.OK);
+
   }
 
   @ApiOperation(value = "searchSites()",

@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -488,5 +489,36 @@ public class SiteResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Site.class);
+  }
+
+  @Test
+  @Transactional
+  public void findSiteShouldReturnSiteWithAttributesMatchingSearchTerm() throws Exception {
+    siteRepository.saveAndFlush(site);
+    Site anotherSite = new Site()
+        .siteCode(UPDATED_SITE_CODE)
+        .localOffice(UPDATED_LOCAL_OFFICE)
+        .trustCode(UPDATED_TRUST_CODE)
+        .siteName(UPDATED_SITE_NAME)
+        .address(UPDATED_ADDRESS)
+        .postCode(UPDATED_POST_CODE)
+        .siteKnownAs(UPDATED_SITE_KNOWN_AS)
+        .siteNumber(UPDATED_SITE_NUMBER)
+        .organisationalUnit(UPDATED_ORGANISATIONAL_UNIT);
+    siteRepository.saveAndFlush(anotherSite);
+
+
+    restSiteMockMvc.perform(get("/api/sites?searchQuery=AAA"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(site.getId().intValue())))
+        .andExpect(jsonPath("$.[*].siteCode").value(hasItem(site.getSiteCode())))
+        .andExpect(jsonPath("$.[*].siteName").value(hasItem(site.getSiteName())))
+        .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())))
+        .andExpect(jsonPath("$.[*].id").value(not(hasItem(anotherSite.getId().intValue()))))
+        .andExpect(jsonPath("$.[*].siteCode").value(not(hasItem(anotherSite.getSiteCode()))))
+        .andExpect(jsonPath("$.[*].siteName").value(not(hasItem(anotherSite.getSiteName()))))
+        .andExpect(jsonPath("$.[*].address").value(not(hasItem(anotherSite.getAddress()))));
+
   }
 }
