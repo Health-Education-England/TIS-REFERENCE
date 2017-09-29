@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
 import com.transformuk.hee.tis.reference.service.model.Site;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +20,7 @@ public interface SiteRepository extends JpaRepository<Site, Long> {
 
   @Query("SELECT s FROM Site s WHERE s.siteCode like %:param% or s.trustCode like %:param% " +
       "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%")
-  List<Site> findBySearchString(@Param("param") String searchString, Pageable pageable);
+  Page<Site> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
   @Query("SELECT s FROM Site s WHERE s.trustCode =:trust and (s.siteCode like %:param% " +
       "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%)")

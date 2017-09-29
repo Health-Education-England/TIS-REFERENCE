@@ -137,17 +137,14 @@ public class SiteResource {
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Sites");
     searchQuery = sanitize(searchQuery);
-    List<SiteDTO> results;
-    Page<Site> page = new PageImpl<Site>(Lists.newArrayList());
+    Page<Site> page;
     if (StringUtils.isEmpty(searchQuery)) {
       page = siteRepository.findAll(pageable);
-      results = siteMapper.sitesToSiteDTOs(page.getContent());
     } else {
-      List<Site> sites = sitesTrustsService.searchSites(searchQuery);
-      results = siteMapper.sitesToSiteDTOs(sites);
+      page = sitesTrustsService.searchSites(searchQuery, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/posts");
-    return new ResponseEntity<>(results, headers, HttpStatus.OK);
+    return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
 
   }
 

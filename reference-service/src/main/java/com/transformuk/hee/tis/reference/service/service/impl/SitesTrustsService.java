@@ -6,7 +6,9 @@ import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,11 +38,23 @@ public class SitesTrustsService {
    * Searches all sites who have data containing given searchString
    *
    * @param searchString search string to be searched for site data
+   * @param pageable     pageable defining the page and size
+   * @return List of {@link Site} matching searchString
+   */
+  public Page<Site> searchSites(String searchString, Pageable pageable) {
+    return siteRepository.findBySearchString(searchString, pageable);
+  }
+
+  /**
+   * Searches all sites who have data containing given searchString
+   *
+   * @param searchString search string to be searched for site data
    * @return List of {@link Site} matching searchString
    */
   public List<Site> searchSites(String searchString) {
     if (!isEmpty(searchString)) {
-      return siteRepository.findBySearchString(searchString, new PageRequest(0, limit));
+      Page<Site> sites = searchSites(searchString, new PageRequest(0, limit));
+      return sites.getContent();
     } else {
       return siteRepository.findAll();
     }
