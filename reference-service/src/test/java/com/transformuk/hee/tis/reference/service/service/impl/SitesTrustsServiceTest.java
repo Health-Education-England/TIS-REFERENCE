@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -40,7 +42,8 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSites() {
     // given
-    given(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(EMPTY_LIST);
+    Page<Site> emptyPage = new PageImpl<>(EMPTY_LIST);
+    given(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
 
     // when
     List<Site> sites = service.searchSites(SEARCH_STRING);
