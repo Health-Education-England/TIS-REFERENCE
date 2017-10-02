@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +8,7 @@ import com.transformuk.hee.tis.reference.service.model.Rotation;
 import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
+import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -194,6 +197,22 @@ public class RotationResourceIntTest {
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueIfRotationExists() throws Exception{
+    // Initialize the database
+    rotationRepository.saveAndFlush(rotation);
+    Map<String, Boolean> expectedMap = Maps.newHashMap(rotation.getLabel(), true);
+    expectedMap.put("XYZ", false);
+    List<String> labels = Lists.newArrayList(rotation.getLabel(), "XYZ");
+    restRotationMockMvc.perform(post("/api/rotations/exists/")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(labels)))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
   @Test
