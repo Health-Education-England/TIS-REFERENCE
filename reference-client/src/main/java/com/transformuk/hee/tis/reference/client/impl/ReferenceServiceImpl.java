@@ -69,6 +69,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
   private static final String MEDICAL_SCHOOLS_MAPPINGS_ENDPOINT = "/api/medical-schools/exists/";
   private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
+  private static final String ROTATIONS_MAPPINGS_ENDPOINT = "/api/rotations/exists/";
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -262,6 +263,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public Map<String, Boolean> countryExists(List<String> values) {
     String url = serviceUrl + COUNTRIES_MAPPINGS_ENDPOINT;
+    return valuesExists(url, values);
+  }
+
+  @Override
+  public Map<String, Boolean> rotationExists(List<String> values) {
+    String url = serviceUrl + ROTATIONS_MAPPINGS_ENDPOINT;
     return valuesExists(url, values);
   }
 
