@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 /**
  * Service Implementation for managing Rotation.
@@ -57,6 +59,19 @@ public class RotationServiceImpl implements RotationService {
     log.debug("Request to get all Rotations");
     return rotationRepository.findAll(pageable)
         .map(rotationMapper::toDto);
+  }
+
+  /**
+   * Get the rotation labels
+   *
+   * @param values the lists of labels of the entity
+   * @return list of existing labels
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public List<String> findByLabelsIn(List<String> values){
+    log.debug("Request to get labels list");
+    return rotationRepository.findByLabelsIn(values);
   }
 
   /**
