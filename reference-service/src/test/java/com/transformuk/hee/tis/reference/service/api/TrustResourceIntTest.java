@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -385,5 +387,36 @@ public class TrustResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Trust.class);
+  }
+
+
+  @Test
+  @Transactional
+  public void findTrustShouldReturnTrustWithAttributesMatchingSearchTerm() throws Exception {
+    trustRepository.saveAndFlush(trust);
+    Trust anotherTrust = new Trust()
+        .code(UPDATED_CODE)
+        .localOffice(UPDATED_LOCAL_OFFICE)
+        .status(UPDATED_STATUS)
+        .trustKnownAs(UPDATED_TRUST_KNOWN_AS)
+        .address(UPDATED_ADDRESS)
+        .postCode(UPDATED_POST_CODE)
+        .trustName(UPDATED_TRUST_NAME)
+        .trustNumber(UPDATED_TRUST_NUMBER);
+
+    trustRepository.saveAndFlush(anotherTrust);
+
+    restTrustMockMvc.perform(get("/api/trusts?page=0&size=200&sort=asc&searchQuery=AAA"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(trust.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE.toString()))
+        .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE.toString()))
+        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
+        .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS.toString()))
+        .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME.toString()))
+        .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER.toString()))
+        .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS.toString()))
+        .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE.toString()));
   }
 }

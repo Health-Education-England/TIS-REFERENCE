@@ -26,7 +26,8 @@ public class SitesTrustsServiceTest {
 
   public static final String SEARCH_STRING = "search me";
   public static final Pageable LIMIT = new PageRequest(0, 100);
-  public static final List<Site> EMPTY_LIST = new ArrayList<>();
+  public static final List<Site> EMPTY_SITE_LIST = new ArrayList<>();
+  public static final List<Trust> EMPTY_TRUST_LIST = new ArrayList<>();
   public static final String TRUST_CODE = "trust code";
 
   @Mock
@@ -42,50 +43,50 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSites() {
     // given
-    Page<Site> emptyPage = new PageImpl<>(EMPTY_LIST);
+    Page<Site> emptyPage = new PageImpl<>(EMPTY_SITE_LIST);
     given(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
 
     // when
     List<Site> sites = service.searchSites(SEARCH_STRING);
 
     // then
-    assertEquals(EMPTY_LIST, sites);
+    assertEquals(EMPTY_SITE_LIST, sites);
   }
 
   @Test
   public void shouldReturnAllSitesIfSearchStringIsNullOrEmpty() {
     // given
-    given(siteRepository.findAll()).willReturn(EMPTY_LIST);
+    given(siteRepository.findAll()).willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSites("");
 
     // then
-    assertEquals(EMPTY_LIST, sites);
+    assertEquals(EMPTY_SITE_LIST, sites);
   }
 
   @Test
   public void shouldSearchSitesWithInATrust() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT)).willReturn(EMPTY_LIST);
+    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, SEARCH_STRING);
 
     // then
-    assertEquals(EMPTY_LIST, sites);
+    assertEquals(EMPTY_SITE_LIST, sites);
   }
 
   @Test
   public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT)).willReturn(EMPTY_LIST);
+    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
 
     // then
-    assertEquals(EMPTY_LIST, sites);
+    assertEquals(EMPTY_SITE_LIST, sites);
   }
 
   @Test
@@ -104,24 +105,26 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchTrusts() {
     // given
-    given(trustRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyList());
+    Page<Trust> emptyPage = new PageImpl<>(EMPTY_TRUST_LIST);
+    given(trustRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
 
     // when
     List<Trust> trusts = service.searchTrusts(SEARCH_STRING);
 
     // then
-    assertEquals(EMPTY_LIST, trusts);
+    assertEquals(EMPTY_SITE_LIST, trusts);
   }
 
   @Test
   public void shouldReturnAllTrustsIfSearchStringIsNullOrEmpty() {
     // given
-    given(trustRepository.findBySearchString("", LIMIT)).willReturn(emptyList());
+    Page<Trust> emptyPage = new PageImpl<>(EMPTY_TRUST_LIST);
+    given(trustRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
 
     // when
     List<Trust> trusts = service.searchTrusts("");
 
     // then
-    assertEquals(EMPTY_LIST, trusts);
+    assertEquals(EMPTY_SITE_LIST, trusts);
   }
 }

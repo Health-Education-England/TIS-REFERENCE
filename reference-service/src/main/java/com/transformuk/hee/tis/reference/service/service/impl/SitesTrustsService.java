@@ -103,9 +103,20 @@ public class SitesTrustsService {
    */
   public List<Trust> searchTrusts(String searchString) {
     if (!isEmpty(searchString)) {
-      return trustRepository.findBySearchString(searchString, new PageRequest(0, limit));
+      return trustRepository.findBySearchString(searchString, new PageRequest(0, limit)).getContent();
     } else {
       return trustRepository.findAll();
     }
+  }
+
+  /**
+   * Searches all trusts who have data containing given searchString
+   *
+   * @param searchString search string to be searched for trust data
+   * @param pageable     pageable defining the page and size
+   * @return Page of {@link Trust} matching searchString
+   */
+  public Page<Trust> searchTrusts(String searchString, Pageable pageable) {
+    return trustRepository.findBySearchString(searchString, pageable);
   }
 }

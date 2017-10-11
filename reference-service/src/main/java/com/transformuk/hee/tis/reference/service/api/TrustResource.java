@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -127,9 +128,18 @@ public class TrustResource {
    */
   @GetMapping("/trusts")
   @Timed
-  public ResponseEntity<List<TrustDTO>> getAllTrusts(@ApiParam Pageable pageable) {
+  public ResponseEntity<List<TrustDTO>> getAllTrusts(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Trusts");
-    Page<Trust> page = trustRepository.findAll(pageable);
+    searchQuery = sanitize(searchQuery);
+    Page<Trust> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = trustRepository.findAll(pageable);
+    } else {
+      page = sitesTrustsService.searchTrusts(searchQuery, pageable);
+    }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
     return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
   }
@@ -140,8 +150,7 @@ public class TrustResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Trusts list", response = LimitedListResponse.class)})
   @RequestMapping(method = GET, value = "/trusts/search")
-  public LimitedListResponse<TrustDTO> searchTrusts(@RequestParam(value = "searchString") String searchString)
-      throws Exception {
+  public LimitedListResponse<TrustDTO> searchTrusts(@RequestParam(value = "searchString") String searchString) {
     List<TrustDTO> ret = trustMapper.trustsToTrustDTOs(sitesTrustsService.searchTrusts(searchString));
     return new LimitedListResponse<>(ret, limit);
   }
@@ -207,7 +216,7 @@ public class TrustResource {
     if (!Collections.isEmpty(trustDTOs)) {
       List<Long> entityIds = trustDTOs.stream()
           .filter(trust -> trust.getId() != null)
-          .map(trust -> trust.getId())
+          .map(TrustDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new Trust cannot already have an ID")).body(null);
@@ -216,7 +225,7 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<Long> ids = results.stream().map(trust -> trust.getId()).collect(Collectors.toList());
+    List<Long> ids = results.stream().map(TrustDTO::getId).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
@@ -251,7 +260,7 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<Long> ids = results.stream().map(trust -> trust.getId()).collect(Collectors.toList());
+    List<Long> ids = results.stream().map(TrustDTO::getId).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
@@ -260,22 +269,22 @@ public class TrustResource {
 
   /**
    * EXISTS /trusts/exists/ : check if trust exists
+   *
    * @param ids the ids of the trustDTO to check
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/trusts/exists/")
   @Timed
-  public ResponseEntity<Map<Long,Boolean>> trustExists(@RequestBody List<Long> ids) {
-    Map<Long,Boolean> trustExistsMap = Maps.newHashMap();
+  public ResponseEntity<Map<Long, Boolean>> trustExists(@RequestBody List<Long> ids) {
+    Map<Long, Boolean> trustExistsMap = Maps.newHashMap();
     log.debug("REST request to check Trust exists : {}", ids);
-    if(!CollectionUtils.isEmpty(ids)){
+    if (!CollectionUtils.isEmpty(ids)) {
       List<Long> dbIds = trustRepository.findByIdsIn(ids);
       ids.forEach(id -> {
-        if(dbIds.contains(id)){
-          trustExistsMap.put(id,true);
-        }
-        else {
-          trustExistsMap.put(id,false);
+        if (dbIds.contains(id)) {
+          trustExistsMap.put(id, true);
+        } else {
+          trustExistsMap.put(id, false);
         }
       });
     }
@@ -284,6 +293,7 @@ public class TrustResource {
 
   /**
    * EXISTS /trusts/codeexists/ : check if trust code exists
+   *
    * @param code trust code to check
    * @return HttpStatus FOUND if exists or NOT_FOUND if doesn't exist
    */
@@ -294,7 +304,7 @@ public class TrustResource {
     HttpStatus trustFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
       Long id = trustRepository.findIdByTrustCode(code);
-      if (id != null){
+      if (id != null) {
         trustFound = HttpStatus.FOUND;
       }
     }

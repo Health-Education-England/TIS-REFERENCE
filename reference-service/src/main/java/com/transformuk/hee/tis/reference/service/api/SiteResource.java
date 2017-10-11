@@ -1,7 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -143,7 +140,7 @@ public class SiteResource {
     } else {
       page = sitesTrustsService.searchSites(searchQuery, pageable);
     }
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/posts");
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
     return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
 
   }
@@ -155,7 +152,7 @@ public class SiteResource {
       @ApiResponse(code = 200, message = "Sites list", response = LimitedListResponse.class)})
   @RequestMapping(method = GET, value = "/sites/search")
   public LimitedListResponse<SiteDTO> searchSites(
-      @RequestParam(value = "searchString", required = false) String searchString) throws Exception {
+      @RequestParam(value = "searchString", required = false) String searchString) {
     List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSites(searchString));
     return new LimitedListResponse<>(ret, limit);
   }
@@ -168,7 +165,7 @@ public class SiteResource {
   @RequestMapping(method = GET, value = "/sites/search-by-trust/{trustCode}")
   public LimitedListResponse<SiteDTO> searchSitesWithinATrustCode(@PathVariable(value = "trustCode") String trustCode,
                                                                   @RequestParam(value = "searchString", required = false)
-                                                                      String searchString) throws Exception {
+                                                                      String searchString) {
     List<SiteDTO> ret = siteMapper.sitesToSiteDTOs(sitesTrustsService.searchSitesWithinTrust(trustCode, searchString));
     return new LimitedListResponse<>(ret, limit);
   }
@@ -205,22 +202,22 @@ public class SiteResource {
 
   /**
    * EXISTS /sites/exists/ : check is site exists
+   *
    * @param ids the ids of the siteDTO to check
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/sites/exists/")
   @Timed
-  public ResponseEntity<Map<Long,Boolean>> siteExists(@RequestBody List<Long> ids) {
-    Map<Long,Boolean> siteExistsMap = Maps.newHashMap();
+  public ResponseEntity<Map<Long, Boolean>> siteExists(@RequestBody List<Long> ids) {
+    Map<Long, Boolean> siteExistsMap = Maps.newHashMap();
     log.debug("REST request to check Site exists : {}", ids);
-    if(!CollectionUtils.isEmpty(ids)){
+    if (!CollectionUtils.isEmpty(ids)) {
       List<Long> dbIds = siteRepository.findByIdsIn(ids);
       ids.forEach(id -> {
-        if(dbIds.contains(id)){
-          siteExistsMap.put(id,true);
-        }
-        else {
-          siteExistsMap.put(id,false);
+        if (dbIds.contains(id)) {
+          siteExistsMap.put(id, true);
+        } else {
+          siteExistsMap.put(id, false);
         }
       });
     }
@@ -230,6 +227,7 @@ public class SiteResource {
 
   /**
    * EXISTS /sites/codeexists/ : check if site code exists
+   *
    * @param code site code to check
    * @return HttpStatus FOUND if exists or NOT_FOUND if doesn't exist
    */
@@ -240,7 +238,7 @@ public class SiteResource {
     HttpStatus siteFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
       Long id = siteRepository.findIdBySiteCode(code);
-      if (id != null){
+      if (id != null) {
         siteFound = HttpStatus.FOUND;
       }
     }
@@ -249,18 +247,19 @@ public class SiteResource {
 
   /**
    * EXISTS /sites/trustmatch/{trustCode} : check is site exists
+   *
    * @param siteCode the code of the site to check
-   * @Param trustCode the code of the trust to check
    * @return HttpStatus FOUND if matched, NOT_FOUND if no match
+   * @Param trustCode the code of the trust to check
    */
   @PostMapping("/sites/trustmatch/{trustCode}")
   @Timed
   public ResponseEntity siteTrustMatch(@RequestBody String siteCode, @PathVariable String trustCode) {
-    log.debug("REST request to check Site exists : {}", siteCode + " " + trustCode);
+    log.debug("REST request to check Site exists : {} {}", siteCode, trustCode);
     HttpStatus siteTrustMatchFound = HttpStatus.NO_CONTENT;
-    if(!siteCode.isEmpty() && !trustCode.isEmpty()){
+    if (!siteCode.isEmpty() && !trustCode.isEmpty()) {
       List<Long> dbIds = siteRepository.findSiteTrustMatch(siteCode, trustCode);
-      if (!dbIds.isEmpty()){
+      if (!dbIds.isEmpty()) {
         siteTrustMatchFound = HttpStatus.FOUND;
       }
     }
@@ -298,7 +297,7 @@ public class SiteResource {
     if (!Collections.isEmpty(siteDTOs)) {
       List<Long> entityIds = siteDTOs.stream()
           .filter(site -> site.getId() != null)
-          .map(site -> site.getId())
+          .map(SiteDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new sites cannot already have an ID")).body(null);
@@ -308,7 +307,7 @@ public class SiteResource {
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<Long> ids = results.stream().map(site -> site.getId()).collect(Collectors.toList());
+    List<Long> ids = results.stream().map(SiteDTO::getId).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
@@ -343,7 +342,7 @@ public class SiteResource {
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<Long> ids = results.stream().map(site -> site.getId()).collect(Collectors.toList());
+    List<Long> ids = results.stream().map(SiteDTO::getId).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
