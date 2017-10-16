@@ -4,14 +4,20 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -31,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Grade.
@@ -99,19 +108,6 @@ public class GradeResource {
   }
 
   /**
-   * GET  /grades : get all the grades.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of grades in body
-   */
-  @GetMapping("/grades")
-  @Timed
-  public List<GradeDTO> getAllGrades() {
-    log.debug("REST request to get all Grades");
-    List<Grade> grades = gradeRepository.findAll();
-    return gradeMapper.gradesToGradeDTOs(grades);
-  }
-
-  /**
    * GET  /grades/:id : get the "id" grade.
    *
    * @param id the id of the gradeDTO to retrieve
@@ -124,6 +120,31 @@ public class GradeResource {
     Grade grade = gradeRepository.findOne(id);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
+  }
+
+  /**
+   * GET  /grades : get all the grades.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of trusts in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/grades")
+  @Timed
+  public ResponseEntity<List<GradeDTO>> getAllGrades(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+    log.debug("REST request to get a page of Grades");
+    searchQuery = sanitize(searchQuery);
+    Page<Grade> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = gradeRepository.findAll(pageable);
+    } else {
+      page = gradeRepository.findBySearchString(searchQuery, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
+    return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
 
   /**
@@ -143,22 +164,22 @@ public class GradeResource {
 
   /**
    * EXISTS /grades/exists/ : check is site exists
+   *
    * @param ids the ids of the gradeDTO to check
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/grades/exists/")
   @Timed
-  public ResponseEntity<Map<Long,Boolean>> gradeExists(@RequestBody List<Long> ids) {
-    Map<Long,Boolean> gradeExistsMap = Maps.newHashMap();
+  public ResponseEntity<Map<Long, Boolean>> gradeExists(@RequestBody List<Long> ids) {
+    Map<Long, Boolean> gradeExistsMap = Maps.newHashMap();
     log.debug("REST request to check Grade exists : {}", ids);
-    if(!CollectionUtils.isEmpty(ids)){
+    if (!CollectionUtils.isEmpty(ids)) {
       List<Long> dbGradeIds = gradeRepository.findByIdsIn(ids);
       ids.forEach(id -> {
-        if(dbGradeIds.contains(id)){
-          gradeExistsMap.put(id,true);
-        }
-        else {
-          gradeExistsMap.put(id,false);
+        if (dbGradeIds.contains(id)) {
+          gradeExistsMap.put(id, true);
+        } else {
+          gradeExistsMap.put(id, false);
         }
       });
     }

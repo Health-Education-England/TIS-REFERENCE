@@ -258,7 +258,7 @@ public class GradeResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnTrueIfGradeExists() throws Exception{
+  public void shouldReturnTrueIfGradeExists() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);
     Map<Long, Boolean> expectedMap = Maps.newHashMap(grade.getId(), true);
@@ -289,6 +289,32 @@ public class GradeResourceIntTest {
         .andExpect(jsonPath("$.trainingGrade").value(DEFAULT_TRAINING_GRADE.booleanValue()))
         .andExpect(jsonPath("$.postGrade").value(DEFAULT_POST_GRADE.booleanValue()))
         .andExpect(jsonPath("$.placementGrade").value(DEFAULT_PLACEMENT_GRADE.booleanValue()));
+  }
+
+  @Test
+  @Transactional
+  public void findTrustShouldReturnGradeWithAttributesMatchingSearchTerm() throws Exception {
+    gradeRepository.saveAndFlush(grade);
+    Grade anotherGrade = new Grade()
+        .abbreviation(UPDATED_ABBREVIATION)
+        .name(UPDATED_NAME)
+        .label(DEFAULT_LABEL)
+        .trainingGrade(DEFAULT_TRAINING_GRADE)
+        .postGrade(DEFAULT_POST_GRADE)
+        .placementGrade(DEFAULT_PLACEMENT_GRADE);
+
+    gradeRepository.saveAndFlush(anotherGrade);
+
+    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=AAA"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(grade.getId().intValue())))
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
+        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE.booleanValue())))
+        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE.booleanValue())))
+        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE.booleanValue())));
   }
 
   @Test
