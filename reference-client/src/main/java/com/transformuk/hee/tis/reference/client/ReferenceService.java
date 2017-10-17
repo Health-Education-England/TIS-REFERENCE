@@ -29,4 +29,6 @@ public interface ReferenceService extends ClientService {
   Map<String, Boolean> countryExists(List<String> values);
 
   Map<String, Boolean> rotationExists(List<String> values);
+
+  Map<Long, Boolean> placementTypeExists(List<Long> values);
 }
