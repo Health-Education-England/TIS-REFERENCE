@@ -10,8 +10,6 @@ import java.util.Objects;
  */
 public class GradeDTO implements Serializable {
 
-  private Long id;
-
   @NotNull
   private String abbreviation;
 
@@ -27,14 +25,6 @@ public class GradeDTO implements Serializable {
 
   @NotNull
   private Boolean placementGrade;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -95,7 +85,7 @@ public class GradeDTO implements Serializable {
 
     GradeDTO gradeDTO = (GradeDTO) o;
 
-    if (!Objects.equals(id, gradeDTO.id)) {
+    if (!Objects.equals(abbreviation, gradeDTO.abbreviation)) {
       return false;
     }
 
@@ -104,14 +94,13 @@ public class GradeDTO implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(abbreviation);
   }
 
   @Override
   public String toString() {
     return "GradeDTO{" +
-        "id=" + id +
-        ", abbreviation='" + abbreviation + "'" +
+        "abbreviation='" + abbreviation + "'" +
         ", name='" + name + "'" +
         ", label='" + label + "'" +
         ", trainingGrade='" + trainingGrade + "'" +

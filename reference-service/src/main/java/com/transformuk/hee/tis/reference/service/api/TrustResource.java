@@ -83,14 +83,14 @@ public class TrustResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
     log.debug("REST request to save Trust : {}", trustDTO);
-    if (trustDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new trust cannot already have an ID")).body(null);
+    if (trustRepository.findByCode(trustDTO.getCode()) != null) {
+      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that Code")).body(null);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
     trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
-    return ResponseEntity.created(new URI("/api/trusts/" + result.getId()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+    return ResponseEntity.created(new URI("/api/trusts/" + result.getCode()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getCode()))
         .body(result);
   }
 
@@ -108,14 +108,14 @@ public class TrustResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrustDTO> updateTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
     log.debug("REST request to update Trust : {}", trustDTO);
-    if (trustDTO.getId() == null) {
+    if (trustDTO.getCode() == null) {
       return createTrust(trustDTO);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
     trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, trustDTO.getId().toString()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, trustDTO.getCode()))
         .body(result);
   }
 
@@ -156,21 +156,6 @@ public class TrustResource {
   }
 
   /**
-   * GET  /trusts/:id : get the "id" trust.
-   *
-   * @param id the id of the trustDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
-   */
-  @GetMapping("/trusts/{id}")
-  @Timed
-  public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
-    log.debug("REST request to get Trust : {}", id);
-    Trust trust = trustRepository.findOne(id);
-    TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
-    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
-  }
-
-  /**
    * GET  /trusts/code/:code : get the "code" trust.
    *
    * @param code the code of the trustDTO to retrieve
@@ -186,18 +171,18 @@ public class TrustResource {
   }
 
   /**
-   * DELETE  /trusts/:id : delete the "id" trust.
+   * DELETE  /trusts/:code : delete the trust using a "code".
    *
-   * @param id the id of the trustDTO to delete
+   * @param code the code of the trustDTO to delete
    * @return the ResponseEntity with status 200 (OK)
    */
-  @DeleteMapping("/trusts/{id}")
+  @DeleteMapping("/trusts/{code}")
   @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteTrust(@PathVariable Long id) {
-    log.debug("REST request to delete Trust : {}", id);
-    trustRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+  public ResponseEntity<Void> deleteTrust(@PathVariable String code) {
+    log.debug("REST request to delete Trust : {}", code);
+    trustRepository.delete(code);
+    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, code)).build();
   }
 
 
@@ -214,9 +199,9 @@ public class TrustResource {
   public ResponseEntity<List<TrustDTO>> bulkCreateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
     log.info("REST request to bulk save Trust : {}", trustDTOs);
     if (!Collections.isEmpty(trustDTOs)) {
-      List<Long> entityIds = trustDTOs.stream()
-          .filter(trust -> trust.getId() != null)
-          .map(TrustDTO::getId)
+      List<String> entityIds = trustDTOs.stream()
+          .filter(trust -> trust.getCode() != null)
+          .map(TrustDTO::getCode)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new Trust cannot already have an ID")).body(null);
@@ -225,7 +210,7 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<Long> ids = results.stream().map(TrustDTO::getId).collect(Collectors.toList());
+    List<String> ids = results.stream().map(TrustDTO::getCode).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
@@ -250,7 +235,7 @@ public class TrustResource {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
           "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(trustDTOs)) {
-      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null).collect(Collectors.toList());
+      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getCode() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
             "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
@@ -260,31 +245,31 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<Long> ids = results.stream().map(TrustDTO::getId).collect(Collectors.toList());
+    List<String> codes = results.stream().map(TrustDTO::getCode).collect(Collectors.toList());
 
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(codes, ",")))
         .body(results);
   }
 
   /**
    * EXISTS /trusts/exists/ : check if trust exists
    *
-   * @param ids the ids of the trustDTO to check
+   * @param codes the codes of the trustDTO to check
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/trusts/exists/")
   @Timed
-  public ResponseEntity<Map<Long, Boolean>> trustExists(@RequestBody List<Long> ids) {
-    Map<Long, Boolean> trustExistsMap = Maps.newHashMap();
-    log.debug("REST request to check Trust exists : {}", ids);
-    if (!CollectionUtils.isEmpty(ids)) {
-      List<Long> dbIds = trustRepository.findByIdsIn(ids);
-      ids.forEach(id -> {
-        if (dbIds.contains(id)) {
-          trustExistsMap.put(id, true);
+  public ResponseEntity<Map<String, Boolean>> trustExists(@RequestBody List<String> codes) {
+    Map<String, Boolean> trustExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Trust exists : {}", codes);
+    if (!CollectionUtils.isEmpty(codes)) {
+      List<String> dbIds = trustRepository.findByCodesIn(codes);
+      codes.forEach(code -> {
+        if (dbIds.contains(code)) {
+          trustExistsMap.put(code, true);
         } else {
-          trustExistsMap.put(id, false);
+          trustExistsMap.put(code, false);
         }
       });
     }
@@ -303,8 +288,8 @@ public class TrustResource {
     log.debug("REST request to check Trust exists : {}", code);
     HttpStatus trustFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
-      Long id = trustRepository.findIdByTrustCode(code);
-      if (id != null) {
+      Trust trust = trustRepository.findByCode(code);
+      if (trust != null) {
         trustFound = HttpStatus.FOUND;
       }
     }

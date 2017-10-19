@@ -83,14 +83,14 @@ public class SiteResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> createSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
-    if (siteDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new site cannot already have an ID")).body(null);
+    if(siteRepository.exists(siteDTO.getSiteCode())) {
+      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Cannot create new site, site code already exists")).body(null);
     }
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
-    return ResponseEntity.created(new URI("/api/sites/" + result.getId()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+    return ResponseEntity.created(new URI("/api/sites/" + result.getSiteCode()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getSiteCode()))
         .body(result);
   }
 
@@ -108,14 +108,11 @@ public class SiteResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> updateSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
     log.debug("REST request to update Site : {}", siteDTO);
-    if (siteDTO.getId() == null) {
-      return createSite(siteDTO);
-    }
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getId().toString()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getSiteCode()))
         .body(result);
   }
 
@@ -171,16 +168,16 @@ public class SiteResource {
   }
 
   /**
-   * GET  /sites/:id : get the "id" site.
+   * GET  /sites/:siteCode : get the site by "siteCode" site.
    *
-   * @param id the id of the siteDTO to retrieve
+   * @param siteCode the siteCode of the siteDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the siteDTO, or with status 404 (Not Found)
    */
-  @GetMapping("/sites/{id}")
+  @GetMapping("/sites/{siteCode}")
   @Timed
-  public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
-    log.debug("REST request to get Site : {}", id);
-    Site site = siteRepository.findOne(id);
+  public ResponseEntity<SiteDTO> getSite(@PathVariable String siteCode) {
+    log.debug("REST request to get Site : {}", siteCode);
+    Site site = siteRepository.findOne(siteCode);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteDTO));
   }
@@ -201,23 +198,23 @@ public class SiteResource {
   }
 
   /**
-   * EXISTS /sites/exists/ : check is site exists
+   * EXISTS /sites/exists : check if site exists
    *
-   * @param ids the ids of the siteDTO to check
+   * @param siteCodes the sitesCodes of the siteDTO to check
    * @return boolean true if exists otherwise false
    */
-  @PostMapping("/sites/exists/")
+  @PostMapping("/sites/exists")
   @Timed
-  public ResponseEntity<Map<Long, Boolean>> siteExists(@RequestBody List<Long> ids) {
-    Map<Long, Boolean> siteExistsMap = Maps.newHashMap();
-    log.debug("REST request to check Site exists : {}", ids);
-    if (!CollectionUtils.isEmpty(ids)) {
-      List<Long> dbIds = siteRepository.findByIdsIn(ids);
-      ids.forEach(id -> {
-        if (dbIds.contains(id)) {
-          siteExistsMap.put(id, true);
+  public ResponseEntity<Map<String, Boolean>> siteExists(@RequestBody List<String> siteCodes) {
+    Map<String, Boolean> siteExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Site exists : {}", siteCodes);
+    if (!CollectionUtils.isEmpty(siteCodes)) {
+      List<String> dbIds = siteRepository.findBySiteCodeIn(siteCodes);
+      siteCodes.forEach(siteCode -> {
+        if (dbIds.contains(siteCode)) {
+          siteExistsMap.put(siteCode, true);
         } else {
-          siteExistsMap.put(id, false);
+          siteExistsMap.put(siteCode, false);
         }
       });
     }
@@ -237,8 +234,8 @@ public class SiteResource {
     log.debug("REST request to check Site exists : {}", code);
     HttpStatus siteFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
-      Long id = siteRepository.findIdBySiteCode(code);
-      if (id != null) {
+      String foundCode = siteRepository.findIdBySiteCode(code);
+      if (foundCode != null) {
         siteFound = HttpStatus.FOUND;
       }
     }
@@ -258,8 +255,8 @@ public class SiteResource {
     log.debug("REST request to check Site exists : {} {}", siteCode, trustCode);
     HttpStatus siteTrustMatchFound = HttpStatus.NO_CONTENT;
     if (!siteCode.isEmpty() && !trustCode.isEmpty()) {
-      List<Long> dbIds = siteRepository.findSiteTrustMatch(siteCode, trustCode);
-      if (!dbIds.isEmpty()) {
+      List<String> dbsiteCodes = siteRepository.findSiteTrustMatch(siteCode, trustCode);
+      if (!dbsiteCodes.isEmpty()) {
         siteTrustMatchFound = HttpStatus.FOUND;
       }
     }
@@ -267,18 +264,18 @@ public class SiteResource {
   }
 
   /**
-   * DELETE  /sites/:id : delete the "id" site.
+   * DELETE  /sites/:siteCode : delete the site with the siteCode.
    *
-   * @param id the id of the siteDTO to delete
+   * @param siteCode the siteCode of the siteDTO to delete
    * @return the ResponseEntity with status 200 (OK)
    */
-  @DeleteMapping("/sites/{id}")
+  @DeleteMapping("/sites/{siteCode}")
   @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteSite(@PathVariable Long id) {
-    log.debug("REST request to delete Site : {}", id);
-    siteRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+  public ResponseEntity<Void> deleteSite(@PathVariable String siteCode) {
+    log.debug("REST request to delete Site : {}", siteCode);
+    siteRepository.delete(siteCode);
+    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, siteCode)).build();
   }
 
 
@@ -294,20 +291,11 @@ public class SiteResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SiteDTO>> bulkCreateSite(@Valid @RequestBody List<SiteDTO> siteDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save Site : {}", siteDTOs);
-    if (!Collections.isEmpty(siteDTOs)) {
-      List<Long> entityIds = siteDTOs.stream()
-          .filter(site -> site.getId() != null)
-          .map(SiteDTO::getId)
-          .collect(Collectors.toList());
-      if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new sites cannot already have an ID")).body(null);
-      }
-    }
 
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<Long> ids = results.stream().map(SiteDTO::getId).collect(Collectors.toList());
+    List<String> ids = results.stream().map(SiteDTO::getSiteCode).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
@@ -332,17 +320,17 @@ public class SiteResource {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
           "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(siteDTOs)) {
-      List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getId() == null).collect(Collectors.toList());
+      List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getSiteCode() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+            "bulk.update.failed.noId", "Some DTOs you've provided have no site code, cannot update entities that dont exist")).body(entitiesWithNoId);
       }
     }
 
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<Long> ids = results.stream().map(SiteDTO::getId).collect(Collectors.toList());
+    List<String> ids = results.stream().map(SiteDTO::getSiteCode).collect(Collectors.toList());
 
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))

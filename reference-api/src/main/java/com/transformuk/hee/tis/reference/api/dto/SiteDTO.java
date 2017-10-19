@@ -10,8 +10,6 @@ import java.util.Objects;
  */
 public class SiteDTO implements Serializable {
 
-  private Long id;
-
   @NotNull
   private String siteCode;
 
@@ -32,14 +30,6 @@ public class SiteDTO implements Serializable {
   private String organisationalUnit;
 
   private String intrepidId;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getSiteCode() {
     return siteCode;
@@ -132,7 +122,7 @@ public class SiteDTO implements Serializable {
 
     SiteDTO siteDTO = (SiteDTO) o;
 
-    if (!Objects.equals(id, siteDTO.id)) {
+    if (!Objects.equals(siteCode, siteDTO.siteCode)) {
       return false;
     }
 
@@ -141,14 +131,13 @@ public class SiteDTO implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(siteCode);
   }
 
   @Override
   public String toString() {
     return "SiteDTO{" +
-        "id=" + id +
-        ", siteCode='" + siteCode + "'" +
+        "siteCode='" + siteCode + "'" +
         ", localOffice='" + localOffice + "'" +
         ", trustCode='" + trustCode + "'" +
         ", siteName='" + siteName + "'" +

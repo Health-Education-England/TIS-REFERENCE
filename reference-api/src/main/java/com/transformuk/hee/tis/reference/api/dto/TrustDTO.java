@@ -10,8 +10,6 @@ import java.util.Objects;
  */
 public class TrustDTO implements Serializable {
 
-  private Long id;
-
   @NotNull
   private String code;
 
@@ -30,14 +28,6 @@ public class TrustDTO implements Serializable {
   private String postCode;
 
   private String intrepidId;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getCode() {
     return code;
@@ -122,7 +112,7 @@ public class TrustDTO implements Serializable {
 
     TrustDTO trustDTO = (TrustDTO) o;
 
-    if (!Objects.equals(id, trustDTO.id)) {
+    if (!Objects.equals(code, trustDTO.code)) {
       return false;
     }
 
@@ -131,14 +121,13 @@ public class TrustDTO implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(code);
   }
 
   @Override
   public String toString() {
     return "TrustDTO{" +
-        "id=" + id +
-        ", code='" + code + "'" +
+        "code='" + code + "'" +
         ", localOffice='" + localOffice + "'" +
         ", status='" + status + "'" +
         ", trustKnownAs='" + trustKnownAs + "'" +
