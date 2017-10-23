@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.service.model.Trust;
 import org.mapstruct.Mapper;
 
 import java.util.List;

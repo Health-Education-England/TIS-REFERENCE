@@ -1,0 +1,14 @@
+ALTER TABLE `Grade`
+DROP COLUMN `id`;
+
+ALTER TABLE `Site`
+DROP COLUMN `id`;
+
+ALTER TABLE `Trust`
+DROP COLUMN `id`;
+
+
+
+
+
+

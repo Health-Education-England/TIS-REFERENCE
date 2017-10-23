@@ -100,13 +100,13 @@ public class TrustResource {
    * @param trustDTO the trustDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTO,
    * or with status 400 (Bad Request) if the trustDTO is not valid,
-   * or with status 500 (Internal Server Error) if the trustDTO couldnt be updated
+   * or with status 500 (Internal Server Error) if the trustDTO couldn't be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/trusts")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<TrustDTO> updateTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
+  public ResponseEntity<TrustDTO> updateTrust(@RequestBody TrustDTO trustDTO) throws URISyntaxException {
     log.debug("REST request to update Trust : {}", trustDTO);
     if (trustDTO.getCode() == null) {
       return createTrust(trustDTO);
