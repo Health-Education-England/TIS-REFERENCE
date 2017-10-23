@@ -15,7 +15,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface GradeRepository extends JpaRepository<Grade, String> {
 
-  @Query("SELECT g FROM Grade g WHERE g.name like %:param% or g.label like %:param%")
+  @Query("SELECT g FROM Grade g WHERE g.name like %:param% or g.label like %:param% or g.abbreviation like %:param%")
   Page<Grade> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
   Grade findByAbbreviation(String code);

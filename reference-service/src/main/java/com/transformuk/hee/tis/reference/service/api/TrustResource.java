@@ -161,7 +161,7 @@ public class TrustResource {
    * @param code the code of the trustDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
    */
-  @GetMapping("/trusts/code/{code}")
+  @GetMapping("/trusts/{code}")
   @Timed
   public ResponseEntity<TrustDTO> getTrust(@PathVariable String code) {
     log.debug("REST request to get Trust by code: {}", code);
