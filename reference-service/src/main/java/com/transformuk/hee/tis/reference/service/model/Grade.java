@@ -19,10 +19,6 @@ public class Grade implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @NotNull
   @Column(name = "abbreviation", nullable = false)
   private String abbreviation;
 
@@ -43,14 +39,6 @@ public class Grade implements Serializable {
   @NotNull
   @Column(name = "placementGrade", nullable = false)
   private Boolean placementGrade;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -139,22 +127,21 @@ public class Grade implements Serializable {
       return false;
     }
     Grade grade = (Grade) o;
-    if (grade.id == null || id == null) {
+    if (grade.abbreviation == null || abbreviation == null) {
       return false;
     }
-    return Objects.equals(id, grade.id);
+    return Objects.equals(abbreviation, grade.abbreviation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(abbreviation);
   }
 
   @Override
   public String toString() {
     return "Grade{" +
-        "id=" + id +
-        ", abbreviation='" + abbreviation + "'" +
+        "abbreviation='" + abbreviation + "'" +
         ", name='" + name + "'" +
         ", label='" + label + "'" +
         ", trainingGrade='" + trainingGrade + "'" +

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -159,17 +160,18 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
-  public void createTrustWithExistingId() throws Exception {
+  public void createTrustWithExistingCode() throws Exception {
+    em.persist(trust);
     int databaseSizeBeforeCreate = trustRepository.findAll().size();
 
     // Create the Trust with an existing ID
-    trust.setId(1L);
-    TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
+    TrustDTO anotherTrust = new TrustDTO();
+    anotherTrust.setCode(DEFAULT_CODE);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restTrustMockMvc.perform(post("/api/trusts")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
+        .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
         .andExpect(status().isBadRequest());
 
     // Validate the Alice in the database
@@ -203,18 +205,17 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts?sort=id,desc"))
+    restTrustMockMvc.perform(get("/api/trusts?sort=code,asc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(trust.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())))
-        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
-        .andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS.toString())))
-        .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME.toString())))
-        .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER.toString())))
-        .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS.toString())))
-        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE.toString())));
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+        .andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS)))
+        .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
+        .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
+        .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
+        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)));
   }
 
   @Test
@@ -234,33 +235,12 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
-  public void getTrust() throws Exception {
-    // Initialize the database
-    trustRepository.saveAndFlush(trust);
-
-    // Get the trust
-    restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId()))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
-        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-        .andExpect(jsonPath("$.localOffice").value(DEFAULT_LOCAL_OFFICE.toString()))
-        .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
-        .andExpect(jsonPath("$.trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS.toString()))
-        .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME.toString()))
-        .andExpect(jsonPath("$.trustNumber").value(DEFAULT_TRUST_NUMBER.toString()))
-        .andExpect(jsonPath("$.address").value(DEFAULT_ADDRESS.toString()))
-        .andExpect(jsonPath("$.postCode").value(DEFAULT_POST_CODE.toString()));
-  }
-
-  @Test
-  @Transactional
   public void getTrustByCode() throws Exception {
     // Initialize the database
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts/code/R1A"))
+    restTrustMockMvc.perform(get("/api/trusts/R1A"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.code").value("R1A"))
@@ -304,7 +284,7 @@ public class TrustResourceIntTest {
   @Transactional
   public void getNonExistingTrust() throws Exception {
     // Get the trust
-    restTrustMockMvc.perform(get("/api/trusts/{id}", Long.MAX_VALUE))
+    restTrustMockMvc.perform(get("/api/trusts/code/{code}", UUID.randomUUID().toString()))
         .andExpect(status().isNotFound());
   }
 
@@ -316,9 +296,8 @@ public class TrustResourceIntTest {
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
 
     // Update the trust
-    Trust updatedTrust = trustRepository.findOne(trust.getId());
+    Trust updatedTrust = trustRepository.findOne(trust.getCode());
     updatedTrust
-        .code(UPDATED_CODE)
         .localOffice(UPDATED_LOCAL_OFFICE)
         .status(UPDATED_STATUS)
         .trustKnownAs(UPDATED_TRUST_KNOWN_AS)
@@ -337,7 +316,7 @@ public class TrustResourceIntTest {
     List<Trust> trustList = trustRepository.findAll();
     assertThat(trustList).hasSize(databaseSizeBeforeUpdate);
     Trust testTrust = trustList.get(trustList.size() - 1);
-    assertThat(testTrust.getCode()).isEqualTo(UPDATED_CODE);
+    assertThat(testTrust.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testTrust.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
     assertThat(testTrust.getStatus()).isEqualTo(UPDATED_STATUS);
     assertThat(testTrust.getTrustKnownAs()).isEqualTo(UPDATED_TRUST_KNOWN_AS);
@@ -359,7 +338,7 @@ public class TrustResourceIntTest {
     restTrustMockMvc.perform(put("/api/trusts")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isCreated());
+        .andExpect(status().isOk());
 
     // Validate the Trust in the database
     List<Trust> trustList = trustRepository.findAll();
@@ -374,7 +353,7 @@ public class TrustResourceIntTest {
     int databaseSizeBeforeDelete = trustRepository.findAll().size();
 
     // Get the trust
-    restTrustMockMvc.perform(delete("/api/trusts/{id}", trust.getId())
+    restTrustMockMvc.perform(delete("/api/trusts/{code}", trust.getCode())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -409,14 +388,13 @@ public class TrustResourceIntTest {
     restTrustMockMvc.perform(get("/api/trusts?page=0&size=200&sort=asc&searchQuery=AAA"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(trust.getId().intValue()))
-        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE.toString()))
-        .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE.toString()))
-        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
-        .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS.toString()))
-        .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME.toString()))
-        .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER.toString()))
-        .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS.toString()))
-        .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE.toString()));
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
+        .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
+        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS))
+        .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
+        .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
+        .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))
+        .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS))
+        .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE));
   }
 }

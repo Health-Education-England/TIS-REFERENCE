@@ -14,7 +14,7 @@ import java.util.List;
  * Spring Data JPA repository for the Site entity.
  */
 @SuppressWarnings("unused")
-public interface SiteRepository extends JpaRepository<Site, Long> {
+public interface SiteRepository extends JpaRepository<Site, String> {
 
   Site findBySiteCode(String code);
 
@@ -30,15 +30,15 @@ public interface SiteRepository extends JpaRepository<Site, Long> {
   @Query("SELECT s FROM Site s WHERE s.trustCode =:trust")
   List<Site> findByTrustCode(@Param("trust") String trustCode, Pageable pageable);
 
-  @Query("SELECT s.id from Site s WHERE s.id in :ids")
-  List<Long> findByIdsIn(@Param("ids") List<Long> ids);
+  @Query("SELECT s.siteCode from Site s WHERE s.siteCode in :siteCode")
+  List<String> findBySiteCodeIn(@Param("siteCode") List<String> siteCodes);
 
   @Query("SELECT s.trustCode FROM Site s WHERE s.siteCode =:siteCode")
   String findTrustCodeBySiteCode(@Param("siteCode") String siteCode);
 
-  @Query("SELECT s.id FROM Site s WHERE s.siteCode =:siteCode AND s.trustCode =:trustCode")
-  List<Long> findSiteTrustMatch (@Param("siteCode") String siteCode, @Param("trustCode") String trustCode);
+  @Query("SELECT s.siteCode FROM Site s WHERE s.siteCode =:siteCode AND s.trustCode =:trustCode")
+  List<String> findSiteTrustMatch (@Param("siteCode") String siteCode, @Param("trustCode") String trustCode);
 
-  @Query("SELECT s.id FROM Site s WHERE s.siteCode =:siteCode")
-  Long findIdBySiteCode(@Param("siteCode") String siteCode);
+  @Query("SELECT s.siteCode FROM Site s WHERE s.siteCode =:siteCode")
+  String findIdBySiteCode(@Param("siteCode") String siteCode);
 }

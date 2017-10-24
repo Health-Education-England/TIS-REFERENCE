@@ -14,13 +14,17 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.http.ResponseEntity;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.transformuk.hee.tis.audit.enumeration.GenericAuditEventType.createEvent;
@@ -37,15 +41,32 @@ public class AuditingAspect {
   private final static String DTO_POSTFIX = "DTO";
   private final static String ETL_USERNAME = "consolidated_etl";
   private final static String ID_KEY = "id";
+  private final static Logger LOG = LoggerFactory.getLogger(AuditingAspect.class);
+
   private final AuditEventRepository auditEventRepository;
+
   @Autowired
   private JsonPatchRepository rebaseTypeRepository;
   private ConcurrentHashMap<String, String> classToPrimaryKeyMap = new ConcurrentHashMap<>();
+  private Map<String, Class> classToIdClass = new ConcurrentHashMap<>();
 
   public AuditingAspect(AuditEventRepository auditEventRepository) {
     this.auditEventRepository = auditEventRepository;
   }
 
+  @PostConstruct
+  public void initClassToPrimaryKeyMap() {
+    classToPrimaryKeyMap.put("TrustDTO", "code");
+    classToPrimaryKeyMap.put("SiteDTO", "siteCode");
+    classToPrimaryKeyMap.put("GradeDTO", "abbreviation");
+  }
+
+  @PostConstruct
+  public void initiClassToIdClass() {
+    classToIdClass.put("TrustDTO", String.class);
+    classToIdClass.put("SiteDTO", String.class);
+    classToIdClass.put("GradeDTO", String.class);
+  }
 
   /**
    * Pointcut that matches all rest call for create method.
@@ -78,40 +99,51 @@ public class AuditingAspect {
   @Before("execution(* com.transformuk.hee.tis.reference.service.api.*.update*(..))")
   public void auditUpdateBeforeExecution(JoinPoint joinPoint) throws Throwable {
     // store old value to map, wait until the update process
-    UserProfile userPofile = getProfileFromContext();
-    if (!userPofile.getUserName().equalsIgnoreCase(ETL_USERNAME)) {
-      final Object newValue = joinPoint.getArgs()[0];
-      String className = newValue.getClass().getSimpleName();
-      String fieldName = classToPrimaryKeyMap.get(className);
-      if (StringUtils.isEmpty(fieldName)) {
-        fieldName = ID_KEY;
-      }
-      String entityName = StringUtils.left(className, StringUtils.length(className) - StringUtils.length(DTO_POSTFIX));
-      if (StringUtils.isNoneEmpty(fieldName)) {
-        final Field idField = newValue.getClass().getDeclaredField(fieldName);
-        idField.setAccessible(true);
-        final Object idFieldValue = idField.get(newValue);
-        Object oldValue = null;
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode newJsonNode = mapper.convertValue(newValue, JsonNode.class);
-        JsonNode oldJsonNode = NullNode.getInstance();
-        // if the idFieldValue is null means it's new record so don't fetch old value from db
-        if (idFieldValue != null) {
-          final Method method = joinPoint.getTarget().getClass().getDeclaredMethod(GET_PREFIX + entityName, new Class[]{Long.class});
-          final Object responseEntity = method.invoke(joinPoint.getTarget(), idField.get(newValue));
-          oldValue = ((ResponseEntity) responseEntity).getBody();
-          oldJsonNode = mapper.convertValue(oldValue, JsonNode.class);
+    try {
+      UserProfile userPofile = getProfileFromContext();
+      if (!userPofile.getUserName().equalsIgnoreCase(ETL_USERNAME)) {
+        final Object newValue = joinPoint.getArgs()[0];
+        String className = newValue.getClass().getSimpleName();
+        String fieldName = classToPrimaryKeyMap.get(className);
+        if (StringUtils.isEmpty(fieldName)) {
+          fieldName = ID_KEY;
         }
+        String entityName = StringUtils.left(className, StringUtils.length(className) - StringUtils.length(DTO_POSTFIX));
+        if (StringUtils.isNoneEmpty(fieldName)) {
+          final Field idField = newValue.getClass().getDeclaredField(fieldName);
+          idField.setAccessible(true);
+          final Object idFieldValue = idField.get(newValue);
+          Object oldValue = null;
+          ObjectMapper mapper = new ObjectMapper();
+          JsonNode newJsonNode = mapper.convertValue(newValue, JsonNode.class);
+          JsonNode oldJsonNode = NullNode.getInstance();
+          // if the idFieldValue is null means it's new record so don't fetch old value from db
+          if (idFieldValue != null) {
 
-        JsonNode patch = JsonDiff.asJson(oldJsonNode, newJsonNode);
-        JsonPatch rebaseJson = new JsonPatch();
-        rebaseJson.setTableDtoName(className);
-        rebaseJson.setPatchId(String.valueOf(idFieldValue));
-        rebaseJson.setPatch(patch.toString());
-        rebaseTypeRepository.save(rebaseJson);
+            final Method method;
+            if (classToIdClass.containsKey(className)) {
+              Class idClass = classToIdClass.get(className);
+              method = joinPoint.getTarget().getClass().getDeclaredMethod(GET_PREFIX + entityName, idClass);
+            } else {
+              method = joinPoint.getTarget().getClass().getDeclaredMethod(GET_PREFIX + entityName, new Class[]{Long.class});
+            }
+            final Object responseEntity = method.invoke(joinPoint.getTarget(), idField.get(newValue));
+            oldValue = ((ResponseEntity) responseEntity).getBody();
+            oldJsonNode = mapper.convertValue(oldValue, JsonNode.class);
+          }
+
+          JsonNode patch = JsonDiff.asJson(oldJsonNode, newJsonNode);
+          JsonPatch rebaseJson = new JsonPatch();
+          rebaseJson.setTableDtoName(className);
+          rebaseJson.setPatchId(String.valueOf(idFieldValue));
+          rebaseJson.setPatch(patch.toString());
+          rebaseTypeRepository.save(rebaseJson);
+        }
       }
+    } catch (Throwable t) {
+      LOG.error("An exception was thrown during an AOP method, rethrowing", t);
+      throw t;
     }
-
   }
 
   /**

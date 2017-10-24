@@ -91,7 +91,7 @@ public class GradeResourceIntTest {
    * This is a static method, as tests for other entities might also need it,
    * if they test an entity which requires the current entity.
    */
-  public static Grade createEntity(EntityManager em) {
+  public static Grade createEntity() {
     Grade grade = new Grade()
         .abbreviation(DEFAULT_ABBREVIATION)
         .name(DEFAULT_NAME)
@@ -114,7 +114,7 @@ public class GradeResourceIntTest {
 
   @Before
   public void initTest() {
-    grade = createEntity(em);
+    grade = createEntity();
   }
 
   @Test
@@ -144,10 +144,10 @@ public class GradeResourceIntTest {
   @Test
   @Transactional
   public void createGradeWithExistingId() throws Exception {
+    em.persist(grade);
     int databaseSizeBeforeCreate = gradeRepository.findAll().size();
 
     // Create the Grade with an existing ID
-    grade.setId(1L);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
 
     // An entity with an existing ID cannot be created, so this API call must fail
@@ -244,16 +244,15 @@ public class GradeResourceIntTest {
     gradeRepository.saveAndFlush(grade);
 
     // Get all the gradeList
-    restGradeMockMvc.perform(get("/api/grades?sort=id,desc"))
+    restGradeMockMvc.perform(get("/api/grades?sort=abbreviation,asc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(grade.getId().intValue())))
-        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
-        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
-        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE.booleanValue())))
-        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE.booleanValue())))
-        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE.booleanValue())));
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
+        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE)))
+        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE)))
+        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE)));
   }
 
   @Test
@@ -261,9 +260,9 @@ public class GradeResourceIntTest {
   public void shouldReturnTrueIfGradeExists() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);
-    Map<Long, Boolean> expectedMap = Maps.newHashMap(grade.getId(), true);
-    expectedMap.put(12345678L, false);
-    List<Long> ids = Lists.newArrayList(grade.getId(), 12345678L);
+    Map<String, Boolean> expectedMap = Maps.newHashMap(grade.getAbbreviation(), true);
+
+    List<String> ids = Lists.newArrayList(grade.getAbbreviation());
     restGradeMockMvc.perform(post("/api/grades/exists/")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ids)))
@@ -279,16 +278,15 @@ public class GradeResourceIntTest {
     gradeRepository.saveAndFlush(grade);
 
     // Get the grade
-    restGradeMockMvc.perform(get("/api/grades/{id}", grade.getId()))
+    restGradeMockMvc.perform(get("/api/grades/{abbreviation}", grade.getAbbreviation()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.id").value(grade.getId().intValue()))
-        .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION.toString()))
-        .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()))
-        .andExpect(jsonPath("$.trainingGrade").value(DEFAULT_TRAINING_GRADE.booleanValue()))
-        .andExpect(jsonPath("$.postGrade").value(DEFAULT_POST_GRADE.booleanValue()))
-        .andExpect(jsonPath("$.placementGrade").value(DEFAULT_PLACEMENT_GRADE.booleanValue()));
+        .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION))
+        .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL))
+        .andExpect(jsonPath("$.trainingGrade").value(DEFAULT_TRAINING_GRADE))
+        .andExpect(jsonPath("$.postGrade").value(DEFAULT_POST_GRADE))
+        .andExpect(jsonPath("$.placementGrade").value(DEFAULT_PLACEMENT_GRADE));
   }
 
   @Test
@@ -308,23 +306,22 @@ public class GradeResourceIntTest {
     restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=AAA"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(grade.getId().intValue())))
-        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
-        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
-        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE.booleanValue())))
-        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE.booleanValue())))
-        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE.booleanValue())));
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
+        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE)))
+        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE)))
+        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE)));
   }
 
   @Test
   @Transactional
-  public void getGradeByCode() throws Exception {
+  public void getGradeByAbbreviation() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);
 
     // Get all the trustList
-    restGradeMockMvc.perform(get("/api/grades/code/ACF"))
+    restGradeMockMvc.perform(get("/api/grades/abbreviation/ACF"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.abbreviation").value("ACF"))
@@ -347,9 +344,8 @@ public class GradeResourceIntTest {
     int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
 
     // Update the grade
-    Grade updatedGrade = gradeRepository.findOne(grade.getId());
+    Grade updatedGrade = gradeRepository.findOne(grade.getAbbreviation());
     updatedGrade
-        .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME)
         .label(UPDATED_LABEL)
         .trainingGrade(UPDATED_TRAINING_GRADE)
@@ -366,7 +362,7 @@ public class GradeResourceIntTest {
     List<Grade> gradeList = gradeRepository.findAll();
     assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
     Grade testGrade = gradeList.get(gradeList.size() - 1);
-    assertThat(testGrade.getAbbreviation()).isEqualTo(UPDATED_ABBREVIATION);
+    assertThat(testGrade.getAbbreviation()).isEqualTo(DEFAULT_ABBREVIATION);
     assertThat(testGrade.getName()).isEqualTo(UPDATED_NAME);
     assertThat(testGrade.getLabel()).isEqualTo(UPDATED_LABEL);
     assertThat(testGrade.isTrainingGrade()).isEqualTo(UPDATED_TRAINING_GRADE);
@@ -386,7 +382,7 @@ public class GradeResourceIntTest {
     restGradeMockMvc.perform(put("/api/grades")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isCreated());
+        .andExpect(status().isOk());
 
     // Validate the Grade in the database
     List<Grade> gradeList = gradeRepository.findAll();
@@ -401,7 +397,7 @@ public class GradeResourceIntTest {
     int databaseSizeBeforeDelete = gradeRepository.findAll().size();
 
     // Get the grade
-    restGradeMockMvc.perform(delete("/api/grades/{id}", grade.getId())
+    restGradeMockMvc.perform(delete("/api/grades/{abbreviation}", grade.getAbbreviation())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 

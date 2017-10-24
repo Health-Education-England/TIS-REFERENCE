@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -15,14 +17,11 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "Site")
-public class Site implements Serializable {
+public class  Site implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
   @NotNull
   private String siteCode;
 
@@ -43,14 +42,6 @@ public class Site implements Serializable {
   private String organisationalUnit;
 
   private String intrepidId;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getSiteCode() {
     return siteCode;
@@ -191,22 +182,21 @@ public class Site implements Serializable {
       return false;
     }
     Site site = (Site) o;
-    if (site.id == null || id == null) {
+    if (site.siteCode == null || siteCode == null) {
       return false;
     }
-    return Objects.equals(id, site.id);
+    return Objects.equals(siteCode, site.siteCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(siteCode);
   }
 
   @Override
   public String toString() {
     return "Site{" +
-        "id=" + id +
-        ", siteCode='" + siteCode + "'" +
+        "siteCode='" + siteCode + "'" +
         ", localOffice='" + localOffice + "'" +
         ", trustCode='" + trustCode + "'" +
         ", siteName='" + siteName + "'" +

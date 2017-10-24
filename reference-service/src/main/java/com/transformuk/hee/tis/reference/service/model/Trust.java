@@ -21,10 +21,6 @@ public class Trust implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 
@@ -43,14 +39,6 @@ public class Trust implements Serializable {
   private String postCode;
 
   private String intrepidId;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getCode() {
     return code;
@@ -178,22 +166,21 @@ public class Trust implements Serializable {
       return false;
     }
     Trust trust = (Trust) o;
-    if (trust.id == null || id == null) {
+    if (trust.code == null || code == null) {
       return false;
     }
-    return Objects.equals(id, trust.id);
+    return Objects.equals(code, trust.code);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(code);
   }
 
   @Override
   public String toString() {
     return "Trust{" +
-        "id=" + id +
-        ", code='" + code + "'" +
+        ",code='" + code + "'" +
         ", localOffice='" + localOffice + "'" +
         ", status='" + status + "'" +
         ", trustKnownAs='" + trustKnownAs + "'" +

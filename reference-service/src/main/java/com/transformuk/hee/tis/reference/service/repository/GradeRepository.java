@@ -13,14 +13,14 @@ import java.util.List;
  * Spring Data JPA repository for the Grade entity.
  */
 @SuppressWarnings("unused")
-public interface GradeRepository extends JpaRepository<Grade, Long> {
+public interface GradeRepository extends JpaRepository<Grade, String> {
 
-  @Query("SELECT g FROM Grade g WHERE g.name like %:param% or g.label like %:param%")
+  @Query("SELECT g FROM Grade g WHERE g.name like %:param% or g.label like %:param% or g.abbreviation like %:param%")
   Page<Grade> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
   Grade findByAbbreviation(String code);
 
-  @Query("SELECT g.id from Grade g WHERE g.id in :ids")
-  List<Long> findByIdsIn(@Param("ids") List<Long> ids);
+  @Query("SELECT g.abbreviation from Grade g WHERE g.abbreviation in :abbreviations")
+  List<String> findByAbbreviationsIn(@Param("abbreviations") List<String> abbreviations);
 
 }

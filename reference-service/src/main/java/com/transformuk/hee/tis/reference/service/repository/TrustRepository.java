@@ -13,17 +13,14 @@ import java.util.List;
  * Spring Data JPA repository for the Trust entity.
  */
 @SuppressWarnings("unused")
-public interface TrustRepository extends JpaRepository<Trust, Long> {
+public interface TrustRepository extends JpaRepository<Trust, String> {
 
   Trust findByCode(String code);
 
   @Query("SELECT t FROM Trust t WHERE t.code like %:param% or t.trustName like %:param%")
   Page<Trust> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
-  @Query("SELECT t.id from Trust t WHERE t.id in :ids")
-  List<Long> findByIdsIn(@Param("ids") List<Long> ids);
-
-  @Query("SELECT t.id FROM Trust t WHERE t.code =:trustCode")
-  Long findIdByTrustCode(@Param("trustCode") String trustCode);
+  @Query("SELECT t.code from Trust t WHERE t.code in :codes")
+  List<String> findByCodesIn(@Param("codes") List<String> codes);
 
 }
