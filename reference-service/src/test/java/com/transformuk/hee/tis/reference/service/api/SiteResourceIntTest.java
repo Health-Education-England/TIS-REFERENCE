@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -520,5 +521,29 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].siteName").value(not(hasItem(anotherSite.getSiteName()))))
         .andExpect(jsonPath("$.[*].address").value(not(hasItem(anotherSite.getAddress()))));
 
+  }
+
+  @Test
+  @Transactional
+  public void getSiteNamesShouldReturnMapOfIdsAndNames() throws Exception {
+    site = siteRepository.saveAndFlush(this.site);
+    Site anotherSite = new Site()
+        .siteCode(UPDATED_SITE_CODE)
+        .localOffice(UPDATED_LOCAL_OFFICE)
+        .trustCode(UPDATED_TRUST_CODE)
+        .siteName(UPDATED_SITE_NAME)
+        .address(UPDATED_ADDRESS)
+        .postCode(UPDATED_POST_CODE)
+        .siteKnownAs(UPDATED_SITE_KNOWN_AS)
+        .siteNumber(UPDATED_SITE_NUMBER)
+        .organisationalUnit(UPDATED_ORGANISATIONAL_UNIT);
+    anotherSite = siteRepository.saveAndFlush(anotherSite);
+    String allSiteIds = site.getId() + "," + anotherSite.getId();
+
+    restSiteMockMvc.perform(get("/api/sites/name?siteIds=" + allSiteIds))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$."+ site.getId()).value(is(site.getSiteName())))
+        .andExpect(jsonPath("$."+ anotherSite.getId()).value(is(anotherSite.getSiteName())));
   }
 }

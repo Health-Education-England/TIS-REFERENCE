@@ -43,6 +43,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
@@ -198,6 +199,20 @@ public class SiteResource {
     Site site = siteRepository.findBySiteCode(code);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteDTO));
+  }
+
+  /**
+   * GET  /sites/names?siteIds= : get the "name" of a collection of site ids.
+   *
+   * @param siteIds the ids of the sites to search for
+   */
+  @GetMapping("/sites/name")
+  @Timed
+  public ResponseEntity<Map<Long, String>> getSiteNamesById(@RequestParam Set<Long> siteIds) {
+    log.debug("REST request to get Site names by Id : {}", StringUtils.join(siteIds, ","));
+    Set<Site> sites = siteRepository.findBySiteIdIn(siteIds);
+    Map<Long, String> siteIdsToName = sites.parallelStream().collect(Collectors.toMap((Site::getId), (Site::getSiteName)));
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteIdsToName));
   }
 
   /**
