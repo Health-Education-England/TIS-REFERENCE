@@ -1,3 +1,5 @@
+set autocommit=0;
+
 ALTER TABLE `Grade`
 DROP COLUMN `id`;
 
@@ -16,13 +18,4 @@ ADD PRIMARY KEY (siteCode);
 ALTER TABLE `Trust`
 ADD PRIMARY KEY (code);
 
-ALTER TABLE `Grade`
-DROP INDEX `abbreviation`;
-
-ALTER TABLE `Site`
-DROP INDEX `siteCode`;
-
-ALTER TABLE `Trust`
-DROP INDEX `code`;
-
-
+commit;
