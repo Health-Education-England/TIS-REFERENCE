@@ -40,9 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
@@ -83,7 +87,7 @@ public class SiteResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> createSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
-    if(siteRepository.exists(siteDTO.getSiteCode())) {
+    if (siteRepository.exists(siteDTO.getSiteCode())) {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Cannot create new site, site code already exists")).body(null);
     }
     Site site = siteMapper.siteDTOToSite(siteDTO);
@@ -106,7 +110,7 @@ public class SiteResource {
   @PutMapping("/sites")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<SiteDTO> updateSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
+  public ResponseEntity<SiteDTO> updateSite(@Valid @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
@@ -140,6 +144,35 @@ public class SiteResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
     return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
 
+  }
+
+  /**
+   * GET  /sites/in/:codes : get sites given to codes.
+   * Ignores malformed or not found sites
+   *
+   * @param codes the codes to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty list
+   */
+  @GetMapping("/sites/in/{codes}")
+  @Timed
+  public ResponseEntity<List<SiteDTO>> getSitesIn(@PathVariable String codes) {
+    log.debug("REST request to find several  Sites");
+    List<SiteDTO> resp = new ArrayList<>();
+    Set<String> codeSet = new HashSet<>();
+
+    if (codes == null || codes.isEmpty()) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    codeSet.addAll(Arrays.asList(codes.split(",")));
+
+    if (!codeSet.isEmpty()) {
+      List<Site> sites = siteRepository.findBySiteCodeIn(codeSet);
+      resp = siteMapper.sitesToSiteDTOs(sites);
+      return new ResponseEntity<>(resp, HttpStatus.FOUND);
+    } else {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
   }
 
   @ApiOperation(value = "searchSites()",
@@ -209,7 +242,7 @@ public class SiteResource {
     Map<String, Boolean> siteExistsMap = Maps.newHashMap();
     log.debug("REST request to check Site exists : {}", siteCodes);
     if (!CollectionUtils.isEmpty(siteCodes)) {
-      List<String> dbIds = siteRepository.findBySiteCodeIn(siteCodes);
+      List<String> dbIds = siteRepository.findSiteCodesBySiteCodeIn(siteCodes);
       siteCodes.forEach(siteCode -> {
         if (dbIds.contains(siteCode)) {
           siteExistsMap.put(siteCode, true);

@@ -228,6 +228,27 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
+  public void getAllSitesIn() throws Exception {
+    // Initialize the database
+    siteRepository.saveAndFlush(site);
+
+    // Get the sites given codes
+    restSiteMockMvc.perform(get("/api/sites/in/invalid," + DEFAULT_SITE_CODE))
+        .andExpect(status().isFound())
+        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE)))
+        .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
+        .andExpect(jsonPath("$.[*].trustCode").value(hasItem(DEFAULT_TRUST_CODE)))
+        .andExpect(jsonPath("$.[*].siteName").value(hasItem(DEFAULT_SITE_NAME)))
+        .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
+        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)))
+        .andExpect(jsonPath("$.[*].siteKnownAs").value(hasItem(DEFAULT_SITE_KNOWN_AS)))
+        .andExpect(jsonPath("$.[*].siteNumber").value(hasItem(DEFAULT_SITE_NUMBER)))
+        .andExpect(jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
+  }
+
+  @Test
+  @Transactional
   public void searchForSite() throws Exception {
     // Initialize the database
     siteRepository.saveAndFlush(site);

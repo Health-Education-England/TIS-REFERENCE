@@ -34,9 +34,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
@@ -120,6 +124,35 @@ public class GradeResource {
     Grade grade = gradeRepository.findOne(abbreviation);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
+  }
+
+  /**
+   * GET  /grades/in/:codes : get grades given to codes.
+   * Ignores malformed or not found grades
+   *
+   * @param codes the codes to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty list
+   */
+  @GetMapping("/grades/in/{codes}")
+  @Timed
+  public ResponseEntity<List<GradeDTO>> getGradesIn(@PathVariable String codes) {
+    log.debug("REST request to find several  Grades");
+    List<GradeDTO> resp = new ArrayList<>();
+    Set<String> codeSet = new HashSet<>();
+
+    if (codes == null || codes.isEmpty()) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    codeSet.addAll(Arrays.asList(codes.split(",")));
+
+    if (!codeSet.isEmpty()) {
+      List<Grade> grades = gradeRepository.findByAbbreviationIn(codeSet);
+      resp = gradeMapper.gradesToGradeDTOs(grades);
+      return new ResponseEntity<>(resp, HttpStatus.FOUND);
+    } else {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
   }
 
   /**

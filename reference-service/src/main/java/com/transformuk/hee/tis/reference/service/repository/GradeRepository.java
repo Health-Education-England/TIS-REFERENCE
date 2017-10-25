@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Spring Data JPA repository for the Grade entity.
@@ -19,6 +20,8 @@ public interface GradeRepository extends JpaRepository<Grade, String> {
   Page<Grade> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
   Grade findByAbbreviation(String code);
+
+  List<Grade> findByAbbreviationIn(Set<String> codes);
 
   @Query("SELECT g.abbreviation from Grade g WHERE g.abbreviation in :abbreviations")
   List<String> findByAbbreviationsIn(@Param("abbreviations") List<String> abbreviations);

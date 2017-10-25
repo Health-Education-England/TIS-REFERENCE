@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
-import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
@@ -29,7 +28,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -207,6 +205,26 @@ public class TrustResourceIntTest {
     // Get all the trustList
     restTrustMockMvc.perform(get("/api/trusts?sort=code,asc"))
         .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+        .andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS)))
+        .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
+        .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
+        .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
+        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)));
+  }
+
+  @Test
+  @Transactional
+  public void getAllTrustsIn() throws Exception {
+    // Initialize the database
+    trustRepository.saveAndFlush(trust);
+
+    // Get all the trustList
+    restTrustMockMvc.perform(get("/api/trusts/in/invalid," + DEFAULT_CODE))
+        .andExpect(status().isFound())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))

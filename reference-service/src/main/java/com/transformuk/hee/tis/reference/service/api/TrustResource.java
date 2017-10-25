@@ -40,9 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
@@ -142,6 +146,35 @@ public class TrustResource {
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
     return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /trusts/in/:codes : get trusts given to codes.
+   * Ignores malformed or not found trusts
+   *
+   * @param codes the codes to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty list
+   */
+  @GetMapping("/trusts/in/{codes}")
+  @Timed
+  public ResponseEntity<List<TrustDTO>> getTrustsIn(@PathVariable String codes) {
+    log.debug("REST request to find several  Trusts");
+    List<TrustDTO> resp = new ArrayList<>();
+    Set<String> codeSet = new HashSet<>();
+
+    if (codes == null || codes.isEmpty()) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    codeSet.addAll(Arrays.asList(codes.split(",")));
+
+    if (!codeSet.isEmpty()) {
+      List<Trust> trusts = trustRepository.findByCodeIn(codeSet);
+      resp = trustMapper.trustsToTrustDTOs(trusts);
+      return new ResponseEntity<>(resp, HttpStatus.FOUND);
+    } else {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
   }
 
   @ApiOperation(value = "searchTrusts()",
@@ -264,7 +297,7 @@ public class TrustResource {
     Map<String, Boolean> trustExistsMap = Maps.newHashMap();
     log.debug("REST request to check Trust exists : {}", codes);
     if (!CollectionUtils.isEmpty(codes)) {
-      List<String> dbIds = trustRepository.findByCodesIn(codes);
+      List<String> dbIds = trustRepository.findCodesByCodesIn(codes);
       codes.forEach(code -> {
         if (dbIds.contains(code)) {
           trustExistsMap.put(code, true);

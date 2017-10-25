@@ -257,6 +257,24 @@ public class GradeResourceIntTest {
 
   @Test
   @Transactional
+  public void getAllGradesIn() throws Exception {
+    // Initialize the database
+    gradeRepository.saveAndFlush(grade);
+
+    // Get grades given the codes
+    restGradeMockMvc.perform(get("/api/grades/in/invalid," + DEFAULT_ABBREVIATION))
+        .andExpect(status().isFound())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
+        .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE)))
+        .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE)))
+        .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE)));
+  }
+
+  @Test
+  @Transactional
   public void shouldReturnTrueIfGradeExists() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);

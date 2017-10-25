@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Spring Data JPA repository for the Trust entity.
@@ -21,6 +22,8 @@ public interface TrustRepository extends JpaRepository<Trust, String> {
   Page<Trust> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
   @Query("SELECT t.code from Trust t WHERE t.code in :codes")
-  List<String> findByCodesIn(@Param("codes") List<String> codes);
+  List<String> findCodesByCodesIn(@Param("codes") List<String> codes);
+
+  List<Trust> findByCodeIn(Set<String> codes);
 
 }
