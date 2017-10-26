@@ -179,22 +179,7 @@ public class GradeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
     return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-
-  /**
-   * GET  /grades/abbreviation/:abbreviation : get the grade by abbreviation.
-   *
-   * @param abbreviation the abbreviation of the gradeDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the gradeDTO, or with status 404 (Not Found)
-   */
-  @GetMapping("/grades/abbreviation/{abbreviation}")
-  @Timed
-  public ResponseEntity<GradeDTO> getGradeByAbbreviation(@PathVariable String abbreviation) {
-    log.debug("REST request to get Grade by abbreviation: {}", abbreviation);
-    Grade grade = gradeRepository.findByAbbreviation(abbreviation);
-    GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
-    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
-  }
-
+  
   /**
    * EXISTS /grades/exists/ : check is site exists
    *
