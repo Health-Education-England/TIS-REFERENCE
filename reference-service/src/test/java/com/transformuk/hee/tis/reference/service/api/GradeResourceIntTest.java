@@ -334,20 +334,6 @@ public class GradeResourceIntTest {
 
   @Test
   @Transactional
-  public void getGradeByAbbreviation() throws Exception {
-    // Initialize the database
-    gradeRepository.saveAndFlush(grade);
-
-    // Get all the trustList
-    restGradeMockMvc.perform(get("/api/grades/abbreviation/ACF"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.abbreviation").value("ACF"))
-        .andExpect(jsonPath("$.label").value("Academic Clinical Fellow"));
-  }
-
-  @Test
-  @Transactional
   public void getNonExistingGrade() throws Exception {
     // Get the grade
     restGradeMockMvc.perform(get("/api/grades/{id}", Long.MAX_VALUE))
