@@ -8,9 +8,10 @@ import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -32,10 +33,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class
-)
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ReferenceServiceImplTest {
 
+  private static final double STANDARD_RATE_LIMIT = 50.0d;
+  private static final double BULK_RATE_LIMIT = 5.0d;
   private static final String DBC = "1-DGBODY";
   private static final String REFERENCE_URL = "http://localhost:8088/reference";
   private static final String TRUST_CODE = "RJ7";
@@ -53,8 +55,9 @@ public class ReferenceServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
+    referenceServiceImpl = new ReferenceServiceImpl(STANDARD_RATE_LIMIT, BULK_RATE_LIMIT);
     referenceServiceImpl.setServiceUrl(REFERENCE_URL);
-
+    MockitoAnnotations.initMocks(this);
   }
 
   @Test
