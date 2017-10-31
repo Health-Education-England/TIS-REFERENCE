@@ -49,6 +49,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -58,8 +59,9 @@ import java.util.Map;
 public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
-  private static final String COLLECTION_VALIDATION_MESSAGE = "Collection provided is empty, will not make call";
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
+  private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
+  private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
@@ -213,6 +215,25 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity.getStatusCode();
   }
 
+  @Override
+  public List<SiteDTO> findSitesIn(Set<String> codes) {
+    String url = serviceUrl + FIND_SITES_IN_ENDPOINT + String.join(",", codes);
+    ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
+        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {
+        });
+    return responseEntity.getBody();
+  }
+
+  @Override
+  public List<GradeDTO> findGradesIn(Set<String> codes) {
+    String url = serviceUrl + FIND_GRADES_IN_ENDPOINT + String.join(",", codes);
+    ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
+        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
+        });
+    return responseEntity.getBody();
+  }
+
+  @Override
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);

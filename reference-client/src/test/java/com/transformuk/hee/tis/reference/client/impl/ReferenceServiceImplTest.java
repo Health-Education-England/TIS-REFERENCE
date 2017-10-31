@@ -1,7 +1,10 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,18 +12,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class
@@ -59,6 +68,42 @@ public class ReferenceServiceImplTest {
 
     // then
     verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
+  }
+
+  @Test
+  public void shouldFindSitesIn() {
+    // given
+    Set<String> codes = Sets.newHashSet("code1", "code2");
+    List<SiteDTO> sites = new ArrayList<>();
+    ResponseEntity<List<SiteDTO>> responseEntity = new ResponseEntity(sites, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
+        any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+
+    // when
+    List<SiteDTO> respList = referenceServiceImpl.findSitesIn(codes);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites/in/code2,code1"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(sites, respList);
+  }
+
+  @Test
+  public void shouldFindGradesIn() {
+    // given
+    Set<String> codes = Sets.newHashSet("code1", "code2");
+    List<GradeDTO> grades = new ArrayList<>();
+    ResponseEntity<List<GradeDTO>> responseEntity = new ResponseEntity(grades, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
+        any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+
+    // when
+    List<GradeDTO> respList = referenceServiceImpl.findGradesIn(codes);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades/in/code2,code1"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(grades, respList);
   }
 
   @Test
@@ -161,7 +206,7 @@ public class ReferenceServiceImplTest {
     };
   }
 
-  private ParameterizedTypeReference<HttpStatus>  getCodeExistsReference() {
+  private ParameterizedTypeReference<HttpStatus> getCodeExistsReference() {
     return new ParameterizedTypeReference<HttpStatus>() {
     };
   }

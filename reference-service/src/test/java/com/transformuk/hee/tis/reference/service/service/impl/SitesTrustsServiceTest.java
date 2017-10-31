@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 
