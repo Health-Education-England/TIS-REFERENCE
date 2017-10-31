@@ -144,6 +144,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Value("${reference.service.url}")
   private String serviceUrl;
 
+  public ReferenceServiceImpl(@Value("${reference.client.rate.limit}") double standardRequestsPerSecondLimit,
+                              @Value("${reference.client.bulk.rate.limit}") double bulkRequestsPerSecondLimit) {
+    super(standardRequestsPerSecondLimit, bulkRequestsPerSecondLimit);
+  }
+
   @Override
   public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO) {
     ParameterizedTypeReference<List<JsonPatchDTO>> typeReference = getJsonPatchDtoReference();
