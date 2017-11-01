@@ -4,3 +4,6 @@
 **/*.iml
 reference-ui/target
 reference-ui/ui-build
+reference-service/target
+reference-client/target
+reference-api/target
