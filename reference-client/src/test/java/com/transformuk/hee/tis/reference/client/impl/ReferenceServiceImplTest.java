@@ -44,7 +44,7 @@ public class ReferenceServiceImplTest {
   private static final String SITE_CODE = "RJ706";
   private static final String UNKNOWN_CODE = "XXX";
 
-  private List<Long> ids = Lists.newArrayList(10L, 20L);
+  private List<String> ids = Lists.newArrayList("SSL", "ADL");
   private List<String> medicalSchoolValues = Lists.newArrayList("University of London", "United Medical & Dental School, London");
   private List<String> countryValues = Lists.newArrayList("United Kingdom");
 
@@ -112,9 +112,9 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldGetGradeExists() {
     // given
-    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/grades/exists/",
         HttpMethod.POST, requestEntity, responseType)).
         willReturn(responseEntity);
@@ -130,9 +130,9 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldGetSiteExists() {
     // given
-    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/sites/exists/",
         HttpMethod.POST, requestEntity, responseType)).
         willReturn(responseEntity);
@@ -184,9 +184,9 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldGetTrustExists() {
     // given
-    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     given(referenceRestTemplate.exchange(REFERENCE_URL + "/api/trusts/exists/",
         HttpMethod.POST, requestEntity, responseType)).
         willReturn(responseEntity);
@@ -199,8 +199,8 @@ public class ReferenceServiceImplTest {
         HttpMethod.POST, requestEntity, responseType);
   }
 
-  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
-    return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+  private ParameterizedTypeReference<Map<String, Boolean>> getExistsReference() {
+    return new ParameterizedTypeReference<Map<String, Boolean>>() {
     };
   }
 

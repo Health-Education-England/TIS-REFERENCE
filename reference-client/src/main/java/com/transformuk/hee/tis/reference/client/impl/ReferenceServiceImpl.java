@@ -167,8 +167,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
-  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsReference() {
+  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsWithLongReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
+  private ParameterizedTypeReference<Map<String, Boolean>> getExistsReference() {
+    return new ParameterizedTypeReference<Map<String, Boolean>>() {
     };
   }
 
@@ -187,10 +192,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
-  private Map<Long, Boolean> exists(String url, List<Long> ids) {
+  private Map<Long, Boolean> existsWithLong(String url, List<Long> ids) {
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
-    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsReference();
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsWithLongReference();
     ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getBody();
+  }
+
+  private Map<String, Boolean> exists(String url, List<String> ids) {
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
+    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getBody();
   }
@@ -246,13 +259,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<Long, Boolean> gradeExists(List<Long> ids) {
+  public Map<String, Boolean> gradeExists(List<String> ids) {
     String url = serviceUrl + GRADES_MAPPINGS_ENDPOINT;
     return exists(url, ids);
   }
 
   @Override
-  public Map<Long, Boolean> siteExists(List<Long> ids) {
+  public Map<String, Boolean> siteExists(List<String> ids) {
     String url = serviceUrl + SITES_MAPPINGS_ENDPOINT;
     return exists(url, ids);
   }
@@ -264,7 +277,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<Long, Boolean> trustExists(List<Long> ids) {
+  public Map<String, Boolean> trustExists(List<String> ids) {
     String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT;
     return exists(url, ids);
   }
@@ -302,7 +315,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public Map<Long, Boolean> placementTypeExists(List<Long> values) {
     String url = serviceUrl + PLACEMENT_TYPES_MAPPINGS_ENDPOINT;
-    return exists(url, values);
+    return existsWithLong(url, values);
   }
 
   @Override
