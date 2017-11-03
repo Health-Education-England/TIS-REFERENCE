@@ -35,11 +35,11 @@ public interface ReferenceService extends ClientService {
 
   HttpStatus siteTrustMatch(String siteCode, String trustCode);
 
-  Map<Long, Boolean> gradeExists(List<Long> Ids);
+  Map<String, Boolean> gradeExists(List<String> Ids);
 
-  Map<Long, Boolean> trustExists(List<Long> Ids);
+  Map<String, Boolean> trustExists(List<String> Ids);
 
-  Map<Long, Boolean> siteExists(List<Long> Ids);
+  Map<String, Boolean> siteExists(List<String> Ids);
 
   HttpStatus trustCodeExists(String Code);
 
