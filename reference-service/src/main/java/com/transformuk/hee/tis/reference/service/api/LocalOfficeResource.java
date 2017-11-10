@@ -136,8 +136,7 @@ public class LocalOfficeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
     return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-
-
+  
 	/**
 	 * GET  /local-offices/user : get all the allowed local offices for the logged in user.
 	 *
