@@ -8,6 +8,7 @@ import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -38,6 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
 /**
@@ -50,12 +53,14 @@ public class LocalOfficeResource {
   private static final String ENTITY_NAME = "localOffice";
   private final Logger log = LoggerFactory.getLogger(LocalOfficeResource.class);
   private final LocalOfficeRepository localOfficeRepository;
+  private final SitesTrustsService sitesTrustsService;
 
   private final LocalOfficeMapper localOfficeMapper;
 
-  public LocalOfficeResource(LocalOfficeRepository localOfficeRepository, LocalOfficeMapper localOfficeMapper) {
+  public LocalOfficeResource(LocalOfficeRepository localOfficeRepository, SitesTrustsService sitesTrustsService, LocalOfficeMapper localOfficeMapper) {
     this.localOfficeRepository = localOfficeRepository;
     this.localOfficeMapper = localOfficeMapper;
+    this.sitesTrustsService = sitesTrustsService;
   }
 
   /**
@@ -115,12 +120,23 @@ public class LocalOfficeResource {
    */
   @GetMapping("/local-offices")
   @Timed
-  public ResponseEntity<List<LocalOfficeDTO>> getAllLocalOffices(@ApiParam Pageable pageable) {
+  public ResponseEntity<List<LocalOfficeDTO>> getAllLocalOffices(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+  @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of LocalOffices");
-    Page<LocalOffice> page = localOfficeRepository.findAll(pageable);
+    searchQuery = sanitize(searchQuery);
+    Page<LocalOffice> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = localOfficeRepository.findAll(pageable);
+    } else {
+      page = sitesTrustsService.searchLocalOffices(searchQuery, pageable);
+    }
+
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
     return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
+
 
 	/**
 	 * GET  /local-offices/user : get all the allowed local offices for the logged in user.
