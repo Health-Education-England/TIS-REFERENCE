@@ -2,6 +2,8 @@ package com.transformuk.hee.tis.reference.service.service.impl;
 
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
+import com.transformuk.hee.tis.reference.service.model.LocalOffice;
+import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,14 @@ public class SitesTrustsService {
   private final int limit;
   private SiteRepository siteRepository;
   private TrustRepository trustRepository;
+  private LocalOfficeRepository localOfficeRepository;
 
   @Autowired
-  public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
+  public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository, LocalOfficeRepository localOfficeRepository,
                             @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
+    this.localOfficeRepository = localOfficeRepository;
     this.limit = limit;
   }
 
@@ -119,4 +123,41 @@ public class SitesTrustsService {
   public Page<Trust> searchTrusts(String searchString, Pageable pageable) {
     return trustRepository.findBySearchString(searchString, pageable);
   }
+
+  /**
+   * Returns a localOffice with given code
+   *
+   * @param abbreviation Code for a LocalOffice - NOT NULL
+   * @return {@link LocalOffice} if found, null otherwise
+   */
+  public LocalOffice getLocalOfficeByAbbreviation(String abbreviation) {
+    checkNotNull(abbreviation);
+    return localOfficeRepository.findByAbbreviation(abbreviation);
+  }
+
+  /**
+   * Searches all localOffices who have data containing given searchString
+   *
+   * @param searchString search string to be searched for localOffice data
+   * @param pageable     pageable defining the page and size
+   * @return Page of {@link LocalOffice} matching searchString
+   */
+  public Page<LocalOffice> searchLocalOffices(String searchString, Pageable pageable) {
+    return localOfficeRepository.findBySearchString(searchString, pageable);
+  }
+
+  /**
+   * Searches all localOffices who have data containing given searchString
+   *
+   * @param searchString search string to be searched for trust data
+   * @return List of {@link LocalOffice} matching searchString
+   */
+  public List<LocalOffice> searchLocalOffices(String searchString) {
+    if (!isEmpty(searchString)) {
+      return localOfficeRepository.findBySearchString(searchString, new PageRequest(0, limit)).getContent();
+    } else {
+      return localOfficeRepository.findAll();
+    }
+  }
+
 }

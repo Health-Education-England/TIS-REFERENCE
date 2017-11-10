@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
 import net.sf.cglib.core.Local;
 import org.junit.Before;
@@ -48,9 +49,11 @@ public class LocalOfficeResourceIntTest {
 
   private static final String DEFAULT_ABBREVIATION = "AAAAAAAAAA";
   private static final String UPDATED_ABBREVIATION = "BBBBBBBBBB";
+  private static final String SEARCH_LOCAL_OFFICE_ABBREVIATTION = "SEARCHLO";
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
+  private static final String SEARCH_LOCAL_OFFICE_NAME = "SEARCHLO";
 
   private static final String HENE_NAME = "Health Education England North East";
   private static final String HENWL_NAME = "Health Education England North West London";
@@ -61,6 +64,9 @@ public class LocalOfficeResourceIntTest {
 
   @Autowired
   private LocalOfficeRepository localOfficeRepository;
+
+  @Autowired
+  private SitesTrustsService sitesTrustsService;
 
   @Autowired
   private LocalOfficeMapper localOfficeMapper;
@@ -94,10 +100,14 @@ public class LocalOfficeResourceIntTest {
     return localOffice;
   }
 
+  LocalOffice searchLO = new LocalOffice()
+      .abbreviation("SEARCHLO")
+      .name("SEARCHLO");
+
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeRepository, localOfficeMapper);
+    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeRepository, sitesTrustsService, localOfficeMapper);
     this.restLocalOfficeMockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -346,5 +356,19 @@ public class LocalOfficeResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(LocalOffice.class);
+  }
+
+  @Test
+  @Transactional
+  public void searchLocalOffices() throws Exception {
+    // Initialize the database
+    localOfficeRepository.saveAndFlush(searchLO);
+
+    // Get all the trustList
+    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=CHLO"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].abbreviation").value(SEARCH_LOCAL_OFFICE_ABBREVIATTION))
+        .andExpect(jsonPath("$.[*].name").value(SEARCH_LOCAL_OFFICE_NAME));
   }
 }

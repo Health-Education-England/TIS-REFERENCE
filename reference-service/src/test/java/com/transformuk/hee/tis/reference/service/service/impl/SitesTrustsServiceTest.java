@@ -1,7 +1,9 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
+import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import org.junit.Test;
@@ -9,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +31,8 @@ public class SitesTrustsServiceTest {
   public static final List<Site> EMPTY_SITE_LIST = new ArrayList<>();
   public static final List<Trust> EMPTY_TRUST_LIST = new ArrayList<>();
   public static final String TRUST_CODE = "trust code";
+  public static final String LOCAL_OFFICE_ABBREVIATION = "abbreviation";
+  public static final List<LocalOffice> EMPTY_LO_LIST = new ArrayList<>();
 
   @Mock
   private SiteRepository siteRepository;
@@ -35,9 +40,12 @@ public class SitesTrustsServiceTest {
   @Mock
   private TrustRepository trustRepository;
 
+  @Mock
+  private LocalOfficeRepository localOfficeRepository;
+
   @InjectMocks
   private SitesTrustsService service =
-      new SitesTrustsService(siteRepository, trustRepository, 100);
+      new SitesTrustsService(siteRepository, trustRepository, localOfficeRepository, 100);
 
   @Test
   public void shouldSearchSites() {
@@ -125,5 +133,44 @@ public class SitesTrustsServiceTest {
 
     // then
     assertEquals(EMPTY_SITE_LIST, trusts);
+  }
+
+  @Test
+  public void shouldGetLocalOfficeWithGivenAbbreviation() {
+    // given
+    LocalOffice localOffice = new LocalOffice();
+    given(localOfficeRepository.findByAbbreviation(LOCAL_OFFICE_ABBREVIATION)).willReturn(localOffice);
+
+    // when
+    LocalOffice actualLocalOffice = service.getLocalOfficeByAbbreviation(LOCAL_OFFICE_ABBREVIATION);
+
+    // then
+    assertEquals(localOffice, actualLocalOffice);
+  }
+
+  @Test
+  public void shouldSearchLocalOffices() {
+    // given
+    Page<LocalOffice> emptyPage = new PageImpl<>(EMPTY_LO_LIST);
+    given(localOfficeRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
+
+    // when
+    List<LocalOffice> localOffices = service.searchLocalOffices(SEARCH_STRING);
+
+    // then
+    assertEquals(EMPTY_LO_LIST, localOffices);
+  }
+
+  @Test
+  public void shouldReturnAllLocalOfficesIfSearchStringIsNullOrEmpty() {
+    // given
+    Page<LocalOffice> emptyPage = new PageImpl<>(EMPTY_LO_LIST);
+    given(localOfficeRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
+
+    // when
+    List<LocalOffice> localOffices = service.searchLocalOffices("");
+
+    // then
+    assertEquals(EMPTY_LO_LIST, localOffices);
   }
 }
