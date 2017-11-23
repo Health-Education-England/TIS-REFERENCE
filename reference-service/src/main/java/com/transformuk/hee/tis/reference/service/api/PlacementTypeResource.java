@@ -53,21 +53,21 @@ public class PlacementTypeResource {
   /**
    * EXISTS /placement-types/exists/ : check if placement type exists
    *
-   * @param ids the Ids of the placeTypeDTO to check
+   * @param codes the Codes of the placeTypeDTO to check
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/placement-types/exists/")
   @Timed
-  public ResponseEntity<Map<Long, Boolean>> rotationsExists(@RequestBody List<Long> ids) {
-    Map<Long, Boolean> placementTypeExistsMap = Maps.newHashMap();
-    log.debug("REST request to check PlaceType exists : {}", ids);
-    if (!CollectionUtils.isEmpty(ids)) {
-      List<Long> dbPlaceTypeIds = placementTypeRepository.findByIdsIn(ids);
-      ids.forEach(id -> {
-        if (dbPlaceTypeIds.contains(id)) {
-          placementTypeExistsMap.put(id, true);
+  public ResponseEntity<Map<String, Boolean>> placementTypeExists(@RequestBody List<String> codes) {
+    Map<String, Boolean> placementTypeExistsMap = Maps.newHashMap();
+    log.debug("REST request to check PlaceType exists : {}", codes);
+    if (!CollectionUtils.isEmpty(codes)) {
+      List<String> dbPlaceTypeCodes = placementTypeRepository.findCodeByCodesIn(codes);
+      codes.forEach(code -> {
+        if (dbPlaceTypeCodes.contains(code)) {
+          placementTypeExistsMap.put(code, true);
         } else {
-          placementTypeExistsMap.put(id, false);
+          placementTypeExistsMap.put(code, false);
         }
       });
     }

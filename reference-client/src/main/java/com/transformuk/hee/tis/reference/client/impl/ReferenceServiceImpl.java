@@ -313,9 +313,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<Long, Boolean> placementTypeExists(List<Long> values) {
+  public Map<String, Boolean> placementTypeExists(List<String> values) {
     String url = serviceUrl + PLACEMENT_TYPES_MAPPINGS_ENDPOINT;
-    return existsWithLong(url, values);
+    return exists(url, values);
   }
 
   @Override
