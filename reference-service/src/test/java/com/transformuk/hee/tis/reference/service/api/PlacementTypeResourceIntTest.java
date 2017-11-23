@@ -282,12 +282,12 @@ public class PlacementTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnTrueIfRotationExists() throws Exception{
+  public void shouldReturnTrueIfPlacementTypeExists() throws Exception{
     // Initialize the database
     placementTypeRepository.saveAndFlush(placementType);
-    Map<Long, Boolean> expectedMap = Maps.newHashMap(placementType.getId(), true);
-    expectedMap.put(12345L, false);
-    List<Long> labels = Lists.newArrayList(placementType.getId(), 12345L);
+    Map<String, Boolean> expectedMap = Maps.newHashMap(placementType.getCode(), true);
+    expectedMap.put("invalid_code", false);
+    List<String> labels = Lists.newArrayList(placementType.getCode(), "invalid_code");
     restPlacementTypeMockMvc.perform(post("/api/placement-types/exists/")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(labels)))

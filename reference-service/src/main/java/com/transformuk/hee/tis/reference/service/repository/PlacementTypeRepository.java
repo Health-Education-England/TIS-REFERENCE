@@ -13,6 +13,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface PlacementTypeRepository extends JpaRepository<PlacementType, Long> {
 
-  @Query("SELECT pt.id from PlacementType pt WHERE pt.id in :ids")
-  List<Long> findByIdsIn(@Param("ids") List<Long> ids);
+  @Query("SELECT pt.code from PlacementType pt WHERE pt.code in :codes")
+  List<String> findCodeByCodesIn(@Param("codes") List<String> codes);
 }
