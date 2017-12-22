@@ -123,3 +123,6 @@ jhipster:
 # ===================================================================
 
 application:
+
+logging:
+  file: ${LOG_DIR:${HOME}}/reference.log
