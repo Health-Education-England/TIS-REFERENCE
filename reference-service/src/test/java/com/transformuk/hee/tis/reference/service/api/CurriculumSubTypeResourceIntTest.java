@@ -5,7 +5,9 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeService;
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +56,9 @@ public class CurriculumSubTypeResourceIntTest {
 
   @Autowired
   private CurriculumSubTypeMapper curriculumSubTypeMapper;
+
+  @Autowired
+  private CurriculumSubTypeService curriculumSubTypeService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +92,7 @@ public class CurriculumSubTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    CurriculumSubTypeResource curriculumSubTypeResource = new CurriculumSubTypeResource(curriculumSubTypeRepository, curriculumSubTypeMapper);
+    CurriculumSubTypeResource curriculumSubTypeResource = new CurriculumSubTypeResource(curriculumSubTypeRepository, curriculumSubTypeMapper, curriculumSubTypeService);
     this.restCurriculumSubTypeMockMvc = MockMvcBuilders.standaloneSetup(curriculumSubTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -204,6 +210,46 @@ public class CurriculumSubTypeResourceIntTest {
         .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+  }
+
+  @Test
+  @Transactional
+  public void getCurriculumSubTypeByCode() throws Exception {
+    // Initialize the database
+    curriculumSubTypeRepository.saveAndFlush(curriculumSubType);
+
+    // Get the curriculumSubType
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types/code/{code}", curriculumSubType.getCode()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+  }
+
+  @Test
+  @Transactional
+  public void getAllCurriculumSubTypeSmartSearch() throws Exception {
+    // Initialize the database
+
+    CurriculumSubType medicalCurriculum = new CurriculumSubType()
+        .code("MEDICAL1")
+        .label("Medical Curriculum - As defined by the GMC");
+
+    CurriculumSubType medicalSPR = new CurriculumSubType()
+        .code("MEDICAL2")
+        .label("Medical SpR - As defined by the GMC");
+
+    List<CurriculumSubType> curriculumSubTypes = Lists.newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
+    curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypeRepository.flush();
+
+    // Get the curriculumSubType
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=med"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].code").value(hasItems("MEDICAL1", "MEDICAL2")))
+        .andExpect(jsonPath("$.[*].label").value(hasItems("Medical Curriculum - As defined by the GMC", "Medical SpR - As defined by the GMC")));
   }
 
   @Test

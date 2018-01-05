@@ -1,0 +1,16 @@
+update `CurriculumSubType` set code = 'MEDICAL_CURRICULUM' where code = 'MedicalCurriculum';
+update `CurriculumSubType` set code = 'MEDICAL_SPR' where code = 'MedicalSpR';
+update `CurriculumSubType` set code = 'DENTAL_CURRICULUM' where code = 'DentalCurriculum';
+update `CurriculumSubType` set code = 'DENTAL_SPR' where code = 'DentalSpR';
+update `CurriculumSubType` set code = 'SUB_SPECIALTY' where code = 'SubSpecialty';
+update `CurriculumSubType` set code = 'DENTAL_POST_CCST' where code = 'DentalPostCCST';
+update `CurriculumSubType` set code = 'ACF_OTHER_FUNDING' where code = 'ACFOtherFunding';
+update `CurriculumSubType` set code = 'ACL' where code = 'ACL';
+update `CurriculumSubType` set code = 'AFT' where code = 'AFT';
+update `CurriculumSubType` set code = 'ACL_OTHER_FUNDING' where code = 'ACLOtherFunding';
+update `CurriculumSubType` set code = 'CLINICAL_LECTURER' where code = 'ClinicalLecturer';
+update `CurriculumSubType` set code = 'CLINICAL_TEACHING_FELLOW' where code = 'ClinicalTeachingFellow';
+update `CurriculumSubType` set code = 'CLINICAL_RESEARCH_FELLOW' where code = 'ClinicalResearchFellow';
+update `CurriculumSubType` set code = 'ACFNIHR_FUNDING' where code = 'ACFNIHRFunding';
+update `CurriculumSubType` set code = 'ACLNIHR_FUNDING' where code = 'ACLNIHRFunding';
+update `CurriculumSubType` set code = 'OTHER_FELLOWSHIP' where code = 'Otherfellowship';

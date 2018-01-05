@@ -3,14 +3,21 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeService;
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -28,6 +36,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing CurriculumSubType.
@@ -41,10 +51,14 @@ public class CurriculumSubTypeResource {
   private final CurriculumSubTypeRepository curriculumSubTypeRepository;
 
   private final CurriculumSubTypeMapper curriculumSubTypeMapper;
+  private final CurriculumSubTypeService curriculumSubTypeService;
 
-  public CurriculumSubTypeResource(CurriculumSubTypeRepository curriculumSubTypeRepository, CurriculumSubTypeMapper curriculumSubTypeMapper) {
+  public CurriculumSubTypeResource(CurriculumSubTypeRepository curriculumSubTypeRepository,
+                                   CurriculumSubTypeMapper curriculumSubTypeMapper,
+                                   CurriculumSubTypeService curriculumSubTypeService) {
     this.curriculumSubTypeRepository = curriculumSubTypeRepository;
     this.curriculumSubTypeMapper = curriculumSubTypeMapper;
+    this.curriculumSubTypeService = curriculumSubTypeService;
   }
 
   /**
@@ -102,11 +116,23 @@ public class CurriculumSubTypeResource {
    */
   @GetMapping("/curriculum-sub-types")
   @Timed
-  public List<CurriculumSubTypeDTO> getAllCurriculumSubTypes() {
+  public ResponseEntity<List<CurriculumSubTypeDTO>> getAllCurriculumSubTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get all CurriculumSubTypes");
-    List<CurriculumSubType> curriculumSubTypes = curriculumSubTypeRepository.findAll();
-    return curriculumSubTypeMapper.curriculumSubTypesToCurriculumSubTypeDTOs(curriculumSubTypes);
+    searchQuery = sanitize(searchQuery);
+
+    Page<CurriculumSubTypeDTO> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = curriculumSubTypeService.findAll(pageable);
+    } else {
+      page = curriculumSubTypeService.advancedSearch(searchQuery, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/curriculum-sub-types");
+    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }
+
 
   /**
    * GET  /curriculum-sub-types/:id : get the "id" curriculumSubType.
@@ -119,6 +145,21 @@ public class CurriculumSubTypeResource {
   public ResponseEntity<CurriculumSubTypeDTO> getCurriculumSubType(@PathVariable Long id) {
     log.debug("REST request to get CurriculumSubType : {}", id);
     CurriculumSubType curriculumSubType = curriculumSubTypeRepository.findOne(id);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(curriculumSubTypeDTO));
+  }
+
+  /**
+   * GET  /curriculum-sub-types/:code : get curriculumSubType by code.
+   *
+   * @param code the code of the curriculumSubTypeDTO to retrieve
+   * @return the ResponseEntity with status 200 (OK) and with body the curriculumSubTypeDTO, or with status 404 (Not Found)
+   */
+  @GetMapping("/curriculum-sub-types/code/{code}")
+  @Timed
+  public ResponseEntity<CurriculumSubTypeDTO> getCurriculumSubTypeByCode(@PathVariable String code) {
+    log.debug("REST request to get CurriculumSubType code: [{}]", code);
+    CurriculumSubType curriculumSubType = curriculumSubTypeRepository.findByCode(code);
     CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(curriculumSubTypeDTO));
   }
