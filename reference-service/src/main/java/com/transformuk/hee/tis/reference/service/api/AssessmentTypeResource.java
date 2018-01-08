@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing College.
+ * REST controller for managing Assessment Types.
  */
 @RestController
 @RequestMapping("/api")
