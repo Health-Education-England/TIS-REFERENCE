@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -15,8 +19,10 @@ public class AssessmentType implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
+  @NotNull(groups = {Update.class, Create.class}, message = "code is needed for both create and update")
   private String code;
 
+  @NotNull(groups = {Update.class, Create.class}, message = "label is needed for both create and update")
   private String label;
 
   public String getCode() {

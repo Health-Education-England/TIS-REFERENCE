@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +37,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api")
+
 public class AssessmentTypeResource {
 
   private static final String ENTITY_NAME = "AssessmentType";
@@ -49,16 +53,16 @@ public class AssessmentTypeResource {
    * POST  /assessment-types : Create a new Assessment type.
    *
    * @param assessmentType the Assessment type to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new AssessmentType, or with status 400 (Bad Request) if the college has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new AssessmentType, or with status 400 (Bad Request) if the AssessmentType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> createAssessmentType(@Valid @RequestBody AssessmentType assessmentType) throws URISyntaxException {
+  public ResponseEntity<AssessmentType> createAssessmentType(@Validated(Create.class) @RequestBody AssessmentType assessmentType) throws URISyntaxException {
     log.debug("REST request to save AssessmentType : {}", assessmentType);
-    if (assessmentType.getCode() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A create to an AssessmentType must not have an ID")).body(null);
+    if (assessmentType.getCode() == null) {
+      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Assessment type must have an ID")).body(null);
     }
     AssessmentType newAssessmentType = assessmentTypeRepository.save(assessmentType);
     return ResponseEntity.created(new URI("/api/assessment-types/" + newAssessmentType.getCode()))
@@ -78,11 +82,13 @@ public class AssessmentTypeResource {
   @PutMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> updateAssessmentTyoe(@Valid @RequestBody AssessmentType assessmentType) throws URISyntaxException {
+  public ResponseEntity<AssessmentType> updateAssessmentType(@Validated(Update.class) @RequestBody AssessmentType assessmentType) throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
-    if (assessmentType.getCode() == null) {
+
+    if(assessmentTypeRepository.findOne(assessmentType.getCode()) == null){
       return createAssessmentType(assessmentType);
     }
+
     AssessmentType result = assessmentTypeRepository.save(assessmentType);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, assessmentType.getCode()))
@@ -93,7 +99,7 @@ public class AssessmentTypeResource {
    * GET  /assessment-types : get all the Assessment Types.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
+   * @return the ResponseEntity with status 200 (OK) and the list of AssessmentType in body
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/assessment-types")
