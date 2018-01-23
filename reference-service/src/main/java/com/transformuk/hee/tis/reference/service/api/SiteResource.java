@@ -169,9 +169,9 @@ public class SiteResource {
     if (!codeSet.isEmpty()) {
       List<Site> sites = siteRepository.findBySiteCodeIn(codeSet);
       resp = siteMapper.sitesToSiteDTOs(sites);
-      return new ResponseEntity<>(resp, HttpStatus.FOUND);
-    } else {
       return new ResponseEntity<>(resp, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
     }
   }
 

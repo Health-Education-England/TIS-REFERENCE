@@ -234,7 +234,7 @@ public class SiteResourceIntTest {
 
     // Get the sites given codes
     restSiteMockMvc.perform(get("/api/sites/in/invalid," + DEFAULT_SITE_CODE))
-        .andExpect(status().isFound())
+        .andExpect(status().isOk())
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
