@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.FundingIssue;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -114,6 +116,24 @@ public class FundingIssueResource {
     log.debug("REST request to get a page of FundingIssues");
     Page<FundingIssue> page = fundingIssueRepository.findAll(pageable);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/funding-issues");
+    return new ResponseEntity<>(fundingIssueMapper.fundingIssuesToFundingIssueDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/funding-issues : get all current fundingIssues.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of fundingIssues in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/funding-issues")
+  @Timed
+  public ResponseEntity<List<FundingIssueDTO>> getAllCurrentFundingIssues(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of current FundingIssues");
+    FundingIssue fundingIssue = new FundingIssue();
+    fundingIssue.setStatus(Status.CURRENT);
+    Page<FundingIssue> page = fundingIssueRepository.findAll(Example.of(fundingIssue), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/funding-issues");
     return new ResponseEntity<>(fundingIssueMapper.fundingIssuesToFundingIssueDTOs(page.getContent()), headers, HttpStatus.OK);
   }
 

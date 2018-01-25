@@ -127,7 +127,31 @@ public class CurriculumSubTypeResource {
     if (StringUtils.isEmpty(searchQuery)) {
       page = curriculumSubTypeService.findAll(pageable);
     } else {
-      page = curriculumSubTypeService.advancedSearch(searchQuery, pageable);
+      page = curriculumSubTypeService.advancedSearch(false, searchQuery, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/curriculum-sub-types");
+    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/curriculum-sub-types : get all current curriculumSubTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of curriculumSubTypes in body
+   */
+  @GetMapping("/current/curriculum-sub-types")
+  @Timed
+  public ResponseEntity<List<CurriculumSubTypeDTO>> getAllCurrentCurriculumSubTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+    log.debug("REST request to get all current CurriculumSubTypes");
+    searchQuery = sanitize(searchQuery);
+
+    Page<CurriculumSubTypeDTO> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      page = curriculumSubTypeService.findAllCurrent(pageable);
+    } else {
+      page = curriculumSubTypeService.advancedSearch(true, searchQuery, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/curriculum-sub-types");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

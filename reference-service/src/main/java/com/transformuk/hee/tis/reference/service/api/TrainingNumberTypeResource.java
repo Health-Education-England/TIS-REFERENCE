@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.repository.TrainingNumberTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,20 @@ public class TrainingNumberTypeResource {
   public List<TrainingNumberTypeDTO> getAllTrainingNumberTypes() {
     log.debug("REST request to get all TrainingNumberTypes");
     List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeRepository.findAll();
+    return trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
+  }
+
+  /**
+   * GET  /current/training-number-types : get all the current trainingNumberTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of trainingNumberTypes in body
+   */
+  @GetMapping("/current/training-number-types")
+  @Timed
+  public List<TrainingNumberTypeDTO> getAllCurrentTrainingNumberTypes() {
+    log.debug("REST request to get all current TrainingNumberTypes");
+    TrainingNumberType trainingNumberType = new TrainingNumberType().status(Status.CURRENT);
+    List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeRepository.findAll(Example.of(trainingNumberType));
     return trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
   }
 

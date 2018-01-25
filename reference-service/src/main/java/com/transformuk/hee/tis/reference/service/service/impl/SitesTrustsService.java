@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -47,6 +48,17 @@ public class SitesTrustsService {
    */
   public Page<Site> searchSites(String searchString, Pageable pageable) {
     return siteRepository.findBySearchString(searchString, pageable);
+  }
+
+  /**
+   * Searches all Current sites who have data containing given searchString
+   *
+   * @param searchString search string to be searched for site data
+   * @param pageable     pageable defining the page and size
+   * @return List of {@link Site} matching searchString
+   */
+  public Page<Site> searchCurrentSites(String searchString, Pageable pageable) {
+    return siteRepository.findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
   }
 
   /**
@@ -125,6 +137,17 @@ public class SitesTrustsService {
   }
 
   /**
+   * Searches all current trusts who have data containing given searchString
+   *
+   * @param searchString search string to be searched for trust data
+   * @param pageable     pageable defining the page and size
+   * @return Page of {@link Trust} matching searchString
+   */
+  public Page<Trust> searchCurrentTrusts(String searchString, Pageable pageable) {
+    return trustRepository.findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
+  }
+
+  /**
    * Returns a localOffice with given code
    *
    * @param abbreviation Code for a LocalOffice - NOT NULL
@@ -144,6 +167,17 @@ public class SitesTrustsService {
    */
   public Page<LocalOffice> searchLocalOffices(String searchString, Pageable pageable) {
     return localOfficeRepository.findBySearchString(searchString, pageable);
+  }
+
+  /**
+   * Searches current localOffices who have data containing given searchString
+   *
+   * @param searchString search string to be searched for localOffice data
+   * @param pageable     pageable defining the page and size
+   * @return Page of {@link LocalOffice} matching searchString
+   */
+  public Page<LocalOffice> searchCurrentLocalOffices(String searchString, Pageable pageable) {
+    return localOfficeRepository.findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
   }
 
   /**

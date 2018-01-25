@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,6 +33,10 @@ public class GdcStatus implements Serializable {
   @NotNull
   @Column(name = "label", nullable = false)
   private String label;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
 
   public Long getId() {
     return id;
@@ -64,6 +72,19 @@ public class GdcStatus implements Serializable {
     return this;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public GdcStatus status(Status status) {
+    this.status = status;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -88,8 +109,9 @@ public class GdcStatus implements Serializable {
   public String toString() {
     return "GdcStatus{" +
         "id=" + id +
-        ", code='" + code + "'" +
-        ", label='" + label + "'" +
+        ", code='" + code + '\'' +
+        ", label='" + label + '\'' +
+        ", status=" + status +
         '}';
   }
 }

@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.service.repository.SettledRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -107,6 +109,21 @@ public class SettledResource {
     List<Settled> settleds = settledRepository.findAll();
     return settledMapper.settledsToSettledDTOs(settleds);
   }
+
+  /**
+   * GET  /current/settleds : get all the current settleds.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of settleds in body
+   */
+  @GetMapping("/current/settleds")
+  @Timed
+  public List<SettledDTO> getAllCurrentSettleds() {
+    log.debug("REST request to get all current Settleds");
+    Settled settled = new Settled().status(Status.CURRENT);
+    List<Settled> settleds = settledRepository.findAll(Example.of(settled));
+    return settledMapper.settledsToSettledDTOs(settleds);
+  }
+
 
   /**
    * GET  /settleds/:id : get the "id" settled.

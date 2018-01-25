@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -107,6 +109,22 @@ public class GenderResource {
     List<Gender> genders = genderRepository.findAll();
     return genderMapper.gendersToGenderDTOs(genders);
   }
+
+  /**
+   * GET  /current/genders : get all the genders.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of genders in body
+   */
+  @GetMapping("/current/genders")
+  @Timed
+  public List<GenderDTO> getAllCurrentGenders() {
+    log.debug("REST request to get all current Genders");
+    Gender gender = new Gender();
+    gender.setStatus(Status.CURRENT);
+    List<Gender> genders = genderRepository.findAll(Example.of(gender));
+    return genderMapper.gendersToGenderDTOs(genders);
+  }
+
 
   /**
    * GET  /genders/:id : get the "id" gender.

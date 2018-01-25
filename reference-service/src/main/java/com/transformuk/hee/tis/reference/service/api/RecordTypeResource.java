@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.service.repository.RecordTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,21 @@ public class RecordTypeResource {
   public List<RecordTypeDTO> getAllRecordTypes() {
     log.debug("REST request to get all RecordTypes");
     List<RecordType> recordTypes = recordTypeRepository.findAll();
+    return recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
+  }
+
+  /**
+   * GET  /current/record-types : get all the current recordTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of recordTypes in body
+   */
+  @GetMapping("/current/record-types")
+  @Timed
+  public List<RecordTypeDTO> getAllCurrentRecordTypes() {
+    log.debug("REST request to get all RecordTypes");
+    RecordType recordType = new RecordType();
+    recordType.setStatus(Status.CURRENT);
+    List<RecordType> recordTypes = recordTypeRepository.findAll(Example.of(recordType));
     return recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
   }
 

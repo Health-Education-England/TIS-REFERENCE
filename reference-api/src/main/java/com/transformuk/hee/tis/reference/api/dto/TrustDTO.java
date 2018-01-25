@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,12 +12,13 @@ import java.util.Objects;
  */
 public class TrustDTO implements Serializable {
 
-  @NotNull
+  private Long id;
+
   private String code;
 
   private String localOffice;
 
-  private String status;
+  private Status status;
 
   private String trustKnownAs;
 
@@ -28,6 +31,14 @@ public class TrustDTO implements Serializable {
   private String postCode;
 
   private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getCode() {
     return code;
@@ -45,11 +56,11 @@ public class TrustDTO implements Serializable {
     this.localOffice = localOffice;
   }
 
-  public String getStatus() {
+  public Status getStatus() {
     return status;
   }
 
-  public void setStatus(String status) {
+  public void setStatus(Status status) {
     this.status = status;
   }
 
@@ -127,15 +138,16 @@ public class TrustDTO implements Serializable {
   @Override
   public String toString() {
     return "TrustDTO{" +
-        "code='" + code + "'" +
-        ", localOffice='" + localOffice + "'" +
-        ", status='" + status + "'" +
-        ", trustKnownAs='" + trustKnownAs + "'" +
-        ", trustName='" + trustName + "'" +
-        ", trustNumber='" + trustNumber + "'" +
-        ", address='" + address + "'" +
-        ", postCode='" + postCode + "'" +
-        ", intrepidId='" + intrepidId + "'" +
+        "id=" + id +
+        ", code='" + code + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", status=" + status +
+        ", trustKnownAs='" + trustKnownAs + '\'' +
+        ", trustName='" + trustName + '\'' +
+        ", trustNumber='" + trustNumber + '\'' +
+        ", address='" + address + '\'' +
+        ", postCode='" + postCode + '\'' +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

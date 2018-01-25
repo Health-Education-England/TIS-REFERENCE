@@ -1,7 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
-import javax.validation.constraints.NotNull;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,7 +11,8 @@ import java.util.Objects;
  */
 public class SiteDTO implements Serializable {
 
-  @NotNull
+  private Long id;
+
   private String siteCode;
 
   private String localOffice;
@@ -29,7 +31,17 @@ public class SiteDTO implements Serializable {
 
   private String organisationalUnit;
 
+  private Status status;
+
   private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getSiteCode() {
     return siteCode;
@@ -103,6 +115,14 @@ public class SiteDTO implements Serializable {
     this.organisationalUnit = organisationalUnit;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   public String getIntrepidId() {
     return intrepidId;
   }
@@ -137,16 +157,18 @@ public class SiteDTO implements Serializable {
   @Override
   public String toString() {
     return "SiteDTO{" +
-        "siteCode='" + siteCode + "'" +
-        ", localOffice='" + localOffice + "'" +
-        ", trustCode='" + trustCode + "'" +
-        ", siteName='" + siteName + "'" +
-        ", address='" + address + "'" +
-        ", postCode='" + postCode + "'" +
-        ", siteKnownAs='" + siteKnownAs + "'" +
-        ", siteNumber='" + siteNumber + "'" +
-        ", organisationalUnit='" + organisationalUnit + "'" +
-        ", intrepidId='" + intrepidId + "'" +
+        "id=" + id +
+        ", siteCode='" + siteCode + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", trustCode='" + trustCode + '\'' +
+        ", siteName='" + siteName + '\'' +
+        ", address='" + address + '\'' +
+        ", postCode='" + postCode + '\'' +
+        ", siteKnownAs='" + siteKnownAs + '\'' +
+        ", siteNumber='" + siteNumber + '\'' +
+        ", organisationalUnit='" + organisationalUnit + '\'' +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

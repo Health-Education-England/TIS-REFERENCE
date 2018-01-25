@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,7 +23,10 @@ public class Grade implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @Column(name = "abbreviation", nullable = false)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "abbreviation")
   private String abbreviation;
 
   @Column(name = "name")
@@ -39,6 +46,27 @@ public class Grade implements Serializable {
   @NotNull
   @Column(name = "placementGrade", nullable = false)
   private Boolean placementGrade;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
+
+  @Column(name = "intrepidId")
+  private String intrepidId;
+
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Grade id(Long id) {
+    this.id = id;
+    return this;
+  }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -118,6 +146,32 @@ public class Grade implements Serializable {
     this.placementGrade = placementGrade;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public Grade status(Status status) {
+    this.status = status;
+    return this;
+  }
+
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+  }
+
+  public Grade intrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -141,12 +195,15 @@ public class Grade implements Serializable {
   @Override
   public String toString() {
     return "Grade{" +
-        "abbreviation='" + abbreviation + "'" +
-        ", name='" + name + "'" +
-        ", label='" + label + "'" +
-        ", trainingGrade='" + trainingGrade + "'" +
-        ", postGrade='" + postGrade + "'" +
-        ", placementGrade='" + placementGrade + "'" +
+        "id=" + id +
+        ", abbreviation='" + abbreviation + '\'' +
+        ", name='" + name + '\'' +
+        ", label='" + label + '\'' +
+        ", trainingGrade=" + trainingGrade +
+        ", postGrade=" + postGrade +
+        ", placementGrade=" + placementGrade +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

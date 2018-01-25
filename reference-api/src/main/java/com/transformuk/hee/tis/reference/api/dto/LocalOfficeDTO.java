@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,6 +19,8 @@ public class LocalOfficeDTO implements Serializable {
 
   @NotNull
   private String name;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -40,6 +44,14 @@ public class LocalOfficeDTO implements Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
   }
 
   @Override
@@ -69,8 +81,9 @@ public class LocalOfficeDTO implements Serializable {
   public String toString() {
     return "LocalOfficeDTO{" +
         "id=" + id +
-        ", abbreviation='" + abbreviation + "'" +
-        ", name='" + name + "'" +
+        ", abbreviation='" + abbreviation + '\'' +
+        ", name='" + name + '\'' +
+        ", status=" + status +
         '}';
   }
 }

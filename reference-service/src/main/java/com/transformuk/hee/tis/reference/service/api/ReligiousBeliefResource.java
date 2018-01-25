@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -114,6 +116,24 @@ public class ReligiousBeliefResource {
     log.debug("REST request to get a page of ReligiousBeliefs");
     Page<ReligiousBelief> page = religiousBeliefRepository.findAll(pageable);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/religious-beliefs");
+    return new ResponseEntity<>(religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/religious-beliefs : get all the religiousBeliefs.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of religiousBeliefs in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/religious-beliefs")
+  @Timed
+  public ResponseEntity<List<ReligiousBeliefDTO>> getAllCurrentReligiousBeliefs(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of current ReligiousBeliefs");
+    ReligiousBelief religiousBelief = new ReligiousBelief();
+    religiousBelief.setStatus(Status.CURRENT);
+    Page<ReligiousBelief> page = religiousBeliefRepository.findAll(Example.of(religiousBelief), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/religious-beliefs");
     return new ResponseEntity<>(religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(page.getContent()), headers, HttpStatus.OK);
   }
 

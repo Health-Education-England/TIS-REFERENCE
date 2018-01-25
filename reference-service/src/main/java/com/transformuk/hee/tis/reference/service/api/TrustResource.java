@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.Trust;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -87,7 +89,7 @@ public class TrustResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
     log.debug("REST request to save Trust : {}", trustDTO);
-    if (trustRepository.findByCode(trustDTO.getCode()) != null) {
+    if (trustDTO.getId() != null && trustRepository.findOne(trustDTO.getId()) != null) {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that Code")).body(null);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
@@ -112,7 +114,7 @@ public class TrustResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrustDTO> updateTrust(@RequestBody TrustDTO trustDTO) throws URISyntaxException {
     log.debug("REST request to update Trust : {}", trustDTO);
-    if (trustDTO.getCode() == null) {
+    if (trustDTO.getId() == null) {
       return createTrust(trustDTO);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
@@ -141,6 +143,32 @@ public class TrustResource {
     Page<Trust> page;
     if (StringUtils.isEmpty(searchQuery)) {
       page = trustRepository.findAll(pageable);
+    } else {
+      page = sitesTrustsService.searchTrusts(searchQuery, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
+    return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/trusts : get all the current trusts.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of trusts in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/trusts")
+  @Timed
+  public ResponseEntity<List<TrustDTO>> getAllCurrentTrusts(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+    log.debug("REST request to get a page of Trusts");
+    searchQuery = sanitize(searchQuery);
+    Page<Trust> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      Trust trust = new Trust().status(Status.CURRENT);
+      page = trustRepository.findAll(Example.of(trust), pageable);
     } else {
       page = sitesTrustsService.searchTrusts(searchQuery, pageable);
     }
@@ -202,22 +230,6 @@ public class TrustResource {
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
   }
-
-  /**
-   * DELETE  /trusts/:code : delete the trust using a "code".
-   *
-   * @param code the code of the trustDTO to delete
-   * @return the ResponseEntity with status 200 (OK)
-   */
-  @DeleteMapping("/trusts/{code}")
-  @Timed
-  @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteTrust(@PathVariable String code) {
-    log.debug("REST request to delete Trust : {}", code);
-    trustRepository.delete(code);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, code)).build();
-  }
-
 
   /**
    * POST  /bulk-trusts : Create a new trust.
@@ -299,6 +311,31 @@ public class TrustResource {
     if (!CollectionUtils.isEmpty(codes)) {
       List<String> dbIds = trustRepository.findCodesByCodesIn(codes);
       codes.forEach(code -> {
+        if (dbIds.contains(code)) {
+          trustExistsMap.put(code, true);
+        } else {
+          trustExistsMap.put(code, false);
+        }
+      });
+    }
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustExistsMap));
+  }
+
+
+  /**
+   * EXISTS /trusts/ids/exists/ : check if trust exists
+   *
+   * @param ids the ids of the trustDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/trusts/ids/exists/")
+  @Timed
+  public ResponseEntity<Map<Long, Boolean>> trustIdsExists(@RequestBody List<Long> ids) {
+    Map<Long, Boolean> trustExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Trust exists : {}", ids);
+    if (!CollectionUtils.isEmpty(ids)) {
+      Set<Long> dbIds = trustRepository.findAll(ids).stream().map(Trust::getId).collect(Collectors.toSet());
+      ids.forEach(code -> {
         if (dbIds.contains(code)) {
           trustExistsMap.put(code, true);
         } else {

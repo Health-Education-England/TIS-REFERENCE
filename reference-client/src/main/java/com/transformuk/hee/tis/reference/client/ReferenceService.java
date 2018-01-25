@@ -23,6 +23,15 @@ public interface ReferenceService extends ClientService {
   List<SiteDTO> findSitesIn(Set<String> codes);
 
   /**
+   * Find the sites given the ids. This does one API call and one SQL call to retrieve
+   * all the sites.
+   *
+   * @param ids the site ids to look for
+   * @return the found sites or an empty list
+   */
+  List<SiteDTO> findSitesIdIn(Set<Long> ids);
+
+  /**
    * Find the grades given the codes. This does one API call and one SQL call to retrieve
    * all the grades.
    *
@@ -31,15 +40,32 @@ public interface ReferenceService extends ClientService {
    */
   List<GradeDTO> findGradesIn(Set<String> codes);
 
+
+  /**
+   * Find the grades given the Ids. This does one API call and one SQL call to retrieve
+   * all the grades.
+   *
+   * @param ids the grade ids to look for
+   * @return the found grades or an empty list
+   */
+  List<GradeDTO> findGradesIdIn(Set<Long> ids);
+
+
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
   HttpStatus siteTrustMatch(String siteCode, String trustCode);
 
   Map<String, Boolean> gradeExists(List<String> Ids);
 
+  Map<Long, Boolean> gradeIdsExists(List<Long> ids);
+
   Map<String, Boolean> trustExists(List<String> Ids);
 
+  Map<Long, Boolean> trustIdsExists(List<Long> ids);
+
   Map<String, Boolean> siteExists(List<String> Ids);
+
+  Map<Long, Boolean> siteIdExists(List<Long> Ids);
 
   HttpStatus trustCodeExists(String Code);
 

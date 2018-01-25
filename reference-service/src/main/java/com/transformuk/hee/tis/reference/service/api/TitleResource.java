@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Title;
 import com.transformuk.hee.tis.reference.service.repository.TitleRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,20 @@ public class TitleResource {
   public List<TitleDTO> getAllTitles() {
     log.debug("REST request to get all Titles");
     List<Title> titles = titleRepository.findAll();
+    return titleMapper.titlesToTitleDTOs(titles);
+  }
+
+  /**
+   * GET  /current/titles : get all the current titles.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of titles in body
+   */
+  @GetMapping("/current/titles")
+  @Timed
+  public List<TitleDTO> getAllCurrentTitles() {
+    log.debug("REST request to get all current Titles");
+    Title title = new Title().status(Status.CURRENT);
+    List<Title> titles = titleRepository.findAll(Example.of(title));
     return titleMapper.titlesToTitleDTOs(titles);
   }
 

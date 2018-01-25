@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Role;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,21 @@ public class RoleResource {
   public List<RoleDTO> getAllRoles() {
     log.debug("REST request to get all Roles");
     List<Role> roles = roleRepository.findAll();
+    return roleMapper.rolesToRoleDTOs(roles);
+  }
+
+
+  /**
+   * GET  /current/roles : get all the current roles.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of roles in body
+   */
+  @GetMapping("/current/roles")
+  @Timed
+  public List<RoleDTO> getAllCurrentRoles() {
+    log.debug("REST request to get all current Roles");
+    Role role = new Role().status(Status.CURRENT);
+    List<Role> roles = roleRepository.findAll(Example.of(role));
     return roleMapper.rolesToRoleDTOs(roles);
   }
 

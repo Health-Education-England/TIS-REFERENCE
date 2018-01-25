@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -22,6 +24,8 @@ public class TariffRateDTO implements Serializable {
   private String tariffRateFringe;
 
   private String tariffRateLondon;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -71,6 +75,14 @@ public class TariffRateDTO implements Serializable {
     this.tariffRateLondon = tariffRateLondon;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -98,11 +110,12 @@ public class TariffRateDTO implements Serializable {
   public String toString() {
     return "TariffRateDTO{" +
         "id=" + id +
-        ", code='" + code + "'" +
-        ", gradeAbbreviation='" + gradeAbbreviation + "'" +
-        ", tariffRate='" + tariffRate + "'" +
-        ", tariffRateFringe='" + tariffRateFringe + "'" +
-        ", tariffRateLondon='" + tariffRateLondon + "'" +
+        ", code='" + code + '\'' +
+        ", gradeAbbreviation='" + gradeAbbreviation + '\'' +
+        ", tariffRate='" + tariffRate + '\'' +
+        ", tariffRateFringe='" + tariffRateFringe + '\'' +
+        ", tariffRateLondon='" + tariffRateLondon + '\'' +
+        ", status=" + status +
         '}';
   }
 }

@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
@@ -12,6 +13,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
@@ -132,6 +134,21 @@ public class PlacementTypeResource {
   public List<PlacementTypeDTO> getAllPlacementTypes() {
     log.debug("REST request to get all PlacementTypes");
     List<PlacementType> placementTypes = placementTypeRepository.findAll();
+    return placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
+  }
+
+  /**
+   * GET  /current/placement-types : get all current placementTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of placementTypes in body
+   */
+  @GetMapping("/current/placement-types")
+  @Timed
+  public List<PlacementTypeDTO> getAllCurrentPlacementTypes() {
+    log.debug("REST request to get all PlacementTypes");
+    PlacementType placementType = new PlacementType();
+    placementType.setStatus(Status.CURRENT);
+    List<PlacementType> placementTypes = placementTypeRepository.findAll(Example.of(placementType));
     return placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
   }
 

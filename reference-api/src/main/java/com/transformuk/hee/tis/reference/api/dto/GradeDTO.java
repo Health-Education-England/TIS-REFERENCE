@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,7 +12,8 @@ import java.util.Objects;
  */
 public class GradeDTO implements Serializable {
 
-  @NotNull
+  private Long id;
+
   private String abbreviation;
 
   private String name;
@@ -25,6 +28,18 @@ public class GradeDTO implements Serializable {
 
   @NotNull
   private Boolean placementGrade;
+
+  private Status status;
+
+  private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -74,6 +89,22 @@ public class GradeDTO implements Serializable {
     this.placementGrade = placementGrade;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -100,12 +131,15 @@ public class GradeDTO implements Serializable {
   @Override
   public String toString() {
     return "GradeDTO{" +
-        "abbreviation='" + abbreviation + "'" +
-        ", name='" + name + "'" +
-        ", label='" + label + "'" +
-        ", trainingGrade='" + trainingGrade + "'" +
-        ", postGrade='" + postGrade + "'" +
-        ", placementGrade='" + placementGrade + "'" +
+        "id=" + id +
+        ", abbreviation='" + abbreviation + '\'' +
+        ", name='" + name + '\'' +
+        ", label='" + label + '\'' +
+        ", trainingGrade=" + trainingGrade +
+        ", postGrade=" + postGrade +
+        ", placementGrade=" + placementGrade +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,21 @@ public class ProgrammeMembershipTypeResource {
   public List<ProgrammeMembershipTypeDTO> getAllProgrammeMembershipTypes() {
     log.debug("REST request to get all ProgrammeMembershipTypes");
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll();
+    return programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
+  }
+
+  /**
+   * GET  /current/programme-membership-types : get all the programmeMembershipTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of programmeMembershipTypes in body
+   */
+  @GetMapping("/current/programme-membership-types")
+  @Timed
+  public List<ProgrammeMembershipTypeDTO> getAllCurrentProgrammeMembershipTypes() {
+    log.debug("REST request to get all ProgrammeMembershipTypes");
+    ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType();
+    programmeMembershipType.setStatus(Status.CURRENT);
+    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll(Example.of(programmeMembershipType));
     return programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
   }
 

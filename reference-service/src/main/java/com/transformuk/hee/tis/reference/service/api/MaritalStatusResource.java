@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,21 @@ public class MaritalStatusResource {
   public List<MaritalStatusDTO> getAllMaritalStatuses() {
     log.debug("REST request to get all MaritalStatuses");
     List<MaritalStatus> maritalStatuses = maritalStatusRepository.findAll();
+    return maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
+  }
+
+  /**
+   * GET  /current/marital-statuses : get all the current maritalStatuses.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of maritalStatuses in body
+   */
+  @GetMapping("/current/marital-statuses")
+  @Timed
+  public List<MaritalStatusDTO> getAllCurrentMaritalStatuses() {
+    log.debug("REST request to get all current MaritalStatuses");
+    MaritalStatus maritalStatus = new MaritalStatus();
+    maritalStatus.setStatus(Status.CURRENT);
+    List<MaritalStatus> maritalStatuses = maritalStatusRepository.findAll(Example.of(maritalStatus));
     return maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
   }
 

@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,6 +31,10 @@ public class College implements Serializable {
   private String abbreviation;
 
   private String name;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
 
   public Long getId() {
     return id;
@@ -62,6 +70,19 @@ public class College implements Serializable {
     return this;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public College status(Status status) {
+    this.status = status;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -86,8 +107,9 @@ public class College implements Serializable {
   public String toString() {
     return "College{" +
         "id=" + id +
-        ", abbreviation='" + abbreviation + "'" +
-        ", name='" + name + "'" +
+        ", abbreviation='" + abbreviation + '\'' +
+        ", name='" + name + '\'' +
+        ", status=" + status +
         '}';
   }
 }

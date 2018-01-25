@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +15,20 @@ import java.util.Set;
  * Spring Data JPA repository for the Site entity.
  */
 @SuppressWarnings("unused")
-public interface SiteRepository extends JpaRepository<Site, String> {
+public interface SiteRepository extends JpaRepository<Site, Long> {
 
   Site findBySiteCode(String code);
 
   @Query("SELECT s FROM Site s WHERE s.siteCode like %:param% or s.trustCode like %:param% " +
       "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%")
   Page<Site> findBySearchString(@Param("param") String searchString, Pageable pageable);
+
+  @Query("SELECT s " +
+      "FROM Site s " +
+      "WHERE ( s.siteCode like %:param% or s.trustCode like %:param% " +
+      "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param% ) " +
+      "AND s.status = :status")
+  Page<Site> findByStatusAndSearchString(@Param("status") Status status, @Param("param") String searchString, Pageable pageable);
 
   @Query("SELECT s FROM Site s WHERE s.trustCode =:trust and (s.siteCode like %:param% " +
       "or s.siteName like %:param% or s.address like %:param% or s.postCode like %:param%)")

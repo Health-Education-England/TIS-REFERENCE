@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +107,20 @@ public class SexualOrientationResource {
   public List<SexualOrientationDTO> getAllSexualOrientations() {
     log.debug("REST request to get all SexualOrientations");
     List<SexualOrientation> sexualOrientations = sexualOrientationRepository.findAll();
+    return sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
+  }
+
+  /**
+   * GET  /current/sexual-orientations : get all the current sexualOrientations.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of sexualOrientations in body
+   */
+  @GetMapping("/current/sexual-orientations")
+  @Timed
+  public List<SexualOrientationDTO> getAllCurrentSexualOrientations() {
+    log.debug("REST request to get all current SexualOrientations");
+    SexualOrientation sexualOrientation = new SexualOrientation().status(Status.CURRENT);
+    List<SexualOrientation> sexualOrientations = sexualOrientationRepository.findAll(Example.of(sexualOrientation));
     return sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
   }
 

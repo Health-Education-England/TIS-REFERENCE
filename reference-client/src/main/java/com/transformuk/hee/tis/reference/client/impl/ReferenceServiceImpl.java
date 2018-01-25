@@ -61,14 +61,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
+  private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/in/id/";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
+  private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/in/id/";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
+  private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
+  private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
+  private static final String TRUSTS_IDS_MAPPINGS_ENDPOINT = "/api/trusts/ids/exists/";
   private static final String MEDICAL_SCHOOLS_MAPPINGS_ENDPOINT = "/api/medical-schools/exists/";
   private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
   private static final String ROTATIONS_MAPPINGS_ENDPOINT = "/api/rotations/exists/";
@@ -177,6 +182,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Map<Long, Boolean>> getExistsLongReference() {
+    return new ParameterizedTypeReference<Map<Long, Boolean>>() {
+    };
+  }
+
   private ParameterizedTypeReference<Map<String, Boolean>> getExistsStringReference() {
     return new ParameterizedTypeReference<Map<String, Boolean>>() {
     };
@@ -204,6 +214,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+        responseType);
+    return responseEntity.getBody();
+  }
+
+  private Map<Long, Boolean> idExists(String url, List<Long> ids) {
+    HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsLongReference();
+    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getBody();
   }
@@ -243,8 +261,26 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public List<SiteDTO> findSitesIdIn(Set<Long> ids) {
+    String url = serviceUrl + FIND_SITES_ID_IN_ENDPOINT + String.join(",", ids.toString());
+    ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
+        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {
+        });
+    return responseEntity.getBody();
+  }
+
+  @Override
   public List<GradeDTO> findGradesIn(Set<String> codes) {
     String url = serviceUrl + FIND_GRADES_IN_ENDPOINT + String.join(",", codes);
+    ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
+        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
+        });
+    return responseEntity.getBody();
+  }
+
+  @Override
+  public List<GradeDTO> findGradesIdIn(Set<Long> ids) {
+    String url = serviceUrl + FIND_GRADES_ID_IN_ENDPOINT + String.join(",", ids.toString());
     ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
         exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
         });
@@ -265,11 +301,22 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public Map<Long, Boolean> gradeIdsExists(List<Long> ids) {
+    String url = serviceUrl + GRADES_IDS_MAPPINGS_ENDPOINT;
+    return idExists(url, ids);
+  }
+
+  @Override
   public Map<String, Boolean> siteExists(List<String> ids) {
     String url = serviceUrl + SITES_MAPPINGS_ENDPOINT;
     return exists(url, ids);
   }
 
+  @Override
+  public Map<Long, Boolean> siteIdExists(List<Long> ids) {
+    String url = serviceUrl + SITES_IDS_MAPPINGS_ENDPOINT;
+    return idExists(url, ids);
+  }
 
   private ParameterizedTypeReference<LimitedListResponse<SiteDTO>> getSiteDtoReference() {
     return new ParameterizedTypeReference<LimitedListResponse<SiteDTO>>() {
@@ -280,6 +327,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Map<String, Boolean> trustExists(List<String> ids) {
     String url = serviceUrl + TRUSTS_MAPPINGS_ENDPOINT;
     return exists(url, ids);
+  }
+
+  @Override
+  public Map<Long, Boolean> trustIdsExists(List<Long> ids) {
+    String url = serviceUrl + TRUSTS_IDS_MAPPINGS_ENDPOINT;
+    return idExists(url, ids);
   }
 
   @Override

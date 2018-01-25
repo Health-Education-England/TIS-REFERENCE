@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,6 +19,8 @@ public class NationalityDTO implements Serializable {
 
   @NotNull
   private String nationality;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -40,6 +44,14 @@ public class NationalityDTO implements Serializable {
 
   public void setNationality(String nationality) {
     this.nationality = nationality;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
   }
 
   @Override
@@ -69,8 +81,9 @@ public class NationalityDTO implements Serializable {
   public String toString() {
     return "NationalityDTO{" +
         "id=" + id +
-        ", countryNumber='" + countryNumber + "'" +
-        ", nationality='" + nationality + "'" +
+        ", countryNumber='" + countryNumber + '\'' +
+        ", nationality='" + nationality + '\'' +
+        ", status=" + status +
         '}';
   }
 }

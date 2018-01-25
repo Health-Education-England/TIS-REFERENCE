@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -112,6 +114,22 @@ public class DBCResource {
     List<DBC> dBCS = dBCRepository.findAll();
     return dBCMapper.dBCSToDBCDTOs(dBCS);
   }
+
+  /**
+   * GET  /current/dbcs : get all current dBCS.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of dBCS in body
+   */
+  @GetMapping("/current/dbcs")
+  @Timed
+  public List<DBCDTO> getAllCurrentDBCS() {
+    log.debug("REST request to get all current DBCS");
+    DBC dbc = new DBC();
+    dbc.setStatus(Status.CURRENT);
+    List<DBC> dBCS = dBCRepository.findAll(Example.of(dbc));
+    return dBCMapper.dBCSToDBCDTOs(dBCS);
+  }
+
 
   /**
    * GET  /dbcs/:id : get the "id" dBC.

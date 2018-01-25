@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
@@ -11,6 +12,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -107,6 +109,24 @@ public class AssessmentTypeResource {
   public ResponseEntity<List<AssessmentType>> getAllAssessmentTypes(@ApiParam Pageable pageable) {
     log.debug("REST request to get a page of Assessment Type");
     Page<AssessmentType> page = assessmentTypeRepository.findAll(pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-types");
+    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/assessment-types : get all current the Assessment Types.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of AssessmentType in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/assessment-types")
+  @Timed
+  public ResponseEntity<List<AssessmentType>> getAllCurrentAssessmentTypes(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of currentAssessment Type");
+    AssessmentType assessmentType = new AssessmentType();
+    assessmentType.setStatus(Status.CURRENT);
+    Page<AssessmentType> page = assessmentTypeRepository.findAll(Example.of(assessmentType), pageable);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-types");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }

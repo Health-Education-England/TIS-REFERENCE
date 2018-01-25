@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
@@ -28,6 +29,8 @@ public class RotationDTO implements Serializable {
 
   @NotNull(message = "LocalOffice is required", groups = {Update.class, Create.class})
   private String localOffice;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -61,6 +64,14 @@ public class RotationDTO implements Serializable {
     this.localOffice = localOffice;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -85,10 +96,11 @@ public class RotationDTO implements Serializable {
   @Override
   public String toString() {
     return "RotationDTO{" +
-        "id=" + getId() +
-        ", code='" + getCode() + "'" +
-        ", label='" + getLabel() + "'" +
-        ", localOffice='" + getLocalOffice() + "'" +
-        "}";
+        "id=" + id +
+        ", code='" + code + '\'' +
+        ", label='" + label + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", status=" + status +
+        '}';
   }
 }

@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.Rotation;
 import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,21 @@ public class RotationServiceImpl implements RotationService {
   }
 
   /**
+   * Get all the current rotations.
+   *
+   * @param pageable the pagination information
+   * @return the list of entities
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public Page<RotationDTO> findAllCurrent(Pageable pageable) {
+    log.debug("Request to get all Rotations");
+    Rotation rotation = new Rotation().status(Status.CURRENT);
+    return rotationRepository.findAll(Example.of(rotation), pageable)
+        .map(rotationMapper::toDto);
+  }
+
+  /**
    * Get the rotation labels
    *
    * @param values the lists of labels of the entity
@@ -69,7 +86,7 @@ public class RotationServiceImpl implements RotationService {
    */
   @Override
   @Transactional(readOnly = true)
-  public List<String> findByLabelsIn(List<String> values){
+  public List<String> findByLabelsIn(List<String> values) {
     log.debug("Request to get labels list");
     return rotationRepository.findByLabelsIn(values);
   }

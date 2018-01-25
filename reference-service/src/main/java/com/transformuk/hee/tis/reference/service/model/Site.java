@@ -1,7 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,7 +27,9 @@ public class  Site implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @NotNull
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   private String siteCode;
 
   private String localOffice;
@@ -41,7 +48,19 @@ public class  Site implements Serializable {
 
   private String organisationalUnit;
 
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
+
   private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getSiteCode() {
     return siteCode;
@@ -173,6 +192,19 @@ public class  Site implements Serializable {
     return this;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public Site status(Status status) {
+    this.status = status;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -196,16 +228,18 @@ public class  Site implements Serializable {
   @Override
   public String toString() {
     return "Site{" +
-        "siteCode='" + siteCode + "'" +
-        ", localOffice='" + localOffice + "'" +
-        ", trustCode='" + trustCode + "'" +
-        ", siteName='" + siteName + "'" +
-        ", address='" + address + "'" +
-        ", postCode='" + postCode + "'" +
-        ", siteKnownAs='" + siteKnownAs + "'" +
-        ", siteNumber='" + siteNumber + "'" +
-        ", organisationalUnit='" + organisationalUnit + "'" +
-        ", intrepidId='" + intrepidId + "'" +
+        "id=" + id +
+        ", siteCode='" + siteCode + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", trustCode='" + trustCode + '\'' +
+        ", siteName='" + siteName + '\'' +
+        ", address='" + address + '\'' +
+        ", postCode='" + postCode + '\'' +
+        ", siteKnownAs='" + siteKnownAs + '\'' +
+        ", siteNumber='" + siteNumber + '\'' +
+        ", organisationalUnit='" + organisationalUnit + '\'' +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }
