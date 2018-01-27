@@ -180,9 +180,7 @@ public class ProgrammeMembershipTypeResource {
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
     programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> result = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
-    List<Long> ids = result.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class ProgrammeMembershipTypeResource {
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
     programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> results = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
-    List<Long> ids = results.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

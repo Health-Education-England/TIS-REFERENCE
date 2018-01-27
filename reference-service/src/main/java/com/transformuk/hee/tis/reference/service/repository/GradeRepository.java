@@ -27,7 +27,7 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
           "AND g.status = :status")
   Page<Grade> findByStatusAndSearchString(@Param("status") Status status, @Param("param") String searchString, Pageable pageable);
 
-  Grade findByAbbreviation(String code);
+  Set<Grade> findAllByAbbreviation(String code);
 
   List<Grade> findByAbbreviationIn(Set<String> codes);
 

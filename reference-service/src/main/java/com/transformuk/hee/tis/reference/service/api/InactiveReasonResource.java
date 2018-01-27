@@ -192,9 +192,7 @@ public class InactiveReasonResource {
     List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
     inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
     List<InactiveReasonDTO> result = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
-    List<Long> ids = result.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -225,9 +223,7 @@ public class InactiveReasonResource {
     List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
     inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
     List<InactiveReasonDTO> results = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
-    List<Long> ids = results.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

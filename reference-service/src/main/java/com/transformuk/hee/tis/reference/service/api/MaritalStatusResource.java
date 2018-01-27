@@ -179,9 +179,7 @@ public class MaritalStatusResource {
     List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
     maritalStatuses = maritalStatusRepository.save(maritalStatuses);
     List<MaritalStatusDTO> result = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
-    List<Long> ids = result.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -212,9 +210,7 @@ public class MaritalStatusResource {
     List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
     maritalStatuses = maritalStatusRepository.save(maritalStatuses);
     List<MaritalStatusDTO> results = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
-    List<Long> ids = results.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

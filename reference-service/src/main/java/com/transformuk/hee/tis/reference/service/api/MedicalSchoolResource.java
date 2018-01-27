@@ -219,9 +219,7 @@ public class MedicalSchoolResource {
     List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
     medicalSchools = medicalSchoolRepository.save(medicalSchools);
     List<MedicalSchoolDTO> result = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
-    List<Long> ids = result.stream().map(medicalSchoolDTO -> medicalSchoolDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -252,9 +250,7 @@ public class MedicalSchoolResource {
     List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
     medicalSchools = medicalSchoolRepository.save(medicalSchools);
     List<MedicalSchoolDTO> results = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
-    List<Long> ids = results.stream().map(medicalSchoolDTO -> medicalSchoolDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

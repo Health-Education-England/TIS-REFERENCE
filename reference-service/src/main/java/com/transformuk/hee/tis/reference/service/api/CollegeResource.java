@@ -191,9 +191,7 @@ public class CollegeResource {
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
     colleges = collegeRepository.save(colleges);
     List<CollegeDTO> result = collegeMapper.collegesToCollegeDTOs(colleges);
-    List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -224,9 +222,7 @@ public class CollegeResource {
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
     colleges = collegeRepository.save(colleges);
     List<CollegeDTO> results = collegeMapper.collegesToCollegeDTOs(colleges);
-    List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

@@ -242,9 +242,7 @@ public class LocalOfficeResource {
     List<LocalOffice> localOffices = localOfficeMapper.localOfficeDTOsToLocalOffices(localOfficeDTOS);
     localOffices = localOfficeRepository.save(localOffices);
     List<LocalOfficeDTO> result = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
-    List<Long> ids = result.stream().map(localOfficeDTO -> localOfficeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -275,9 +273,7 @@ public class LocalOfficeResource {
     List<LocalOffice> localOffices = localOfficeMapper.localOfficeDTOsToLocalOffices(localOfficeDTOS);
     localOffices = localOfficeRepository.save(localOffices);
     List<LocalOfficeDTO> results = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
-    List<Long> ids = results.stream().map(localOfficeDTO -> localOfficeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

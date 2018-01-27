@@ -19,6 +19,8 @@ public class SiteDTO implements Serializable {
 
   private String trustCode;
 
+  private Long trustId;
+
   private String siteName;
 
   private String address;
@@ -65,6 +67,14 @@ public class SiteDTO implements Serializable {
 
   public void setTrustCode(String trustCode) {
     this.trustCode = trustCode;
+  }
+
+  public Long getTrustId() {
+    return trustId;
+  }
+
+  public void setTrustId(Long trustId) {
+    this.trustId = trustId;
   }
 
   public String getSiteName() {
@@ -161,6 +171,7 @@ public class SiteDTO implements Serializable {
         ", siteCode='" + siteCode + '\'' +
         ", localOffice='" + localOffice + '\'' +
         ", trustCode='" + trustCode + '\'' +
+        ", trustId=" + trustId +
         ", siteName='" + siteName + '\'' +
         ", address='" + address + '\'' +
         ", postCode='" + postCode + '\'' +

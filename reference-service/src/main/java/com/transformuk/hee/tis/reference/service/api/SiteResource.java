@@ -94,8 +94,8 @@ public class SiteResource {
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
-    return ResponseEntity.created(new URI("/api/sites/" + result.getSiteCode()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getSiteCode()))
+    return ResponseEntity.created(new URI("/api/sites/" + result.getId()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
@@ -117,7 +117,7 @@ public class SiteResource {
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getSiteCode()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getId().toString()))
         .body(result);
   }
 
@@ -369,10 +369,7 @@ public class SiteResource {
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<String> ids = results.stream().map(SiteDTO::getSiteCode).collect(Collectors.toList());
-
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 
@@ -394,7 +391,7 @@ public class SiteResource {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
           "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(siteDTOs)) {
-      List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getSiteCode() == null).collect(Collectors.toList());
+      List<SiteDTO> entitiesWithNoId = siteDTOs.stream().filter(site -> site.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
             "bulk.update.failed.noId", "Some DTOs you've provided have no site code, cannot update entities that dont exist")).body(entitiesWithNoId);
@@ -404,10 +401,7 @@ public class SiteResource {
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
     sites = siteRepository.save(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
-    List<String> ids = results.stream().map(SiteDTO::getSiteCode).collect(Collectors.toList());
-
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

@@ -192,9 +192,7 @@ public class ReligiousBeliefResource {
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
     religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
     List<ReligiousBeliefDTO> result = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
-    List<Long> ids = result.stream().map(rb -> rb.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -225,9 +223,7 @@ public class ReligiousBeliefResource {
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
     religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
     List<ReligiousBeliefDTO> results = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
-    List<Long> ids = results.stream().map(rb -> rb.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

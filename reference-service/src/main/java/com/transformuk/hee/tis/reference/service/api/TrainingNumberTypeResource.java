@@ -179,9 +179,7 @@ public class TrainingNumberTypeResource {
     List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeMapper.trainingNumberTypeDTOsToTrainingNumberTypes(trainingNumberTypeDTOS);
     trainingNumberTypes = trainingNumberTypeRepository.save(trainingNumberTypes);
     List<TrainingNumberTypeDTO> result = trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
-    List<Long> ids = result.stream().map(tnt -> tnt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -212,9 +210,7 @@ public class TrainingNumberTypeResource {
     List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeMapper.trainingNumberTypeDTOsToTrainingNumberTypes(trainingNumberTypeDTOS);
     trainingNumberTypes = trainingNumberTypeRepository.save(trainingNumberTypes);
     List<TrainingNumberTypeDTO> results = trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
-    List<Long> ids = results.stream().map(tnt -> tnt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

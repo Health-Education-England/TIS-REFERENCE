@@ -180,9 +180,7 @@ public class RoleResource {
     List<Role> roles = roleMapper.roleDTOsToRoles(roleDTOS);
     roles = roleRepository.save(roles);
     List<RoleDTO> result = roleMapper.rolesToRoleDTOs(roles);
-    List<Long> ids = result.stream().map(roleDTO -> roleDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class RoleResource {
     List<Role> roleList = roleMapper.roleDTOsToRoles(roleDTOS);
     roleList = roleRepository.save(roleList);
     List<RoleDTO> results = roleMapper.rolesToRoleDTOs(roleList);
-    List<Long> ids = results.stream().map(roleDTO -> roleDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

@@ -207,9 +207,7 @@ public class PlacementTypeResource {
     List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
     List<PlacementTypeDTO> result = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
-    List<Long> ids = result.stream().map(placementTypeDTO -> placementTypeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -240,9 +238,7 @@ public class PlacementTypeResource {
     List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
     List<PlacementTypeDTO> results = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
-    List<Long> ids = results.stream().map(placementTypeDTO -> placementTypeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

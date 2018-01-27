@@ -193,9 +193,7 @@ public class TariffRateResource {
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
     tariffRates = tariffRateRepository.save(tariffRates);
     List<TariffRateDTO> result = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
-    List<Long> ids = result.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -226,9 +224,7 @@ public class TariffRateResource {
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
     tariffRates = tariffRateRepository.save(tariffRates);
     List<TariffRateDTO> results = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
-    List<Long> ids = results.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

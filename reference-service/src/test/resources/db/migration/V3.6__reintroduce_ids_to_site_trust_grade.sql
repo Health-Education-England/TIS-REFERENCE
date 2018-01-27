@@ -8,12 +8,19 @@ DROP PRIMARY KEY;
 
 
 ALTER TABLE `Site`
-ADD COLUMN `id` bigint(10) NOT NULL AUTO_INCREMENT;
+ADD COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `Site` ADD PRIMARY KEY(id);
 
 ALTER TABLE `Site`
 MODIFY `siteCode` VARCHAR(255);
+
+--make trust code nullable
+ALTER TABLE `Site`
+MODIFY `trustCode` VARCHAR(255);
+
+ALTER TABLE `Site`
+ADD COLUMN `trustId` bigint(20);
 
 ---
 
@@ -24,7 +31,7 @@ ALTER TABLE `Trust`
 DROP PRIMARY KEY;
 
 ALTER TABLE `Trust`
-ADD COLUMN `id` bigint(10) NOT NULL AUTO_INCREMENT;
+ADD COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `Trust` ADD PRIMARY KEY(id);
 
@@ -40,7 +47,7 @@ ALTER TABLE `Grade`
 DROP PRIMARY KEY;
 
 ALTER TABLE `Grade`
-ADD COLUMN `id` bigint(10) NOT NULL AUTO_INCREMENT;
+ADD COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `Grade` ADD PRIMARY KEY(id);
 
@@ -49,5 +56,14 @@ MODIFY `abbreviation` VARCHAR(255);
 
 ALTER TABLE `Grade`
 ADD COLUMN `intrepidId` VARCHAR(255);
+
+---
+
+--remove unique constraint on code
+ALTER TABLE `MedicalSchool`
+DROP CONSTRAINT `CONSTRAINT_79D`;
+
+ALTER TABLE `MedicalSchool`
+ALTER COLUMN `code` VARCHAR(255);
 
 SET FOREIGN_KEY_CHECKS = 1;

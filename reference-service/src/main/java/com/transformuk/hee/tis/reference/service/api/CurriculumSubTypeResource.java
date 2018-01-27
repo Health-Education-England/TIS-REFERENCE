@@ -228,9 +228,7 @@ public class CurriculumSubTypeResource {
     List<CurriculumSubType> curriculumSubTypes = curriculumSubTypeMapper.curriculumSubTypeDTOsToCurriculumSubTypes(curriculumSubTypeDTOs);
     curriculumSubTypes = curriculumSubTypeRepository.save(curriculumSubTypes);
     List<CurriculumSubTypeDTO> result = curriculumSubTypeMapper.curriculumSubTypesToCurriculumSubTypeDTOs(curriculumSubTypes);
-    List<Long> ids = result.stream().map(cst -> cst.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -261,9 +259,7 @@ public class CurriculumSubTypeResource {
     List<CurriculumSubType> curriculumSubTypes = curriculumSubTypeMapper.curriculumSubTypeDTOsToCurriculumSubTypes(curriculumSubTypeDTOs);
     curriculumSubTypes = curriculumSubTypeRepository.save(curriculumSubTypes);
     List<CurriculumSubTypeDTO> results = curriculumSubTypeMapper.curriculumSubTypesToCurriculumSubTypeDTOs(curriculumSubTypes);
-    List<Long> ids = results.stream().map(cst -> cst.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

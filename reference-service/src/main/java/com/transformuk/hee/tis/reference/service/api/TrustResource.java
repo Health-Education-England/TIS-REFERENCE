@@ -95,8 +95,8 @@ public class TrustResource {
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
     trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
-    return ResponseEntity.created(new URI("/api/trusts/" + result.getCode()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getCode()))
+    return ResponseEntity.created(new URI("/api/trusts/" + result.getId()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
@@ -121,7 +121,7 @@ public class TrustResource {
     trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, trustDTO.getCode()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, trustDTO.getId().toString()))
         .body(result);
   }
 
@@ -217,14 +217,29 @@ public class TrustResource {
   }
 
   /**
+   * GET  /trusts/:id : get trust by id.
+   *
+   * @param id the code of the trustDTO to retrieve
+   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
+   */
+  @GetMapping("/trusts/{id}}")
+  @Timed
+  public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
+    log.debug("REST request to get Trust by id: {}", id);
+    Trust trust = trustRepository.findOne(id);
+    TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
+  }
+
+  /**
    * GET  /trusts/code/:code : get the "code" trust.
    *
    * @param code the code of the trustDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
    */
-  @GetMapping("/trusts/{code}")
+  @GetMapping("/trusts/code/{code}")
   @Timed
-  public ResponseEntity<TrustDTO> getTrust(@PathVariable String code) {
+  public ResponseEntity<TrustDTO> getTrustByCode(@PathVariable String code) {
     log.debug("REST request to get Trust by code: {}", code);
     Trust trust = trustRepository.findByCode(code);
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
@@ -245,7 +260,7 @@ public class TrustResource {
     log.info("REST request to bulk save Trust : {}", trustDTOs);
     if (!Collections.isEmpty(trustDTOs)) {
       List<String> entityIds = trustDTOs.stream()
-          .filter(trust -> trust.getCode() != null)
+          .filter(trust -> trust.getId() != null)
           .map(TrustDTO::getCode)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
@@ -255,10 +270,7 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<String> ids = results.stream().map(TrustDTO::getCode).collect(Collectors.toList());
-
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 
@@ -280,7 +292,7 @@ public class TrustResource {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
           "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(trustDTOs)) {
-      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getCode() == null).collect(Collectors.toList());
+      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
             "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
@@ -290,10 +302,8 @@ public class TrustResource {
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
     trusts = trustRepository.save(trusts);
     List<TrustDTO> results = trustMapper.trustsToTrustDTOs(trusts);
-    List<String> codes = results.stream().map(TrustDTO::getCode).collect(Collectors.toList());
 
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(codes, ",")))
         .body(results);
   }
 

@@ -180,9 +180,7 @@ public class RecordTypeResource {
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
     recordTypes = recordTypeRepository.save(recordTypes);
     List<RecordTypeDTO> result = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
-    List<Long> ids = result.stream().map(rt -> rt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class RecordTypeResource {
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
     recordTypes = recordTypeRepository.save(recordTypes);
     List<RecordTypeDTO> results = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
-    List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

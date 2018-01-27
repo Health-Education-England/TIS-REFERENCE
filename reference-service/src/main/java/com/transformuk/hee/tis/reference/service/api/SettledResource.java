@@ -180,9 +180,7 @@ public class SettledResource {
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
     settledList = settledRepository.save(settledList);
     List<SettledDTO> result = settledMapper.settledsToSettledDTOs(settledList);
-    List<Long> ids = result.stream().map(settledDTO -> settledDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class SettledResource {
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
     settledList = settledRepository.save(settledList);
     List<SettledDTO> results = settledMapper.settledsToSettledDTOs(settledList);
-    List<Long> ids = results.stream().map(settledDTO -> settledDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

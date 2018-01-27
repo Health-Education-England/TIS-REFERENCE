@@ -191,9 +191,7 @@ public class FundingIssueResource {
     List<FundingIssue> fundingIssues = fundingIssueMapper.fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
     fundingIssues = fundingIssueRepository.save(fundingIssues);
     List<FundingIssueDTO> result = fundingIssueMapper.fundingIssuesToFundingIssueDTOs(fundingIssues);
-    List<Long> ids = result.stream().map(fi -> fi.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -224,9 +222,7 @@ public class FundingIssueResource {
     List<FundingIssue> fundingIssues = fundingIssueMapper.fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
     fundingIssues = fundingIssueRepository.save(fundingIssues);
     List<FundingIssueDTO> results = fundingIssueMapper.fundingIssuesToFundingIssueDTOs(fundingIssues);
-    List<Long> ids = results.stream().map(fi -> fi.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

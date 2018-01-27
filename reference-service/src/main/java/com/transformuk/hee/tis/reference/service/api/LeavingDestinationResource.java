@@ -191,9 +191,7 @@ public class LeavingDestinationResource {
     List<LeavingDestination> leavingDestinations = leavingDestinationMapper.leavingDestinationDTOsToLeavingDestinations(leavingDestinationDTOS);
     leavingDestinations = leavingDestinationRepository.save(leavingDestinations);
     List<LeavingDestinationDTO> result = leavingDestinationMapper.leavingDestinationsToLeavingDestinationDTOs(leavingDestinations);
-    List<Long> ids = result.stream().map(leavingDestinationDTO -> leavingDestinationDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -224,9 +222,7 @@ public class LeavingDestinationResource {
     List<LeavingDestination> leavingDestinations = leavingDestinationMapper.leavingDestinationDTOsToLeavingDestinations(leavingDestinationDTOS);
     leavingDestinations = leavingDestinationRepository.save(leavingDestinations);
     List<LeavingDestinationDTO> results = leavingDestinationMapper.leavingDestinationsToLeavingDestinationDTOs(leavingDestinations);
-    List<Long> ids = results.stream().map(leavingDestinationDTO -> leavingDestinationDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

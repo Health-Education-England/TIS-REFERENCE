@@ -180,9 +180,7 @@ public class GenderResource {
     List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
     genders = genderRepository.save(genders);
     List<GenderDTO> result = genderMapper.gendersToGenderDTOs(genders);
-    List<Long> ids = result.stream().map(genderDTO -> genderDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class GenderResource {
     List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
     genders = genderRepository.save(genders);
     List<GenderDTO> results = genderMapper.gendersToGenderDTOs(genders);
-    List<Long> ids = results.stream().map(g -> g.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

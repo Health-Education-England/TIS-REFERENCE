@@ -191,9 +191,7 @@ public class NationalityResource {
     List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
     nationalities = nationalityRepository.save(nationalities);
     List<NationalityDTO> result = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
-    List<Long> ids = result.stream().map(nationalityDTO -> nationalityDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -224,9 +222,7 @@ public class NationalityResource {
     List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
     nationalities = nationalityRepository.save(nationalities);
     List<NationalityDTO> results = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
-    List<Long> ids = results.stream().map(nationalityDTO -> nationalityDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

@@ -36,6 +36,8 @@ public class  Site implements Serializable {
 
   private String trustCode;
 
+  private Long trustId;
+
   private String siteName;
 
   private String address;
@@ -98,6 +100,19 @@ public class  Site implements Serializable {
 
   public Site trustCode(String trustCode) {
     this.trustCode = trustCode;
+    return this;
+  }
+
+  public Long getTrustId() {
+    return trustId;
+  }
+
+  public void setTrustId(Long trustId) {
+    this.trustId = trustId;
+  }
+
+  public Site trustId(Long trustId) {
+    this.trustId = trustId;
     return this;
   }
 

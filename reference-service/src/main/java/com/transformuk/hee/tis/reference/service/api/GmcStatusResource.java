@@ -180,9 +180,7 @@ public class GmcStatusResource {
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
     gmcStatuses = gmcStatusRepository.save(gmcStatuses);
     List<GmcStatusDTO> result = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
-    List<Long> ids = result.stream().map(gmcStatusDTO -> gmcStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class GmcStatusResource {
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
     gmcStatuses = gmcStatusRepository.save(gmcStatuses);
     List<GmcStatusDTO> results = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
-    List<Long> ids = results.stream().map(gmcStatusDTO -> gmcStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

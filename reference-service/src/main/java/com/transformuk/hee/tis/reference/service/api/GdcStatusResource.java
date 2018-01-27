@@ -179,9 +179,7 @@ public class GdcStatusResource {
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
     gdcStatuses = gdcStatusRepository.save(gdcStatuses);
     List<GdcStatusDTO> result = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
-    List<Long> ids = result.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -212,9 +210,7 @@ public class GdcStatusResource {
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
     gdcStatuses = gdcStatusRepository.save(gdcStatuses);
     List<GdcStatusDTO> results = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
-    List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

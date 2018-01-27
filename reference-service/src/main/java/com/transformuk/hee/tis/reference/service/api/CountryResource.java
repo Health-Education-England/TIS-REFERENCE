@@ -220,9 +220,7 @@ public class CountryResource {
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
     countries = countryRepository.save(countries);
     List<CountryDTO> result = countryMapper.countriesToCountryDTOs(countries);
-    List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -253,9 +251,7 @@ public class CountryResource {
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
     countries = countryRepository.save(countries);
     List<CountryDTO> results = countryMapper.countriesToCountryDTOs(countries);
-    List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

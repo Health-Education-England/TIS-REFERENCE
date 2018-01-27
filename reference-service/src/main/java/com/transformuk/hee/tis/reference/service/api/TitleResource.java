@@ -179,9 +179,7 @@ public class TitleResource {
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);
     titles = titleRepository.save(titles);
     List<TitleDTO> result = titleMapper.titlesToTitleDTOs(titles);
-    List<Long> ids = result.stream().map(titleDTO -> titleDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -212,9 +210,7 @@ public class TitleResource {
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);
     titles = titleRepository.save(titles);
     List<TitleDTO> results = titleMapper.titlesToTitleDTOs(titles);
-    List<Long> ids = results.stream().map(titleDTO -> titleDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

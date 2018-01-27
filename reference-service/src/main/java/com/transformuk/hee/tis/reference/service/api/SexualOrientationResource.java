@@ -179,9 +179,7 @@ public class SexualOrientationResource {
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper.sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
     sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
     List<SexualOrientationDTO> result = sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
-    List<Long> ids = result.stream().map(so -> so.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -212,9 +210,7 @@ public class SexualOrientationResource {
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper.sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
     sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
     List<SexualOrientationDTO> results = sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
-    List<Long> ids = results.stream().map(so -> so.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

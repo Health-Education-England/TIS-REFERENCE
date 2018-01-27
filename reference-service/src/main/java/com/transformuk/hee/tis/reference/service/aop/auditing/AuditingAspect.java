@@ -56,16 +56,16 @@ public class AuditingAspect {
 
   @PostConstruct
   public void initClassToPrimaryKeyMap() {
-    classToPrimaryKeyMap.put("TrustDTO", "code");
-    classToPrimaryKeyMap.put("SiteDTO", "siteCode");
-    classToPrimaryKeyMap.put("GradeDTO", "abbreviation");
+    classToPrimaryKeyMap.put("TrustDTO", "id");
+    classToPrimaryKeyMap.put("SiteDTO", "id");
+    classToPrimaryKeyMap.put("GradeDTO", "id");
   }
 
   @PostConstruct
   public void initiClassToIdClass() {
-    classToIdClass.put("TrustDTO", String.class);
-    classToIdClass.put("SiteDTO", String.class);
-    classToIdClass.put("GradeDTO", String.class);
+    classToIdClass.put("TrustDTO", Long.class);
+    classToIdClass.put("SiteDTO", Long.class);
+    classToIdClass.put("GradeDTO", Long.class);
   }
 
   /**

@@ -1,9 +1,12 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,6 +15,8 @@ import java.util.Objects;
  */
 public class GradeDTO implements Serializable {
 
+  @NotNull(groups = Update.class, message = "id must not be null during update")
+  @Null(groups = Create.class, message = "id must be null during create")
   private Long id;
 
   private String abbreviation;
@@ -20,14 +25,11 @@ public class GradeDTO implements Serializable {
 
   private String label;
 
-  @NotNull
-  private Boolean trainingGrade;
+  private boolean trainingGrade;
 
-  @NotNull
-  private Boolean postGrade;
+  private boolean postGrade;
 
-  @NotNull
-  private Boolean placementGrade;
+  private boolean placementGrade;
 
   private Status status;
 
@@ -65,24 +67,28 @@ public class GradeDTO implements Serializable {
     this.label = label;
   }
 
-  public Boolean getTrainingGrade() {
+  public boolean isTrainingGrade() {
     return trainingGrade;
   }
 
-  public void setTrainingGrade(Boolean trainingGrade) {
+  public void setTrainingGrade(boolean trainingGrade) {
     this.trainingGrade = trainingGrade;
   }
 
-  public Boolean getPostGrade() {
+  public boolean isPostGrade() {
     return postGrade;
   }
 
-  public void setPostGrade(Boolean postGrade) {
+  public void setPostGrade(boolean postGrade) {
     this.postGrade = postGrade;
   }
 
-  public Boolean getPlacementGrade() {
+  public boolean isPlacementGrade() {
     return placementGrade;
+  }
+
+  public void setPlacementGrade(boolean placementGrade) {
+    this.placementGrade = placementGrade;
   }
 
   public void setPlacementGrade(Boolean placementGrade) {

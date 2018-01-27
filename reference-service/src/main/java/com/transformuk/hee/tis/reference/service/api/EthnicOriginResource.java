@@ -180,9 +180,7 @@ public class EthnicOriginResource {
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
     List<EthnicOriginDTO> result = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
-    List<Long> ids = result.stream().map(eo -> eo.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -213,9 +211,7 @@ public class EthnicOriginResource {
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
     List<EthnicOriginDTO> results = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
-    List<Long> ids = results.stream().map(eo -> eo.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

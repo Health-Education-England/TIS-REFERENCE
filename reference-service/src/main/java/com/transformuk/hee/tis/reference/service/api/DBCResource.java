@@ -218,9 +218,7 @@ public class DBCResource {
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
     dbcs = dBCRepository.save(dbcs);
     List<DBCDTO> result = dBCMapper.dBCSToDBCDTOs(dbcs);
-    List<Long> ids = result.stream().map(dbc -> dbc.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -249,9 +247,7 @@ public class DBCResource {
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
     dbcs = dBCRepository.save(dbcs);
     List<DBCDTO> results = dBCMapper.dBCSToDBCDTOs(dbcs);
-    List<Long> ids = results.stream().map(dbc -> dbc.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }
