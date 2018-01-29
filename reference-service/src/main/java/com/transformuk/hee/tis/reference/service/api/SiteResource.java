@@ -205,6 +205,29 @@ public class SiteResource {
     }
   }
 
+  /**
+   * GET  /sites/ids/in : get sites given to ids.
+   * Ignores malformed or not found sites
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty list
+   */
+  @ApiOperation(value = "get a collection of sites by id")
+  @GetMapping("/sites/ids/in")
+  @Timed
+  public ResponseEntity<List<SiteDTO>> getSitesInById(@RequestParam List<Long> ids) {
+    log.debug("REST request to find several Sites by ids {}", ids);
+    List<SiteDTO> resp = new ArrayList<>();
+    if (CollectionUtils.isEmpty(ids)) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    } else {
+      List<Site> sites = siteRepository.findAll(ids);
+      resp = siteMapper.sitesToSiteDTOs(sites);
+      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+    }
+  }
+
+
   @ApiOperation(value = "searchSites()",
       notes = "Returns a list of sites matching given search string",
       response = List.class, responseContainer = "Sites List")

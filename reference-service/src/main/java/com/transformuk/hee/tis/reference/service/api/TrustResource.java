@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -202,6 +201,29 @@ public class TrustResource {
       return new ResponseEntity<>(resp, HttpStatus.FOUND);
     } else {
       return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+  }
+
+  /**
+   * GET  /trusts/ids/in : get trusts given to ids.
+   * Ignores malformed or not found trusts
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty list
+   */
+  @ApiOperation("Get a list of trusts by id")
+  @GetMapping("/trusts/ids/in")
+  @Timed
+  public ResponseEntity<List<TrustDTO>> getTrustsIdsIn(@RequestParam List<Long> ids) {
+    log.debug("REST request to find several Trusts by id");
+    List<TrustDTO> resp = new ArrayList<>();
+
+    if (CollectionUtils.isEmpty(ids)) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    } else {
+      List<Trust> trusts = trustRepository.findAll(ids);
+      resp = trustMapper.trustsToTrustDTOs(trusts);
+      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
   }
 

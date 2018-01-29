@@ -156,6 +156,28 @@ public class GradeResource {
   }
 
   /**
+   * GET  /grades/ids/in : get grades by a list of ids in query param.
+   * Ignores malformed or not found grades
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty list
+   */
+  @GetMapping("/grades/ids/in")
+  @Timed
+  public ResponseEntity<List<GradeDTO>> getGradesByIds(@RequestParam List<Long> ids) {
+    log.debug("REST request to find several Grades by ids");
+    List<GradeDTO> resp = new ArrayList<>();
+
+    if (CollectionUtils.isEmpty(ids)) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    } else {
+      List<Grade> grades = gradeRepository.findAll(ids);
+      resp = gradeMapper.gradesToGradeDTOs(grades);
+      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+    }
+  }
+
+  /**
    * GET  /grades : get all the grades.
    *
    * @param pageable the pagination information
@@ -201,7 +223,7 @@ public class GradeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
     return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-  
+
   /**
    * EXISTS /grades/exists/ : check is site exists
    *
