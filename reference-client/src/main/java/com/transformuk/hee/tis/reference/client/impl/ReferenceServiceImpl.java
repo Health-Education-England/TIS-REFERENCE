@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -263,10 +265,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public List<SiteDTO> findSitesIdIn(Set<Long> ids) {
     String url = serviceUrl + FIND_SITES_ID_IN_ENDPOINT + String.join(",", ids.toString());
-    ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
-        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {
-        });
-    return responseEntity.getBody();
+    try {
+      ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
+          exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {
+          });
+      return responseEntity.getBody();
+    } catch(Exception e) {
+      LOG.error("Exception during find sites id in, returning empty list. Here's the error message {}", e.getMessage());
+      return Collections.EMPTY_LIST;
+    }
   }
 
   @Override
@@ -281,10 +288,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public List<GradeDTO> findGradesIdIn(Set<Long> ids) {
     String url = serviceUrl + FIND_GRADES_ID_IN_ENDPOINT + String.join(",", ids.toString());
-    ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
-        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
-        });
-    return responseEntity.getBody();
+    try {
+      ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
+          exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
+          });
+      return responseEntity.getBody();
+    }catch (Exception e) {
+      LOG.error("Exception during find grade id in, returning empty list. Here's the error message {}", e.getMessage());
+      return Collections.EMPTY_LIST;
+    }
   }
 
   @Override
