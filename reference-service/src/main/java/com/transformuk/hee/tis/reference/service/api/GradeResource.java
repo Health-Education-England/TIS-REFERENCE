@@ -3,6 +3,8 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
@@ -25,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,7 +79,7 @@ public class GradeResource {
   @PostMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> createGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> createGrade(@Validated(Create.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to save Grade : {}", gradeDTO);
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
@@ -98,7 +101,7 @@ public class GradeResource {
   @PutMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> updateGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> updateGrade(@Validated(Update.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to update Grade : {}", gradeDTO);
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
