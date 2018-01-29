@@ -243,11 +243,12 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts/R1A"))
+    restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.code").value("R1A"))
-        .andExpect(jsonPath("$.trustName").value("Worcestershire Health and Care NHS Trust"));
+        .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+        .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME));
   }
 
 

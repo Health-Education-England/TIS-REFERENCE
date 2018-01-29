@@ -222,7 +222,7 @@ public class TrustResource {
    * @param id the code of the trustDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
    */
-  @GetMapping("/trusts/{id}}")
+  @GetMapping("/trusts/{id}")
   @Timed
   public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
     log.debug("REST request to get Trust by id: {}", id);

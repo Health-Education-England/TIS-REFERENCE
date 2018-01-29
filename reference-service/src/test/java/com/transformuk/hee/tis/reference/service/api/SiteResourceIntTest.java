@@ -452,7 +452,7 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
-  public void updateNonExistingSite() throws Exception {
+  public void updateNonExistingSiteShouldFailValidation() throws Exception {
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Create the Site
@@ -462,11 +462,11 @@ public class SiteResourceIntTest {
     restSiteMockMvc.perform(put("/api/sites")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
-        .andExpect(status().isOk());
+        .andExpect(status().isBadRequest());
 
     // Validate the Site in the database
     List<Site> siteList = siteRepository.findAll();
-    assertThat(siteList).hasSize(databaseSizeBeforeUpdate + 1);
+    assertThat(siteList).hasSize(databaseSizeBeforeUpdate);
   }
 
 

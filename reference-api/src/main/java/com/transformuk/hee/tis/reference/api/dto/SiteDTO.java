@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -11,6 +15,8 @@ import java.util.Objects;
  */
 public class SiteDTO implements Serializable {
 
+  @NotNull(groups = Update.class, message = "Id cannot be null during update")
+  @Null(groups = Create.class, message = "Id must be null in order to create")
   private Long id;
 
   private String siteCode;

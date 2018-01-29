@@ -4,6 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
@@ -29,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,11 +89,8 @@ public class SiteResource {
   @PostMapping("/sites")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<SiteDTO> createSite(@Valid @RequestBody SiteDTO siteDTO) throws URISyntaxException {
+  public ResponseEntity<SiteDTO> createSite(@Validated(Create.class) @RequestBody SiteDTO siteDTO) throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
-    if (siteDTO.getId() != null && siteRepository.findOne(siteDTO.getId()) != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Cannot create new site, site code already exists")).body(null);
-    }
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
@@ -111,7 +111,7 @@ public class SiteResource {
   @PutMapping("/sites")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<SiteDTO> updateSite(@Valid @RequestBody SiteDTO siteDTO) {
+  public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
