@@ -35,6 +35,7 @@ import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,9 +65,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
-  private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/in/id/";
+  private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
-  private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/in/id/";
+  private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
@@ -264,14 +266,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<SiteDTO> findSitesIdIn(Set<Long> ids) {
-    String url = serviceUrl + FIND_SITES_ID_IN_ENDPOINT + String.join(",", ids.toString());
+    String url = serviceUrl + FIND_SITES_ID_IN_ENDPOINT;
+    String joinedIds = StringUtils.join(ids, ",");
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+        .queryParam("ids", joinedIds);
     try {
       ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
-          exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {
-          });
+          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
+              new ParameterizedTypeReference<List<SiteDTO>>() {});
       return responseEntity.getBody();
     } catch(Exception e) {
-      LOG.error("Exception during find sites id in, returning empty list. Here's the error message {}", e.getMessage());
+      LOG.error("Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
+          joinedIds, e.getMessage());
       return Collections.EMPTY_LIST;
     }
   }
@@ -287,14 +293,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<GradeDTO> findGradesIdIn(Set<Long> ids) {
-    String url = serviceUrl + FIND_GRADES_ID_IN_ENDPOINT + String.join(",", ids.toString());
+    String url = serviceUrl + FIND_GRADES_ID_IN_ENDPOINT;
+    String joinedIds = StringUtils.join(ids, ",");
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+        .queryParam("ids", joinedIds);
     try {
       ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
-          exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
+          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
           });
       return responseEntity.getBody();
     }catch (Exception e) {
-      LOG.error("Exception during find grade id in, returning empty list. Here's the error message {}", e.getMessage());
+      LOG.error("Exception during find grade id in for ids [{}], returning empty list. Here's the error message {}",
+          joinedIds, e.getMessage());
       return Collections.EMPTY_LIST;
     }
   }
