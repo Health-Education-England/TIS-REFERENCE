@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,6 +30,10 @@ public class FundingIssue implements Serializable {
   @Column(name = "code", nullable = false)
   private String code;
 
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
+
   public Long getId() {
     return id;
   }
@@ -44,6 +52,19 @@ public class FundingIssue implements Serializable {
 
   public FundingIssue code(String code) {
     this.code = code;
+    return this;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public FundingIssue status(Status status) {
+    this.status = status;
     return this;
   }
 
@@ -71,7 +92,8 @@ public class FundingIssue implements Serializable {
   public String toString() {
     return "FundingIssue{" +
         "id=" + id +
-        ", code='" + code + "'" +
+        ", code='" + code + '\'' +
+        ", status=" + status +
         '}';
   }
 }

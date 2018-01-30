@@ -5,8 +5,10 @@ import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.Rotation;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
@@ -108,6 +110,22 @@ public class RotationResource {
     log.debug("REST request to get a page of Rotations");
     Page<RotationDTO> page = rotationService.findAll(pageable);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/rotations");
+    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /current/rotations : get all the current rotations.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of rotations in body
+   */
+  @GetMapping("/current/rotations")
+  @Timed
+  public ResponseEntity<List<RotationDTO>> getAllCurrentRotations(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of Rotations");
+    Rotation status = new Rotation().status(Status.CURRENT);
+    Page<RotationDTO> page = rotationService.findAllCurrent(pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/rotations");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }
 

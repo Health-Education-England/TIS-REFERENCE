@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,12 +25,17 @@ public class Trust implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @Column(name = "code", nullable = false)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "code")
   private String code;
 
   private String localOffice;
 
-  private String status;
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
 
   private String trustKnownAs;
 
@@ -39,6 +48,14 @@ public class Trust implements Serializable {
   private String postCode;
 
   private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getCode() {
     return code;
@@ -66,15 +83,15 @@ public class Trust implements Serializable {
     return this;
   }
 
-  public String getStatus() {
+  public Status getStatus() {
     return status;
   }
 
-  public void setStatus(String status) {
+  public void setStatus(Status status) {
     this.status = status;
   }
 
-  public Trust status(String status) {
+  public Trust status(Status status) {
     this.status = status;
     return this;
   }
@@ -166,29 +183,30 @@ public class Trust implements Serializable {
       return false;
     }
     Trust trust = (Trust) o;
-    if (trust.code == null || code == null) {
+    if (trust.id == null || id == null) {
       return false;
     }
-    return Objects.equals(code, trust.code);
+    return Objects.equals(id, trust.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(code);
+    return Objects.hashCode(id);
   }
 
   @Override
   public String toString() {
     return "Trust{" +
-        ",code='" + code + "'" +
-        ", localOffice='" + localOffice + "'" +
-        ", status='" + status + "'" +
-        ", trustKnownAs='" + trustKnownAs + "'" +
-        ", trustName='" + trustName + "'" +
-        ", trustNumber='" + trustNumber + "'" +
-        ", address='" + address + "'" +
-        ", postCode='" + postCode + "'" +
-        ", intrepidId='" + intrepidId + "'" +
+        "id=" + id +
+        ", code='" + code + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", status=" + status +
+        ", trustKnownAs='" + trustKnownAs + '\'' +
+        ", trustName='" + trustName + '\'' +
+        ", trustNumber='" + trustNumber + '\'' +
+        ", address='" + address + '\'' +
+        ", postCode='" + postCode + '\'' +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

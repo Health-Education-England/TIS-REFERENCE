@@ -163,82 +163,6 @@ public class GradeResourceIntTest {
 
   @Test
   @Transactional
-  public void checkAbbreviationIsRequired() throws Exception {
-    int databaseSizeBeforeTest = gradeRepository.findAll().size();
-    // set the field null
-    grade.setAbbreviation(null);
-
-    // Create the Grade, which fails.
-    GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
-
-    restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeTest);
-  }
-
-  @Test
-  @Transactional
-  public void checkTrainingGradeIsRequired() throws Exception {
-    int databaseSizeBeforeTest = gradeRepository.findAll().size();
-    // set the field null
-    grade.setTrainingGrade(null);
-
-    // Create the Grade, which fails.
-    GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
-
-    restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeTest);
-  }
-
-  @Test
-  @Transactional
-  public void checkPostGradeIsRequired() throws Exception {
-    int databaseSizeBeforeTest = gradeRepository.findAll().size();
-    // set the field null
-    grade.setPostGrade(null);
-
-    // Create the Grade, which fails.
-    GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
-
-    restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeTest);
-  }
-
-  @Test
-  @Transactional
-  public void checkPlacementGradeIsRequired() throws Exception {
-    int databaseSizeBeforeTest = gradeRepository.findAll().size();
-    // set the field null
-    grade.setPlacementGrade(null);
-
-    // Create the Grade, which fails.
-    GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
-
-    restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeTest);
-  }
-
-  @Test
-  @Transactional
   public void getAllGrades() throws Exception {
     // Initialize the database
     gradeRepository.saveAndFlush(grade);
@@ -293,12 +217,13 @@ public class GradeResourceIntTest {
   @Transactional
   public void getGrade() throws Exception {
     // Initialize the database
-    gradeRepository.saveAndFlush(grade);
+    grade = gradeRepository.saveAndFlush(grade);
 
     // Get the grade
-    restGradeMockMvc.perform(get("/api/grades/{abbreviation}", grade.getAbbreviation()))
+    restGradeMockMvc.perform(get("/api/grades/{id}", grade.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id").value(grade.getId()))
         .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL))
@@ -344,11 +269,11 @@ public class GradeResourceIntTest {
   @Transactional
   public void updateGrade() throws Exception {
     // Initialize the database
-    gradeRepository.saveAndFlush(grade);
+    grade = gradeRepository.saveAndFlush(grade);
     int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
 
     // Update the grade
-    Grade updatedGrade = gradeRepository.findOne(grade.getAbbreviation());
+    Grade updatedGrade = gradeRepository.findOne(grade.getId());
     updatedGrade
         .name(UPDATED_NAME)
         .label(UPDATED_LABEL)
@@ -386,28 +311,11 @@ public class GradeResourceIntTest {
     restGradeMockMvc.perform(put("/api/grades")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
-        .andExpect(status().isOk());
+        .andExpect(status().isBadRequest());
 
-    // Validate the Grade in the database
+    // Validate the Grade is not saved
     List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeUpdate + 1);
-  }
-
-  @Test
-  @Transactional
-  public void deleteGrade() throws Exception {
-    // Initialize the database
-    gradeRepository.saveAndFlush(grade);
-    int databaseSizeBeforeDelete = gradeRepository.findAll().size();
-
-    // Get the grade
-    restGradeMockMvc.perform(delete("/api/grades/{abbreviation}", grade.getAbbreviation())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
-        .andExpect(status().isOk());
-
-    // Validate the database is empty
-    List<Grade> gradeList = gradeRepository.findAll();
-    assertThat(gradeList).hasSize(databaseSizeBeforeDelete - 1);
+    assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
   }
 
   @Test

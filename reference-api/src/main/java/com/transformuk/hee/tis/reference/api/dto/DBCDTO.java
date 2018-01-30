@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -20,6 +22,8 @@ public class DBCDTO implements Serializable {
 
   @NotNull
   private String abbr;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -53,6 +57,14 @@ public class DBCDTO implements Serializable {
     this.abbr = abbr;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -80,9 +92,10 @@ public class DBCDTO implements Serializable {
   public String toString() {
     return "DBCDTO{" +
         "id=" + id +
-        ", dbc='" + dbc + "'" +
-        ", name='" + name + "'" +
-        ", abbr='" + abbr + "'" +
+        ", dbc='" + dbc + '\'' +
+        ", name='" + name + '\'' +
+        ", abbr='" + abbr + '\'' +
+        ", status=" + status +
         '}';
   }
 }

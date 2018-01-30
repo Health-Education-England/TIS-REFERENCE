@@ -168,11 +168,11 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
-  public void createSiteWithExistingSiteCode() throws Exception {
+  public void createSiteWithExistingSiteId() throws Exception {
     int databaseSizeBeforeCreate = siteRepository.findAll().size();
-    String siteCode = siteRepository.findAll().get(0).getSiteCode();
+    Long siteId = siteRepository.findAll().get(0).getId();
     // Create the Site with an existing siteCode
-    site.setSiteCode(siteCode);
+    site.setId(siteId);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
 
     // An entity with an existing siteCode cannot be created, so this API call must fail
@@ -188,27 +188,9 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
-  public void checkSiteCodeIsRequired() throws Exception {
-    int databaseSizeBeforeTest = siteRepository.findAll().size();
-    // set the field null
-    site.setSiteCode(null);
-
-    // Create the Site, which fails.
-    SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
-
-    restSiteMockMvc.perform(post("/api/sites")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Site> siteList = siteRepository.findAll();
-    assertThat(siteList).hasSize(databaseSizeBeforeTest);
-  }
-
-  @Test
-  @Transactional
   public void getAllSites() throws Exception {
     // Initialize the database
+    siteRepository.deleteAllInBatch();
     siteRepository.saveAndFlush(site);
 
     // Get all the siteList
@@ -287,27 +269,28 @@ public class SiteResourceIntTest {
   @Transactional
   public void getSiteByCode() throws Exception {
     // Initialize the database
-    siteRepository.saveAndFlush(site);
+    site = siteRepository.saveAndFlush(this.site);
 
     // Get all the siteList
-    restSiteMockMvc.perform(get("/api/sites/code/R1AAA"))
+    restSiteMockMvc.perform(get("/api/sites/code/{code}", DEFAULT_SITE_CODE))
         .andExpect(status().isOk())
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.siteCode").value("R1AAA"))
-        .andExpect(jsonPath("$.trustCode").value("R1A"))
-        .andExpect(jsonPath("$.siteName").value("Malvern Friends Meeting House"))
-        .andExpect(jsonPath("$.address").value("1 Orchard Road Malvern Worcestershire"))
-        .andExpect(jsonPath("$.postCode").value("WR14 3DA"));
+        .andExpect(jsonPath("$.id").value(site.getId().intValue()))
+        .andExpect(jsonPath("$.siteCode").value(DEFAULT_SITE_CODE))
+        .andExpect(jsonPath("$.trustCode").value(DEFAULT_TRUST_CODE))
+        .andExpect(jsonPath("$.siteName").value(DEFAULT_SITE_NAME))
+        .andExpect(jsonPath("$.address").value(DEFAULT_ADDRESS))
+        .andExpect(jsonPath("$.postCode").value(DEFAULT_POST_CODE));
   }
 
   @Test
   @Transactional
   public void getSite() throws Exception {
     // Initialize the database
-    siteRepository.saveAndFlush(site);
+    site = siteRepository.saveAndFlush(this.site);
 
     // Get the site
-    restSiteMockMvc.perform(get("/api/sites/{siteCode}", site.getSiteCode()))
+    restSiteMockMvc.perform(get("/api/sites/{id}", this.site.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.siteCode").value(DEFAULT_SITE_CODE))
@@ -431,11 +414,11 @@ public class SiteResourceIntTest {
   @Transactional
   public void updateSite() throws Exception {
     // Initialize the database
-    siteRepository.saveAndFlush(site);
+    site = siteRepository.saveAndFlush(site);
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Update the site
-    Site updatedSite = siteRepository.findOne(site.getSiteCode());
+    Site updatedSite = siteRepository.findOne(site.getId());
     updatedSite
         .localOffice(UPDATED_LOCAL_OFFICE)
         .trustCode(UPDATED_TRUST_CODE)
@@ -469,7 +452,7 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
-  public void updateNonExistingSite() throws Exception {
+  public void updateNonExistingSiteShouldFailValidation() throws Exception {
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Create the Site
@@ -479,29 +462,13 @@ public class SiteResourceIntTest {
     restSiteMockMvc.perform(put("/api/sites")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
-        .andExpect(status().isOk());
+        .andExpect(status().isBadRequest());
 
     // Validate the Site in the database
     List<Site> siteList = siteRepository.findAll();
-    assertThat(siteList).hasSize(databaseSizeBeforeUpdate + 1);
+    assertThat(siteList).hasSize(databaseSizeBeforeUpdate);
   }
 
-  @Test
-  @Transactional
-  public void deleteSite() throws Exception {
-    // Initialize the database
-    siteRepository.saveAndFlush(site);
-    int databaseSizeBeforeDelete = siteRepository.findAll().size();
-
-    // Get the site
-    restSiteMockMvc.perform(delete("/api/sites/{siteCode}", site.getSiteCode())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
-        .andExpect(status().isOk());
-
-    // Validate the database is empty
-    List<Site> siteList = siteRepository.findAll();
-    assertThat(siteList).hasSize(databaseSizeBeforeDelete - 1);
-  }
 
   @Test
   @Transactional

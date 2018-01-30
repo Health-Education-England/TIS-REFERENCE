@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
@@ -12,6 +13,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
@@ -136,6 +138,21 @@ public class PlacementTypeResource {
   }
 
   /**
+   * GET  /current/placement-types : get all current placementTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of placementTypes in body
+   */
+  @GetMapping("/current/placement-types")
+  @Timed
+  public List<PlacementTypeDTO> getAllCurrentPlacementTypes() {
+    log.debug("REST request to get all PlacementTypes");
+    PlacementType placementType = new PlacementType();
+    placementType.setStatus(Status.CURRENT);
+    List<PlacementType> placementTypes = placementTypeRepository.findAll(Example.of(placementType));
+    return placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
+  }
+
+  /**
    * GET  /placement-types/:id : get the "id" placementType.
    *
    * @param id the id of the placementTypeDTO to retrieve
@@ -190,9 +207,7 @@ public class PlacementTypeResource {
     List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
     List<PlacementTypeDTO> result = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
-    List<Long> ids = result.stream().map(placementTypeDTO -> placementTypeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -223,9 +238,7 @@ public class PlacementTypeResource {
     List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
     List<PlacementTypeDTO> results = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
-    List<Long> ids = results.stream().map(placementTypeDTO -> placementTypeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

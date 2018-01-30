@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,21 @@ public class GdcStatusResource {
   }
 
   /**
+   * GET  /current/gdc-statuses : get all current gdcStatuses.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of gdcStatuses in body
+   */
+  @GetMapping("/current/gdc-statuses")
+  @Timed
+  public List<GdcStatusDTO> getAllCurrentGdcStatuses() {
+    log.debug("REST request to get all current GdcStatuses");
+    GdcStatus gdcStatus = new GdcStatus();
+    gdcStatus.setStatus(Status.CURRENT);
+    List<GdcStatus> gdcStatuses = gdcStatusRepository.findAll(Example.of(gdcStatus));
+    return gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
+  }
+
+  /**
    * GET  /gdc-statuses/:id : get the "id" gdcStatus.
    *
    * @param id the id of the gdcStatusDTO to retrieve
@@ -162,9 +179,7 @@ public class GdcStatusResource {
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
     gdcStatuses = gdcStatusRepository.save(gdcStatuses);
     List<GdcStatusDTO> result = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
-    List<Long> ids = result.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -195,9 +210,7 @@ public class GdcStatusResource {
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
     gdcStatuses = gdcStatusRepository.save(gdcStatuses);
     List<GdcStatusDTO> results = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
-    List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

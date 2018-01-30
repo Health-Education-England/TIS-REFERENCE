@@ -3,6 +3,9 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.Grade;
@@ -10,18 +13,21 @@ import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,16 +79,13 @@ public class GradeResource {
   @PostMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> createGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> createGrade(@Validated(Create.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to save Grade : {}", gradeDTO);
-    if (gradeRepository.findByAbbreviation(gradeDTO.getAbbreviation()) != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A grade already exists with the same abbreviation")).body(null);
-    }
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
     GradeDTO result = gradeMapper.gradeToGradeDTO(grade);
-    return ResponseEntity.created(new URI("/api/grades/" + result.getAbbreviation()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getAbbreviation()))
+    return ResponseEntity.created(new URI("/api/grades/" + result.getId()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
@@ -98,30 +101,27 @@ public class GradeResource {
   @PutMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> updateGrade(@Valid @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> updateGrade(@Validated(Update.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to update Grade : {}", gradeDTO);
-    if (gradeDTO.getAbbreviation() == null) {
-      return createGrade(gradeDTO);
-    }
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
     GradeDTO result = gradeMapper.gradeToGradeDTO(grade);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gradeDTO.getAbbreviation()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gradeDTO.getId().toString()))
         .body(result);
   }
 
   /**
-   * GET  /grades/:abbreviation : get the grade by abbreviation.
+   * GET  /grades/:id : get the grade by id.
    *
-   * @param abbreviation the abbreviation of the gradeDTO to retrieve
+   * @param id the id of the gradeDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the gradeDTO, or with status 404 (Not Found)
    */
-  @GetMapping("/grades/{abbreviation}")
+  @GetMapping("/grades/{id}")
   @Timed
-  public ResponseEntity<GradeDTO> getGrade(@PathVariable String abbreviation) {
-    log.debug("REST request to get Grade : {}", abbreviation);
-    Grade grade = gradeRepository.findOne(abbreviation);
+  public ResponseEntity<GradeDTO> getGrade(@PathVariable Long id) {
+    log.debug("REST request to get Grade : {}", id);
+    Grade grade = gradeRepository.findOne(id);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
   }
@@ -156,6 +156,28 @@ public class GradeResource {
   }
 
   /**
+   * GET  /grades/ids/in : get grades by a list of ids in query param.
+   * Ignores malformed or not found grades
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty list
+   */
+  @GetMapping("/grades/ids/in")
+  @Timed
+  public ResponseEntity<List<GradeDTO>> getGradesByIds(@RequestParam List<Long> ids) {
+    log.debug("REST request to find several Grades by ids");
+    List<GradeDTO> resp = new ArrayList<>();
+
+    if (CollectionUtils.isEmpty(ids)) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    } else {
+      List<Grade> grades = gradeRepository.findAll(ids);
+      resp = gradeMapper.gradesToGradeDTOs(grades);
+      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+    }
+  }
+
+  /**
    * GET  /grades : get all the grades.
    *
    * @param pageable the pagination information
@@ -179,7 +201,29 @@ public class GradeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
     return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-  
+
+  @ApiOperation("Get all current grades using pagination or smart search")
+  @GetMapping("/current/grades")
+  @Timed
+  @Transactional(readOnly = true)
+  public ResponseEntity<List<GradeDTO>> getAllCurrentGrades(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+    log.debug("REST request to get a page of Grades");
+    searchQuery = sanitize(searchQuery);
+    Page<Grade> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      Grade gradeExample = new Grade();
+      gradeExample.setStatus(Status.CURRENT);
+      page = gradeRepository.findAll(Example.of(gradeExample), pageable);
+    } else {
+      page = gradeRepository.findByStatusAndSearchString(Status.CURRENT, searchQuery, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
+    return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
   /**
    * EXISTS /grades/exists/ : check is site exists
    *
@@ -205,18 +249,28 @@ public class GradeResource {
   }
 
   /**
-   * DELETE  /grades/:abbreviation : delete the grade by abbreviation.
+   * EXISTS /grades/ids/exists/ : check is site exists
    *
-   * @param abbreviation the abbreviation of the gradeDTO to delete
-   * @return the ResponseEntity with status 200 (OK)
+   * @param ids the ids of the gradeDTO to check
+   * @return boolean true if exists otherwise false
    */
-  @DeleteMapping("/grades/{abbreviation}")
+  @PostMapping("/grades/ids/exists/")
   @Timed
-  @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteGrade(@PathVariable String abbreviation) {
-    log.debug("REST request to delete Grade : {}", abbreviation);
-    gradeRepository.delete(abbreviation);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, abbreviation)).build();
+  public ResponseEntity<Map<Long, Boolean>> gradeIdsExists(@RequestBody List<Long> ids) {
+    Map<Long, Boolean> gradeExistsMap = Maps.newHashMap();
+    log.debug("REST request to check Grade exists : {}", ids);
+    if (!CollectionUtils.isEmpty(ids)) {
+      List<Grade> found = gradeRepository.findAll(ids);
+      Set<Long> foundIds = found.stream().map(Grade::getId).collect(Collectors.toSet());
+      ids.forEach(id -> {
+        if (foundIds.contains(id)) {
+          gradeExistsMap.put(id, true);
+        } else {
+          gradeExistsMap.put(id, false);
+        }
+      });
+    }
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeExistsMap));
   }
 
 
@@ -233,20 +287,17 @@ public class GradeResource {
   public ResponseEntity<List<GradeDTO>> bulkCreateGrade(@Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save Grade : {}", gradeDTOs);
     if (!Collections.isEmpty(gradeDTOs)) {
-      List<GradeDTO> entityIds = gradeDTOs.stream()
-          .filter(grade -> grade.getAbbreviation() == null)
+      List<GradeDTO> entitiesWithIds = gradeDTOs.stream()
+          .filter(grade -> grade.getId() != null)
           .collect(Collectors.toList());
-      if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "Bulk create grades failed because grades require Abbreviations")).body(null);
+      if (!Collections.isEmpty(entitiesWithIds)) {
+        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithIds, ","), "ids.exist", "Bulk create grades failed because grades cannot be created with ids")).body(null);
       }
     }
     List<Grade> grades = gradeMapper.gradeDTOsToGrades(gradeDTOs);
     grades = gradeRepository.save(grades);
     List<GradeDTO> results = gradeMapper.gradesToGradeDTOs(grades);
-    List<String> abbreviations = results.stream().map(GradeDTO::getAbbreviation).collect(Collectors.toList());
-
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(abbreviations, ",")))
         .body(results);
   }
 
@@ -268,20 +319,18 @@ public class GradeResource {
       return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
           "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(gradeDTOs)) {
-      List<GradeDTO> entitiesWithNoId = gradeDTOs.stream().filter(grades -> grades.getAbbreviation() == null).collect(Collectors.toList());
+      List<GradeDTO> entitiesWithNoId = gradeDTOs.stream().filter(grades -> grades.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no abbreviation, cannot update entities that don't exist")).body(entitiesWithNoId);
+            "bulk.update.failed.noId", "Some DTOs you've provided have no id, cannot update entities that don't exist")).body(entitiesWithNoId);
       }
     }
 
     List<Grade> grades = gradeMapper.gradeDTOsToGrades(gradeDTOs);
     grades = gradeRepository.save(grades);
     List<GradeDTO> results = gradeMapper.gradesToGradeDTOs(grades);
-    List<String> abbreviations = results.stream().map(GradeDTO::getAbbreviation).collect(Collectors.toList());
 
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(abbreviations, ",")))
         .body(results);
   }
 

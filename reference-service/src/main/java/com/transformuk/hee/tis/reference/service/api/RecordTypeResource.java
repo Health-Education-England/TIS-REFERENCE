@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.service.repository.RecordTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,21 @@ public class RecordTypeResource {
   }
 
   /**
+   * GET  /current/record-types : get all the current recordTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of recordTypes in body
+   */
+  @GetMapping("/current/record-types")
+  @Timed
+  public List<RecordTypeDTO> getAllCurrentRecordTypes() {
+    log.debug("REST request to get all RecordTypes");
+    RecordType recordType = new RecordType();
+    recordType.setStatus(Status.CURRENT);
+    List<RecordType> recordTypes = recordTypeRepository.findAll(Example.of(recordType));
+    return recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
+  }
+
+  /**
    * GET  /record-types/:id : get the "id" recordType.
    *
    * @param id the id of the recordTypeDTO to retrieve
@@ -163,9 +180,7 @@ public class RecordTypeResource {
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
     recordTypes = recordTypeRepository.save(recordTypes);
     List<RecordTypeDTO> result = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
-    List<Long> ids = result.stream().map(rt -> rt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -196,9 +211,7 @@ public class RecordTypeResource {
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
     recordTypes = recordTypeRepository.save(recordTypes);
     List<RecordTypeDTO> results = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
-    List<Long> ids = results.stream().map(at -> at.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

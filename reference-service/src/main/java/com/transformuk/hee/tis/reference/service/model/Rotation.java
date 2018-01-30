@@ -1,7 +1,11 @@
 package com.transformuk.hee.tis.reference.service.model;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,6 +32,10 @@ public class Rotation implements Serializable {
 
   @Column(name = "localOffice")
   private String localOffice;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
 
   public Long getId() {
     return id;
@@ -76,6 +84,19 @@ public class Rotation implements Serializable {
     this.localOffice = localOffice;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public Rotation status(Status status) {
+    this.status = status;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -99,10 +120,11 @@ public class Rotation implements Serializable {
   @Override
   public String toString() {
     return "Rotation{" +
-        "id=" + getId() +
-        ", code='" + getCode() + "'" +
-        ", label='" + getLabel() + "'" +
-        ", localOffice='" + getLocalOffice() + "'" +
-        "}";
+        "id=" + id +
+        ", code='" + code + '\'' +
+        ", label='" + label + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", status=" + status +
+        '}';
   }
 }

@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GmcStatusRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -108,6 +110,22 @@ public class GmcStatusResource {
     return gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
   }
 
+
+  /**
+   * GET  /current/gmc-statuses : get all the gmcStatuses.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of gmcStatuses in body
+   */
+  @GetMapping("/current/gmc-statuses")
+  @Timed
+  public List<GmcStatusDTO> getAllCurrentGmcStatuses() {
+    log.debug("REST request to get all current GmcStatuses");
+    GmcStatus gmcStatus = new GmcStatus();
+    gmcStatus.setStatus(Status.CURRENT);
+    List<GmcStatus> gmcStatuses = gmcStatusRepository.findAll(Example.of(gmcStatus));
+    return gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
+  }
+
   /**
    * GET  /gmc-statuses/:id : get the "id" gmcStatus.
    *
@@ -162,9 +180,7 @@ public class GmcStatusResource {
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
     gmcStatuses = gmcStatusRepository.save(gmcStatuses);
     List<GmcStatusDTO> result = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
-    List<Long> ids = result.stream().map(gmcStatusDTO -> gmcStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -195,9 +211,7 @@ public class GmcStatusResource {
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
     gmcStatuses = gmcStatusRepository.save(gmcStatuses);
     List<GmcStatusDTO> results = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
-    List<Long> ids = results.stream().map(gmcStatusDTO -> gmcStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

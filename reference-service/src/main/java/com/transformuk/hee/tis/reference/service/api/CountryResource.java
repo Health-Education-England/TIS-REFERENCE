@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.Country;
@@ -14,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -121,6 +123,24 @@ public class CountryResource {
   }
 
   /**
+   * GET  /current/countries : get all current countries.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of countries in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/countries")
+  @Timed
+  public ResponseEntity<List<CountryDTO>> getAllCurrentCountries(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of current Countries");
+    Country country = new Country();
+    country.setStatus(Status.CURRENT);
+    Page<Country> page = countryRepository.findAll(Example.of(country), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/countries");
+    return new ResponseEntity<>(countryMapper.countriesToCountryDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
    * EXISTS /countries/exists/ : check is countries exists
    *
    * @param values the values of the countryDTO to check
@@ -200,9 +220,7 @@ public class CountryResource {
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
     countries = countryRepository.save(countries);
     List<CountryDTO> result = countryMapper.countriesToCountryDTOs(countries);
-    List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -233,9 +251,7 @@ public class CountryResource {
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
     countries = countryRepository.save(countries);
     List<CountryDTO> results = countryMapper.countriesToCountryDTOs(countries);
-    List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

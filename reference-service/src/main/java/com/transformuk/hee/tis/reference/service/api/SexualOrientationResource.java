@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,20 @@ public class SexualOrientationResource {
   }
 
   /**
+   * GET  /current/sexual-orientations : get all the current sexualOrientations.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of sexualOrientations in body
+   */
+  @GetMapping("/current/sexual-orientations")
+  @Timed
+  public List<SexualOrientationDTO> getAllCurrentSexualOrientations() {
+    log.debug("REST request to get all current SexualOrientations");
+    SexualOrientation sexualOrientation = new SexualOrientation().status(Status.CURRENT);
+    List<SexualOrientation> sexualOrientations = sexualOrientationRepository.findAll(Example.of(sexualOrientation));
+    return sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
+  }
+
+  /**
    * GET  /sexual-orientations/:id : get the "id" sexualOrientation.
    *
    * @param id the id of the sexualOrientationDTO to retrieve
@@ -163,9 +179,7 @@ public class SexualOrientationResource {
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper.sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
     sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
     List<SexualOrientationDTO> result = sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
-    List<Long> ids = result.stream().map(so -> so.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -196,9 +210,7 @@ public class SexualOrientationResource {
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper.sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
     sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
     List<SexualOrientationDTO> results = sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
-    List<Long> ids = results.stream().map(so -> so.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

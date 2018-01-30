@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,22 @@ public class EthnicOriginResource {
   }
 
   /**
+   * GET  /current/ethnic-origins : get all the current ethnicOrigins.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of ethnicOrigins in body
+   */
+  @GetMapping("/current/ethnic-origins")
+  @Timed
+  public List<EthnicOriginDTO> getAllCurrentEthnicOrigins() {
+    log.debug("REST request to get all current EthnicOrigins");
+    EthnicOrigin ethnicOrigin = new EthnicOrigin();
+    ethnicOrigin.setStatus(Status.CURRENT);
+    List<EthnicOrigin> ethnicOrigins = ethnicOriginRepository.findAll(Example.of(ethnicOrigin));
+    return ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
+  }
+
+
+  /**
    * GET  /ethnic-origins/:id : get the "id" ethnicOrigin.
    *
    * @param id the id of the ethnicOriginDTO to retrieve
@@ -162,9 +180,7 @@ public class EthnicOriginResource {
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
     List<EthnicOriginDTO> result = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
-    List<Long> ids = result.stream().map(eo -> eo.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -195,9 +211,7 @@ public class EthnicOriginResource {
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
     List<EthnicOriginDTO> results = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
-    List<Long> ids = results.stream().map(eo -> eo.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

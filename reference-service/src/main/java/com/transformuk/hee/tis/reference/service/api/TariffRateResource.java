@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.TariffRate;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -117,6 +119,25 @@ public class TariffRateResource {
     return new ResponseEntity<>(tariffRateMapper.tariffRatesToTariffRateDTOs(page.getContent()), headers, HttpStatus.OK);
   }
 
+
+  /**
+   * GET  /cuurent/tariff-rates : get all the current tariffRates.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of tariffRates in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/tariff-rates")
+  @Timed
+  public ResponseEntity<List<TariffRateDTO>> getAllCurrentTariffRates(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of TariffRates");
+    TariffRate tariffRate = new TariffRate().status(Status.CURRENT);
+    Page<TariffRate> page = tariffRateRepository.findAll(Example.of(tariffRate), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/tariff-rates");
+    return new ResponseEntity<>(tariffRateMapper.tariffRatesToTariffRateDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+
   /**
    * GET  /tariff-rates/:id : get the "id" tariffRate.
    *
@@ -172,9 +193,7 @@ public class TariffRateResource {
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
     tariffRates = tariffRateRepository.save(tariffRates);
     List<TariffRateDTO> result = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
-    List<Long> ids = result.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -205,9 +224,7 @@ public class TariffRateResource {
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
     tariffRates = tariffRateRepository.save(tariffRates);
     List<TariffRateDTO> results = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
-    List<Long> ids = results.stream().map(tariffRateDTO -> tariffRateDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

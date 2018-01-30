@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.service.mapper.DbcToLocalOfficeMapper;
 import com.transformuk.hee.tis.security.model.UserProfile;
 import com.codahale.metrics.annotation.Timed;
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -136,7 +138,37 @@ public class LocalOfficeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
     return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-  
+
+
+
+  /**
+   * GET  /current/local-offices : get all current localOffices.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of localOffices in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/local-offices")
+  @Timed
+  public ResponseEntity<List<LocalOfficeDTO>> getAllLCurrentocalOffices(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+    log.debug("REST request to get a page of LocalOffices");
+    searchQuery = sanitize(searchQuery);
+    Page<LocalOffice> page;
+    if (StringUtils.isEmpty(searchQuery)) {
+      LocalOffice localOffice = new LocalOffice();
+      localOffice.setStatus(Status.CURRENT);
+      page = localOfficeRepository.findAll(Example.of(localOffice), pageable);
+    } else {
+      page = sitesTrustsService.searchCurrentLocalOffices(searchQuery, pageable);
+    }
+
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
+    return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
 	/**
 	 * GET  /local-offices/user : get all the allowed local offices for the logged in user.
 	 *
@@ -210,9 +242,7 @@ public class LocalOfficeResource {
     List<LocalOffice> localOffices = localOfficeMapper.localOfficeDTOsToLocalOffices(localOfficeDTOS);
     localOffices = localOfficeRepository.save(localOffices);
     List<LocalOfficeDTO> result = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
-    List<Long> ids = result.stream().map(localOfficeDTO -> localOfficeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -243,9 +273,7 @@ public class LocalOfficeResource {
     List<LocalOffice> localOffices = localOfficeMapper.localOfficeDTOsToLocalOffices(localOfficeDTOS);
     localOffices = localOfficeRepository.save(localOffices);
     List<LocalOfficeDTO> results = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
-    List<Long> ids = results.stream().map(localOfficeDTO -> localOfficeDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

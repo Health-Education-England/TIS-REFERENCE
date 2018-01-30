@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +16,8 @@ public class FundingIssueDTO implements Serializable {
 
   @NotNull
   private String code;
+
+  private Status status;
 
   public Long getId() {
     return id;
@@ -29,6 +33,14 @@ public class FundingIssueDTO implements Serializable {
 
   public void setCode(String code) {
     this.code = code;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
   }
 
   @Override
@@ -58,7 +70,8 @@ public class FundingIssueDTO implements Serializable {
   public String toString() {
     return "FundingIssueDTO{" +
         "id=" + id +
-        ", code='" + code + "'" +
+        ", code='" + code + '\'' +
+        ", status=" + status +
         '}';
   }
 }

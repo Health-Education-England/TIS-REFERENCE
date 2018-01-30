@@ -1,7 +1,12 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,12 +15,17 @@ import java.util.Objects;
  */
 public class SiteDTO implements Serializable {
 
-  @NotNull
+  @NotNull(groups = Update.class, message = "Id cannot be null during update")
+  @Null(groups = Create.class, message = "Id must be null in order to create")
+  private Long id;
+
   private String siteCode;
 
   private String localOffice;
 
   private String trustCode;
+
+  private Long trustId;
 
   private String siteName;
 
@@ -29,7 +39,17 @@ public class SiteDTO implements Serializable {
 
   private String organisationalUnit;
 
+  private Status status;
+
   private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getSiteCode() {
     return siteCode;
@@ -53,6 +73,14 @@ public class SiteDTO implements Serializable {
 
   public void setTrustCode(String trustCode) {
     this.trustCode = trustCode;
+  }
+
+  public Long getTrustId() {
+    return trustId;
+  }
+
+  public void setTrustId(Long trustId) {
+    this.trustId = trustId;
   }
 
   public String getSiteName() {
@@ -103,6 +131,14 @@ public class SiteDTO implements Serializable {
     this.organisationalUnit = organisationalUnit;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   public String getIntrepidId() {
     return intrepidId;
   }
@@ -137,16 +173,19 @@ public class SiteDTO implements Serializable {
   @Override
   public String toString() {
     return "SiteDTO{" +
-        "siteCode='" + siteCode + "'" +
-        ", localOffice='" + localOffice + "'" +
-        ", trustCode='" + trustCode + "'" +
-        ", siteName='" + siteName + "'" +
-        ", address='" + address + "'" +
-        ", postCode='" + postCode + "'" +
-        ", siteKnownAs='" + siteKnownAs + "'" +
-        ", siteNumber='" + siteNumber + "'" +
-        ", organisationalUnit='" + organisationalUnit + "'" +
-        ", intrepidId='" + intrepidId + "'" +
+        "id=" + id +
+        ", siteCode='" + siteCode + '\'' +
+        ", localOffice='" + localOffice + '\'' +
+        ", trustCode='" + trustCode + '\'' +
+        ", trustId=" + trustId +
+        ", siteName='" + siteName + '\'' +
+        ", address='" + address + '\'' +
+        ", postCode='" + postCode + '\'' +
+        ", siteKnownAs='" + siteKnownAs + '\'' +
+        ", siteNumber='" + siteNumber + '\'' +
+        ", organisationalUnit='" + organisationalUnit + '\'' +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

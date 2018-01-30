@@ -8,5 +8,7 @@ public interface CurriculumSubTypeService {
 
   Page<CurriculumSubTypeDTO> findAll(Pageable pageable);
 
-  Page<CurriculumSubTypeDTO> advancedSearch(String searchQuery, Pageable pageable);
+  Page<CurriculumSubTypeDTO> findAllCurrent(Pageable pageable);
+
+  Page<CurriculumSubTypeDTO> advancedSearch(boolean currentStatus, String searchQuery, Pageable pageable);
 }

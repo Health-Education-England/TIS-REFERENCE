@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.College;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -118,6 +120,24 @@ public class CollegeResource {
   }
 
   /**
+   * GET  /current/colleges : get all current colleges.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/olleges")
+  @Timed
+  public ResponseEntity<List<CollegeDTO>> getAllCurrentColleges(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of current Colleges");
+    College college = new College();
+    college.setStatus(Status.CURRENT);
+    Page<College> page = collegeRepository.findAll(Example.of(college), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/colleges");
+    return new ResponseEntity<>(collegeMapper.collegesToCollegeDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+  /**
    * GET  /colleges/:id : get the "id" college.
    *
    * @param id the id of the collegeDTO to retrieve
@@ -171,9 +191,7 @@ public class CollegeResource {
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
     colleges = collegeRepository.save(colleges);
     List<CollegeDTO> result = collegeMapper.collegesToCollegeDTOs(colleges);
-    List<Long> ids = result.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -204,9 +222,7 @@ public class CollegeResource {
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
     colleges = collegeRepository.save(colleges);
     List<CollegeDTO> results = collegeMapper.collegesToCollegeDTOs(colleges);
-    List<Long> ids = results.stream().map(c -> c.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

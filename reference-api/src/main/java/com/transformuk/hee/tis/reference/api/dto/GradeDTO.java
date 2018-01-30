@@ -1,7 +1,12 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
+import com.transformuk.hee.tis.reference.api.dto.validation.Create;
+import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,21 +15,33 @@ import java.util.Objects;
  */
 public class GradeDTO implements Serializable {
 
-  @NotNull
+  @NotNull(groups = Update.class, message = "id must not be null during update")
+  @Null(groups = Create.class, message = "id must be null during create")
+  private Long id;
+
   private String abbreviation;
 
   private String name;
 
   private String label;
 
-  @NotNull
-  private Boolean trainingGrade;
+  private boolean trainingGrade;
 
-  @NotNull
-  private Boolean postGrade;
+  private boolean postGrade;
 
-  @NotNull
-  private Boolean placementGrade;
+  private boolean placementGrade;
+
+  private Status status;
+
+  private String intrepidId;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -50,28 +67,48 @@ public class GradeDTO implements Serializable {
     this.label = label;
   }
 
-  public Boolean getTrainingGrade() {
+  public boolean isTrainingGrade() {
     return trainingGrade;
   }
 
-  public void setTrainingGrade(Boolean trainingGrade) {
+  public void setTrainingGrade(boolean trainingGrade) {
     this.trainingGrade = trainingGrade;
   }
 
-  public Boolean getPostGrade() {
+  public boolean isPostGrade() {
     return postGrade;
   }
 
-  public void setPostGrade(Boolean postGrade) {
+  public void setPostGrade(boolean postGrade) {
     this.postGrade = postGrade;
   }
 
-  public Boolean getPlacementGrade() {
+  public boolean isPlacementGrade() {
     return placementGrade;
+  }
+
+  public void setPlacementGrade(boolean placementGrade) {
+    this.placementGrade = placementGrade;
   }
 
   public void setPlacementGrade(Boolean placementGrade) {
     this.placementGrade = placementGrade;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public String getIntrepidId() {
+    return intrepidId;
+  }
+
+  public void setIntrepidId(String intrepidId) {
+    this.intrepidId = intrepidId;
   }
 
   @Override
@@ -100,12 +137,15 @@ public class GradeDTO implements Serializable {
   @Override
   public String toString() {
     return "GradeDTO{" +
-        "abbreviation='" + abbreviation + "'" +
-        ", name='" + name + "'" +
-        ", label='" + label + "'" +
-        ", trainingGrade='" + trainingGrade + "'" +
-        ", postGrade='" + postGrade + "'" +
-        ", placementGrade='" + placementGrade + "'" +
+        "id=" + id +
+        ", abbreviation='" + abbreviation + '\'' +
+        ", name='" + name + '\'' +
+        ", label='" + label + '\'' +
+        ", trainingGrade=" + trainingGrade +
+        ", postGrade=" + postGrade +
+        ", placementGrade=" + placementGrade +
+        ", status=" + status +
+        ", intrepidId='" + intrepidId + '\'' +
         '}';
   }
 }

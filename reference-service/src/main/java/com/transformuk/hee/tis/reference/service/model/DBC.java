@@ -1,8 +1,12 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,6 +37,10 @@ public class DBC implements Serializable {
   @NotNull
   @Column(name = "abbr", nullable = false)
   private String abbr;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
 
   public Long getId() {
     return id;
@@ -81,6 +89,19 @@ public class DBC implements Serializable {
     return this;
   }
 
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public DBC status(Status status) {
+    this.status = status;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -105,9 +126,10 @@ public class DBC implements Serializable {
   public String toString() {
     return "DBC{" +
         "id=" + id +
-        ", dbc='" + dbc + "'" +
-        ", name='" + name + "'" +
-        ", abbr='" + abbr + "'" +
+        ", dbc='" + dbc + '\'' +
+        ", name='" + name + '\'' +
+        ", abbr='" + abbr + '\'' +
+        ", status=" + status +
         '}';
   }
 }

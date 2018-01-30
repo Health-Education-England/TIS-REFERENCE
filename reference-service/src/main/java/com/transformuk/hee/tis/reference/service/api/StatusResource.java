@@ -163,9 +163,7 @@ public class StatusResource {
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);
     statuses = statusRepository.save(statuses);
     List<StatusDTO> result = statusMapper.statusesToStatusDTOs(statuses);
-    List<Long> ids = result.stream().map(statusDTO -> statusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -196,9 +194,7 @@ public class StatusResource {
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);
     statuses = statusRepository.save(statuses);
     List<StatusDTO> results = statusMapper.statusesToStatusDTOs(statuses);
-    List<Long> ids = results.stream().map(statusDTO -> statusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

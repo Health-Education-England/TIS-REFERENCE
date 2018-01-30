@@ -3,8 +3,12 @@ package com.transformuk.hee.tis.reference.service.model;
 
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -25,6 +29,10 @@ public class AssessmentType implements Serializable {
   @NotNull(groups = {Update.class, Create.class}, message = "label is needed for both create and update")
   private String label;
 
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status")
+  private Status status;
+
   public String getCode() {
     return code;
   }
@@ -43,6 +51,19 @@ public class AssessmentType implements Serializable {
 
   public AssessmentType name(String label) {
     this.label = label;
+    return this;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public AssessmentType status(Status status) {
+    this.status = status;
     return this;
   }
 
@@ -68,9 +89,10 @@ public class AssessmentType implements Serializable {
 
   @Override
   public String toString() {
-    return "College{" +
-        "code=" + code +
-        ", label='" + label + "'" +
+    return "AssessmentType{" +
+        "code='" + code + '\'' +
+        ", label='" + label + '\'' +
+        ", status=" + status +
         '}';
   }
 }

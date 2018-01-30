@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,21 @@ public class ProgrammeMembershipTypeResource {
   }
 
   /**
+   * GET  /current/programme-membership-types : get all the programmeMembershipTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of programmeMembershipTypes in body
+   */
+  @GetMapping("/current/programme-membership-types")
+  @Timed
+  public List<ProgrammeMembershipTypeDTO> getAllCurrentProgrammeMembershipTypes() {
+    log.debug("REST request to get all ProgrammeMembershipTypes");
+    ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType();
+    programmeMembershipType.setStatus(Status.CURRENT);
+    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll(Example.of(programmeMembershipType));
+    return programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
+  }
+
+  /**
    * GET  /programme-membership-types/:id : get the "id" programmeMembershipType.
    *
    * @param id the id of the programmeMembershipTypeDTO to retrieve
@@ -163,9 +180,7 @@ public class ProgrammeMembershipTypeResource {
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
     programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> result = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
-    List<Long> ids = result.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -196,9 +211,7 @@ public class ProgrammeMembershipTypeResource {
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
     programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> results = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
-    List<Long> ids = results.stream().map(pmt -> pmt.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

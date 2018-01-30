@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +111,21 @@ public class MaritalStatusResource {
   }
 
   /**
+   * GET  /current/marital-statuses : get all the current maritalStatuses.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of maritalStatuses in body
+   */
+  @GetMapping("/current/marital-statuses")
+  @Timed
+  public List<MaritalStatusDTO> getAllCurrentMaritalStatuses() {
+    log.debug("REST request to get all current MaritalStatuses");
+    MaritalStatus maritalStatus = new MaritalStatus();
+    maritalStatus.setStatus(Status.CURRENT);
+    List<MaritalStatus> maritalStatuses = maritalStatusRepository.findAll(Example.of(maritalStatus));
+    return maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
+  }
+
+  /**
    * GET  /marital-statuses/:id : get the "id" maritalStatus.
    *
    * @param id the id of the maritalStatusDTO to retrieve
@@ -162,9 +179,7 @@ public class MaritalStatusResource {
     List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
     maritalStatuses = maritalStatusRepository.save(maritalStatuses);
     List<MaritalStatusDTO> result = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
-    List<Long> ids = result.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -195,9 +210,7 @@ public class MaritalStatusResource {
     List<MaritalStatus> maritalStatuses = maritalStatusMapper.maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
     maritalStatuses = maritalStatusRepository.save(maritalStatuses);
     List<MaritalStatusDTO> results = maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
-    List<Long> ids = results.stream().map(maritalStatusDTO -> maritalStatusDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 

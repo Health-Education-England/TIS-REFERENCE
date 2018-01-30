@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -108,6 +110,23 @@ public class FundingTypeResource {
     return fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
   }
 
+
+  /**
+   * GET  /current/funding-types : get all current fundingTypes.
+   *
+   * @return the ResponseEntity with status 200 (OK) and the list of fundingTypes in body
+   */
+  @GetMapping("/current/funding-types")
+  @Timed
+  public List<FundingTypeDTO> getAllCurrentFundingTypes() {
+    log.debug("REST request to get all current FundingTypes");
+    FundingType fundingType = new FundingType();
+    fundingType.setStatus(Status.CURRENT);
+    List<FundingType> fundingTypes = fundingTypeRepository.findAll(Example.of(fundingType));
+    return fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
+  }
+
+
   /**
    * GET  /funding-types/:id : get the "id" fundingType.
    *
@@ -162,9 +181,7 @@ public class FundingTypeResource {
     List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
     fundingTypes = fundingTypeRepository.save(fundingTypes);
     List<FundingTypeDTO> result = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
-    List<Long> ids = result.stream().map(ft -> ft.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -195,9 +212,7 @@ public class FundingTypeResource {
     List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
     fundingTypes = fundingTypeRepository.save(fundingTypes);
     List<FundingTypeDTO> results = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
-    List<Long> ids = results.stream().map(ft -> ft.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }

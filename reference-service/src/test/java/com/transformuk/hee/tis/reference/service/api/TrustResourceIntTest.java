@@ -1,12 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,8 +54,8 @@ public class TrustResourceIntTest {
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
 
-  private static final String DEFAULT_STATUS = "AAAAAAAAAA";
-  private static final String UPDATED_STATUS = "BBBBBBBBBB";
+  private static final Status DEFAULT_STATUS = Status.CURRENT;
+  private static final Status UPDATED_STATUS = Status.INACTIVE;
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
@@ -159,12 +162,12 @@ public class TrustResourceIntTest {
   @Test
   @Transactional
   public void createTrustWithExistingCode() throws Exception {
-    em.persist(trust);
+    trust = trustRepository.save(this.trust);
     int databaseSizeBeforeCreate = trustRepository.findAll().size();
 
     // Create the Trust with an existing ID
     TrustDTO anotherTrust = new TrustDTO();
-    anotherTrust.setCode(DEFAULT_CODE);
+    anotherTrust.setId(trust.getId());
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restTrustMockMvc.perform(post("/api/trusts")
@@ -177,24 +180,6 @@ public class TrustResourceIntTest {
     assertThat(trustList).hasSize(databaseSizeBeforeCreate);
   }
 
-  @Test
-  @Transactional
-  public void checkCodeIsRequired() throws Exception {
-    int databaseSizeBeforeTest = trustRepository.findAll().size();
-    // set the field null
-    trust.setCode(null);
-
-    // Create the Trust, which fails.
-    TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
-
-    restTrustMockMvc.perform(post("/api/trusts")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isBadRequest());
-
-    List<Trust> trustList = trustRepository.findAll();
-    assertThat(trustList).hasSize(databaseSizeBeforeTest);
-  }
 
   @Test
   @Transactional
@@ -208,7 +193,7 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
-        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
         .andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS)))
         .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
         .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
@@ -228,7 +213,7 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
-        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
         .andExpect(jsonPath("$.[*].trustKnownAs").value(hasItem(DEFAULT_TRUST_KNOWN_AS)))
         .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
         .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
@@ -258,11 +243,12 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts/R1A"))
+    restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.code").value("R1A"))
-        .andExpect(jsonPath("$.trustName").value("Worcestershire Health and Care NHS Trust"));
+        .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+        .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME));
   }
 
 
@@ -310,11 +296,11 @@ public class TrustResourceIntTest {
   @Transactional
   public void updateTrust() throws Exception {
     // Initialize the database
-    trustRepository.saveAndFlush(trust);
+    trust = trustRepository.saveAndFlush(trust);
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
 
     // Update the trust
-    Trust updatedTrust = trustRepository.findOne(trust.getCode());
+    Trust updatedTrust = trustRepository.findOne(trust.getId());
     updatedTrust
         .localOffice(UPDATED_LOCAL_OFFICE)
         .status(UPDATED_STATUS)
@@ -356,28 +342,11 @@ public class TrustResourceIntTest {
     restTrustMockMvc.perform(put("/api/trusts")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isOk());
+        .andExpect(status().isCreated());
 
     // Validate the Trust in the database
     List<Trust> trustList = trustRepository.findAll();
     assertThat(trustList).hasSize(databaseSizeBeforeUpdate + 1);
-  }
-
-  @Test
-  @Transactional
-  public void deleteTrust() throws Exception {
-    // Initialize the database
-    trustRepository.saveAndFlush(trust);
-    int databaseSizeBeforeDelete = trustRepository.findAll().size();
-
-    // Get the trust
-    restTrustMockMvc.perform(delete("/api/trusts/{code}", trust.getCode())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
-        .andExpect(status().isOk());
-
-    // Validate the database is empty
-    List<Trust> trustList = trustRepository.findAll();
-    assertThat(trustList).hasSize(databaseSizeBeforeDelete - 1);
   }
 
   @Test
@@ -390,7 +359,7 @@ public class TrustResourceIntTest {
   @Test
   @Transactional
   public void findTrustShouldReturnTrustWithAttributesMatchingSearchTerm() throws Exception {
-    trustRepository.saveAndFlush(trust);
+    trust = trustRepository.saveAndFlush(trust);
     Trust anotherTrust = new Trust()
         .code(UPDATED_CODE)
         .localOffice(UPDATED_LOCAL_OFFICE)
@@ -408,7 +377,7 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
-        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS))
+        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
         .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
         .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
         .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))

@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.InactiveReason;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -118,6 +120,25 @@ public class InactiveReasonResource {
   }
 
   /**
+   * GET  /current/inactive-reasons : get all the inactiveReasons.
+   *
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of inactiveReasons in body
+   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   */
+  @GetMapping("/current/inactive-reasons")
+  @Timed
+  public ResponseEntity<List<InactiveReasonDTO>> getAllCurrentInactiveReasons(@ApiParam Pageable pageable) {
+    log.debug("REST request to get a page of InactiveReasons");
+    InactiveReason inactiveReason = new InactiveReason();
+    inactiveReason.setStatus(Status.CURRENT);
+    Page<InactiveReason> page = inactiveReasonRepository.findAll(Example.of(inactiveReason), pageable);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/inactive-reasons");
+    return new ResponseEntity<>(inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(page.getContent()), headers, HttpStatus.OK);
+  }
+
+
+  /**
    * GET  /inactive-reasons/:id : get the "id" inactiveReason.
    *
    * @param id the id of the inactiveReasonDTO to retrieve
@@ -171,9 +192,7 @@ public class InactiveReasonResource {
     List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
     inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
     List<InactiveReasonDTO> result = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
-    List<Long> ids = result.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(result);
   }
 
@@ -204,9 +223,7 @@ public class InactiveReasonResource {
     List<InactiveReason> inactiveReasons = inactiveReasonMapper.inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
     inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
     List<InactiveReasonDTO> results = inactiveReasonMapper.inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
-    List<Long> ids = results.stream().map(inactiveReasonDTO -> inactiveReasonDTO.getId()).collect(Collectors.toList());
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, StringUtils.join(ids, ",")))
         .body(results);
   }
 }
