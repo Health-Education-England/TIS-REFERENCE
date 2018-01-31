@@ -30,6 +30,9 @@ public class TariffRate implements Serializable {
   @Column(name = "code", nullable = false)
   private String code;
 
+  @Column(name = "gradeId")
+  private Long gradeId;
+
   private String gradeAbbreviation;
 
   private String tariffRate;
@@ -60,6 +63,19 @@ public class TariffRate implements Serializable {
 
   public TariffRate code(String code) {
     this.code = code;
+    return this;
+  }
+
+  public Long getGradeId() {
+    return gradeId;
+  }
+
+  public void setGradeId(Long gradeId) {
+    this.gradeId = gradeId;
+  }
+
+  public TariffRate gradeId(Long gradeId) {
+    this.gradeId = gradeId;
     return this;
   }
 

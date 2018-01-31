@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -16,6 +17,9 @@ public class TariffRateDTO implements Serializable {
 
   @NotNull
   private String code;
+
+  @ApiModelProperty("The grade id that this tariff is linked to")
+  private Long gradeId;
 
   private String gradeAbbreviation;
 
@@ -41,6 +45,14 @@ public class TariffRateDTO implements Serializable {
 
   public void setCode(String code) {
     this.code = code;
+  }
+
+  public Long getGradeId() {
+    return gradeId;
+  }
+
+  public void setGradeId(Long gradeId) {
+    this.gradeId = gradeId;
   }
 
   public String getGradeAbbreviation() {
@@ -111,6 +123,7 @@ public class TariffRateDTO implements Serializable {
     return "TariffRateDTO{" +
         "id=" + id +
         ", code='" + code + '\'' +
+        ", gradeId=" + gradeId +
         ", gradeAbbreviation='" + gradeAbbreviation + '\'' +
         ", tariffRate='" + tariffRate + '\'' +
         ", tariffRateFringe='" + tariffRateFringe + '\'' +
