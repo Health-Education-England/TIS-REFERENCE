@@ -1,16 +1,25 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingIssueServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing FundingIssue.
@@ -46,13 +59,16 @@ public class FundingIssueResource {
 
   private static final String ENTITY_NAME = "fundingIssue";
   private final Logger log = LoggerFactory.getLogger(FundingIssueResource.class);
+
   private final FundingIssueRepository fundingIssueRepository;
-
   private final FundingIssueMapper fundingIssueMapper;
+  private final FundingIssueServiceImpl fundingIssueService;
 
-  public FundingIssueResource(FundingIssueRepository fundingIssueRepository, FundingIssueMapper fundingIssueMapper) {
+  public FundingIssueResource(FundingIssueRepository fundingIssueRepository, FundingIssueMapper fundingIssueMapper,
+                              FundingIssueServiceImpl fundingIssueService) {
     this.fundingIssueRepository = fundingIssueRepository;
     this.fundingIssueMapper = fundingIssueMapper;
+    this.fundingIssueService = fundingIssueService;
   }
 
   /**
@@ -104,37 +120,36 @@ public class FundingIssueResource {
   }
 
   /**
-   * GET  /funding-issues : get all the fundingIssues.
+   * GET  /funding-issues : get all funding issues.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of fundingIssues in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of funding issues in body
    */
+  @ApiOperation(value = "Lists funding issues",
+      notes = "Returns a list of funding issues with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "funding issues list")})
   @GetMapping("/funding-issues")
   @Timed
-  public ResponseEntity<List<FundingIssueDTO>> getAllFundingIssues(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of FundingIssues");
-    Page<FundingIssue> page = fundingIssueRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/funding-issues");
-    return new ResponseEntity<>(fundingIssueMapper.fundingIssuesToFundingIssueDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
-
-  /**
-   * GET  /current/funding-issues : get all current fundingIssues.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of fundingIssues in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/funding-issues")
-  @Timed
-  public ResponseEntity<List<FundingIssueDTO>> getAllCurrentFundingIssues(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of current FundingIssues");
-    FundingIssue fundingIssue = new FundingIssue();
-    fundingIssue.setStatus(Status.CURRENT);
-    Page<FundingIssue> page = fundingIssueRepository.findAll(Example.of(fundingIssue), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/funding-issues");
-    return new ResponseEntity<>(fundingIssueMapper.fundingIssuesToFundingIssueDTOs(page.getContent()), headers, HttpStatus.OK);
+  public ResponseEntity<List<FundingIssueDTO>> getAllFundingIssues(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of countries begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<FundingIssue> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = fundingIssueRepository.findAll(pageable);
+    } else {
+      page = fundingIssueService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<FundingIssueDTO> results = page.map(fundingIssueMapper::fundingIssueToFundingIssueDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/countries");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

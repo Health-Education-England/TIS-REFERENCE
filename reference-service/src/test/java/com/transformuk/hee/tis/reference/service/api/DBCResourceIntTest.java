@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.DBCServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +67,9 @@ public class DBCResourceIntTest {
   private DBCMapper dBCMapper;
 
   @Autowired
+  private DBCServiceImpl dbcService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -98,7 +102,7 @@ public class DBCResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    DBCResource dBCResource = new DBCResource(dBCRepository, dBCMapper);
+    DBCResource dBCResource = new DBCResource(dBCRepository, dBCMapper, dbcService);
     this.restDBCMockMvc = MockMvcBuilders.standaloneSetup(dBCResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

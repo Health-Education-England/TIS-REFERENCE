@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SexualOrientationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SexualOrientationMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing SexualOrientation.
@@ -40,13 +59,15 @@ public class SexualOrientationResource {
 
   private static final String ENTITY_NAME = "sexualOrientation";
   private final Logger log = LoggerFactory.getLogger(SexualOrientationResource.class);
+
   private final SexualOrientationRepository sexualOrientationRepository;
-
   private final SexualOrientationMapper sexualOrientationMapper;
-
-  public SexualOrientationResource(SexualOrientationRepository sexualOrientationRepository, SexualOrientationMapper sexualOrientationMapper) {
+  private final SexualOrientationServiceImpl sexualOrientationService;
+  public SexualOrientationResource(SexualOrientationRepository sexualOrientationRepository, SexualOrientationMapper sexualOrientationMapper,
+                                   SexualOrientationServiceImpl sexualOrientationService) {
     this.sexualOrientationRepository = sexualOrientationRepository;
     this.sexualOrientationMapper = sexualOrientationMapper;
+    this.sexualOrientationService = sexualOrientationService;
   }
 
   /**
@@ -98,30 +119,36 @@ public class SexualOrientationResource {
   }
 
   /**
-   * GET  /sexual-orientations : get all the sexualOrientations.
+   * GET  /sexual-orientations : get all sexual orientations.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of sexualOrientations in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of sexual orientations in body
    */
+  @ApiOperation(value = "Lists sexual orientations",
+      notes = "Returns a list of sexual orientations with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "sexual orientations list")})
   @GetMapping("/sexual-orientations")
   @Timed
-  public List<SexualOrientationDTO> getAllSexualOrientations() {
-    log.debug("REST request to get all SexualOrientations");
-    List<SexualOrientation> sexualOrientations = sexualOrientationRepository.findAll();
-    return sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
-  }
-
-  /**
-   * GET  /current/sexual-orientations : get all the current sexualOrientations.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of sexualOrientations in body
-   */
-  @GetMapping("/current/sexual-orientations")
-  @Timed
-  public List<SexualOrientationDTO> getAllCurrentSexualOrientations() {
-    log.debug("REST request to get all current SexualOrientations");
-    SexualOrientation sexualOrientation = new SexualOrientation().status(Status.CURRENT);
-    List<SexualOrientation> sexualOrientations = sexualOrientationRepository.findAll(Example.of(sexualOrientation));
-    return sexualOrientationMapper.sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
+  public ResponseEntity<List<SexualOrientationDTO>> getAllSexualOrientations(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of sexual orientations begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<SexualOrientation> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = sexualOrientationRepository.findAll(pageable);
+    } else {
+      page = sexualOrientationService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<SexualOrientationDTO> results = page.map(sexualOrientationMapper::sexualOrientationToSexualOrientationDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sexual-orientations");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

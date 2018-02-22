@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,9 @@ public class EthnicOriginResourceIntTest {
   private EthnicOriginMapper ethnicOriginMapper;
 
   @Autowired
+  private EthnicOriginServiceImpl ethnicOriginService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -82,7 +86,8 @@ public class EthnicOriginResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    EthnicOriginResource ethnicOriginResource = new EthnicOriginResource(ethnicOriginRepository, ethnicOriginMapper);
+    EthnicOriginResource ethnicOriginResource = new EthnicOriginResource(ethnicOriginRepository, ethnicOriginMapper,
+        ethnicOriginService);
     this.restEthnicOriginMockMvc = MockMvcBuilders.standaloneSetup(ethnicOriginResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

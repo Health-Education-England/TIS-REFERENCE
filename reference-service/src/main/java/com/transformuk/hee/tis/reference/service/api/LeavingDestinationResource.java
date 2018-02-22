@@ -1,16 +1,25 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.repository.LeavingDestinationRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.LeavingDestinationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingDestinationMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing LeavingDestination.
@@ -46,13 +59,17 @@ public class LeavingDestinationResource {
 
   private static final String ENTITY_NAME = "leavingDestination";
   private final Logger log = LoggerFactory.getLogger(LeavingDestinationResource.class);
+
   private final LeavingDestinationRepository leavingDestinationRepository;
-
   private final LeavingDestinationMapper leavingDestinationMapper;
+  private final LeavingDestinationServiceImpl leavingDestinationService;
 
-  public LeavingDestinationResource(LeavingDestinationRepository leavingDestinationRepository, LeavingDestinationMapper leavingDestinationMapper) {
+  public LeavingDestinationResource(LeavingDestinationRepository leavingDestinationRepository,
+                                    LeavingDestinationMapper leavingDestinationMapper,
+                                    LeavingDestinationServiceImpl leavingDestinationService) {
     this.leavingDestinationRepository = leavingDestinationRepository;
     this.leavingDestinationMapper = leavingDestinationMapper;
+    this.leavingDestinationService = leavingDestinationService;
   }
 
   /**
@@ -104,38 +121,38 @@ public class LeavingDestinationResource {
   }
 
   /**
-   * GET  /leaving-destinations : get all the leavingDestinations.
+   * GET  /leaving-destinations : get all leaving destinations.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of leavingDestinations in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of leaving destinations in body
    */
+  @ApiOperation(value = "Lists leaving destinations",
+      notes = "Returns a list of leaving destinations with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/leaving-destinations")
   @Timed
-  public ResponseEntity<List<LeavingDestinationDTO>> getAllLeavingDestinations(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of LeavingDestinations");
-    Page<LeavingDestination> page = leavingDestinationRepository.findAll(pageable);
+  public ResponseEntity<List<LeavingDestinationDTO>> getAllLeavingDestinations(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of leaving destinations begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<LeavingDestination> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = leavingDestinationRepository.findAll(pageable);
+    } else {
+      page = leavingDestinationService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<LeavingDestinationDTO> results = page.map(leavingDestinationMapper::leavingDestinationToLeavingDestinationDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/leaving-destinations");
-    return new ResponseEntity<>(leavingDestinationMapper.leavingDestinationsToLeavingDestinationDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
-  /**
-   * GET  /current/leaving-destinations : get all the current leavingDestinations.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of leavingDestinations in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/leaving-destinations")
-  @Timed
-  public ResponseEntity<List<LeavingDestinationDTO>> getAllCurrentLeavingDestinations(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of current LeavingDestinations");
-    LeavingDestination leavingDestination = new LeavingDestination();
-    leavingDestination.setStatus(Status.CURRENT);
-    Page<LeavingDestination> page = leavingDestinationRepository.findAll(Example.of(leavingDestination), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/leaving-destinations");
-    return new ResponseEntity<>(leavingDestinationMapper.leavingDestinationsToLeavingDestinationDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
 
   /**
    * GET  /leaving-destinations/:id : get the "id" leavingDestination.

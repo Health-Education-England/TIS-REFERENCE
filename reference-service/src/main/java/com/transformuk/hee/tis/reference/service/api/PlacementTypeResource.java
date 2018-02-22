@@ -1,19 +1,34 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.PlacementTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
@@ -24,15 +39,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing PlacementType.
@@ -43,13 +62,16 @@ public class PlacementTypeResource {
 
   private static final String ENTITY_NAME = "placementType";
   private final Logger log = LoggerFactory.getLogger(PlacementTypeResource.class);
+
   private final PlacementTypeRepository placementTypeRepository;
-
   private final PlacementTypeMapper placementTypeMapper;
+  private final PlacementTypeServiceImpl placementTypeService;
 
-  public PlacementTypeResource(PlacementTypeRepository placementTypeRepository, PlacementTypeMapper placementTypeMapper) {
+  public PlacementTypeResource(PlacementTypeRepository placementTypeRepository, PlacementTypeMapper placementTypeMapper,
+                               PlacementTypeServiceImpl placementTypeService) {
     this.placementTypeRepository = placementTypeRepository;
     this.placementTypeMapper = placementTypeMapper;
+    this.placementTypeService = placementTypeService;
   }
 
   /**
@@ -124,32 +146,38 @@ public class PlacementTypeResource {
         .body(result);
   }
 
-  /**
-   * GET  /placement-types : get all the placementTypes.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of placementTypes in body
-   */
-  @GetMapping("/placement-types")
-  @Timed
-  public List<PlacementTypeDTO> getAllPlacementTypes() {
-    log.debug("REST request to get all PlacementTypes");
-    List<PlacementType> placementTypes = placementTypeRepository.findAll();
-    return placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
-  }
 
   /**
-   * GET  /current/placement-types : get all current placementTypes.
+   * GET  /placement-types : get all placement types.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of placementTypes in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of placement types in body
    */
-  @GetMapping("/current/placement-types")
+  @ApiOperation(value = "Lists placement types",
+      notes = "Returns a list of placement types with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "placement types list")})
+  @GetMapping("/placement-types")
   @Timed
-  public List<PlacementTypeDTO> getAllCurrentPlacementTypes() {
-    log.debug("REST request to get all PlacementTypes");
-    PlacementType placementType = new PlacementType();
-    placementType.setStatus(Status.CURRENT);
-    List<PlacementType> placementTypes = placementTypeRepository.findAll(Example.of(placementType));
-    return placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
+  public ResponseEntity<List<PlacementTypeDTO>> getAllPlacementTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of placement types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<PlacementType> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = placementTypeRepository.findAll(pageable);
+    } else {
+      page = placementTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<PlacementTypeDTO> results = page.map(placementTypeMapper::placementTypeToPlacementTypeDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/countries");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

@@ -1,20 +1,28 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GradeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -60,13 +69,15 @@ public class GradeResource {
 
   private static final String ENTITY_NAME = "grade";
   private final Logger log = LoggerFactory.getLogger(GradeResource.class);
+
   private final GradeRepository gradeRepository;
-
   private final GradeMapper gradeMapper;
+  private final GradeServiceImpl gradeService;
 
-  public GradeResource(GradeRepository gradeRepository, GradeMapper gradeMapper) {
+  public GradeResource(GradeRepository gradeRepository, GradeMapper gradeMapper, GradeServiceImpl gradeService) {
     this.gradeRepository = gradeRepository;
     this.gradeMapper = gradeMapper;
+    this.gradeService = gradeService;
   }
 
   /**
@@ -177,29 +188,38 @@ public class GradeResource {
     }
   }
 
+
   /**
-   * GET  /grades : get all the grades.
+   * GET  /grades : get all grades.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of trusts in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
+  @ApiOperation(value = "Lists grades",
+      notes = "Returns a list of grades with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "grades list")})
   @GetMapping("/grades")
   @Timed
   public ResponseEntity<List<GradeDTO>> getAllGrades(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
-    log.debug("REST request to get a page of Grades");
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of grades begin");
     searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<Grade> page;
-    if (StringUtils.isEmpty(searchQuery)) {
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = gradeRepository.findAll(pageable);
     } else {
-      page = gradeRepository.findBySearchString(searchQuery, pageable);
+      page = gradeService.advancedSearch(searchQuery, columnFilters, pageable);
     }
+    Page<GradeDTO> results = page.map(gradeMapper::gradeToGradeDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
-    return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   @ApiOperation("Get all current grades using pagination or smart search")

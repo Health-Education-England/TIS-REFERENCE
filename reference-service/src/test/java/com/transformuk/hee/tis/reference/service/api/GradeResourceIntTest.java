@@ -6,6 +6,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Grade;
 import com.transformuk.hee.tis.reference.service.repository.GradeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GradeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GradeMapper;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
@@ -70,6 +71,9 @@ public class GradeResourceIntTest {
   private GradeMapper gradeMapper;
 
   @Autowired
+  private GradeServiceImpl gradeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -105,7 +109,7 @@ public class GradeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    GradeResource gradeResource = new GradeResource(gradeRepository, gradeMapper);
+    GradeResource gradeResource = new GradeResource(gradeRepository, gradeMapper, gradeService);
     this.restGradeMockMvc = MockMvcBuilders.standaloneSetup(gradeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

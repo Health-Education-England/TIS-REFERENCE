@@ -1,22 +1,31 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static org.springframework.util.StringUtils.isEmpty;
 
 /**
@@ -48,17 +57,6 @@ public class SitesTrustsService {
    */
   public Page<Site> searchSites(String searchString, Pageable pageable) {
     return siteRepository.findBySearchString(searchString, pageable);
-  }
-
-  /**
-   * Searches all Current sites who have data containing given searchString
-   *
-   * @param searchString search string to be searched for site data
-   * @param pageable     pageable defining the page and size
-   * @return List of {@link Site} matching searchString
-   */
-  public Page<Site> searchCurrentSites(String searchString, Pageable pageable) {
-    return siteRepository.findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
   }
 
   /**
@@ -158,15 +156,68 @@ public class SitesTrustsService {
     return localOfficeRepository.findByAbbreviation(abbreviation);
   }
 
-  /**
-   * Searches all localOffices who have data containing given searchString
-   *
-   * @param searchString search string to be searched for localOffice data
-   * @param pageable     pageable defining the page and size
-   * @return Page of {@link LocalOffice} matching searchString
-   */
-  public Page<LocalOffice> searchLocalOffices(String searchString, Pageable pageable) {
-    return localOfficeRepository.findBySearchString(searchString, pageable);
+
+  @Transactional(readOnly = true)
+  public Page<Site> advanceSearchSite(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+
+    List<Specification<Site>> specs = new ArrayList<>();
+    //add the text search criteria
+    if (StringUtils.isNotEmpty(searchString)) {
+      specs.add(Specifications.where(containsLike("siteCode", searchString)).
+          or(containsLike("trustCode", searchString)).
+          or(containsLike("siteName", searchString)).
+          or(containsLike("postCode", searchString)).
+          or(containsLike("address", searchString))
+      );
+    }
+    //add the column filters criteria
+    if (columnFilters != null && !columnFilters.isEmpty()) {
+      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
+    }
+
+    Page<Site> result;
+    if (!specs.isEmpty()) {
+      Specifications<Site> fullSpec = Specifications.where(specs.get(0));
+      //add the rest of the specs that made it in
+      for (int i = 1; i < specs.size(); i++) {
+        fullSpec = fullSpec.and(specs.get(i));
+      }
+      result = siteRepository.findAll(fullSpec, pageable);
+    } else {
+      result = siteRepository.findAll(pageable);
+    }
+
+    return result;
+  }
+
+
+  @Transactional(readOnly = true)
+  public Page<LocalOffice> advanceSearchLocalOffice(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+
+    List<Specification<LocalOffice>> specs = new ArrayList<>();
+    //add the text search criteria
+    if (StringUtils.isNotEmpty(searchString)) {
+      specs.add(Specifications.where(containsLike("abbreviation", searchString)).
+          or(containsLike("name", searchString)));
+    }
+    //add the column filters criteria
+    if (columnFilters != null && !columnFilters.isEmpty()) {
+      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
+    }
+
+    Page<LocalOffice> result;
+    if (!specs.isEmpty()) {
+      Specifications<LocalOffice> fullSpec = Specifications.where(specs.get(0));
+      //add the rest of the specs that made it in
+      for (int i = 1; i < specs.size(); i++) {
+        fullSpec = fullSpec.and(specs.get(i));
+      }
+      result = localOfficeRepository.findAll(fullSpec, pageable);
+    } else {
+      result = localOfficeRepository.findAll(pageable);
+    }
+
+    return result;
   }
 
   /**

@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GdcStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing GdcStatus.
@@ -40,13 +59,16 @@ public class GdcStatusResource {
 
   private static final String ENTITY_NAME = "gdcStatus";
   private final Logger log = LoggerFactory.getLogger(GdcStatusResource.class);
+
   private final GdcStatusRepository gdcStatusRepository;
-
   private final GdcStatusMapper gdcStatusMapper;
+  private final GdcStatusServiceImpl gdcStatusService;
 
-  public GdcStatusResource(GdcStatusRepository gdcStatusRepository, GdcStatusMapper gdcStatusMapper) {
+  public GdcStatusResource(GdcStatusRepository gdcStatusRepository, GdcStatusMapper gdcStatusMapper,
+                           GdcStatusServiceImpl gdcStatusService) {
     this.gdcStatusRepository = gdcStatusRepository;
     this.gdcStatusMapper = gdcStatusMapper;
+    this.gdcStatusService = gdcStatusService;
   }
 
   /**
@@ -98,31 +120,36 @@ public class GdcStatusResource {
   }
 
   /**
-   * GET  /gdc-statuses : get all the gdcStatuses.
+   * GET  /gdc-statuses : get all gdc statuses.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of gdcStatuses in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of gdc statuses in body
    */
+  @ApiOperation(value = "Lists gdc statuses",
+      notes = "Returns a list of gdc statuses with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "gdc statuses list")})
   @GetMapping("/gdc-statuses")
   @Timed
-  public List<GdcStatusDTO> getAllGdcStatuses() {
-    log.debug("REST request to get all GdcStatuses");
-    List<GdcStatus> gdcStatuses = gdcStatusRepository.findAll();
-    return gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
-  }
-
-  /**
-   * GET  /current/gdc-statuses : get all current gdcStatuses.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of gdcStatuses in body
-   */
-  @GetMapping("/current/gdc-statuses")
-  @Timed
-  public List<GdcStatusDTO> getAllCurrentGdcStatuses() {
-    log.debug("REST request to get all current GdcStatuses");
-    GdcStatus gdcStatus = new GdcStatus();
-    gdcStatus.setStatus(Status.CURRENT);
-    List<GdcStatus> gdcStatuses = gdcStatusRepository.findAll(Example.of(gdcStatus));
-    return gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
+  public ResponseEntity<List<GdcStatusDTO>> getAllGdcStatuses(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of gdc statuses begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<GdcStatus> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = gdcStatusRepository.findAll(pageable);
+    } else {
+      page = gdcStatusService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<GdcStatusDTO> results = page.map(gdcStatusMapper::gdcStatusToGdcStatusDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/gdc-statuses");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

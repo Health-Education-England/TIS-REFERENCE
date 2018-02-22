@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.service.repository.SettledRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SettledServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SettledMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class SettledResourceIntTest {
   private SettledMapper settledMapper;
 
   @Autowired
+  private SettledServiceImpl settledService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,7 @@ public class SettledResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    SettledResource settledResource = new SettledResource(settledRepository, settledMapper);
+    SettledResource settledResource = new SettledResource(settledRepository, settledMapper, settledService);
     this.restSettledMockMvc = MockMvcBuilders.standaloneSetup(settledResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

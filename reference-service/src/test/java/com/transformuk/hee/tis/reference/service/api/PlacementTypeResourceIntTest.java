@@ -6,6 +6,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.PlacementType;
 import com.transformuk.hee.tis.reference.service.repository.PlacementTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.PlacementTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.PlacementTypeMapper;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
@@ -58,6 +59,9 @@ public class PlacementTypeResourceIntTest {
   private PlacementTypeMapper placementTypeMapper;
 
   @Autowired
+  private PlacementTypeServiceImpl placementTypeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -89,7 +93,8 @@ public class PlacementTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    PlacementTypeResource placementTypeResource = new PlacementTypeResource(placementTypeRepository, placementTypeMapper);
+    PlacementTypeResource placementTypeResource = new PlacementTypeResource(placementTypeRepository,
+        placementTypeMapper, placementTypeService);
     this.restPlacementTypeMockMvc = MockMvcBuilders.standaloneSetup(placementTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

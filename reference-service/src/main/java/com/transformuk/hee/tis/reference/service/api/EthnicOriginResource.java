@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing EthnicOrigin.
@@ -40,13 +59,16 @@ public class EthnicOriginResource {
 
   private static final String ENTITY_NAME = "ethnicOrigin";
   private final Logger log = LoggerFactory.getLogger(EthnicOriginResource.class);
+
   private final EthnicOriginRepository ethnicOriginRepository;
-
   private final EthnicOriginMapper ethnicOriginMapper;
+  private final EthnicOriginServiceImpl ethnicOriginService;
 
-  public EthnicOriginResource(EthnicOriginRepository ethnicOriginRepository, EthnicOriginMapper ethnicOriginMapper) {
+  public EthnicOriginResource(EthnicOriginRepository ethnicOriginRepository, EthnicOriginMapper ethnicOriginMapper,
+                              EthnicOriginServiceImpl ethnicOriginService) {
     this.ethnicOriginRepository = ethnicOriginRepository;
     this.ethnicOriginMapper = ethnicOriginMapper;
+    this.ethnicOriginService = ethnicOriginService;
   }
 
   /**
@@ -97,34 +119,39 @@ public class EthnicOriginResource {
         .body(result);
   }
 
+
   /**
-   * GET  /ethnic-origins : get all the ethnicOrigins.
+   * GET  /ethnic-origins : get all ethnic origins.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of ethnicOrigins in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of ethnic origins in body
    */
+  @ApiOperation(value = "Lists ethnic origins",
+      notes = "Returns a list of ethnic origins with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "ethnic origins list")})
   @GetMapping("/ethnic-origins")
   @Timed
-  public List<EthnicOriginDTO> getAllEthnicOrigins() {
-    log.debug("REST request to get all EthnicOrigins");
-    List<EthnicOrigin> ethnicOrigins = ethnicOriginRepository.findAll();
-    return ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
+  public ResponseEntity<List<EthnicOriginDTO>> getAllEthnicOrigins(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of ethnic origins begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<EthnicOrigin> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = ethnicOriginRepository.findAll(pageable);
+    } else {
+      page = ethnicOriginService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<EthnicOriginDTO> results = page.map(ethnicOriginMapper::ethnicOriginToEthnicOriginDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/ethnic-origins");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
-
-  /**
-   * GET  /current/ethnic-origins : get all the current ethnicOrigins.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of ethnicOrigins in body
-   */
-  @GetMapping("/current/ethnic-origins")
-  @Timed
-  public List<EthnicOriginDTO> getAllCurrentEthnicOrigins() {
-    log.debug("REST request to get all current EthnicOrigins");
-    EthnicOrigin ethnicOrigin = new EthnicOrigin();
-    ethnicOrigin.setStatus(Status.CURRENT);
-    List<EthnicOrigin> ethnicOrigins = ethnicOriginRepository.findAll(Example.of(ethnicOrigin));
-    return ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
-  }
-
 
   /**
    * GET  /ethnic-origins/:id : get the "id" ethnicOrigin.

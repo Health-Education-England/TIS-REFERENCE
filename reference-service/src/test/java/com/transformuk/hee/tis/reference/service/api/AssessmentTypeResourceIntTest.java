@@ -4,13 +4,16 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,8 +62,14 @@ public class AssessmentTypeResourceIntTest {
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
   public static final String LOCATION_HEADER = "Location";
 
+  @InjectMocks
+  private AssessmentTypeResource testObj;
+
   @MockBean
   private AssessmentTypeRepository assessmentTypeRepositoryMock;
+
+  @MockBean
+  private AssessmentTypeServiceImpl assessmentTypeServiceMock;
 
   @Captor
   private ArgumentCaptor<Pageable> pageableArgumentCaptor;
@@ -93,7 +102,7 @@ public class AssessmentTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    AssessmentTypeResource testObj = new AssessmentTypeResource(assessmentTypeRepositoryMock);
+    AssessmentTypeResource testObj = new AssessmentTypeResource(assessmentTypeRepositoryMock, assessmentTypeServiceMock);
     this.testObjMockMvc = MockMvcBuilders.standaloneSetup(testObj)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

@@ -1,17 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.MedicalSchoolServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +39,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing MedicalSchool.
@@ -49,13 +62,16 @@ public class MedicalSchoolResource {
 
   private static final String ENTITY_NAME = "medicalSchool";
   private final Logger log = LoggerFactory.getLogger(MedicalSchoolResource.class);
+
   private final MedicalSchoolRepository medicalSchoolRepository;
-
   private final MedicalSchoolMapper medicalSchoolMapper;
+  private final MedicalSchoolServiceImpl medicalSchoolService;
 
-  public MedicalSchoolResource(MedicalSchoolRepository medicalSchoolRepository, MedicalSchoolMapper medicalSchoolMapper) {
+  public MedicalSchoolResource(MedicalSchoolRepository medicalSchoolRepository, MedicalSchoolMapper medicalSchoolMapper,
+                               MedicalSchoolServiceImpl medicalSchoolService) {
     this.medicalSchoolRepository = medicalSchoolRepository;
     this.medicalSchoolMapper = medicalSchoolMapper;
+    this.medicalSchoolService = medicalSchoolService;
   }
 
   /**
@@ -107,38 +123,38 @@ public class MedicalSchoolResource {
   }
 
   /**
-   * GET  /medical-schools : get all the medicalSchools.
+   * GET  /medical-schools : get all medical schools.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of medicalSchools in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of medical schools in body
    */
+  @ApiOperation(value = "Lists medical schools",
+      notes = "Returns a list of medical schools with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "medical schools list")})
   @GetMapping("/medical-schools")
   @Timed
-  public ResponseEntity<List<MedicalSchoolDTO>> getAllMedicalSchools(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of MedicalSchools");
-    Page<MedicalSchool> page = medicalSchoolRepository.findAll(pageable);
+  public ResponseEntity<List<MedicalSchoolDTO>> getAllMedicalSchools(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of medical schools begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<MedicalSchool> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = medicalSchoolRepository.findAll(pageable);
+    } else {
+      page = medicalSchoolService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<MedicalSchoolDTO> results = page.map(medicalSchoolMapper::medicalSchoolToMedicalSchoolDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/medical-schools");
-    return new ResponseEntity<>(medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
-  /**
-   * GET  /current/medical-schools : get all the medicalSchools.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of medicalSchools in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/medical-schools")
-  @Timed
-  public ResponseEntity<List<MedicalSchoolDTO>> getAllCurrentMedicalSchools(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of MedicalSchools");
-    MedicalSchool medicalSchool = new MedicalSchool();
-    medicalSchool.setStatus(Status.CURRENT);
-    Page<MedicalSchool> page = medicalSchoolRepository.findAll(Example.of(medicalSchool), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/medical-schools");
-    return new ResponseEntity<>(medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
 
   /**
    * GET  /medical-schools/:id : get the "id" medicalSchool.

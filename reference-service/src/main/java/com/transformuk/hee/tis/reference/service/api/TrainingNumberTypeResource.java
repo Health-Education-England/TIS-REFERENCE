@@ -1,18 +1,30 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.repository.TrainingNumberTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TrainingNumberTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrainingNumberTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing TrainingNumberType.
@@ -43,10 +59,14 @@ public class TrainingNumberTypeResource {
   private final TrainingNumberTypeRepository trainingNumberTypeRepository;
 
   private final TrainingNumberTypeMapper trainingNumberTypeMapper;
+  private final TrainingNumberTypeServiceImpl trainingNumberTypeService;
 
-  public TrainingNumberTypeResource(TrainingNumberTypeRepository trainingNumberTypeRepository, TrainingNumberTypeMapper trainingNumberTypeMapper) {
+  public TrainingNumberTypeResource(TrainingNumberTypeRepository trainingNumberTypeRepository,
+                                    TrainingNumberTypeMapper trainingNumberTypeMapper,
+                                    TrainingNumberTypeServiceImpl trainingNumberTypeService) {
     this.trainingNumberTypeRepository = trainingNumberTypeRepository;
     this.trainingNumberTypeMapper = trainingNumberTypeMapper;
+    this.trainingNumberTypeService = trainingNumberTypeService;
   }
 
   /**
@@ -98,30 +118,36 @@ public class TrainingNumberTypeResource {
   }
 
   /**
-   * GET  /training-number-types : get all the trainingNumberTypes.
+   * GET  /training-number-types : get all training number types.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of trainingNumberTypes in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of training number types in body
    */
+  @ApiOperation(value = "Lists training number types",
+      notes = "Returns a list of training number types with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "training number types list")})
   @GetMapping("/training-number-types")
   @Timed
-  public List<TrainingNumberTypeDTO> getAllTrainingNumberTypes() {
-    log.debug("REST request to get all TrainingNumberTypes");
-    List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeRepository.findAll();
-    return trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
-  }
-
-  /**
-   * GET  /current/training-number-types : get all the current trainingNumberTypes.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of trainingNumberTypes in body
-   */
-  @GetMapping("/current/training-number-types")
-  @Timed
-  public List<TrainingNumberTypeDTO> getAllCurrentTrainingNumberTypes() {
-    log.debug("REST request to get all current TrainingNumberTypes");
-    TrainingNumberType trainingNumberType = new TrainingNumberType().status(Status.CURRENT);
-    List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeRepository.findAll(Example.of(trainingNumberType));
-    return trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
+  public ResponseEntity<List<TrainingNumberTypeDTO>> getAllTrainingNumberTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of training number types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<TrainingNumberType> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = trainingNumberTypeRepository.findAll(pageable);
+    } else {
+      page = trainingNumberTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<TrainingNumberTypeDTO> results = page.map(trainingNumberTypeMapper::trainingNumberTypeToTrainingNumberTypeDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/training-number-types");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

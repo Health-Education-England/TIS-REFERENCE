@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.MedicalSchoolServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class MedicalSchoolResourceIntTest {
   private MedicalSchoolMapper medicalSchoolMapper;
 
   @Autowired
+  private MedicalSchoolServiceImpl medicalSchoolService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class MedicalSchoolResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    MedicalSchoolResource medicalSchoolResource = new MedicalSchoolResource(medicalSchoolRepository, medicalSchoolMapper);
+    MedicalSchoolResource medicalSchoolResource = new MedicalSchoolResource(medicalSchoolRepository,
+        medicalSchoolMapper, medicalSchoolService);
     this.restMedicalSchoolMockMvc = MockMvcBuilders.standaloneSetup(medicalSchoolResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

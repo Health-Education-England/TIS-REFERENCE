@@ -1,20 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.NationalityServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Nationality.
@@ -46,13 +56,16 @@ public class NationalityResource {
 
   private static final String ENTITY_NAME = "nationality";
   private final Logger log = LoggerFactory.getLogger(NationalityResource.class);
+
   private final NationalityRepository nationalityRepository;
-
   private final NationalityMapper nationalityMapper;
+  private final NationalityServiceImpl nationalityService;
 
-  public NationalityResource(NationalityRepository nationalityRepository, NationalityMapper nationalityMapper) {
+  public NationalityResource(NationalityRepository nationalityRepository, NationalityMapper nationalityMapper,
+                             NationalityServiceImpl nationalityService) {
     this.nationalityRepository = nationalityRepository;
     this.nationalityMapper = nationalityMapper;
+    this.nationalityService = nationalityService;
   }
 
   /**
@@ -103,38 +116,38 @@ public class NationalityResource {
         .body(result);
   }
 
-  /**
-   * GET  /nationalities : get all the nationalities.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of nationalities in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/nationalities")
-  @Timed
-  public ResponseEntity<List<NationalityDTO>> getAllNationalities(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Nationalities");
-    Page<Nationality> page = nationalityRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/nationalities");
-    return new ResponseEntity<>(nationalityMapper.nationalitiesToNationalityDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
 
   /**
-   * GET  /current/nationalities : get all the current nationalities.
+   * GET  /nationalities : get all nationalities.
    *
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of nationalities in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
-  @GetMapping("/current/nationalities")
+  @ApiOperation(value = "Lists nationalities",
+      notes = "Returns a list of nationalities with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "country list")})
+  @GetMapping("/nationalities")
   @Timed
-  public ResponseEntity<List<NationalityDTO>> getAllCurrentNationalities(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Nationalities");
-    Nationality nationality = new Nationality();
-    nationality.setStatus(Status.CURRENT);
-    Page<Nationality> page = nationalityRepository.findAll(Example.of(nationality), pageable);
+  public ResponseEntity<List<NationalityDTO>> getAllNationalities(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of nationalities begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Nationality> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = nationalityRepository.findAll(pageable);
+    } else {
+      page = nationalityService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<NationalityDTO> results = page.map(nationalityMapper::nationalityToNationalityDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/nationalities");
-    return new ResponseEntity<>(nationalityMapper.nationalitiesToNationalityDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

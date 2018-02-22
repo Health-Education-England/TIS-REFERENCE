@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GdcStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,8 @@ public class GdcStatusResourceIntTest {
 
   @Autowired
   private GdcStatusMapper gdcStatusMapper;
+  @Autowired
+  private GdcStatusServiceImpl gdcStatusService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +89,7 @@ public class GdcStatusResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    GdcStatusResource gdcStatusResource = new GdcStatusResource(gdcStatusRepository, gdcStatusMapper);
+    GdcStatusResource gdcStatusResource = new GdcStatusResource(gdcStatusRepository, gdcStatusMapper, gdcStatusService);
     this.restGdcStatusMockMvc = MockMvcBuilders.standaloneSetup(gdcStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

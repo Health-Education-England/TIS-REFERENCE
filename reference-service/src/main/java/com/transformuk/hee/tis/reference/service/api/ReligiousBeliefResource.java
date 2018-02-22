@@ -1,20 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.ReligiousBeliefServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing ReligiousBelief.
@@ -46,13 +56,17 @@ public class ReligiousBeliefResource {
 
   private static final String ENTITY_NAME = "religiousBelief";
   private final Logger log = LoggerFactory.getLogger(ReligiousBeliefResource.class);
+
   private final ReligiousBeliefRepository religiousBeliefRepository;
-
   private final ReligiousBeliefMapper religiousBeliefMapper;
+  private final ReligiousBeliefServiceImpl religiousBeliefsService;
 
-  public ReligiousBeliefResource(ReligiousBeliefRepository religiousBeliefRepository, ReligiousBeliefMapper religiousBeliefMapper) {
+  public ReligiousBeliefResource(ReligiousBeliefRepository religiousBeliefRepository,
+                                 ReligiousBeliefMapper religiousBeliefMapper,
+                                 ReligiousBeliefServiceImpl religiousBeliefsService) {
     this.religiousBeliefRepository = religiousBeliefRepository;
     this.religiousBeliefMapper = religiousBeliefMapper;
+    this.religiousBeliefsService = religiousBeliefsService;
   }
 
   /**
@@ -103,39 +117,40 @@ public class ReligiousBeliefResource {
         .body(result);
   }
 
-  /**
-   * GET  /religious-beliefs : get all the religiousBeliefs.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of religiousBeliefs in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/religious-beliefs")
-  @Timed
-  public ResponseEntity<List<ReligiousBeliefDTO>> getAllReligiousBeliefs(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of ReligiousBeliefs");
-    Page<ReligiousBelief> page = religiousBeliefRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/religious-beliefs");
-    return new ResponseEntity<>(religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
 
   /**
-   * GET  /current/religious-beliefs : get all the religiousBeliefs.
+   * GET  /religious-beliefs : get all religious beliefs.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of religiousBeliefs in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of religious beliefs in body
    */
-  @GetMapping("/current/religious-beliefs")
+  @ApiOperation(value = "Lists religious beliefs",
+      notes = "Returns a list of religious beliefs with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "religious beliefs list")})
+  @GetMapping("/religious-beliefs")
   @Timed
-  public ResponseEntity<List<ReligiousBeliefDTO>> getAllCurrentReligiousBeliefs(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of current ReligiousBeliefs");
-    ReligiousBelief religiousBelief = new ReligiousBelief();
-    religiousBelief.setStatus(Status.CURRENT);
-    Page<ReligiousBelief> page = religiousBeliefRepository.findAll(Example.of(religiousBelief), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/religious-beliefs");
-    return new ResponseEntity<>(religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(page.getContent()), headers, HttpStatus.OK);
+  public ResponseEntity<List<ReligiousBeliefDTO>> getAllReligiousBeliefs(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of religious beliefs begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<ReligiousBelief> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = religiousBeliefRepository.findAll(pageable);
+    } else {
+      page = religiousBeliefsService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<ReligiousBeliefDTO> results = page.map(religiousBeliefMapper::religiousBeliefToReligiousBeliefDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/religious-beliefs");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
+
 
   /**
    * GET  /religious-beliefs/:id : get the "id" religiousBelief.

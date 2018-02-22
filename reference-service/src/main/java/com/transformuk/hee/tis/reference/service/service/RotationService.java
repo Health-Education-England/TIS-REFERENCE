@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.service.service;
 
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Rotation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -57,4 +59,7 @@ public interface RotationService {
    * @param id the id of the entity
    */
   void delete(Long id);
+
+  Page<Rotation> advancedSearch(String searchString, List<ColumnFilter> columnFilters, Pageable pageable);
+
 }

@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Title;
 import com.transformuk.hee.tis.reference.service.repository.TitleRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TitleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TitleMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class TitleResourceIntTest {
   private TitleMapper titleMapper;
 
   @Autowired
+  private TitleServiceImpl titleService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,7 @@ public class TitleResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TitleResource titleResource = new TitleResource(titleRepository, titleMapper);
+    TitleResource titleResource = new TitleResource(titleRepository, titleMapper, titleService);
     this.restTitleMockMvc = MockMvcBuilders.standaloneSetup(titleResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

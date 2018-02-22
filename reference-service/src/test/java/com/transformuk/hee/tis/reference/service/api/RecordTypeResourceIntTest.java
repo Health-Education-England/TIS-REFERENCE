@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.RecordType;
 import com.transformuk.hee.tis.reference.service.repository.RecordTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.RecordTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RecordTypeMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class RecordTypeResourceIntTest {
   private RecordTypeMapper recordTypeMapper;
 
   @Autowired
+  private RecordTypeServiceImpl recordTypeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,7 @@ public class RecordTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    RecordTypeResource recordTypeResource = new RecordTypeResource(recordTypeRepository, recordTypeMapper);
+    RecordTypeResource recordTypeResource = new RecordTypeResource(recordTypeRepository, recordTypeMapper, recordTypeService);
     this.restRecordTypeMockMvc = MockMvcBuilders.standaloneSetup(recordTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

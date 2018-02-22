@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GenderServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Gender.
@@ -40,13 +59,15 @@ public class GenderResource {
 
   private static final String ENTITY_NAME = "gender";
   private final Logger log = LoggerFactory.getLogger(GenderResource.class);
+
   private final GenderRepository genderRepository;
-
   private final GenderMapper genderMapper;
+  private final GenderServiceImpl genderService;
 
-  public GenderResource(GenderRepository genderRepository, GenderMapper genderMapper) {
+  public GenderResource(GenderRepository genderRepository, GenderMapper genderMapper, GenderServiceImpl genderService) {
     this.genderRepository = genderRepository;
     this.genderMapper = genderMapper;
+    this.genderService = genderService;
   }
 
   /**
@@ -98,31 +119,36 @@ public class GenderResource {
   }
 
   /**
-   * GET  /genders : get all the genders.
+   * GET  /genders : get all genders.
    *
+   * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of genders in body
    */
+  @ApiOperation(value = "Lists genders",
+      notes = "Returns a list of genders with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/genders")
   @Timed
-  public List<GenderDTO> getAllGenders() {
-    log.debug("REST request to get all Genders");
-    List<Gender> genders = genderRepository.findAll();
-    return genderMapper.gendersToGenderDTOs(genders);
-  }
-
-  /**
-   * GET  /current/genders : get all the genders.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of genders in body
-   */
-  @GetMapping("/current/genders")
-  @Timed
-  public List<GenderDTO> getAllCurrentGenders() {
-    log.debug("REST request to get all current Genders");
-    Gender gender = new Gender();
-    gender.setStatus(Status.CURRENT);
-    List<Gender> genders = genderRepository.findAll(Example.of(gender));
-    return genderMapper.gendersToGenderDTOs(genders);
+  public ResponseEntity<List<GenderDTO>> getAllGenders(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of genders begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Gender> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = genderRepository.findAll(pageable);
+    } else {
+      page = genderService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<GenderDTO> results = page.map(genderMapper::genderToGenderDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/genders");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
 

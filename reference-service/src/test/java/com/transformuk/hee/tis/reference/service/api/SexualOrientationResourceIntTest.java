@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SexualOrientationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SexualOrientationMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,8 @@ public class SexualOrientationResourceIntTest {
 
   @Autowired
   private SexualOrientationMapper sexualOrientationMapper;
+  @Autowired
+  private SexualOrientationServiceImpl sexualOrientationService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +89,8 @@ public class SexualOrientationResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    SexualOrientationResource sexualOrientationResource = new SexualOrientationResource(sexualOrientationRepository, sexualOrientationMapper);
+    SexualOrientationResource sexualOrientationResource = new SexualOrientationResource(sexualOrientationRepository,
+        sexualOrientationMapper, sexualOrientationService);
     this.restSexualOrientationMockMvc = MockMvcBuilders.standaloneSetup(sexualOrientationResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

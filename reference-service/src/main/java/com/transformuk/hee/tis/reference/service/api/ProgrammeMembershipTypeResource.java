@@ -1,18 +1,30 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.ProgrammeMembershipTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing ProgrammeMembershipType.
@@ -40,13 +56,17 @@ public class ProgrammeMembershipTypeResource {
 
   private static final String ENTITY_NAME = "programmeMembershipType";
   private final Logger log = LoggerFactory.getLogger(ProgrammeMembershipTypeResource.class);
+
   private final ProgrammeMembershipTypeRepository programmeMembershipTypeRepository;
-
   private final ProgrammeMembershipTypeMapper programmeMembershipTypeMapper;
+  private final ProgrammeMembershipTypeServiceImpl programmeMembershipTypeService;
 
-  public ProgrammeMembershipTypeResource(ProgrammeMembershipTypeRepository programmeMembershipTypeRepository, ProgrammeMembershipTypeMapper programmeMembershipTypeMapper) {
+  public ProgrammeMembershipTypeResource(ProgrammeMembershipTypeRepository programmeMembershipTypeRepository,
+                                         ProgrammeMembershipTypeMapper programmeMembershipTypeMapper,
+                                         ProgrammeMembershipTypeServiceImpl programmeMembershipTypeService) {
     this.programmeMembershipTypeRepository = programmeMembershipTypeRepository;
     this.programmeMembershipTypeMapper = programmeMembershipTypeMapper;
+    this.programmeMembershipTypeService = programmeMembershipTypeService;
   }
 
   /**
@@ -98,32 +118,38 @@ public class ProgrammeMembershipTypeResource {
   }
 
   /**
-   * GET  /programme-membership-types : get all the programmeMembershipTypes.
+   * GET  /programme-membership-types : get programme membership types.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of programmeMembershipTypes in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of programme membership types in body
    */
+  @ApiOperation(value = "Lists programme membership types",
+      notes = "Returns a list of programme membership types with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "programme membership types list")})
   @GetMapping("/programme-membership-types")
   @Timed
-  public List<ProgrammeMembershipTypeDTO> getAllProgrammeMembershipTypes() {
-    log.debug("REST request to get all ProgrammeMembershipTypes");
-    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll();
-    return programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
+  public ResponseEntity<List<ProgrammeMembershipTypeDTO>> getAllProgrammeMembershipTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of programme membership types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<ProgrammeMembershipType> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = programmeMembershipTypeRepository.findAll(pageable);
+    } else {
+      page = programmeMembershipTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<ProgrammeMembershipTypeDTO> results = page.map(programmeMembershipTypeMapper::programmeMembershipTypeToProgrammeMembershipTypeDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/programme-membership-types");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
-  /**
-   * GET  /current/programme-membership-types : get all the programmeMembershipTypes.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of programmeMembershipTypes in body
-   */
-  @GetMapping("/current/programme-membership-types")
-  @Timed
-  public List<ProgrammeMembershipTypeDTO> getAllCurrentProgrammeMembershipTypes() {
-    log.debug("REST request to get all ProgrammeMembershipTypes");
-    ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType();
-    programmeMembershipType.setStatus(Status.CURRENT);
-    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll(Example.of(programmeMembershipType));
-    return programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
-  }
 
   /**
    * GET  /programme-membership-types/:id : get the "id" programmeMembershipType.

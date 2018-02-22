@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Role;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class RoleResourceIntTest {
   private RoleMapper roleMapper;
 
   @Autowired
+  private RoleServiceImpl roleService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,7 @@ public class RoleResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    RoleResource roleResource = new RoleResource(roleRepository, roleMapper);
+    RoleResource roleResource = new RoleResource(roleRepository, roleMapper, roleService);
     this.restRoleMockMvc = MockMvcBuilders.standaloneSetup(roleResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

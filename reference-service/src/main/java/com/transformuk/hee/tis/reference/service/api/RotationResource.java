@@ -1,17 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Rotation;
+import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
+import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,13 +38,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Rotation.
@@ -44,14 +57,17 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class RotationResource {
 
-  private final Logger log = LoggerFactory.getLogger(RotationResource.class);
-
   private static final String ENTITY_NAME = "rotation";
-
+  private final Logger log = LoggerFactory.getLogger(RotationResource.class);
   private final RotationService rotationService;
+  private final RotationMapper rotationMapper;
+  private final RotationRepository rotationRepository;
 
-  public RotationResource(RotationService rotationService) {
+
+  public RotationResource(RotationRepository rotationRepository, RotationMapper rotationMapper, RotationService rotationService) {
     this.rotationService = rotationService;
+    this.rotationMapper = rotationMapper;
+    this.rotationRepository = rotationRepository;
   }
 
   /**
@@ -98,36 +114,40 @@ public class RotationResource {
         .body(result);
   }
 
-  /**
-   * GET  /rotations : get all the rotations.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of rotations in body
-   */
-  @GetMapping("/rotations")
-  @Timed
-  public ResponseEntity<List<RotationDTO>> getAllRotations(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Rotations");
-    Page<RotationDTO> page = rotationService.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/rotations");
-    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-  }
 
   /**
-   * GET  /current/rotations : get all the current rotations.
+   * GET  /rotations : get all rotations.
    *
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of rotations in body
    */
-  @GetMapping("/current/rotations")
+  @ApiOperation(value = "Lists rotations",
+      notes = "Returns a list of rotations with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "rotations list")})
+  @GetMapping("/rotations")
   @Timed
-  public ResponseEntity<List<RotationDTO>> getAllCurrentRotations(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Rotations");
-    Rotation status = new Rotation().status(Status.CURRENT);
-    Page<RotationDTO> page = rotationService.findAllCurrent(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/rotations");
-    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+  public ResponseEntity<List<RotationDTO>> getAllRotations(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of rotations begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Rotation> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = rotationRepository.findAll(pageable);
+    } else {
+      page = rotationService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<RotationDTO> results = page.map(rotationMapper::toDto);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/rotations");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
+
 
   /**
    * EXISTS /rotations/exists/ : check is countries exists

@@ -1,9 +1,13 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeService;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -119,44 +124,23 @@ public class CurriculumSubTypeResource {
   public ResponseEntity<List<CurriculumSubTypeDTO>> getAllCurriculumSubTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get all CurriculumSubTypes");
     searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
 
     Page<CurriculumSubTypeDTO> page;
-    if (StringUtils.isEmpty(searchQuery)) {
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = curriculumSubTypeService.findAll(pageable);
     } else {
-      page = curriculumSubTypeService.advancedSearch(false, searchQuery, pageable);
+      page = curriculumSubTypeService.advancedSearch(searchQuery, columnFilters, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/curriculum-sub-types");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }
-
-  /**
-   * GET  /current/curriculum-sub-types : get all current curriculumSubTypes.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of curriculumSubTypes in body
-   */
-  @GetMapping("/current/curriculum-sub-types")
-  @Timed
-  public ResponseEntity<List<CurriculumSubTypeDTO>> getAllCurrentCurriculumSubTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
-    log.debug("REST request to get all current CurriculumSubTypes");
-    searchQuery = sanitize(searchQuery);
-
-    Page<CurriculumSubTypeDTO> page;
-    if (StringUtils.isEmpty(searchQuery)) {
-      page = curriculumSubTypeService.findAllCurrent(pageable);
-    } else {
-      page = curriculumSubTypeService.advancedSearch(true, searchQuery, pageable);
-    }
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/curriculum-sub-types");
-    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-  }
-
 
   /**
    * GET  /curriculum-sub-types/:id : get the "id" curriculumSubType.

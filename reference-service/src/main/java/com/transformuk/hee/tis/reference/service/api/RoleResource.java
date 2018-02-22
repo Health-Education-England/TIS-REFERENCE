@@ -1,18 +1,31 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Role;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +35,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Role.
@@ -40,13 +57,15 @@ public class RoleResource {
 
   private static final String ENTITY_NAME = "role";
   private final Logger log = LoggerFactory.getLogger(RoleResource.class);
+
   private final RoleRepository roleRepository;
-
   private final RoleMapper roleMapper;
+  private final RoleServiceImpl roleService;
 
-  public RoleResource(RoleRepository roleRepository, RoleMapper roleMapper) {
+  public RoleResource(RoleRepository roleRepository, RoleMapper roleMapper, RoleServiceImpl roleService) {
     this.roleRepository = roleRepository;
     this.roleMapper = roleMapper;
+    this.roleService = roleService;
   }
 
   /**
@@ -97,17 +116,38 @@ public class RoleResource {
         .body(result);
   }
 
+
   /**
-   * GET  /roles : get all the roles.
+   * GET  /roles : get all roles.
    *
+   * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of roles in body
    */
+  @ApiOperation(value = "Lists roles",
+      notes = "Returns a list of roles with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "role list")})
   @GetMapping("/roles")
   @Timed
-  public List<RoleDTO> getAllRoles() {
-    log.debug("REST request to get all Roles");
-    List<Role> roles = roleRepository.findAll();
-    return roleMapper.rolesToRoleDTOs(roles);
+  public ResponseEntity<List<RoleDTO>> getAllRoles(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of roles begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Role> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = roleRepository.findAll(pageable);
+    } else {
+      page = roleService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<RoleDTO> results = page.map(roleMapper::roleToRoleDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/roles");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
 

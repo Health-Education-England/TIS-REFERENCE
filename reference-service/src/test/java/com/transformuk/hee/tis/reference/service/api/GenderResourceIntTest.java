@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.GenderServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class GenderResourceIntTest {
   private GenderMapper genderMapper;
 
   @Autowired
+  private GenderServiceImpl genderService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,7 @@ public class GenderResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    GenderResource genderResource = new GenderResource(genderRepository, genderMapper);
+    GenderResource genderResource = new GenderResource(genderRepository, genderMapper, genderService);
     this.restGenderMockMvc = MockMvcBuilders.standaloneSetup(genderResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

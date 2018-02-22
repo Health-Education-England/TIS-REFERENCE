@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.service.repository.SettledRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.SettledServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SettledMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Settled.
@@ -40,13 +59,15 @@ public class SettledResource {
 
   private static final String ENTITY_NAME = "settled";
   private final Logger log = LoggerFactory.getLogger(SettledResource.class);
+
   private final SettledRepository settledRepository;
-
   private final SettledMapper settledMapper;
+  private final SettledServiceImpl settledService;
 
-  public SettledResource(SettledRepository settledRepository, SettledMapper settledMapper) {
+  public SettledResource(SettledRepository settledRepository, SettledMapper settledMapper, SettledServiceImpl settledService) {
     this.settledRepository = settledRepository;
     this.settledMapper = settledMapper;
+    this.settledService = settledService;
   }
 
   /**
@@ -97,33 +118,39 @@ public class SettledResource {
         .body(result);
   }
 
+
   /**
-   * GET  /settleds : get all the settleds.
+   * GET  /settleds : get all settled.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of settleds in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of settled in body
    */
+  @ApiOperation(value = "Lists settled",
+      notes = "Returns a list of settled with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "settled list")})
   @GetMapping("/settleds")
   @Timed
-  public List<SettledDTO> getAllSettleds() {
-    log.debug("REST request to get all Settleds");
-    List<Settled> settleds = settledRepository.findAll();
-    return settledMapper.settledsToSettledDTOs(settleds);
+  public ResponseEntity<List<SettledDTO>> getAllSettleds(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of settled begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Settled> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = settledRepository.findAll(pageable);
+    } else {
+      page = settledService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<SettledDTO> results = page.map(settledMapper::settledToSettledDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/settleds");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
-
-  /**
-   * GET  /current/settleds : get all the current settleds.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of settleds in body
-   */
-  @GetMapping("/current/settleds")
-  @Timed
-  public List<SettledDTO> getAllCurrentSettleds() {
-    log.debug("REST request to get all current Settleds");
-    Settled settled = new Settled().status(Status.CURRENT);
-    List<Settled> settleds = settledRepository.findAll(Example.of(settled));
-    return settledMapper.settledsToSettledDTOs(settleds);
-  }
-
 
   /**
    * GET  /settleds/:id : get the "id" settled.

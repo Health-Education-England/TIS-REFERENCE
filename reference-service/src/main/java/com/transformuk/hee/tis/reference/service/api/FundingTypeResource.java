@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing FundingType.
@@ -40,13 +59,16 @@ public class FundingTypeResource {
 
   private static final String ENTITY_NAME = "fundingType";
   private final Logger log = LoggerFactory.getLogger(FundingTypeResource.class);
+
   private final FundingTypeRepository fundingTypeRepository;
-
   private final FundingTypeMapper fundingTypeMapper;
+  private final FundingTypeServiceImpl fundingTypeService;
 
-  public FundingTypeResource(FundingTypeRepository fundingTypeRepository, FundingTypeMapper fundingTypeMapper) {
+  public FundingTypeResource(FundingTypeRepository fundingTypeRepository, FundingTypeMapper fundingTypeMapper,
+                             FundingTypeServiceImpl fundingTypeService) {
     this.fundingTypeRepository = fundingTypeRepository;
     this.fundingTypeMapper = fundingTypeMapper;
+    this.fundingTypeService = fundingTypeService;
   }
 
   /**
@@ -98,32 +120,36 @@ public class FundingTypeResource {
   }
 
   /**
-   * GET  /funding-types : get all the fundingTypes.
+   * GET  /funding-types : get all funding types.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of fundingTypes in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
+  @ApiOperation(value = "Lists funding types",
+      notes = "Returns a list of funding types with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "funding types list")})
   @GetMapping("/funding-types")
   @Timed
-  public List<FundingTypeDTO> getAllFundingTypes() {
-    log.debug("REST request to get all FundingTypes");
-    List<FundingType> fundingTypes = fundingTypeRepository.findAll();
-    return fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
-  }
-
-
-  /**
-   * GET  /current/funding-types : get all current fundingTypes.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of fundingTypes in body
-   */
-  @GetMapping("/current/funding-types")
-  @Timed
-  public List<FundingTypeDTO> getAllCurrentFundingTypes() {
-    log.debug("REST request to get all current FundingTypes");
-    FundingType fundingType = new FundingType();
-    fundingType.setStatus(Status.CURRENT);
-    List<FundingType> fundingTypes = fundingTypeRepository.findAll(Example.of(fundingType));
-    return fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
+  public ResponseEntity<List<FundingTypeDTO>> getAllFundingTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of funding types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<FundingType> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = fundingTypeRepository.findAll(pageable);
+    } else {
+      page = fundingTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<FundingTypeDTO> results = page.map(fundingTypeMapper::fundingTypeToFundingTypeDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/funding-types");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
 

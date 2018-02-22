@@ -1,14 +1,19 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
+import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
@@ -42,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -133,47 +139,21 @@ public class SiteResource {
   public ResponseEntity<List<SiteDTO>> getAllSites(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get a page of Sites");
     searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<Site> page;
-    if (StringUtils.isEmpty(searchQuery)) {
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = siteRepository.findAll(pageable);
     } else {
-      page = sitesTrustsService.searchSites(searchQuery, pageable);
+      page = sitesTrustsService.advanceSearchSite(searchQuery, columnFilters, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
     return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
-
-  }
-
-
-  /**
-   * GET  /current/sites : get all current sites or search for sites
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of sites in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/sites")
-  @Timed
-  public ResponseEntity<List<SiteDTO>> getAllCurrentSites(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
-    log.debug("REST request to get a page of Sites");
-    searchQuery = sanitize(searchQuery);
-    Page<Site> page;
-    if (StringUtils.isEmpty(searchQuery)) {
-      Site site = new Site();
-      site.setStatus(Status.CURRENT);
-      page = siteRepository.findAll(Example.of(site), pageable);
-    } else {
-      page = sitesTrustsService.searchCurrentSites(searchQuery, pageable);
-    }
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
-    return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
-
   }
 
   /**

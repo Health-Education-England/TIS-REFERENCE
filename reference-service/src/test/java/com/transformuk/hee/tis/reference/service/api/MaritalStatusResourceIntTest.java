@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.MaritalStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class MaritalStatusResourceIntTest {
   private MaritalStatusMapper maritalStatusMapper;
 
   @Autowired
+  private MaritalStatusServiceImpl maritalStatusService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class MaritalStatusResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    MaritalStatusResource maritalStatusResource = new MaritalStatusResource(maritalStatusRepository, maritalStatusMapper);
+    MaritalStatusResource maritalStatusResource = new MaritalStatusResource(maritalStatusRepository, maritalStatusMapper,
+        maritalStatusService);
     this.restMaritalStatusMockMvc = MockMvcBuilders.standaloneSetup(maritalStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

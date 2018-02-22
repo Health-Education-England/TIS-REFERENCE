@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.TrainingNumberType;
 import com.transformuk.hee.tis.reference.service.repository.TrainingNumberTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TrainingNumberTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrainingNumberTypeMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class TrainingNumberTypeResourceIntTest {
   private TrainingNumberTypeMapper trainingNumberTypeMapper;
 
   @Autowired
+  private TrainingNumberTypeServiceImpl trainingNumberTypeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class TrainingNumberTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TrainingNumberTypeResource trainingNumberTypeResource = new TrainingNumberTypeResource(trainingNumberTypeRepository, trainingNumberTypeMapper);
+    TrainingNumberTypeResource trainingNumberTypeResource = new TrainingNumberTypeResource(trainingNumberTypeRepository,
+        trainingNumberTypeMapper, trainingNumberTypeService);
     this.restTrainingNumberTypeMockMvc = MockMvcBuilders.standaloneSetup(trainingNumberTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

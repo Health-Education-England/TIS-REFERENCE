@@ -5,8 +5,10 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.CollegeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -55,6 +57,9 @@ public class CollegeResourceIntTest {
   private CollegeMapper collegeMapper;
 
   @Autowired
+  private CollegeServiceImpl collegeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,8 +91,8 @@ public class CollegeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    CollegeResource collegeResource = new CollegeResource(collegeRepository, collegeMapper);
-    this.restCollegeMockMvc = MockMvcBuilders.standaloneSetup(collegeResource)
+    CollegeResource testObj = new CollegeResource(collegeRepository, collegeMapper, collegeService);
+    this.restCollegeMockMvc = MockMvcBuilders.standaloneSetup(testObj)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();

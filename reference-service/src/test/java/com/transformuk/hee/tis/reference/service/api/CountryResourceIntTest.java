@@ -6,9 +6,11 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.CountryServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -58,6 +60,9 @@ public class CountryResourceIntTest {
   private CountryMapper countryMapper;
 
   @Autowired
+  private CountryServiceImpl countryService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -89,7 +94,7 @@ public class CountryResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    CountryResource countryResource = new CountryResource(countryRepository, countryMapper);
+    CountryResource countryResource = new CountryResource(countryRepository, countryMapper, countryService);
     this.restCountryMockMvc = MockMvcBuilders.standaloneSetup(countryResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

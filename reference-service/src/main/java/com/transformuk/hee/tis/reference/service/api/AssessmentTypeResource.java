@@ -1,15 +1,23 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
@@ -26,13 +34,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Assessment Types.
@@ -46,9 +58,12 @@ public class AssessmentTypeResource {
   private final Logger log = LoggerFactory.getLogger(AssessmentTypeResource.class);
 
   private final AssessmentTypeRepository assessmentTypeRepository;
+  private final AssessmentTypeServiceImpl assessmentTypeService;
 
-  public AssessmentTypeResource(AssessmentTypeRepository assessmentTypeRepository) {
+  public AssessmentTypeResource(AssessmentTypeRepository assessmentTypeRepository,
+                                AssessmentTypeServiceImpl assessmentTypeService) {
     this.assessmentTypeRepository = assessmentTypeRepository;
+    this.assessmentTypeService = assessmentTypeService;
   }
 
   /**
@@ -98,36 +113,34 @@ public class AssessmentTypeResource {
   }
 
   /**
-   * GET  /assessment-types : get all the Assessment Types.
+   * GET  /assessment-types : get all assessment types.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of AssessmentType in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of assessment types in body
    */
+  @ApiOperation(value = "Lists assessment types",
+      notes = "Returns a list of assessment types with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "assessment types list")})
   @GetMapping("/assessment-types")
   @Timed
-  public ResponseEntity<List<AssessmentType>> getAllAssessmentTypes(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Assessment Type");
-    Page<AssessmentType> page = assessmentTypeRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-types");
-    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-  }
-
-  /**
-   * GET  /current/assessment-types : get all current the Assessment Types.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of AssessmentType in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/assessment-types")
-  @Timed
-  public ResponseEntity<List<AssessmentType>> getAllCurrentAssessmentTypes(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of currentAssessment Type");
-    AssessmentType assessmentType = new AssessmentType();
-    assessmentType.setStatus(Status.CURRENT);
-    Page<AssessmentType> page = assessmentTypeRepository.findAll(Example.of(assessmentType), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-types");
+  public ResponseEntity<List<AssessmentType>> getAllAssessmentTypes(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of assessment types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<AssessmentType> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = assessmentTypeRepository.findAll(pageable);
+    } else {
+      page = assessmentTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-type");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }
 

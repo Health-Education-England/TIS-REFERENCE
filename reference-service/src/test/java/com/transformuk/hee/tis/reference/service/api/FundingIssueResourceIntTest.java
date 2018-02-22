@@ -5,6 +5,8 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingIssueServiceImpl;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +54,9 @@ public class FundingIssueResourceIntTest {
   private FundingIssueMapper fundingIssueMapper;
 
   @Autowired
+  private FundingIssueServiceImpl fundingIssueService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -82,7 +87,8 @@ public class FundingIssueResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    FundingIssueResource fundingIssueResource = new FundingIssueResource(fundingIssueRepository, fundingIssueMapper);
+    FundingIssueResource fundingIssueResource = new FundingIssueResource(fundingIssueRepository, fundingIssueMapper,
+        fundingIssueService);
     this.restFundingIssueMockMvc = MockMvcBuilders.standaloneSetup(fundingIssueResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

@@ -1,17 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.College;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.CountryServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +39,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Country.
@@ -49,13 +62,15 @@ public class CountryResource {
 
   private static final String ENTITY_NAME = "country";
   private final Logger log = LoggerFactory.getLogger(CountryResource.class);
+
   private final CountryRepository countryRepository;
-
   private final CountryMapper countryMapper;
+  private final CountryServiceImpl countryService;
 
-  public CountryResource(CountryRepository countryRepository, CountryMapper countryMapper) {
+  public CountryResource(CountryRepository countryRepository, CountryMapper countryMapper, CountryServiceImpl countryService) {
     this.countryRepository = countryRepository;
     this.countryMapper = countryMapper;
+    this.countryService = countryService;
   }
 
   /**
@@ -107,19 +122,36 @@ public class CountryResource {
   }
 
   /**
-   * GET  /countries : get all the countries.
+   * GET  /countries : get all countries.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of countries in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
+  @ApiOperation(value = "Lists countries",
+      notes = "Returns a list of countries with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/countries")
   @Timed
-  public ResponseEntity<List<CountryDTO>> getAllCountries(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Countries");
-    Page<Country> page = countryRepository.findAll(pageable);
+  public ResponseEntity<List<CountryDTO>> getAllCountries(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of countries begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Country> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = countryRepository.findAll(pageable);
+    } else {
+      page = countryService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<CountryDTO> results = page.map(countryMapper::countryToCountryDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/countries");
-    return new ResponseEntity<>(countryMapper.countriesToCountryDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

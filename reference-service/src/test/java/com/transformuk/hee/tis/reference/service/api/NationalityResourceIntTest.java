@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.NationalityServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,8 @@ public class NationalityResourceIntTest {
 
   @Autowired
   private NationalityMapper nationalityMapper;
+  @Autowired
+  private NationalityServiceImpl nationalityService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +89,8 @@ public class NationalityResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    NationalityResource nationalityResource = new NationalityResource(nationalityRepository, nationalityMapper);
+    NationalityResource nationalityResource = new NationalityResource(nationalityRepository, nationalityMapper,
+        nationalityService);
     this.restNationalityMockMvc = MockMvcBuilders.standaloneSetup(nationalityResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.ReligiousBeliefServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,8 @@ public class ReligiousBeliefResourceIntTest {
 
   @Autowired
   private ReligiousBeliefMapper religiousBeliefMapper;
+  @Autowired
+  private ReligiousBeliefServiceImpl religiousBeliefService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +89,8 @@ public class ReligiousBeliefResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    ReligiousBeliefResource religiousBeliefResource = new ReligiousBeliefResource(religiousBeliefRepository, religiousBeliefMapper);
+    ReligiousBeliefResource religiousBeliefResource = new ReligiousBeliefResource(religiousBeliefRepository,
+        religiousBeliefMapper, religiousBeliefService);
     this.restReligiousBeliefMockMvc = MockMvcBuilders.standaloneSetup(religiousBeliefResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

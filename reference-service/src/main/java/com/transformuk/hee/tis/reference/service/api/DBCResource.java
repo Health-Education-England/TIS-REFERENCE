@@ -1,18 +1,32 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.DBCServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,11 +37,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 import com.transformuk.hee.tis.security.model.UserProfile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -45,13 +63,15 @@ public class DBCResource {
 
   private static final String ENTITY_NAME = "dBC";
   private final Logger log = LoggerFactory.getLogger(DBCResource.class);
+
   private final DBCRepository dBCRepository;
-
   private final DBCMapper dBCMapper;
+  private final DBCServiceImpl dbcService;
 
-  public DBCResource(DBCRepository dBCRepository, DBCMapper dBCMapper) {
+  public DBCResource(DBCRepository dBCRepository, DBCMapper dBCMapper, DBCServiceImpl dbcService) {
     this.dBCRepository = dBCRepository;
     this.dBCMapper = dBCMapper;
+    this.dbcService = dbcService;
   }
 
   /**
@@ -103,33 +123,37 @@ public class DBCResource {
   }
 
   /**
-   * GET  /dbcs : get all the dBCS.
+   * GET  /dbcs : get all dbcs.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of dBCS in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
+  @ApiOperation(value = "Lists countries",
+      notes = "Returns a list of countries with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "dbcs list")})
   @GetMapping("/dbcs")
   @Timed
-  public List<DBCDTO> getAllDBCS() {
-    log.debug("REST request to get all DBCS");
-    List<DBC> dBCS = dBCRepository.findAll();
-    return dBCMapper.dBCSToDBCDTOs(dBCS);
+  public ResponseEntity<List<DBCDTO>> getAllDbcs(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of dbcs begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<DBC> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = dBCRepository.findAll(pageable);
+    } else {
+      page = dbcService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<DBCDTO> results = page.map(dBCMapper::dBCToDBCDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/dbcs");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
-
-  /**
-   * GET  /current/dbcs : get all current dBCS.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of dBCS in body
-   */
-  @GetMapping("/current/dbcs")
-  @Timed
-  public List<DBCDTO> getAllCurrentDBCS() {
-    log.debug("REST request to get all current DBCS");
-    DBC dbc = new DBC();
-    dbc.setStatus(Status.CURRENT);
-    List<DBC> dBCS = dBCRepository.findAll(Example.of(dbc));
-    return dBCMapper.dBCSToDBCDTOs(dBCS);
-  }
-
 
   /**
    * GET  /dbcs/:id : get the "id" dBC.

@@ -1,23 +1,25 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.transformuk.hee.tis.reference.api.enums.Status;
-import com.transformuk.hee.tis.reference.service.service.mapper.DbcToLocalOfficeMapper;
-import com.transformuk.hee.tis.security.model.UserProfile;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
+import com.transformuk.hee.tis.reference.service.service.mapper.DbcToLocalOfficeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
+import com.transformuk.hee.tis.security.model.UserProfile;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -125,67 +128,43 @@ public class LocalOfficeResource {
   public ResponseEntity<List<LocalOfficeDTO>> getAllLocalOffices(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
-  @RequestParam(value = "searchQuery", required = false) String searchQuery) {
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get a page of LocalOffices");
     searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
     Page<LocalOffice> page;
-    if (StringUtils.isEmpty(searchQuery)) {
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = localOfficeRepository.findAll(pageable);
     } else {
-      page = sitesTrustsService.searchLocalOffices(searchQuery, pageable);
+      page = sitesTrustsService.advanceSearchLocalOffice(searchQuery, columnFilters, pageable);
     }
 
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
     return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
   }
-
 
 
   /**
-   * GET  /current/local-offices : get all current localOffices.
+   * GET  /local-offices/user : get all the allowed local offices for the logged in user.
    *
-   * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of localOffices in body
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
-  @GetMapping("/current/local-offices")
+  @GetMapping("/local-offices/user")
   @Timed
-  public ResponseEntity<List<LocalOfficeDTO>> getAllLCurrentocalOffices(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery) {
-    log.debug("REST request to get a page of LocalOffices");
-    searchQuery = sanitize(searchQuery);
-    Page<LocalOffice> page;
-    if (StringUtils.isEmpty(searchQuery)) {
-      LocalOffice localOffice = new LocalOffice();
-      localOffice.setStatus(Status.CURRENT);
-      page = localOfficeRepository.findAll(Example.of(localOffice), pageable);
-    } else {
-      page = sitesTrustsService.searchCurrentLocalOffices(searchQuery, pageable);
-    }
-
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/local-offices");
-    return new ResponseEntity<>(localOfficeMapper.localOfficesToLocalOfficeDTOs(page.getContent()), headers, HttpStatus.OK);
+  public ResponseEntity<List<LocalOfficeDTO>> getUserLocalOffices() {
+    log.debug("REST request to get page of Local Offices for current user");
+    UserProfile userProfile = getProfileFromContext();
+    Set<String> allowedBodyCodes = userProfile.getDesignatedBodyCodes();
+    Set<String> allowedLocalOffices = DbcToLocalOfficeMapper.map(allowedBodyCodes);
+    List<LocalOffice> localOfficeList = localOfficeRepository.findByNameIn(allowedLocalOffices);
+    List<LocalOfficeDTO> loDtoList = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOfficeList);
+    return new ResponseEntity<>(loDtoList, HttpStatus.OK);
   }
-
-	/**
-	 * GET  /local-offices/user : get all the allowed local offices for the logged in user.
-	 *
-	 * @return the ResponseEntity with status 200 (OK) and the list of localOffices in body
-	 * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-	 */
-	@GetMapping("/local-offices/user")
-	@Timed
-	public ResponseEntity<List<LocalOfficeDTO>> getUserLocalOffices(){
-		log.debug("REST request to get page of Local Offices for current user");
-		UserProfile userProfile = getProfileFromContext();
-		Set<String> allowedBodyCodes = userProfile.getDesignatedBodyCodes();
-		Set<String> allowedLocalOffices = DbcToLocalOfficeMapper.map(allowedBodyCodes);
-		List<LocalOffice> localOfficeList = localOfficeRepository.findByNameIn(allowedLocalOffices);
-		List<LocalOfficeDTO> loDtoList = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOfficeList);
-		return new ResponseEntity<>(loDtoList, HttpStatus.OK);
-	}
 
 
   /**

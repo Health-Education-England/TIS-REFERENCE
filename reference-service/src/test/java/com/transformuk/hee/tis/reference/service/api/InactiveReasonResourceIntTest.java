@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.InactiveReason;
 import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.InactiveReasonServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class InactiveReasonResourceIntTest {
   private InactiveReasonMapper inactiveReasonMapper;
 
   @Autowired
+  private InactiveReasonServiceImpl inactiveReasonService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class InactiveReasonResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    InactiveReasonResource inactiveReasonResource = new InactiveReasonResource(inactiveReasonRepository, inactiveReasonMapper);
+    InactiveReasonResource inactiveReasonResource = new InactiveReasonResource(inactiveReasonRepository,
+        inactiveReasonMapper, inactiveReasonService);
     this.restInactiveReasonMockMvc = MockMvcBuilders.standaloneSetup(inactiveReasonResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

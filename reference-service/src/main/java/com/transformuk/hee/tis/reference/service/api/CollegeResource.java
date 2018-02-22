@@ -1,19 +1,28 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.model.College;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.CollegeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing College.
@@ -46,13 +59,18 @@ public class CollegeResource {
 
   private static final String ENTITY_NAME = "college";
   private final Logger log = LoggerFactory.getLogger(CollegeResource.class);
-  private final CollegeRepository collegeRepository;
 
-  private final CollegeMapper collegeMapper;
+  @Autowired
+  private CollegeRepository collegeRepository;
+  @Autowired
+  private CollegeMapper collegeMapper;
+  @Autowired
+  private CollegeServiceImpl collegeService;
 
-  public CollegeResource(CollegeRepository collegeRepository, CollegeMapper collegeMapper) {
+  public CollegeResource(CollegeRepository collegeRepository, CollegeMapper collegeMapper, CollegeServiceImpl collegeService) {
     this.collegeRepository = collegeRepository;
     this.collegeMapper = collegeMapper;
+    this.collegeService = collegeService;
   }
 
   /**
@@ -103,38 +121,38 @@ public class CollegeResource {
         .body(result);
   }
 
-  /**
-   * GET  /colleges : get all the colleges.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/colleges")
-  @Timed
-  public ResponseEntity<List<CollegeDTO>> getAllColleges(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of Colleges");
-    Page<College> page = collegeRepository.findAll(pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/colleges");
-    return new ResponseEntity<>(collegeMapper.collegesToCollegeDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
 
   /**
-   * GET  /current/colleges : get all current colleges.
+   * GET  /colleges : get all colleges.
    *
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
-  @GetMapping("/current/olleges")
+  @ApiOperation(value = "Lists colleges",
+      notes = "Returns a list of colleges with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "college list")})
+  @GetMapping("/colleges")
   @Timed
-  public ResponseEntity<List<CollegeDTO>> getAllCurrentColleges(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of current Colleges");
-    College college = new College();
-    college.setStatus(Status.CURRENT);
-    Page<College> page = collegeRepository.findAll(Example.of(college), pageable);
+  public ResponseEntity<List<CollegeDTO>> getAllColleges(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of assessment types begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<College> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = collegeRepository.findAll(pageable);
+    } else {
+      page = collegeService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<CollegeDTO> results = page.map(collegeMapper::collegeToCollegeDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/colleges");
-    return new ResponseEntity<>(collegeMapper.collegesToCollegeDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

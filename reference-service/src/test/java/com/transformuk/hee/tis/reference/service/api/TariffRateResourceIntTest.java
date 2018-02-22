@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.TariffRate;
 import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TariffRateServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +63,8 @@ public class TariffRateResourceIntTest {
 
   @Autowired
   private TariffRateMapper tariffRateMapper;
+  @Autowired
+  private TariffRateServiceImpl tariffRateService;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -98,7 +101,7 @@ public class TariffRateResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TariffRateResource tariffRateResource = new TariffRateResource(tariffRateRepository, tariffRateMapper);
+    TariffRateResource tariffRateResource = new TariffRateResource(tariffRateRepository, tariffRateMapper, tariffRateService);
     this.restTariffRateMockMvc = MockMvcBuilders.standaloneSetup(tariffRateResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

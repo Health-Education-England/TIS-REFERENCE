@@ -1,18 +1,33 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.MaritalStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +37,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing MaritalStatus.
@@ -40,13 +59,16 @@ public class MaritalStatusResource {
 
   private static final String ENTITY_NAME = "maritalStatus";
   private final Logger log = LoggerFactory.getLogger(MaritalStatusResource.class);
+
   private final MaritalStatusRepository maritalStatusRepository;
-
   private final MaritalStatusMapper maritalStatusMapper;
+  private final MaritalStatusServiceImpl maritalStatusService;
 
-  public MaritalStatusResource(MaritalStatusRepository maritalStatusRepository, MaritalStatusMapper maritalStatusMapper) {
+  public MaritalStatusResource(MaritalStatusRepository maritalStatusRepository, MaritalStatusMapper maritalStatusMapper,
+                               MaritalStatusServiceImpl maritalStatusService) {
     this.maritalStatusRepository = maritalStatusRepository;
     this.maritalStatusMapper = maritalStatusMapper;
+    this.maritalStatusService = maritalStatusService;
   }
 
   /**
@@ -97,32 +119,38 @@ public class MaritalStatusResource {
         .body(result);
   }
 
-  /**
-   * GET  /marital-statuses : get all the maritalStatuses.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of maritalStatuses in body
-   */
-  @GetMapping("/marital-statuses")
-  @Timed
-  public List<MaritalStatusDTO> getAllMaritalStatuses() {
-    log.debug("REST request to get all MaritalStatuses");
-    List<MaritalStatus> maritalStatuses = maritalStatusRepository.findAll();
-    return maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
-  }
 
   /**
-   * GET  /current/marital-statuses : get all the current maritalStatuses.
+   * GET  /marital-statuses : get all marital statuses.
    *
-   * @return the ResponseEntity with status 200 (OK) and the list of maritalStatuses in body
+   * @param pageable the pagination information
+   * @return the ResponseEntity with status 200 (OK) and the list of marital statuses in body
    */
-  @GetMapping("/current/marital-statuses")
+  @ApiOperation(value = "Lists marital statuses",
+      notes = "Returns a list of marital statuses with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "marital statuses list")})
+  @GetMapping("/marital-statuses")
   @Timed
-  public List<MaritalStatusDTO> getAllCurrentMaritalStatuses() {
-    log.debug("REST request to get all current MaritalStatuses");
-    MaritalStatus maritalStatus = new MaritalStatus();
-    maritalStatus.setStatus(Status.CURRENT);
-    List<MaritalStatus> maritalStatuses = maritalStatusRepository.findAll(Example.of(maritalStatus));
-    return maritalStatusMapper.maritalStatusesToMaritalStatusDTOs(maritalStatuses);
+  public ResponseEntity<List<MaritalStatusDTO>> getAllMaritalStatuses(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of marital statuses begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<MaritalStatus> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = maritalStatusRepository.findAll(pageable);
+    } else {
+      page = maritalStatusService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<MaritalStatusDTO> results = page.map(maritalStatusMapper::maritalStatusToMaritalStatusDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/marital-statuses");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
   /**

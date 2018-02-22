@@ -6,6 +6,7 @@ import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,7 +17,7 @@ import java.util.Set;
  * Spring Data JPA repository for the LocalOffice entity.
  */
 @SuppressWarnings("unused")
-public interface LocalOfficeRepository extends JpaRepository<LocalOffice, Long> {
+public interface LocalOfficeRepository extends JpaRepository<LocalOffice, Long>, JpaSpecificationExecutor {
 
 	List<LocalOffice> findByNameIn(Set<String> localOffices);
 

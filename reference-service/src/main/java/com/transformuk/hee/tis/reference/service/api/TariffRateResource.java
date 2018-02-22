@@ -1,20 +1,26 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.TariffRate;
 import com.transformuk.hee.tis.reference.service.repository.TariffRateRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TariffRateServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing TariffRate.
@@ -49,10 +59,13 @@ public class TariffRateResource {
   private final TariffRateRepository tariffRateRepository;
 
   private final TariffRateMapper tariffRateMapper;
+  private final TariffRateServiceImpl tariffRateService;
 
-  public TariffRateResource(TariffRateRepository tariffRateRepository, TariffRateMapper tariffRateMapper) {
+  public TariffRateResource(TariffRateRepository tariffRateRepository, TariffRateMapper tariffRateMapper,
+                            TariffRateServiceImpl tariffRateService) {
     this.tariffRateRepository = tariffRateRepository;
     this.tariffRateMapper = tariffRateMapper;
+    this.tariffRateService = tariffRateService;
   }
 
   /**
@@ -104,39 +117,37 @@ public class TariffRateResource {
   }
 
   /**
-   * GET  /tariff-rates : get all the tariffRates.
+   * GET  /tariff-rates : get all tariff rates.
    *
    * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of tariffRates in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+   * @return the ResponseEntity with status 200 (OK) and the list of tariff rates in body
    */
+  @ApiOperation(value = "Lists tariff rates",
+      notes = "Returns a list of tariff rates with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "tariff rates list")})
   @GetMapping("/tariff-rates")
   @Timed
-  public ResponseEntity<List<TariffRateDTO>> getAllTariffRates(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of TariffRates");
-    Page<TariffRate> page = tariffRateRepository.findAll(pageable);
+  public ResponseEntity<List<TariffRateDTO>> getAllTariffRates(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of tariff rates begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<TariffRate> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = tariffRateRepository.findAll(pageable);
+    } else {
+      page = tariffRateService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<TariffRateDTO> results = page.map(tariffRateMapper::tariffRateToTariffRateDTO);
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/tariff-rates");
-    return new ResponseEntity<>(tariffRateMapper.tariffRatesToTariffRateDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
-
-
-  /**
-   * GET  /cuurent/tariff-rates : get all the current tariffRates.
-   *
-   * @param pageable the pagination information
-   * @return the ResponseEntity with status 200 (OK) and the list of tariffRates in body
-   * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-   */
-  @GetMapping("/current/tariff-rates")
-  @Timed
-  public ResponseEntity<List<TariffRateDTO>> getAllCurrentTariffRates(@ApiParam Pageable pageable) {
-    log.debug("REST request to get a page of TariffRates");
-    TariffRate tariffRate = new TariffRate().status(Status.CURRENT);
-    Page<TariffRate> page = tariffRateRepository.findAll(Example.of(tariffRate), pageable);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/current/tariff-rates");
-    return new ResponseEntity<>(tariffRateMapper.tariffRatesToTariffRateDTOs(page.getContent()), headers, HttpStatus.OK);
-  }
-
 
   /**
    * GET  /tariff-rates/:id : get the "id" tariffRate.

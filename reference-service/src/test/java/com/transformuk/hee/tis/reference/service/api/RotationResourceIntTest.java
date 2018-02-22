@@ -84,7 +84,7 @@ public class RotationResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    final RotationResource rotationResource = new RotationResource(rotationService);
+    final RotationResource rotationResource = new RotationResource(rotationRepository, rotationMapper, rotationService);
     this.restRotationMockMvc = MockMvcBuilders.standaloneSetup(rotationResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

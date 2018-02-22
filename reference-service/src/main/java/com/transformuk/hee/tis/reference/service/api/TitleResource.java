@@ -1,18 +1,30 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Title;
 import com.transformuk.hee.tis.reference.service.repository.TitleRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.TitleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TitleMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +34,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
 
 /**
  * REST controller for managing Title.
@@ -41,12 +57,13 @@ public class TitleResource {
   private static final String ENTITY_NAME = "title";
   private final Logger log = LoggerFactory.getLogger(TitleResource.class);
   private final TitleRepository titleRepository;
-
   private final TitleMapper titleMapper;
+  private final TitleServiceImpl titleService;
 
-  public TitleResource(TitleRepository titleRepository, TitleMapper titleMapper) {
+  public TitleResource(TitleRepository titleRepository, TitleMapper titleMapper, TitleServiceImpl titleService) {
     this.titleRepository = titleRepository;
     this.titleMapper = titleMapper;
+    this.titleService = titleService;
   }
 
   /**
@@ -98,31 +115,38 @@ public class TitleResource {
   }
 
   /**
-   * GET  /titles : get all the titles.
+   * GET  /titles : get all titles.
    *
+   * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of titles in body
    */
+  @ApiOperation(value = "Lists titles",
+      notes = "Returns a list of titles with support for pagination, sorting, smart search and column filters \n")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "titles list")})
   @GetMapping("/titles")
   @Timed
-  public List<TitleDTO> getAllTitles() {
-    log.debug("REST request to get all Titles");
-    List<Title> titles = titleRepository.findAll();
-    return titleMapper.titlesToTitleDTOs(titles);
+  public ResponseEntity<List<TitleDTO>> getAllTitles(
+      @ApiParam Pageable pageable,
+      @ApiParam(value = "any wildcard string to be searched")
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
+      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+    log.info("REST request to get a page of titles begin");
+    searchQuery = sanitize(searchQuery);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    Page<Title> page;
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+      page = titleRepository.findAll(pageable);
+    } else {
+      page = titleService.advancedSearch(searchQuery, columnFilters, pageable);
+    }
+    Page<TitleDTO> results = page.map(titleMapper::titleToTitleDTO);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/titles");
+    return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }
 
-  /**
-   * GET  /current/titles : get all the current titles.
-   *
-   * @return the ResponseEntity with status 200 (OK) and the list of titles in body
-   */
-  @GetMapping("/current/titles")
-  @Timed
-  public List<TitleDTO> getAllCurrentTitles() {
-    log.debug("REST request to get all current Titles");
-    Title title = new Title().status(Status.CURRENT);
-    List<Title> titles = titleRepository.findAll(Example.of(title));
-    return titleMapper.titlesToTitleDTOs(titles);
-  }
 
   /**
    * GET  /titles/:id : get the "id" title.

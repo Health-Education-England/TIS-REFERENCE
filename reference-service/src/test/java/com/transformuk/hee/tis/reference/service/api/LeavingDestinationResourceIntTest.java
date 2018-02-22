@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.repository.LeavingDestinationRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.LeavingDestinationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingDestinationMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class LeavingDestinationResourceIntTest {
   private LeavingDestinationMapper leavingDestinationMapper;
 
   @Autowired
+  private LeavingDestinationServiceImpl leavingDestinationService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class LeavingDestinationResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    LeavingDestinationResource leavingDestinationResource = new LeavingDestinationResource(leavingDestinationRepository, leavingDestinationMapper);
+    LeavingDestinationResource leavingDestinationResource = new LeavingDestinationResource(
+        leavingDestinationRepository, leavingDestinationMapper, leavingDestinationService);
     this.restLeavingDestinationMockMvc = MockMvcBuilders.standaloneSetup(leavingDestinationResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

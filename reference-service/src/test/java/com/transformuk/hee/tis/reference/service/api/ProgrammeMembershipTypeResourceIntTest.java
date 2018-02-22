@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.ProgrammeMembershipTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class ProgrammeMembershipTypeResourceIntTest {
   private ProgrammeMembershipTypeMapper programmeMembershipTypeMapper;
 
   @Autowired
+  private ProgrammeMembershipTypeServiceImpl programmeMembershipTypeService;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -86,7 +90,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    ProgrammeMembershipTypeResource programmeMembershipTypeResource = new ProgrammeMembershipTypeResource(programmeMembershipTypeRepository, programmeMembershipTypeMapper);
+    ProgrammeMembershipTypeResource programmeMembershipTypeResource = new ProgrammeMembershipTypeResource(
+        programmeMembershipTypeRepository, programmeMembershipTypeMapper, programmeMembershipTypeService);
     this.restProgrammeMembershipTypeMockMvc = MockMvcBuilders.standaloneSetup(programmeMembershipTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
