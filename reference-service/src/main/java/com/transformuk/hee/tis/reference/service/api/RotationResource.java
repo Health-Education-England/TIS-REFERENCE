@@ -163,11 +163,8 @@ public class RotationResource {
     if (!CollectionUtils.isEmpty(values)) {
       List<String> dbLabels = rotationService.findByLabelsIn(values);
       values.forEach(label -> {
-        if (dbLabels.contains(label)) {
-          rotationExistsMap.put(label, true);
-        } else {
-          rotationExistsMap.put(label, false);
-        }
+        boolean isMatch = dbLabels.stream().anyMatch(label::equalsIgnoreCase);
+        rotationExistsMap.put(label, isMatch);
       });
     }
 

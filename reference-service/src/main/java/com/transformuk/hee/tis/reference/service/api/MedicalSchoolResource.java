@@ -185,11 +185,8 @@ public class MedicalSchoolResource {
     if (!CollectionUtils.isEmpty(values)) {
       List<String> dbLabels = medicalSchoolRepository.findByLabel(values);
       values.forEach(label -> {
-        if (dbLabels.contains(label)) {
-          medicalSchoolExistsMap.put(label, true);
-        } else {
-          medicalSchoolExistsMap.put(label, false);
-        }
+        boolean isMatch = dbLabels.stream().anyMatch(label::equalsIgnoreCase);
+        medicalSchoolExistsMap.put(label, isMatch);
       });
     }
 

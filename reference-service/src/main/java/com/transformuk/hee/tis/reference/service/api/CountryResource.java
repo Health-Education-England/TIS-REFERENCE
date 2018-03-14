@@ -186,11 +186,8 @@ public class CountryResource {
     if (!CollectionUtils.isEmpty(values)) {
       List<String> dbLabels = countryRepository.findByNationality(values);
       values.forEach(label -> {
-        if (dbLabels.contains(label)) {
-          countriesExistsMap.put(label, true);
-        } else {
-          countriesExistsMap.put(label, false);
-        }
+        boolean isMatch = dbLabels.stream().anyMatch(label::equalsIgnoreCase);
+        countriesExistsMap.put(label, isMatch);
       });
     }
 

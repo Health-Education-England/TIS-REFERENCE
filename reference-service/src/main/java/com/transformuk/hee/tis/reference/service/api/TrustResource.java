@@ -343,11 +343,8 @@ public class TrustResource {
     if (!CollectionUtils.isEmpty(codes)) {
       List<String> dbIds = trustRepository.findCodesByCodesIn(codes);
       codes.forEach(code -> {
-        if (dbIds.contains(code)) {
-          trustExistsMap.put(code, true);
-        } else {
-          trustExistsMap.put(code, false);
-        }
+        boolean isMatch = dbIds.stream().anyMatch(code::equalsIgnoreCase);
+        trustExistsMap.put(code, isMatch);
       });
     }
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustExistsMap));
