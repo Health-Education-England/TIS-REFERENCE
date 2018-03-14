@@ -277,11 +277,8 @@ public class SiteResource {
     if (!CollectionUtils.isEmpty(siteCodes)) {
       List<String> dbIds = siteRepository.findSiteCodesBySiteCodeIn(siteCodes);
       siteCodes.forEach(siteCode -> {
-        if (dbIds.contains(siteCode)) {
-          siteExistsMap.put(siteCode, true);
-        } else {
-          siteExistsMap.put(siteCode, false);
-        }
+        boolean isMatch = dbIds.stream().anyMatch(siteCode::equalsIgnoreCase);
+        siteExistsMap.put(siteCode, isMatch);
       });
     }
 

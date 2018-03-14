@@ -258,11 +258,8 @@ public class GradeResource {
     if (!CollectionUtils.isEmpty(abbreviations)) {
       List<String> dbGradeIds = gradeRepository.findByAbbreviationsIn(abbreviations);
       abbreviations.forEach(id -> {
-        if (dbGradeIds.contains(id)) {
-          gradeExistsMap.put(id, true);
-        } else {
-          gradeExistsMap.put(id, false);
-        }
+        boolean isMatch = dbGradeIds.stream().anyMatch(id::equalsIgnoreCase);
+        gradeExistsMap.put(id, isMatch);
       });
     }
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeExistsMap));
