@@ -88,11 +88,9 @@ public class PlacementTypeResource {
     if (!CollectionUtils.isEmpty(codes)) {
       List<String> dbPlaceTypeCodes = placementTypeRepository.findCodeByCodesIn(codes);
       codes.forEach(code -> {
-        if (dbPlaceTypeCodes.contains(code)) {
-          placementTypeExistsMap.put(code, true);
-        } else {
-          placementTypeExistsMap.put(code, false);
-        }
+        boolean isMatched = dbPlaceTypeCodes.stream().anyMatch(code::equalsIgnoreCase);
+        placementTypeExistsMap.put(code,isMatched);
+
       });
     }
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(placementTypeExistsMap));
