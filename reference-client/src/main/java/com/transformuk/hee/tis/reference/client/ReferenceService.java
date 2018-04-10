@@ -32,6 +32,15 @@ public interface ReferenceService extends ClientService {
   List<SiteDTO> findSitesIdIn(Set<Long> ids);
 
   /**
+   * Find the sites given the name. This does one API call and one SQL call to retrieve
+   * all the sites.
+   *
+   * @param name the site name to look for
+   * @return the found sites or an empty list
+   */
+  List<SiteDTO> findSitesByName(String name);
+
+  /**
    * Find the grades given the codes. This does one API call and one SQL call to retrieve
    * all the grades.
    *
@@ -50,6 +59,14 @@ public interface ReferenceService extends ClientService {
    */
   List<GradeDTO> findGradesIdIn(Set<Long> ids);
 
+  /**
+   * Find the grades given the name. This does one API call and one SQL call to retrieve
+   * all the grades.
+   *
+   * @param name the grade name to look for
+   * @return the found grades or an empty list
+   */
+  List<GradeDTO> findGradesByName(String name);
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 

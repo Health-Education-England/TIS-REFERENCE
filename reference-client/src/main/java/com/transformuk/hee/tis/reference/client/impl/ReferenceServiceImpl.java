@@ -35,13 +35,14 @@ import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
+import org.apache.commons.codec.EncoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Example;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -50,10 +51,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The default implementation of the reference service client. Provides method for which we use to communicate with
@@ -64,8 +68,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
+  private static final String FIND_GRADES_BY_NAME_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
   private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
+  private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
@@ -82,6 +88,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
   private static final String ROTATIONS_MAPPINGS_ENDPOINT = "/api/rotations/exists/";
   private static final String PLACEMENT_TYPES_MAPPINGS_ENDPOINT = "/api/placement-types/exists/";
+
+  private static String sitesJsonQuerystringURLEncoded;
+  private static String gradesJsonQuerystringURLEncoded;
+
+  static {
+    try {
+      sitesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"]}");
+      gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"]}");
+    } catch (EncoderException e) {
+      e.printStackTrace();
+    }
+  }
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
@@ -255,6 +273,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity.getStatusCode();
   }
 
+  @Cacheable("sites")
+  @Override
+  public List<SiteDTO> findSitesByName(String siteName) {
+    LOG.debug("calling getSitesByName with {}", siteName);
+
+    return referenceRestTemplate
+        .exchange(serviceUrl + FIND_SITES_BY_NAME_ENDPOINT + sitesJsonQuerystringURLEncoded.replace("PARAMETER_NAME", urlEncode(siteName)), HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {})
+        .getBody();
+  }
+
   @Override
   public List<SiteDTO> findSitesIn(Set<String> codes) {
     String url = serviceUrl + FIND_SITES_IN_ENDPOINT + String.join(",", codes);
@@ -279,6 +307,23 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       LOG.error("Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
           joinedIds, e.getMessage());
       return Collections.EMPTY_LIST;
+    }
+  }
+
+  @Cacheable("grades")
+  @Override
+  public List<GradeDTO> findGradesByName(String gradeName) {
+    LOG.debug("calling getGradesByName with {}", gradeName);
+    return referenceRestTemplate
+        .exchange(serviceUrl + FIND_GRADES_BY_NAME_ENDPOINT + gradesJsonQuerystringURLEncoded.replace("PARAMETER_NAME", urlEncode(gradeName)), HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {})
+        .getBody();
+  }
+
+  private String urlEncode(String name) {
+    try {
+      return URLEncoder.encode(name, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new AssertionError("UTF-8 is unknown");
     }
   }
 

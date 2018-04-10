@@ -9,9 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -20,13 +18,11 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -92,6 +88,30 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldFindSiteByName() {
+    // given
+    String siteNameWithSpecialCharacters = "siteNameWithSpecialCharacters@!£&£$%@/\\";
+    Set<String> codes = Sets.newHashSet(siteNameWithSpecialCharacters, "code2");
+    SiteDTO siteDTO = new SiteDTO();
+    siteDTO.setSiteName(siteNameWithSpecialCharacters);
+    List<SiteDTO> sites = Collections.singletonList(siteDTO);
+
+    ResponseEntity<List<SiteDTO>> responseEntity = new ResponseEntity(sites, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any())).willReturn(responseEntity);
+
+    // when
+    List<SiteDTO> respList = referenceServiceImpl.findSitesByName(siteNameWithSpecialCharacters);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites?columnFilters=%7B%22siteKnownAs%22%3A%5B%22siteNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(sites, respList);
+  }
+
+  @Test
   public void shouldFindGradesIn() {
     // given
     Set<String> codes = Sets.newHashSet("code1", "code2");
@@ -106,6 +126,30 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades/in/code2,code1"),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(grades, respList);
+  }
+
+  @Test
+  public void shouldFindGradeByName() {
+    // given
+    String gradeNameWithSpecialCharacters = "gradeNameWithSpecialCharacters@!£&£$%@/\\";
+    Set<String> codes = Sets.newHashSet(gradeNameWithSpecialCharacters, "code2");
+    GradeDTO gradeDTO = new GradeDTO();
+    gradeDTO.setName(gradeNameWithSpecialCharacters);
+    List<GradeDTO> grades = Collections.singletonList(gradeDTO);
+
+    ResponseEntity<List<GradeDTO>> responseEntity = new ResponseEntity(grades, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any())).willReturn(responseEntity);
+
+    // when
+    List<GradeDTO> respList = referenceServiceImpl.findGradesByName(gradeNameWithSpecialCharacters);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades?columnFilters=%7B%22name%22%3A%5B%22gradeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any());
     assertEquals(grades, respList);
   }
 
