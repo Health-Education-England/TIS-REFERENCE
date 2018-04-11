@@ -211,7 +211,9 @@ public class GradeResource {
     log.info("REST request to get a page of grades begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
+    if (columnFilterJson != null) {
+      columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
+    }
     List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<Grade> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {

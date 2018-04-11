@@ -146,7 +146,9 @@ public class SiteResource {
     log.debug("REST request to get a page of Sites");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
+    if (columnFilterJson != null) {
+      columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
+    }
     List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<Site> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
