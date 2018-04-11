@@ -164,6 +164,22 @@ public class TitleResource {
   }
 
   /**
+   * EXISTS /titles/exists/ : check is titles exists
+   *
+   * @param code the code of the titleDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/titles/exists/")
+  @Timed
+  public ResponseEntity<Boolean> titleExists(@RequestBody String code) {
+    log.debug("REST request to check Title exists : {}", code);
+    Title title = titleRepository.findFirstByCode(code);
+    if(title == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
+  }
+  /**
    * DELETE  /titles/:id : delete the "id" title.
    *
    * @param id the id of the titleDTO to delete

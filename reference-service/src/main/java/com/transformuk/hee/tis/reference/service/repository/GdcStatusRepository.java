@@ -10,4 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 @SuppressWarnings("unused")
 public interface GdcStatusRepository extends JpaRepository<GdcStatus, Long>, JpaSpecificationExecutor {
 
+  GdcStatus findFirstByCode(String code);
+
 }

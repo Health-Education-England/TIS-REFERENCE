@@ -95,4 +95,6 @@ public interface ReferenceService extends ClientService {
   Map<String, Boolean> rotationExists(List<String> values);
 
   Map<String, Boolean> placementTypeExists(List<String> values);
+
+  Boolean isValueExists(Class dtoClass,String value);
 }

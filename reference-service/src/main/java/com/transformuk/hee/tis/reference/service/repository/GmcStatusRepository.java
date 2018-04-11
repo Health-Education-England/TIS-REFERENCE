@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 @SuppressWarnings("unused")
 public interface GmcStatusRepository extends JpaRepository<GmcStatus, Long>, JpaSpecificationExecutor {
 
+  GmcStatus findFirstByCode(String code);
 }

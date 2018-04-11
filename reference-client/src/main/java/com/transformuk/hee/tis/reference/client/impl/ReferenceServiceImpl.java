@@ -88,6 +88,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
   private static final String ROTATIONS_MAPPINGS_ENDPOINT = "/api/rotations/exists/";
   private static final String PLACEMENT_TYPES_MAPPINGS_ENDPOINT = "/api/placement-types/exists/";
+  private static final String TITLE_MAPPINGS_ENDPOINT = "/api/titles/exists/";
+  private static final String GMC_STATUS_MAPPINGS_ENDPOINT = "/api/gmc-statuses/exists/";
+  private static final String GDC_STATUS_MAPPINGS_ENDPOINT = "/api/gdc-statuses/exists/";
+
 
   private static String sitesJsonQuerystringURLEncoded;
   private static String gradesJsonQuerystringURLEncoded;
@@ -219,6 +223,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Boolean> getCodeExistsDto() {
+    return new ParameterizedTypeReference<Boolean>() {
+    };
+  }
+
+
   private ParameterizedTypeReference<HttpStatus> getSiteTrustMatchReference() {
     return new ParameterizedTypeReference<HttpStatus>() {
     };
@@ -263,6 +273,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
         responseType);
     return responseEntity.getStatusCode();
+  }
+
+  private Boolean codeExistsDto(String url, String code) {
+    HttpEntity<String> requestEntity = new HttpEntity<>(code);
+    ParameterizedTypeReference<Boolean> responseType = getCodeExistsDto();
+    LOG.info("Trying codeExists with URL: {}", url);
+    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
+    return responseEntity.getBody();
   }
 
   private HttpStatus siteTrustMatchExists(String url, String siteCode) {
@@ -439,6 +458,21 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public Boolean isValueExists(Class dtoClass, String value) {
+    String url = serviceUrl;
+    if(dtoClass.equals(TitleDTO.class)){
+      url = url + TITLE_MAPPINGS_ENDPOINT;
+    }
+    else if(dtoClass.equals(GmcStatusDTO.class)){
+      url= url + GMC_STATUS_MAPPINGS_ENDPOINT;
+    }
+    else if(dtoClass.equals(GdcStatusDTO.class)){
+      url= url + GDC_STATUS_MAPPINGS_ENDPOINT;
+    }
+    return codeExistsDto(url,value);
+  }
+
+  @Override
   public HttpStatus siteTrustMatch(String siteCode, String trustCode) {
     String url = serviceUrl + SITE_TRUST_MATCH_ENDPOINT + trustCode;
     return siteTrustMatchExists(url, siteCode);
@@ -462,4 +496,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
     return classToParamTypeRefMap;
   }
+
+
 }
