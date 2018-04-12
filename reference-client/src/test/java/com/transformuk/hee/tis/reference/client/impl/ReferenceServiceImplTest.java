@@ -105,7 +105,7 @@ public class ReferenceServiceImplTest {
     List<SiteDTO> respList = referenceServiceImpl.findSitesByName(siteNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites?columnFilters=%7B%22siteKnownAs%22%3A%5B%22siteNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites?columnFilters=%7B%22siteKnownAs%22%3A%5B%22siteNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(sites, respList);
@@ -147,7 +147,7 @@ public class ReferenceServiceImplTest {
     List<GradeDTO> respList = referenceServiceImpl.findGradesByName(gradeNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades?columnFilters=%7B%22name%22%3A%5B%22gradeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades?columnFilters=%7B%22name%22%3A%5B%22gradeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any());
     assertEquals(grades, respList);
