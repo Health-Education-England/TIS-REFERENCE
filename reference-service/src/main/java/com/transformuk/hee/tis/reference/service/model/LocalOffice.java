@@ -34,6 +34,10 @@ public class LocalOffice implements Serializable {
   @Column(name = "name", nullable = false)
   private String name;
 
+  @NotNull
+  @Column(name = "postAbbreviation", nullable = false)
+  private String postAbbreviation;
+
   @Enumerated(value = EnumType.STRING)
   @Column(name = "status")
   private Status status;
@@ -69,6 +73,19 @@ public class LocalOffice implements Serializable {
 
   public LocalOffice name(String name) {
     this.name = name;
+    return this;
+  }
+
+  public String getPostAbbreviation() {
+    return postAbbreviation;
+  }
+
+  public void setPostAbbreviation(String postAbbreviation) {
+    this.postAbbreviation = postAbbreviation;
+  }
+
+  public LocalOffice postAbbreviation(String postAbbreviation) {
+    this.postAbbreviation = postAbbreviation;
     return this;
   }
 
@@ -111,6 +128,7 @@ public class LocalOffice implements Serializable {
         "id=" + id +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
+        ", postAbbreviation='" + postAbbreviation + '\'' +
         ", status=" + status +
         '}';
   }

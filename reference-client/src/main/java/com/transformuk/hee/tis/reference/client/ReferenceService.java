@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.client;
 import com.transformuk.hee.tis.client.ClientService;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -97,4 +98,6 @@ public interface ReferenceService extends ClientService {
   Map<String, Boolean> placementTypeExists(List<String> values);
 
   Boolean isValueExists(Class dtoClass,String value);
+
+  List<LocalOfficeDTO> findAllLocalOffice();
 }

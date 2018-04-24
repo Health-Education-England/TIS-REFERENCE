@@ -74,6 +74,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
+  private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
@@ -91,6 +92,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String TITLE_MAPPINGS_ENDPOINT = "/api/titles/exists/";
   private static final String GMC_STATUS_MAPPINGS_ENDPOINT = "/api/gmc-statuses/exists/";
   private static final String GDC_STATUS_MAPPINGS_ENDPOINT = "/api/gdc-statuses/exists/";
+
 
 
   private static String sitesJsonQuerystringURLEncoded;
@@ -338,6 +340,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .getBody();
   }
 
+  @Override
+  public List<LocalOfficeDTO> findAllLocalOffice() {
+    LOG.debug("calling getGradesByName with {}");
+    return referenceRestTemplate
+        .exchange(serviceUrl + FIND_ALL_LOCAL_OFFICE_ENDPOINT, HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
+        .getBody();
+  }
+
   private String urlEncode(String name) {
     try {
       return URLEncoder.encode(name, "UTF-8");
@@ -496,6 +506,5 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Map<Class, ParameterizedTypeReference> getClassToParamTypeRefMap() {
     return classToParamTypeRefMap;
   }
-
 
 }
