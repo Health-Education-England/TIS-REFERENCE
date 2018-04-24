@@ -59,6 +59,9 @@ public class LocalOfficeResourceIntTest {
   private static final String HENWL_NAME = "Health Education England North West London";
   private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
 
+  private static final String DEFAULT_POST_ABBREVIATION = "AAA";
+  private static final String UPDATED_POST_ABBREVIATION = "BBB";
+
   private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};
 
 
@@ -96,13 +99,15 @@ public class LocalOfficeResourceIntTest {
   public static LocalOffice createEntity(EntityManager em) {
     LocalOffice localOffice = new LocalOffice()
         .abbreviation(DEFAULT_ABBREVIATION)
-        .name(DEFAULT_NAME);
+        .name(DEFAULT_NAME)
+        .postAbbreviation(DEFAULT_POST_ABBREVIATION);
     return localOffice;
   }
 
   LocalOffice searchLO = new LocalOffice()
       .abbreviation("SEARCHLO")
-      .name("SEARCHLO");
+      .name("SEARCHLO")
+      .postAbbreviation("SEARCHLO");
 
   @Before
   public void setup() {
@@ -233,7 +238,8 @@ public class LocalOfficeResourceIntTest {
 		for (String lo : localOfficeArray) {
 			LocalOffice localOfficeReal = new LocalOffice()
 					.abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
-					.name(lo);
+					.name(lo)
+          .postAbbreviation(DEFAULT_POST_ABBREVIATION + count.toString());
 			localOfficeRepository.saveAndFlush(localOfficeReal);
 			count++;
 		}
@@ -263,7 +269,10 @@ public class LocalOfficeResourceIntTest {
 				.andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA2")))
 				.andExpect(jsonPath("$.[*].name").value(hasItem(HEKSS_NAME)))
 				.andExpect(jsonPath("$.[*].name").value(hasItem(HENWL_NAME)))
-				.andExpect(jsonPath("$.[*].name").value(not(contains(HENE_NAME))));
+				.andExpect(jsonPath("$.[*].name").value(not(contains(HENE_NAME))))
+				.andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA3")))
+				.andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA2")))
+        ;
 	}
 
   @Test
