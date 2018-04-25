@@ -2,14 +2,12 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServiceImpl;
@@ -23,7 +21,6 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -166,6 +163,23 @@ public class EthnicOriginResource {
     EthnicOrigin ethnicOrigin = ethnicOriginRepository.findOne(id);
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(ethnicOriginDTO));
+  }
+
+  /**
+   * EXISTS /ethnic-origins/exists/ : check is ethnicOrigin exists
+   *
+   * @param code the code of the ethnicOriginDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/ethnic-origins/exists/")
+  @Timed
+  public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code) {
+    log.debug("REST request to check EthnicOrigin exists : {}", code);
+    EthnicOrigin ethnicOrigin = ethnicOriginRepository.findFirstByCode(code);
+    if(ethnicOrigin == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
   }
 
   /**

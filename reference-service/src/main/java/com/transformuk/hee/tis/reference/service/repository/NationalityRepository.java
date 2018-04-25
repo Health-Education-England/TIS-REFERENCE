@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface NationalityRepository extends JpaRepository<Nationality, Long>, JpaSpecificationExecutor {
-
+  Nationality findFirstByCountryNumber(String code);
 }

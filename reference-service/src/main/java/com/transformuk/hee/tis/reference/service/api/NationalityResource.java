@@ -166,6 +166,23 @@ public class NationalityResource {
   }
 
   /**
+   * EXISTS /nationalities/exists/ : check is nationalities exists
+   *
+   * @param code the code of the nationalityDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/nationalities/exists/")
+  @Timed
+  public ResponseEntity<Boolean> nationalityExists(@RequestBody String code) {
+    log.debug("REST request to check Nationality exists : {}", code);
+    Nationality nationality = nationalityRepository.findFirstByCountryNumber(code);
+    if(nationality == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
+  }
+
+  /**
    * DELETE  /nationalities/:id : delete the "id" nationality.
    *
    * @param id the id of the nationalityDTO to delete

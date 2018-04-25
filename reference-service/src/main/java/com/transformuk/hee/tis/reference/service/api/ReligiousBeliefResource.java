@@ -168,6 +168,23 @@ public class ReligiousBeliefResource {
   }
 
   /**
+   * EXISTS /religious-beliefs/exists/ : check is religiousBelief exists
+   *
+   * @param code the code of the religiousBeliefDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/religious-beliefs/exists/")
+  @Timed
+  public ResponseEntity<Boolean> religiousBeliefExists(@RequestBody String code) {
+    log.debug("REST request to check ReligiousBelief exists : {}", code);
+    ReligiousBelief religiousBelief = religiousBeliefRepository.findFirstByCode(code);
+    if(religiousBelief == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
+  }
+
+  /**
    * DELETE  /religious-beliefs/:id : delete the "id" religiousBelief.
    *
    * @param id the id of the religiousBeliefDTO to delete

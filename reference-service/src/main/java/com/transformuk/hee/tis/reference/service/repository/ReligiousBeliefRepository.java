@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface ReligiousBeliefRepository extends JpaRepository<ReligiousBelief, Long>, JpaSpecificationExecutor {
-
+  ReligiousBelief findFirstByCode(String code);
 }

@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface GenderRepository extends JpaRepository<Gender, Long>, JpaSpecificationExecutor {
-
+  Gender findFirstByCode(String code);
 }

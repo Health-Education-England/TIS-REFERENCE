@@ -2,14 +2,12 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.MaritalStatusServiceImpl;
@@ -23,7 +21,6 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -166,6 +163,23 @@ public class MaritalStatusResource {
     MaritalStatus maritalStatus = maritalStatusRepository.findOne(id);
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(maritalStatusDTO));
+  }
+
+  /**
+   * EXISTS /marital-statuses/exists/ : check is maritalStatus exists
+   *
+   * @param code the code of the maritalStatusDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/marital-statuses/exists/")
+  @Timed
+  public ResponseEntity<Boolean> maritalStatusExists(@RequestBody String code) {
+    log.debug("REST request to check MaritalStatus exists : {}", code);
+    MaritalStatus maritalStatus = maritalStatusRepository.findFirstByCode(code);
+    if(maritalStatus == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
   }
 
   /**

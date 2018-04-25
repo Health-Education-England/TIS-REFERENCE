@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface SexualOrientationRepository extends JpaRepository<SexualOrientation, Long>, JpaSpecificationExecutor {
-
+  SexualOrientation findFirstByCode(String code);
 }
