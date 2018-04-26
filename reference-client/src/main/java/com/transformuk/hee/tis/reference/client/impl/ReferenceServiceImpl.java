@@ -92,6 +92,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String TITLE_MAPPINGS_ENDPOINT = "/api/titles/exists/";
   private static final String GMC_STATUS_MAPPINGS_ENDPOINT = "/api/gmc-statuses/exists/";
   private static final String GDC_STATUS_MAPPINGS_ENDPOINT = "/api/gdc-statuses/exists/";
+  private static final String GENDER_MAPPINGS_ENDPOINT = "/api/genders/exists/";
+  private static final String NATIONALITY_STATUS_MAPPINGS_ENDPOINT = "/api/nationalities/exists/";
+  private static final String ETHINIC_ORIGIN_MAPPINGS_ENDPOINT = "/api/ethnic-origins/exists/";
+  private static final String MARITAL_STATUS_MAPPINGS_ENDPOINT = "/api/marital-statuses/exists/";
+  private static final String SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT = "/api/sexual-orientations/exists/";
+  private static final String RELIGIOUS_BELIF_MAPPINGS_ENDPOINT = "/api/religious-beliefs/exists/";
 
 
 
@@ -472,12 +478,22 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     String url = serviceUrl;
     if(dtoClass.equals(TitleDTO.class)){
       url = url + TITLE_MAPPINGS_ENDPOINT;
-    }
-    else if(dtoClass.equals(GmcStatusDTO.class)){
-      url= url + GMC_STATUS_MAPPINGS_ENDPOINT;
-    }
-    else if(dtoClass.equals(GdcStatusDTO.class)){
-      url= url + GDC_STATUS_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(GmcStatusDTO.class)){
+      url = url + GMC_STATUS_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(GdcStatusDTO.class)){
+      url = url + GDC_STATUS_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(GenderDTO.class)){
+      url = url + GENDER_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(NationalityDTO.class)){
+      url = url + NATIONALITY_STATUS_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(EthnicOriginDTO.class)){
+      url= url + ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(MaritalStatusDTO.class)){
+      url= url + MARITAL_STATUS_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(SexualOrientationDTO.class)){
+      url= url + SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(ReligiousBeliefDTO.class)){
+      url= url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
     }
     return codeExistsDto(url,value);
   }
