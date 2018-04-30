@@ -2,38 +2,7 @@ package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
-import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
-import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
-import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
-import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
-import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
-import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
-import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
-import com.transformuk.hee.tis.reference.api.dto.JsonPatchDTO;
-import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
-import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
-import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
-import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
-import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
-import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
-import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
-import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
-import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
-import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
-import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
-import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
-import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
-import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
-import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.dto.*;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.lang3.StringUtils;
@@ -98,6 +67,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String MARITAL_STATUS_MAPPINGS_ENDPOINT = "/api/marital-statuses/exists/";
   private static final String SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT = "/api/sexual-orientations/exists/";
   private static final String RELIGIOUS_BELIF_MAPPINGS_ENDPOINT = "/api/religious-beliefs/exists/";
+  private static final String QUALIFICATION_MAPPINGS_ENDPOINT = "/api/qualification-reference/exists/";
 
 
 
@@ -494,6 +464,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       url= url + SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
     } else if(dtoClass.equals(ReligiousBeliefDTO.class)){
       url= url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(QualificationReferenceDTO.class)){
+      url= url + QUALIFICATION_MAPPINGS_ENDPOINT;
     }
     return codeExistsDto(url,value);
   }

@@ -174,6 +174,23 @@ public class QualificationReferenceResource {
   }
 
   /**
+   * EXISTS /qualification-reference/exists/ : check is qualificationReference exists
+   *
+   * @param code the code of the qualificationReferenceDTO to check
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/qualification-reference/exists/")
+  @Timed
+  public ResponseEntity<Boolean> qualificationReferenceExists(@RequestBody String code) {
+    log.debug("REST request to check QualificationReference exists : {}", code);
+    QualificationReference qualificationReference = qualificationReferenceRepository.findFirstByCode(code);
+    if(qualificationReference == null){
+      return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(true, HttpStatus.OK);
+  }
+
+  /**
    * POST  /bulk-qualification-reference : Bulk create a new qualification-reference.
    *
    * @param qualificationReferenceDTOs List of the qualificationReferenceDTOS to create

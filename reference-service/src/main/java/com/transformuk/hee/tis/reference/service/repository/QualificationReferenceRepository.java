@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface QualificationReferenceRepository extends JpaRepository<QualificationReference, Long>, JpaSpecificationExecutor {
-
+  QualificationReference findFirstByCode(String code);
 }
