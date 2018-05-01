@@ -68,7 +68,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT = "/api/sexual-orientations/exists/";
   private static final String RELIGIOUS_BELIF_MAPPINGS_ENDPOINT = "/api/religious-beliefs/exists/";
   private static final String QUALIFICATION_MAPPINGS_ENDPOINT = "/api/qualification-reference/exists/";
-
+  private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT = "/api/qualification-types/exists/";
 
 
   private static String sitesJsonQuerystringURLEncoded;
@@ -466,6 +466,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       url= url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
     } else if(dtoClass.equals(QualificationReferenceDTO.class)){
       url= url + QUALIFICATION_MAPPINGS_ENDPOINT;
+    } else if(dtoClass.equals(QualificationTypeDTO.class)){
+      url= url + QUALIFICATION_TYPE_MAPPINGS_ENDPOINT;
     }
     return codeExistsDto(url,value);
   }
