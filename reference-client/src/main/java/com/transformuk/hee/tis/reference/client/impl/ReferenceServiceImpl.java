@@ -22,10 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -69,6 +66,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String RELIGIOUS_BELIF_MAPPINGS_ENDPOINT = "/api/religious-beliefs/exists/";
   private static final String QUALIFICATION_MAPPINGS_ENDPOINT = "/api/qualification-reference/exists/";
   private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT = "/api/qualification-types/exists/";
+  private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
 
 
   private static String sitesJsonQuerystringURLEncoded;
@@ -323,6 +321,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .exchange(serviceUrl + FIND_ALL_LOCAL_OFFICE_ENDPOINT, HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
         .getBody();
   }
+
+  @Override
+  public Collection<RoleDTO> getRolesByCategory(final Long categoryId) {
+    LOG.debug("calling getRolesByCategory with {}", categoryId);
+
+    return referenceRestTemplate
+            .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + String.valueOf(categoryId), HttpMethod.GET, null, new ParameterizedTypeReference<List<RoleDTO>>() {})
+            .getBody();
+  }
+
 
   private String urlEncode(String name) {
     try {

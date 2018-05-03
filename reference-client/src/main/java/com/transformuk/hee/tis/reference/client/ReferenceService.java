@@ -1,13 +1,11 @@
 package com.transformuk.hee.tis.reference.client;
 
 import com.transformuk.hee.tis.client.ClientService;
-import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
-import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
-import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
-import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,4 +98,6 @@ public interface ReferenceService extends ClientService {
   Boolean isValueExists(Class dtoClass,String value);
 
   List<LocalOfficeDTO> findAllLocalOffice();
+
+  Collection<RoleDTO> getRolesByCategory(final Long categoryId);
 }
