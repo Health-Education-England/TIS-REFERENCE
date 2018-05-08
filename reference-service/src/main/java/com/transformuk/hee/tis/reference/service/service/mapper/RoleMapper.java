@@ -1,22 +1,25 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
+import com.transformuk.hee.tis.reference.api.dto.RoleCategoryDTO;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.service.model.Role;
+import com.transformuk.hee.tis.reference.service.model.RoleCategory;
 import org.mapstruct.Mapper;
 
+import java.util.Arrays;
 import java.util.List;
 
-/**
- * Mapper for the entity Role and its DTO RoleDTO.
- */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {}, imports = Arrays.class)
 public interface RoleMapper {
+    RoleDTO roleToRoleDTO(Role role);
 
-  RoleDTO roleToRoleDTO(Role role);
+    List<RoleDTO> rolesToRoleDTOs(List<Role> roles);
 
-  List<RoleDTO> rolesToRoleDTOs(List<Role> roles);
+    Role roleDTOToRole(RoleDTO roleDTO);
 
-  Role roleDTOToRole(RoleDTO roleDTO);
+    List<Role> roleDTOsToRoles(List<RoleDTO> roleDTOs);
 
-  List<Role> roleDTOsToRoles(List<RoleDTO> roleDTOs);
+    RoleCategory map(RoleCategoryDTO roleCategoryDTO);
+
+    RoleCategoryDTO map(RoleCategory roleCategory);
 }
