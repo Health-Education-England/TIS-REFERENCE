@@ -13,6 +13,7 @@ import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.api.util.UrlDecoderUtil;
+import com.transformuk.hee.tis.reference.service.config.ApplicationProperties;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.model.Site;
@@ -28,6 +29,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -78,11 +80,15 @@ public class SiteResource {
 
   private final int limit;
 
+  private ApplicationProperties applicationProperties;
+
   public SiteResource(SiteRepository siteRepository, SiteMapper siteMapper, SitesTrustsService sitesTrustsService,
+                      ApplicationProperties applicationProperties,
                       @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.siteMapper = siteMapper;
     this.sitesTrustsService = sitesTrustsService;
+    this.applicationProperties = applicationProperties;
     this.limit = limit;
   }
 
@@ -149,7 +155,7 @@ public class SiteResource {
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
     }
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList, applicationProperties.isSqlInjectionSanitiserRelaxed());
     Page<Site> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = siteRepository.findAll(pageable);

@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.config.ApplicationProperties;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
@@ -100,6 +101,9 @@ public class SiteResourceIntTest {
   @Autowired
   private EntityManager em;
 
+  @Autowired
+  private ApplicationProperties applicationProperties;
+
   private MockMvc restSiteMockMvc;
 
   private Site site;
@@ -127,7 +131,7 @@ public class SiteResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService, 100);
+    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService,  applicationProperties, 100);
     this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
