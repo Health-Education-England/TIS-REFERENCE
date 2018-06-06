@@ -34,15 +34,19 @@ public final class ColumnFilterUtil {
   public ColumnFilterUtil() {
   }
 
-  /**
-   * Parse json string to column filter list and checks for filter column if enum then converts string to Enum
-   *
-   * @param columnFilterJson json string to parse
-   * @param enumList         list of enums as column filter for the entity
-   * @return
-   * @throws IOException
-   */
   public static List<ColumnFilter> getColumnFilters(String columnFilterJson, List<Class> enumList) throws IOException {
+    return getColumnFilters(columnFilterJson, enumList, false);
+  }
+
+    /**
+		 * Parse json string to column filter list and checks for filter column if enum then converts string to Enum
+		 *
+		 * @param columnFilterJson json string to parse
+		 * @param enumList         list of enums as column filter for the entity
+		 * @return
+		 * @throws IOException
+		 */
+  public static List<ColumnFilter> getColumnFilters(String columnFilterJson, List<Class> enumList, boolean relaxSanitiser) throws IOException {
     if (columnFilterJson != null) {
       if (!columnFilterJson.startsWith("{")) {
         //attempt to decode
@@ -71,7 +75,7 @@ public final class ColumnFilterUtil {
           } else {
             List<Object> values = e.getValue().stream().map(v -> {
               if (!DateColumns.contains(e.getKey())) {
-                return StringUtil.sanitize(v);
+                return relaxSanitiser ? v : StringUtil.sanitize(v);
               }
               return v;
             }).collect(toList());
