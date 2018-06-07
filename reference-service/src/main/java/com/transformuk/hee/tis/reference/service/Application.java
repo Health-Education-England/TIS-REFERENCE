@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service;
 
+import com.transformuk.hee.tis.reference.service.api.util.StringUtil;
 import com.transformuk.hee.tis.reference.service.config.ApplicationProperties;
 import com.transformuk.hee.tis.reference.service.config.DefaultProfileUtil;
 import io.github.jhipster.config.JHipsterConstants;
@@ -47,6 +48,7 @@ public class Application {
     SpringApplication app = new SpringApplication(Application.class);
     DefaultProfileUtil.addDefaultProfile(app);
     Environment env = app.run(args).getEnvironment();
+    StringUtil.setSanitiserRegex(env.getProperty("SANITISER_REGEX"));
     String protocol = "http";
     if (env.getProperty("server.ssl.key-store") != null) {
       protocol = "https";
