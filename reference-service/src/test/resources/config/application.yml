@@ -115,4 +115,3 @@ jhipster:
 # ===================================================================
 
 application:
-  relaxSqlInjectionSanitiser : ${RELAX_SQL_INJECTION_SANITISER:false}
