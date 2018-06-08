@@ -125,7 +125,6 @@ jhipster:
 # ===================================================================
 
 application:
-  relaxSqlInjectionSanitiser : ${RELAX_SQL_INJECTION_SANITISER:false}
 
 logging:
   file: ${LOG_DIR:${HOME}}/reference.log
