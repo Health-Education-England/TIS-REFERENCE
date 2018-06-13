@@ -157,6 +157,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>2.4.6</version>
+    </dependency>
+    <dependency>
       <groupId>com.transformuk.hee</groupId>
       <artifactId>audit</artifactId>
       <version>2.1.0</version>

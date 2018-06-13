@@ -26,6 +26,16 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.get.GetField;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.ConstantScoreQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,15 +85,17 @@ public class SiteResource {
   private final SiteRepository siteRepository;
   private final SiteMapper siteMapper;
   private final SitesTrustsService sitesTrustsService;
+  private final TransportClient transportClient;
 
   private final int limit;
 
   public SiteResource(SiteRepository siteRepository, SiteMapper siteMapper, SitesTrustsService sitesTrustsService,
-                      @Value("${search.result.limit:100}") int limit) {
+                      @Value("${search.result.limit:100}") int limit, TransportClient transportClient) {
     this.siteRepository = siteRepository;
     this.siteMapper = siteMapper;
     this.sitesTrustsService = sitesTrustsService;
     this.limit = limit;
+    this.transportClient = transportClient;
   }
 
   /**
@@ -137,12 +149,13 @@ public class SiteResource {
    */
   @GetMapping("/sites")
   @Timed
-  public ResponseEntity<List<SiteDTO>> getAllSites(
+  public ResponseEntity<Object> getAllSites(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson,
+      @RequestParam(required = false, defaultValue = "false") boolean filter) throws IOException {
     log.debug("REST request to get a page of Sites");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -151,13 +164,45 @@ public class SiteResource {
     }
     List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<Site> page;
-    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
-      page = siteRepository.findAll(pageable);
+//    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
+//      page = siteRepository.findAll(pageable);
+//    } else {
+//      page = sitesTrustsService.advanceSearchSite(searchQuery, columnFilters, pageable);
+//    }
+
+    //HACK AND SLASH
+    BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    if (filter) {
+      boolQueryBuilder.should(new MatchQueryBuilder("siteName", searchQuery).type(MatchQueryBuilder.Type.PHRASE).boost(1.1f))
+          .should(new MatchQueryBuilder("trustCode", searchQuery).type(MatchQueryBuilder.Type.PHRASE))
+          .should(new MatchQueryBuilder("siteCode", searchQuery).type(MatchQueryBuilder.Type.PHRASE))
+          .should(new MatchQueryBuilder("address", searchQuery).type(MatchQueryBuilder.Type.PHRASE)).boost(1.1f)
+          .should(new MatchQueryBuilder("postCode", searchQuery).type(MatchQueryBuilder.Type.PHRASE))
+          .should(new MatchQueryBuilder("siteKnownAs", searchQuery).type(MatchQueryBuilder.Type.PHRASE)).boost(1.2f)
+          .should(new MatchQueryBuilder("siteNumber", searchQuery).type(MatchQueryBuilder.Type.PHRASE));
     } else {
-      page = sitesTrustsService.advanceSearchSite(searchQuery, columnFilters, pageable);
+      boolQueryBuilder.should(new MatchQueryBuilder("siteName", searchQuery)).boost(1.3f)
+          .should(new MatchQueryBuilder("trustCode", searchQuery))
+          .should(new MatchQueryBuilder("siteCode", searchQuery))
+          .should(new MatchQueryBuilder("address", searchQuery)).boost(1.1f)
+          .should(new MatchQueryBuilder("postCode", searchQuery))
+          .should(new MatchQueryBuilder("siteKnownAs", searchQuery)).boost(1.2f)
+          .should(new MatchQueryBuilder("siteNumber", searchQuery));
     }
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/sites");
-    return new ResponseEntity<>(siteMapper.sitesToSiteDTOs(page.getContent()), headers, HttpStatus.OK);
+
+    SearchResponse searchResponse = transportClient.prepareSearch("sites")
+        .setQuery(boolQueryBuilder)
+        .setSize(1000)
+        .setMinScore(0.1f)
+        .execute()
+        .actionGet();
+
+    SearchHit[] hits = searchResponse.getHits().hits();
+    List<String> result = Lists.newArrayList();
+    for (SearchHit hit : hits) {
+      result.add(hit.sourceAsString());
+    }
+    return new ResponseEntity<>(result, null, HttpStatus.OK);
   }
 
   /**

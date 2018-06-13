@@ -9,6 +9,7 @@ import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import org.assertj.core.util.Maps;
+import org.elasticsearch.client.transport.TransportClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,6 +89,10 @@ public class SiteResourceIntTest {
   @Autowired
   private SitesTrustsService sitesTrustsService;
 
+
+  @Autowired
+  private TransportClient transportClient;
+
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -127,7 +132,7 @@ public class SiteResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService, 100);
+    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService, 100, transportClient);
     this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)

@@ -128,3 +128,9 @@ application:
 
 logging:
   file: ${LOG_DIR:${HOME}}/reference.log
+
+elasticsearch:
+  name: elasticsearch
+  clustersniffing: false
+  hostname: ${ES_HOST:localhost}
+  port: ${ES_PORT:9300}
