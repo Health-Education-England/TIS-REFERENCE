@@ -24,6 +24,10 @@ public class StringUtilTest {
     assertThat(res).isEmpty();
   }
 
+  /**
+   * Removes any non alphanumeric characters from the given string, except for whitespaces,commas,
+   * dots,and,minus,plus,single quotes,slash and brackets
+   */
   @Test
   public void shouldStripNonAlphanumericButLeaveWhitespace() {
     //Given

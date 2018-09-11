@@ -9,7 +9,8 @@ import java.net.URLDecoder;
 public final class StringUtil {
 
   /**
-   * Removes any non alphanumeric characters from the given string, except for whitespace and commas.
+   * Removes any non alphanumeric characters from the given string, except for whitespace,commas,
+   * dots,and,minus,plus,single quotes,slash and brackets
    * Please note that this method also trims whitespace from the beginning and end of the string.
    *
    * @param str the string to process
