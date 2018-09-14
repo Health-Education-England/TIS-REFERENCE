@@ -100,4 +100,6 @@ public interface ReferenceService extends ClientService {
   List<LocalOfficeDTO> findAllLocalOffice();
 
   Collection<RoleDTO> getRolesByCategory(final Long categoryId);
+
+  Set<DBCDTO> getAllDBCs();
 }
