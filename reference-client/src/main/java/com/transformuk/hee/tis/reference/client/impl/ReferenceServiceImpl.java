@@ -511,7 +511,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public Set<DBCDTO> getAllDBCs() {
-    String url = serviceUrl + "dbcs?size=100&page=0";
     ResponseEntity<Set<DBCDTO>> responseEntity = referenceRestTemplate.exchange(serviceUrl + "/dbcs?size=100&page=0", HttpMethod.GET, null, getDBCDto());
     return responseEntity.getBody();
   }
