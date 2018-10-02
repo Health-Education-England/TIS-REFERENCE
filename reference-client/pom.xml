@@ -6,7 +6,7 @@
 
   <groupId>com.transformuk.hee</groupId>
   <artifactId>reference-client</artifactId>
-  <version>4.1.7</version>
+  <version>4.1.8</version>
 
   <properties>
     <java.version>1.8</java.version>
@@ -43,11 +43,6 @@
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>io.github.jhipster</groupId>
-      <artifactId>jhipster</artifactId>
-      <version>${jhipster.server.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
