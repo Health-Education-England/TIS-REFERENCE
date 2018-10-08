@@ -4,7 +4,7 @@ def utils = new hee.tis.utils()
 
 node {
 
-    def service = "referance"
+    def service = "reference"
 
     deleteDir()
 
