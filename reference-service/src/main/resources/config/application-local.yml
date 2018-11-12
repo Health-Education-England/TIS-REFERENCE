@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DBHOST:localhost}:${DBPORT:3306}/${DBNAME:reference}?useUnicode=true&characterEncoding=utf8&useSSL=${USE_SSL:false}
+    username: ${DBUSER:root}
+    password: ${DBPASSWORD:}
+
+flyway:
+  password: ${DBPASSWORD:}
+  schemas: ${DBNAME:reference}
+
+logging:
+  file: ${LOG_DIR:${HOME}}/reference.log
