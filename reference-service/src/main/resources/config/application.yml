@@ -14,84 +14,114 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 search:
-    result:
-        limit: 100
+  result:
+    limit: 100
 
 management:
-    context-path: /management
-    security:
-        enabled: false
-    health:
-        mail:
-            enabled: false # When using the MailService, configure an SMTP server and set this to true
-    add-application-context-header: false
+  context-path: /management
+  security:
+    enabled: false
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  add-application-context-header: false
 
 spring:
-    application:
-        name: reference
-    profiles:
-        # The commented value for `active` can be replaced with valid Spring profiles to load.
-        # Otherwise, it will be filled in by maven when building the WAR file
-        # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-        active: prod, prometheus
-    jackson:
-        serialization.write_dates_as_timestamps: false
-    jpa:
-        open-in-view: false
-        hibernate:
-            ddl-auto: none
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-    messages:
-        basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
+  application:
+    name: reference
+  profiles:
+    active: local
+    include:
+    - prometheus
+    - swagger
+  jackson:
+    serialization.write_dates_as_timestamps: false
+    serialization.indent_output: true
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    database: MYSQL
+    show-sql: true
+    format-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+  messages:
+    basename: i18n/messages
+    cache-seconds: 1
+  mvc:
+    favicon:
+      enabled: false
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: false # we use gulp + BrowserSync for livereload
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+  mail:
+    host: ${DBHOST:localhost}
+    port: 25
+    username:
+    password:
 
 flyway:
-    baseline-description: #
-    baseline-version: 1 # version to start migration
-    baseline-on-migrate: true
-    check-location: false # Check that migration scripts location exists.
-    clean-on-validation-error: false
-    flyway.enabled: true # Enable flyway.
-    encoding: #
-    ignore-failed-future-migration: #
-    init-sqls: # SQL statements to execute to initialize a connection immediately after obtaining it.
-    locations: classpath:db/migration
-    out-of-order: true
-    password: ${DBPASSWORD:}
-    placeholder-prefix:
-    placeholder-replacement:
-    placeholder-suffix:
-    placeholders.*:
-    schemas: ${DBNAME:reference}
-    sql-migration-prefix: V
-    sql-migration-separator:
-    sql-migration-suffix: .sql
-    table:  #
-    url: ${spring.datasource.url}
-    user: ${spring.datasource.username}
-    validate-on-migrate:  #
-    initOnMigrate: true
+  baseline-description: #
+  baseline-version: 1 # version to start migration
+  baseline-on-migrate: true
+  check-location: false # Check that migration scripts location exists.
+  clean-on-validation-error: false
+  flyway.enabled: true # Enable flyway.
+  encoding: #
+  ignore-failed-future-migration: #
+  init-sqls: # SQL statements to execute to initialize a connection immediately after obtaining it.
+  locations: classpath:db/migration
+  out-of-order: true
+  password: ${DBPASSWORD:}
+  placeholder-prefix:
+  placeholder-replacement:
+  placeholder-suffix:
+  placeholders.*:
+  schemas: ${DBNAME:reference}
+  sql-migration-prefix: V
+  sql-migration-separator:
+  sql-migration-suffix: .sql
+  table:  #
+  url: ${spring.datasource.url}
+  user: ${spring.datasource.username}
+  validate-on-migrate:  #
+  initOnMigrate: true
 
 security:
-    basic:
-        enabled: false
-    user:
-        name: admin
-        password: admin
+  basic:
+    enabled: false
+  user:
+    name: admin
+    password: admin
 
 server:
-    session:
-        cookie:
-            http-only: true
-    context-path: /reference
+  port: 8088
+  session:
+    cookie:
+      http-only: true
+  context-path: /reference
 
 info:
-    project:
-        version: #project.version#
+  project:
+    version: #project.version#
 
 # ===================================================================
 # JHipster specific properties
@@ -100,20 +130,49 @@ info:
 # ===================================================================
 
 jhipster:
-    async:
-        core-pool-size: 2
-        max-pool-size: 50
-        queue-capacity: 10000
+  async:
+    core-pool-size: 2
+    max-pool-size: 50
+    queue-capacity: 10000
     # By default CORS is disabled. Uncomment to enable.
     #cors:
-        #allowed-origins: "*"
-        #allowed-methods: GET, PUT, POST, DELETE, OPTIONS
-        #allowed-headers: "*"
-        #exposed-headers:
-        #allow-credentials: true
-        #max-age: 1800
-    ribbon:
-        display-on-active-profiles: dev
+    #allowed-origins: "*"
+    #allowed-methods: GET, PUT, POST, DELETE, OPTIONS
+    #allowed-headers: "*"
+    #exposed-headers:
+    #allow-credentials: true
+    #max-age: 1800
+  ribbon:
+    display-on-active-profiles: dev
+  http:
+    version: V_1_1 # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
+  security:
+    authentication:
+      jwt:
+        secret: my-secret-token-to-change-in-production
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
+  metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
+    jmx.enabled: true
+    graphite: # Use the "graphite" Maven profile to have the Graphite dependencies
+      enabled: false
+      host: localhost
+      port: 2003
+      prefix: reference
+    prometheus: # Use the "prometheus" Maven profile to have the Prometheus dependencies
+      enabled: false
+      endpoint: /prometheusMetrics
+    logs: # Reports Dropwizard metrics in the logs
+      enabled: false
+      reportFrequency: 60 # in seconds
+  logging:
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
+
 
 # ===================================================================
 # Application specific properties
@@ -125,6 +184,3 @@ jhipster:
 # ===================================================================
 
 application:
-
-logging:
-  file: ${LOG_DIR:${HOME}}/reference.log

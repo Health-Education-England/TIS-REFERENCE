@@ -33,6 +33,7 @@ public class SwaggerDocumentationConfig {
   @Bean
   public Docket customImplementation() {
     return new Docket(DocumentationType.SWAGGER_2)
+        .groupName("Reference")
         .select()
         .apis(RequestHandlerSelectors.basePackage("com.transformuk.hee.tis.reference.service.api"))
         .build()
