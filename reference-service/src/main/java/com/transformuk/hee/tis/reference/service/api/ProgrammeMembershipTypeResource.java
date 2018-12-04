@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.ProgrammeMembershi
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -77,7 +64,6 @@ public class ProgrammeMembershipTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/programme-membership-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ProgrammeMembershipTypeDTO> createProgrammeMembershipType(@Valid @RequestBody ProgrammeMembershipTypeDTO programmeMembershipTypeDTO) throws URISyntaxException {
     log.debug("REST request to save ProgrammeMembershipType : {}", programmeMembershipTypeDTO);
@@ -102,7 +88,6 @@ public class ProgrammeMembershipTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/programme-membership-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ProgrammeMembershipTypeDTO> updateProgrammeMembershipType(@Valid @RequestBody ProgrammeMembershipTypeDTO programmeMembershipTypeDTO) throws URISyntaxException {
     log.debug("REST request to update ProgrammeMembershipType : {}", programmeMembershipTypeDTO);
@@ -123,18 +108,11 @@ public class ProgrammeMembershipTypeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of programme membership types in body
    */
-  @ApiOperation(value = "Lists programme membership types",
-      notes = "Returns a list of programme membership types with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "programme membership types list")})
   @GetMapping("/programme-membership-types")
-  @Timed
   public ResponseEntity<List<ProgrammeMembershipTypeDTO>> getAllProgrammeMembershipTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of programme membership types begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -158,10 +136,9 @@ public class ProgrammeMembershipTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the programmeMembershipTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/programme-membership-types/{id}")
-  @Timed
   public ResponseEntity<ProgrammeMembershipTypeDTO> getProgrammeMembershipType(@PathVariable Long id) {
     log.debug("REST request to get ProgrammeMembershipType : {}", id);
-    ProgrammeMembershipType programmeMembershipType = programmeMembershipTypeRepository.findOne(id);
+      ProgrammeMembershipType programmeMembershipType = programmeMembershipTypeRepository.findById(id).orElse(null);
     ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(programmeMembershipTypeDTO));
   }
@@ -173,11 +150,10 @@ public class ProgrammeMembershipTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/programme-membership-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteProgrammeMembershipType(@PathVariable Long id) {
     log.debug("REST request to delete ProgrammeMembershipType : {}", id);
-    programmeMembershipTypeRepository.delete(id);
+      programmeMembershipTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -190,7 +166,6 @@ public class ProgrammeMembershipTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-programme-membership-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ProgrammeMembershipTypeDTO>> bulkCreateProgrammeMembershipType(@Valid @RequestBody List<ProgrammeMembershipTypeDTO> programmeMembershipTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save ProgrammeMembershipTypeDtos : {}", programmeMembershipTypeDTOS);
@@ -204,7 +179,7 @@ public class ProgrammeMembershipTypeResource {
       }
     }
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
-    programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
+      programmeMembershipTypes = programmeMembershipTypeRepository.saveAll(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> result = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -220,7 +195,6 @@ public class ProgrammeMembershipTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-programme-membership-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ProgrammeMembershipTypeDTO>> bulkUpdateProgrammeMembershipType(@Valid @RequestBody List<ProgrammeMembershipTypeDTO> programmeMembershipTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update ProgrammeMembershipTypeDtos : {}", programmeMembershipTypeDTOS);
@@ -235,7 +209,7 @@ public class ProgrammeMembershipTypeResource {
       }
     }
     List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeMapper.programmeMembershipTypeDTOsToProgrammeMembershipTypes(programmeMembershipTypeDTOS);
-    programmeMembershipTypes = programmeMembershipTypeRepository.save(programmeMembershipTypes);
+      programmeMembershipTypes = programmeMembershipTypeRepository.saveAll(programmeMembershipTypes);
     List<ProgrammeMembershipTypeDTO> results = programmeMembershipTypeMapper.programmeMembershipTypesToProgrammeMembershipTypeDTOs(programmeMembershipTypes);
     return ResponseEntity.ok()
         .body(results);

@@ -25,13 +25,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the StatusResource REST controller.
@@ -222,7 +217,7 @@ public class StatusResourceIntTest {
     int databaseSizeBeforeUpdate = statusRepository.findAll().size();
 
     // Update the status
-    Status updatedStatus = statusRepository.findOne(status.getId());
+      Status updatedStatus = statusRepository.findById(status.getId()).orElse(null);
     updatedStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

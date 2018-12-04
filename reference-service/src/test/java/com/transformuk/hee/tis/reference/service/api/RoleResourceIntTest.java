@@ -99,7 +99,7 @@ public class RoleResourceIntTest {
                 .setControllerAdvice(exceptionTranslator)
                 .setMessageConverters(jacksonMessageConverter).build();
 
-        roleCategory = roleCategoryRepository.findOne(3L);
+        roleCategory = roleCategoryRepository.findById(3L).orElse(null);
     }
 
     @Before
@@ -230,8 +230,8 @@ public class RoleResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.id").value(role.getId().intValue()))
-                .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-                .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+                .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+                .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
     }
 
     @Test
@@ -250,7 +250,7 @@ public class RoleResourceIntTest {
         int databaseSizeBeforeUpdate = roleRepository.findAll().size();
 
         // Update the role
-        Role updatedRole = roleRepository.findOne(role.getId());
+        Role updatedRole = roleRepository.findById(role.getId()).orElse(null);
         updatedRole
                 .code(UPDATED_CODE)
                 .label(UPDATED_LABEL);

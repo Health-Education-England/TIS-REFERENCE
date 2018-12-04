@@ -8,7 +8,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServ
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -32,19 +31,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the AssessmentType REST controller.
@@ -146,7 +141,7 @@ public class AssessmentTypeResourceIntTest {
   @Test
   @Transactional
   public void updateAssessmentTypeShouldReturnUpdateAssessmentType() throws Exception {
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getCode())).thenReturn(assessmentType);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getCode())).thenReturn(Optional.of(assessmentType));
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(assessmentType);
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
@@ -162,7 +157,7 @@ public class AssessmentTypeResourceIntTest {
   @Test
   @Transactional
   public void updateAssessmentTypeShouldReturnCreateAssessmentTypeWhenItDoesntExist() throws Exception {
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getCode())).thenReturn(null);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getCode())).thenReturn(Optional.empty());
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(assessmentType);
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
@@ -214,7 +209,7 @@ public class AssessmentTypeResourceIntTest {
   @Test
   @Transactional
   public void getAssessmentTypeByCodeShouldReturnSingleAssessmentType() throws Exception {
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getCode())).thenReturn(assessmentType);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getCode())).thenReturn(Optional.of(assessmentType));
 
     testObjMockMvc.perform(get("/api/assessment-types/{code}", assessmentType.getCode()))
         .andExpect(status().isOk())
@@ -222,18 +217,18 @@ public class AssessmentTypeResourceIntTest {
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
 
-    verify(assessmentTypeRepositoryMock).findOne(assessmentType.getCode());
+    verify(assessmentTypeRepositoryMock).findById(assessmentType.getCode());
   }
 
   @Test
   @Transactional
   public void getAssessmentTypeByCodeShouldReturn404() throws Exception {
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getCode())).thenReturn(null);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getCode())).thenReturn(Optional.empty());
 
     testObjMockMvc.perform(get("/api/assessment-types/{code}", assessmentType.getCode()))
         .andExpect(status().isNotFound());
 
-    verify(assessmentTypeRepositoryMock).findOne(assessmentType.getCode());
+    verify(assessmentTypeRepositoryMock).findById(assessmentType.getCode());
   }
 
   @Test

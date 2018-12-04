@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -74,9 +73,6 @@ public class SitesTrustsServiceTest {
 
   @Test
   public void shouldSearchSitesWithInATrust() {
-    // given
-    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
-
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, SEARCH_STRING);
 
@@ -86,9 +82,6 @@ public class SitesTrustsServiceTest {
 
   @Test
   public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
-    // given
-    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
-
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
 
@@ -126,7 +119,6 @@ public class SitesTrustsServiceTest {
   public void shouldReturnAllTrustsIfSearchStringIsNullOrEmpty() {
     // given
     Page<Trust> emptyPage = new PageImpl<>(EMPTY_TRUST_LIST);
-    given(trustRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
 
     // when
     List<Trust> trusts = service.searchTrusts("");
@@ -165,7 +157,6 @@ public class SitesTrustsServiceTest {
   public void shouldReturnAllLocalOfficesIfSearchStringIsNullOrEmpty() {
     // given
     Page<LocalOffice> emptyPage = new PageImpl<>(EMPTY_LO_LIST);
-    given(localOfficeRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
 
     // when
     List<LocalOffice> localOffices = service.searchLocalOffices("");

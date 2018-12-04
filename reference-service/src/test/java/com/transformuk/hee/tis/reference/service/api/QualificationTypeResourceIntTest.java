@@ -223,7 +223,7 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationTypeRepository.findAll().size();
 
     // Update the qualificationType
-    QualificationType updatedQualificationType = qualificationTypeRepository.findOne(qualificationType.getId());
+      QualificationType updatedQualificationType = qualificationTypeRepository.findById(qualificationType.getId()).orElse(null);
     updatedQualificationType
             .code(UPDATED_CODE)
             .label(UPDATED_LABEL);

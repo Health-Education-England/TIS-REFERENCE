@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.ReligiousBeliefSer
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -77,7 +64,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ReligiousBeliefDTO> createReligiousBelief(@Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
     log.debug("REST request to save ReligiousBelief : {}", religiousBeliefDTO);
@@ -102,7 +88,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ReligiousBeliefDTO> updateReligiousBelief(@Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
     log.debug("REST request to update ReligiousBelief : {}", religiousBeliefDTO);
@@ -124,18 +109,11 @@ public class ReligiousBeliefResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of religious beliefs in body
    */
-  @ApiOperation(value = "Lists religious beliefs",
-      notes = "Returns a list of religious beliefs with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "religious beliefs list")})
   @GetMapping("/religious-beliefs")
-  @Timed
   public ResponseEntity<List<ReligiousBeliefDTO>> getAllReligiousBeliefs(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of religious beliefs begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -159,10 +137,9 @@ public class ReligiousBeliefResource {
    * @return the ResponseEntity with status 200 (OK) and with body the religiousBeliefDTO, or with status 404 (Not Found)
    */
   @GetMapping("/religious-beliefs/{id}")
-  @Timed
   public ResponseEntity<ReligiousBeliefDTO> getReligiousBelief(@PathVariable Long id) {
     log.debug("REST request to get ReligiousBelief : {}", id);
-    ReligiousBelief religiousBelief = religiousBeliefRepository.findOne(id);
+      ReligiousBelief religiousBelief = religiousBeliefRepository.findById(id).orElse(null);
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(religiousBeliefDTO));
   }
@@ -174,7 +151,6 @@ public class ReligiousBeliefResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/religious-beliefs/exists/")
-  @Timed
   public ResponseEntity<Boolean> religiousBeliefExists(@RequestBody String code) {
     log.debug("REST request to check ReligiousBelief exists : {}", code);
     ReligiousBelief religiousBelief = religiousBeliefRepository.findFirstByCode(code);
@@ -191,11 +167,10 @@ public class ReligiousBeliefResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/religious-beliefs/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteReligiousBelief(@PathVariable Long id) {
     log.debug("REST request to delete ReligiousBelief : {}", id);
-    religiousBeliefRepository.delete(id);
+      religiousBeliefRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -208,7 +183,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ReligiousBeliefDTO>> bulkCreateReligiousBelief(@Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save ReligiousBelief : {}", religiousBeliefDTOS);
@@ -222,7 +196,7 @@ public class ReligiousBeliefResource {
       }
     }
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
-    religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+      religiousBeliefs = religiousBeliefRepository.saveAll(religiousBeliefs);
     List<ReligiousBeliefDTO> result = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
     return ResponseEntity.ok()
         .body(result);
@@ -238,7 +212,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ReligiousBeliefDTO>> bulkUpdateReligiousBelief(@Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update ReligiousBeliefDtos : {}", religiousBeliefDTOS);
@@ -253,7 +226,7 @@ public class ReligiousBeliefResource {
       }
     }
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper.religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
-    religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+      religiousBeliefs = religiousBeliefRepository.saveAll(religiousBeliefs);
     List<ReligiousBeliefDTO> results = religiousBeliefMapper.religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
     return ResponseEntity.ok()
         .body(results);

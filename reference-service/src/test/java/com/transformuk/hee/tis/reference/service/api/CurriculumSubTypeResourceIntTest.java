@@ -28,13 +28,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the CurriculumSubTypeResource REST controller.
@@ -241,7 +236,7 @@ public class CurriculumSubTypeResourceIntTest {
         .label("Medical SpR - As defined by the GMC");
 
     List<CurriculumSubType> curriculumSubTypes = Lists.newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
-    curriculumSubTypeRepository.save(curriculumSubTypes);
+      curriculumSubTypeRepository.saveAll(curriculumSubTypes);
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
@@ -268,7 +263,7 @@ public class CurriculumSubTypeResourceIntTest {
     int databaseSizeBeforeUpdate = curriculumSubTypeRepository.findAll().size();
 
     // Update the curriculumSubType
-    CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository.findOne(curriculumSubType.getId());
+      CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository.findById(curriculumSubType.getId()).orElse(null);
     updatedCurriculumSubType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

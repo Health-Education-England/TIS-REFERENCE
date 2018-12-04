@@ -31,13 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the SiteResource REST controller.
@@ -418,7 +413,7 @@ public class SiteResourceIntTest {
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Update the site
-    Site updatedSite = siteRepository.findOne(site.getId());
+      Site updatedSite = siteRepository.findById(site.getId()).orElse(null);
     updatedSite
         .localOffice(UPDATED_LOCAL_OFFICE)
         .trustCode(UPDATED_TRUST_CODE)

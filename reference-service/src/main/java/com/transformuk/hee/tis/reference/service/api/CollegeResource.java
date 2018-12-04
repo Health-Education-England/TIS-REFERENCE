@@ -1,13 +1,11 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
-import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
@@ -15,30 +13,17 @@ import com.transformuk.hee.tis.reference.service.service.impl.CollegeServiceImpl
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -81,7 +66,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CollegeDTO> createCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
     log.debug("REST request to save College : {}", collegeDTO);
@@ -106,7 +90,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CollegeDTO> updateCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
     log.debug("REST request to update College : {}", collegeDTO);
@@ -128,18 +111,11 @@ public class CollegeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
-  @ApiOperation(value = "Lists colleges",
-      notes = "Returns a list of colleges with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "college list")})
   @GetMapping("/colleges")
-  @Timed
   public ResponseEntity<List<CollegeDTO>> getAllColleges(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of assessment types begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -162,10 +138,9 @@ public class CollegeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the collegeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/colleges/{id}")
-  @Timed
   public ResponseEntity<CollegeDTO> getCollege(@PathVariable Long id) {
     log.debug("REST request to get College : {}", id);
-    College college = collegeRepository.findOne(id);
+      College college = collegeRepository.findById(id).orElse(null);
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(college);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(collegeDTO));
   }
@@ -177,11 +152,10 @@ public class CollegeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/colleges/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteCollege(@PathVariable Long id) {
     log.debug("REST request to delete College : {}", id);
-    collegeRepository.delete(id);
+      collegeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -193,7 +167,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CollegeDTO>> bulkCreateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save CollegeDTOs : {}", collegeDTOS);
@@ -207,7 +180,7 @@ public class CollegeResource {
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
-    colleges = collegeRepository.save(colleges);
+      colleges = collegeRepository.saveAll(colleges);
     List<CollegeDTO> result = collegeMapper.collegesToCollegeDTOs(colleges);
     return ResponseEntity.ok()
         .body(result);
@@ -223,7 +196,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CollegeDTO>> bulkUpdateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update CollegeDTO : {}", collegeDTOS);
@@ -238,7 +210,7 @@ public class CollegeResource {
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
-    colleges = collegeRepository.save(colleges);
+      colleges = collegeRepository.saveAll(colleges);
     List<CollegeDTO> results = collegeMapper.collegesToCollegeDTOs(colleges);
     return ResponseEntity.ok()
         .body(results);

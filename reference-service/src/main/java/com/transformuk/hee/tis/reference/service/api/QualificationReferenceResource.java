@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.QualificationRefer
 import com.transformuk.hee.tis.reference.service.service.mapper.QualificationReferenceMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +64,6 @@ public class QualificationReferenceResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/qualification-reference")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationReferenceDTO> createQualificationReference(@Valid @RequestBody QualificationReferenceDTO qualificationReferenceDTO) throws URISyntaxException {
     log.debug("REST request to save QualificationReference : {}", qualificationReferenceDTO);
@@ -94,7 +88,6 @@ public class QualificationReferenceResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/qualification-reference")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationReferenceDTO> updateQualificationReference(@Valid @RequestBody QualificationReferenceDTO qualificationReferenceDTO) throws URISyntaxException {
     log.debug("REST request to update QualificationReference : {}", qualificationReferenceDTO);
@@ -116,17 +109,10 @@ public class QualificationReferenceResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of qualification reference in body
    */
-  @ApiOperation(value = "Lists qualification reference",
-          notes = "Returns a list of qualification reference with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Qualification Reference list")})
   @GetMapping("/qualification-reference")
-  @Timed
   public ResponseEntity<List<QualificationReferenceDTO>> getAllQualificationReferences(
-          @ApiParam Pageable pageable,
-          @ApiParam(value = "any wildcard string to be searched")
+          Pageable pageable,
           @RequestParam(value = "searchQuery", required = false) String searchQuery,
-          @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
           @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of Qualification Reference begin");
     searchQuery = sanitize(searchQuery);
@@ -150,10 +136,9 @@ public class QualificationReferenceResource {
    * @return the ResponseEntity with status 200 (OK) and with body the qualificationReferenceDTO, or with status 404 (Not Found)
    */
   @GetMapping("/qualification-reference/{id}")
-  @Timed
   public ResponseEntity<QualificationReferenceDTO> getQualificationReference(@PathVariable Long id) {
     log.debug("REST request to get qualificationReference : {}", id);
-    QualificationReference qualificationReference = qualificationReferenceRepository.findOne(id);
+      QualificationReference qualificationReference = qualificationReferenceRepository.findById(id).orElse(null);
     QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(qualificationReferenceDTO));
   }
@@ -165,11 +150,10 @@ public class QualificationReferenceResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/qualification-reference/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteQualificationReference(@PathVariable Long id) {
     log.debug("REST request to delete qualificationReference : {}", id);
-    qualificationReferenceRepository.delete(id);
+      qualificationReferenceRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -180,7 +164,6 @@ public class QualificationReferenceResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/qualification-reference/exists/")
-  @Timed
   public ResponseEntity<Boolean> qualificationReferenceExists(@RequestBody String code) {
     log.debug("REST request to check QualificationReference exists : {}", code);
     QualificationReference qualificationReference = qualificationReferenceRepository.findFirstByCode(code);
@@ -198,7 +181,6 @@ public class QualificationReferenceResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-qualification-reference")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationReferenceDTO>> bulkCreateQualificationReference(@Valid @RequestBody List<QualificationReferenceDTO> qualificationReferenceDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save qualificationReference : {}", qualificationReferenceDTOs);
@@ -212,7 +194,7 @@ public class QualificationReferenceResource {
       }
     }
     List<QualificationReference> qualificationReferences = qualificationReferenceMapper.qualificationReferenceDTOsToQualificationReferences(qualificationReferenceDTOs);
-    qualificationReferences = qualificationReferenceRepository.save(qualificationReferences);
+      qualificationReferences = qualificationReferenceRepository.saveAll(qualificationReferences);
     List<QualificationReferenceDTO> result = qualificationReferenceMapper.qualificationReferencesToQualificationReferenceDTOs(qualificationReferences);
     return ResponseEntity.ok()
             .body(result);
@@ -228,7 +210,6 @@ public class QualificationReferenceResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-qualification-reference")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationReferenceDTO>> bulkUpdateQualificationReference(@Valid @RequestBody List<QualificationReferenceDTO> qualificationReferenceDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update qualificationReference : {}", qualificationReferenceDTOS);
@@ -243,7 +224,7 @@ public class QualificationReferenceResource {
       }
     }
     List<QualificationReference> qualificationReferences = qualificationReferenceMapper.qualificationReferenceDTOsToQualificationReferences(qualificationReferenceDTOS);
-    qualificationReferences = qualificationReferenceRepository.save(qualificationReferences);
+      qualificationReferences = qualificationReferenceRepository.saveAll(qualificationReferences);
     List<QualificationReferenceDTO> results = qualificationReferenceMapper.qualificationReferencesToQualificationReferenceDTOs(qualificationReferences);
     return ResponseEntity.ok()
             .body(results);

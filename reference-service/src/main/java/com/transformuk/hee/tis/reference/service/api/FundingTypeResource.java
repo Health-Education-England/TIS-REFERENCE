@@ -1,44 +1,28 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -79,7 +63,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingTypeDTO> createFundingType(@Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
     log.debug("REST request to save FundingType : {}", fundingTypeDTO);
@@ -104,7 +87,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingTypeDTO> updateFundingType(@Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
     log.debug("REST request to update FundingType : {}", fundingTypeDTO);
@@ -125,18 +107,11 @@ public class FundingTypeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
-  @ApiOperation(value = "Lists funding types",
-      notes = "Returns a list of funding types with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "funding types list")})
   @GetMapping("/funding-types")
-  @Timed
   public ResponseEntity<List<FundingTypeDTO>> getAllFundingTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of funding types begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -160,10 +135,9 @@ public class FundingTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the fundingTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/funding-types/{id}")
-  @Timed
   public ResponseEntity<FundingTypeDTO> getFundingType(@PathVariable Long id) {
     log.debug("REST request to get FundingType : {}", id);
-    FundingType fundingType = fundingTypeRepository.findOne(id);
+      FundingType fundingType = fundingTypeRepository.findById(id).orElse(null);
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingTypeDTO));
   }
@@ -175,11 +149,10 @@ public class FundingTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/funding-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteFundingType(@PathVariable Long id) {
     log.debug("REST request to delete FundingType : {}", id);
-    fundingTypeRepository.delete(id);
+      fundingTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -191,7 +164,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingTypeDTO>> bulkCreateFundingType(@Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save FundingTypeDTOs : {}", fundingTypeDTOS);
@@ -205,7 +177,7 @@ public class FundingTypeResource {
       }
     }
     List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
-    fundingTypes = fundingTypeRepository.save(fundingTypes);
+      fundingTypes = fundingTypeRepository.saveAll(fundingTypes);
     List<FundingTypeDTO> result = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -221,7 +193,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingTypeDTO>> bulkUpdateFundingType(@Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update AssessmentTypesDTO : {}", fundingTypeDTOS);
@@ -236,7 +207,7 @@ public class FundingTypeResource {
       }
     }
     List<FundingType> fundingTypes = fundingTypeMapper.fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
-    fundingTypes = fundingTypeRepository.save(fundingTypes);
+      fundingTypes = fundingTypeRepository.saveAll(fundingTypes);
     List<FundingTypeDTO> results = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
     return ResponseEntity.ok()
         .body(results);

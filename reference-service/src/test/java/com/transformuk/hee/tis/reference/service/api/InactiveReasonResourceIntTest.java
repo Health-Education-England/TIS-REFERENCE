@@ -26,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the InactiveReasonResource REST controller.
@@ -192,8 +187,8 @@ public class InactiveReasonResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(inactiveReason.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+            .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)));
   }
 
   @Test
@@ -207,8 +202,8 @@ public class InactiveReasonResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(inactiveReason.getId().intValue()))
-        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+            .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+            .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
   }
 
   @Test
@@ -227,7 +222,7 @@ public class InactiveReasonResourceIntTest {
     int databaseSizeBeforeUpdate = inactiveReasonRepository.findAll().size();
 
     // Update the inactiveReason
-    InactiveReason updatedInactiveReason = inactiveReasonRepository.findOne(inactiveReason.getId());
+      InactiveReason updatedInactiveReason = inactiveReasonRepository.findById(inactiveReason.getId()).orElse(null);
     updatedInactiveReason
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

@@ -28,13 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsNot.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the DBCResource REST controller.
@@ -265,7 +260,7 @@ public class DBCResourceIntTest {
     dBCRepository.saveAndFlush(dBC);
 
     // Update the dBC
-    DBC updatedDBC = dBCRepository.findOne(dBC.getId());
+      DBC updatedDBC = dBCRepository.findById(dBC.getId()).orElse(null);
     updatedDBC
         .dbc(UPDATED_DBC)
         .name(UPDATED_NAME)

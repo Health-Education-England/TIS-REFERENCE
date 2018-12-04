@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.QualificationTypeS
 import com.transformuk.hee.tis.reference.service.service.mapper.QualificationTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +64,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationTypeDTO> createQualificationType(@Valid @RequestBody QualificationTypeDTO qualificationTypeDTO) throws URISyntaxException {
     log.debug("REST request to save QualificationType : {}", qualificationTypeDTO);
@@ -94,7 +88,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationTypeDTO> updateQualificationType(@Valid @RequestBody QualificationTypeDTO qualificationTypeDTO) throws URISyntaxException {
     log.debug("REST request to update QualificationType : {}", qualificationTypeDTO);
@@ -116,17 +109,10 @@ public class QualificationTypeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of qualification Type in body
    */
-  @ApiOperation(value = "Lists qualification Type",
-          notes = "Returns a list of qualification Type with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Qualification Type list")})
   @GetMapping("/qualification-types")
-  @Timed
   public ResponseEntity<List<QualificationTypeDTO>> getAllQualificationTypes(
-          @ApiParam Pageable pageable,
-          @ApiParam(value = "any wildcard string to be searched")
+          Pageable pageable,
           @RequestParam(value = "searchQuery", required = false) String searchQuery,
-          @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
           @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of Qualification Type begin");
     searchQuery = sanitize(searchQuery);
@@ -150,10 +136,9 @@ public class QualificationTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the qualificationTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/qualification-types/{id}")
-  @Timed
   public ResponseEntity<QualificationTypeDTO> getQualificationType(@PathVariable Long id) {
     log.debug("REST request to get qualificationType : {}", id);
-    QualificationType qualificationType = qualificationTypeRepository.findOne(id);
+      QualificationType qualificationType = qualificationTypeRepository.findById(id).orElse(null);
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(qualificationTypeDTO));
   }
@@ -165,11 +150,10 @@ public class QualificationTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/qualification-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteQualificationType(@PathVariable Long id) {
     log.debug("REST request to delete qualificationType : {}", id);
-    qualificationTypeRepository.delete(id);
+      qualificationTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -180,7 +164,6 @@ public class QualificationTypeResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/qualification-types/exists/")
-  @Timed
   public ResponseEntity<Boolean> qualificationTypeExists(@RequestBody String code) {
     log.debug("REST request to check QualificationType exists : {}", code);
     QualificationType qualificationType = qualificationTypeRepository.findFirstByCode(code);
@@ -198,7 +181,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationTypeDTO>> bulkCreateQualificationType(@Valid @RequestBody List<QualificationTypeDTO> qualificationTypeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save qualificationType : {}", qualificationTypeDTOs);
@@ -212,7 +194,7 @@ public class QualificationTypeResource {
       }
     }
     List<QualificationType> qualificationTypes = qualificationTypeMapper.qualificationTypeDTOsToQualificationTypes(qualificationTypeDTOs);
-    qualificationTypes = qualificationTypeRepository.save(qualificationTypes);
+      qualificationTypes = qualificationTypeRepository.saveAll(qualificationTypes);
     List<QualificationTypeDTO> result = qualificationTypeMapper.qualificationTypesToQualificationTypeDTOs(qualificationTypes);
     return ResponseEntity.ok()
             .body(result);
@@ -228,7 +210,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationTypeDTO>> bulkUpdateQualificationType(@Valid @RequestBody List<QualificationTypeDTO> qualificationTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update qualificationType : {}", qualificationTypeDTOS);
@@ -243,7 +224,7 @@ public class QualificationTypeResource {
       }
     }
     List<QualificationType> qualificationTypes = qualificationTypeMapper.qualificationTypeDTOsToQualificationTypes(qualificationTypeDTOS);
-    qualificationTypes = qualificationTypeRepository.save(qualificationTypes);
+      qualificationTypes = qualificationTypeRepository.saveAll(qualificationTypes);
     List<QualificationTypeDTO> results = qualificationTypeMapper.qualificationTypesToQualificationTypeDTOs(qualificationTypes);
     return ResponseEntity.ok()
             .body(results);

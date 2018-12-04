@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
@@ -16,10 +15,6 @@ import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
 import io.github.jhipster.web.util.ResponseUtil;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,15 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -78,7 +65,6 @@ public class RotationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/rotations")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Create')")
   public ResponseEntity<RotationDTO> createRotation(@RequestBody @Validated(Create.class) RotationDTO rotationDTO) throws URISyntaxException {
     log.debug("REST request to save Rotation : {}", rotationDTO);
@@ -101,7 +87,6 @@ public class RotationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/rotations")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Update')")
   public ResponseEntity<RotationDTO> updateRotation(@RequestBody @Validated(Update.class) RotationDTO rotationDTO) throws URISyntaxException {
     log.debug("REST request to update Rotation : {}", rotationDTO);
@@ -121,18 +106,11 @@ public class RotationResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of rotations in body
    */
-  @ApiOperation(value = "Lists rotations",
-      notes = "Returns a list of rotations with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "rotations list")})
   @GetMapping("/rotations")
-  @Timed
   public ResponseEntity<List<RotationDTO>> getAllRotations(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of rotations begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -156,7 +134,6 @@ public class RotationResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/rotations/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> rotationsExists(@RequestBody List<String> values) {
     Map<String, Boolean> rotationExistsMap = Maps.newHashMap();
     log.debug("REST request to check Rotations exists : {}", values);
@@ -178,7 +155,6 @@ public class RotationResource {
    * @return the ResponseEntity with status 200 (OK) and with body the rotationDTO, or with status 404 (Not Found)
    */
   @GetMapping("/rotations/{id}")
-  @Timed
   public ResponseEntity<RotationDTO> getRotation(@PathVariable Long id) {
     log.debug("REST request to get Rotation : {}", id);
     RotationDTO rotationDTO = rotationService.findOne(id);
@@ -192,7 +168,6 @@ public class RotationResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/rotations/{id}")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Delete')")
   public ResponseEntity<Void> deleteRotation(@PathVariable Long id) {
     log.debug("REST request to delete Rotation : {}", id);

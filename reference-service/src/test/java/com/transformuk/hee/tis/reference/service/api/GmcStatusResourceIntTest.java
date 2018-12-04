@@ -26,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the GmcStatusResource REST controller.
@@ -191,8 +186,8 @@ public class GmcStatusResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(gmcStatus.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+            .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)));
   }
 
   @Test
@@ -206,8 +201,8 @@ public class GmcStatusResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(gmcStatus.getId().intValue()))
-        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+            .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+            .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
   }
 
   @Test
@@ -226,7 +221,7 @@ public class GmcStatusResourceIntTest {
     int databaseSizeBeforeUpdate = gmcStatusRepository.findAll().size();
 
     // Update the gmcStatus
-    GmcStatus updatedGmcStatus = gmcStatusRepository.findOne(gmcStatus.getId());
+      GmcStatus updatedGmcStatus = gmcStatusRepository.findById(gmcStatus.getId()).orElse(null);
     updatedGmcStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

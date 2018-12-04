@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.PermitToWorkServic
 import com.transformuk.hee.tis.reference.service.service.mapper.PermitToWorkMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +63,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PermitToWorkDTO> createPermitToWork(@Valid @RequestBody PermitToWorkDTO permitToWorkDTO) throws URISyntaxException {
     log.debug("REST request to save PermitToWork : {}", permitToWorkDTO);
@@ -93,7 +87,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PermitToWorkDTO> updatePermitToWork(@Valid @RequestBody PermitToWorkDTO permitToWorkDTO) throws URISyntaxException {
     log.debug("REST request to update PermitToWork : {}", permitToWorkDTO);
@@ -115,17 +108,10 @@ public class PermitToWorkResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of permit to work in body
    */
-  @ApiOperation(value = "Lists permit to work",
-          notes = "Returns a list of permit to work with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "permit to work list")})
   @GetMapping("/permit-to-works")
-  @Timed
   public ResponseEntity<List<PermitToWorkDTO>> getAllPermitToWorks(
-          @ApiParam Pageable pageable,
-          @ApiParam(value = "any wildcard string to be searched")
+          Pageable pageable,
           @RequestParam(value = "searchQuery", required = false) String searchQuery,
-          @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
           @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of permit to work begin");
     searchQuery = sanitize(searchQuery);
@@ -149,10 +135,9 @@ public class PermitToWorkResource {
    * @return the ResponseEntity with status 200 (OK) and with body the permitToWorkDTO, or with status 404 (Not Found)
    */
   @GetMapping("/permit-to-works/{id}")
-  @Timed
   public ResponseEntity<PermitToWorkDTO> getPermitToWork(@PathVariable Long id) {
     log.debug("REST request to get PermitToWork : {}", id);
-    PermitToWork permitToWork = permitToWorkRepository.findOne(id);
+    PermitToWork permitToWork = permitToWorkRepository.findById(id).orElse(null);
     PermitToWorkDTO permitToWorkDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(permitToWorkDTO));
   }
@@ -164,11 +149,10 @@ public class PermitToWorkResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/permit-to-works/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deletePermitToWork(@PathVariable Long id) {
     log.debug("REST request to delete PermitToWork : {}", id);
-    permitToWorkRepository.delete(id);
+    permitToWorkRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -180,21 +164,20 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PermitToWorkDTO>> bulkCreatePermitToWork(@Valid @RequestBody List<PermitToWorkDTO> permitToWorkDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save PermitToWork : {}", permitToWorkDTOS);
     if (!Collections.isEmpty(permitToWorkDTOS)) {
       List<Long> entityIds = permitToWorkDTOS.stream()
               .filter(permitToWorkDTO -> permitToWorkDTO.getId() != null)
-              .map(permitToWorkDTO -> permitToWorkDTO.getId())
+              .map(PermitToWorkDTO::getId)
               .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new permitToWorks cannot already have an ID")).body(null);
       }
     }
     List<PermitToWork> permitToWorks = permitToWorkMapper.permitToWorkDTOsToPermitToWorks(permitToWorkDTOS);
-    permitToWorks = permitToWorkRepository.save(permitToWorks);
+    permitToWorks = permitToWorkRepository.saveAll(permitToWorks);
     List<PermitToWorkDTO> result = permitToWorkMapper.permitToWorksToPermitToWorkDTOs(permitToWorks);
     return ResponseEntity.ok()
             .body(result);
@@ -210,7 +193,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PermitToWorkDTO>> bulkUpdatePermitToWork(@Valid @RequestBody List<PermitToWorkDTO> permitToWorkDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update PermitToWork : {}", permitToWorkDTOS);
@@ -225,7 +207,7 @@ public class PermitToWorkResource {
       }
     }
     List<PermitToWork> permitToWorks = permitToWorkMapper.permitToWorkDTOsToPermitToWorks(permitToWorkDTOS);
-    permitToWorks = permitToWorkRepository.save(permitToWorks);
+    permitToWorks = permitToWorkRepository.saveAll(permitToWorks);
     List<PermitToWorkDTO> results = permitToWorkMapper.permitToWorksToPermitToWorkDTOs(permitToWorks);
     return ResponseEntity.ok()
             .body(results);

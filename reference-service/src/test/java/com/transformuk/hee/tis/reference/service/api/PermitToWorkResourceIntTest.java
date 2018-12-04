@@ -222,7 +222,7 @@ public class PermitToWorkResourceIntTest {
     int databaseSizeBeforeUpdate = permitToWorkRepository.findAll().size();
 
     // Update the maritalStatus
-    PermitToWork updatedPermitToWork = permitToWorkRepository.findOne(permitToWork.getId());
+      PermitToWork updatedPermitToWork = permitToWorkRepository.findById(permitToWork.getId()).orElse(null);
     updatedPermitToWork
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

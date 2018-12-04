@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServic
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -76,7 +63,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<EthnicOriginDTO> createEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
     log.debug("REST request to save EthnicOrigin : {}", ethnicOriginDTO);
@@ -101,7 +87,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<EthnicOriginDTO> updateEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
     log.debug("REST request to update EthnicOrigin : {}", ethnicOriginDTO);
@@ -123,18 +108,11 @@ public class EthnicOriginResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of ethnic origins in body
    */
-  @ApiOperation(value = "Lists ethnic origins",
-      notes = "Returns a list of ethnic origins with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "ethnic origins list")})
   @GetMapping("/ethnic-origins")
-  @Timed
   public ResponseEntity<List<EthnicOriginDTO>> getAllEthnicOrigins(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of ethnic origins begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -157,10 +135,9 @@ public class EthnicOriginResource {
    * @return the ResponseEntity with status 200 (OK) and with body the ethnicOriginDTO, or with status 404 (Not Found)
    */
   @GetMapping("/ethnic-origins/{id}")
-  @Timed
   public ResponseEntity<EthnicOriginDTO> getEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to get EthnicOrigin : {}", id);
-    EthnicOrigin ethnicOrigin = ethnicOriginRepository.findOne(id);
+      EthnicOrigin ethnicOrigin = ethnicOriginRepository.findById(id).orElse(null);
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(ethnicOriginDTO));
   }
@@ -172,7 +149,6 @@ public class EthnicOriginResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/ethnic-origins/exists/")
-  @Timed
   public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code) {
     log.debug("REST request to check EthnicOrigin exists : {}", code);
     EthnicOrigin ethnicOrigin = ethnicOriginRepository.findFirstByCode(code);
@@ -189,11 +165,10 @@ public class EthnicOriginResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/ethnic-origins/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to delete EthnicOrigin : {}", id);
-    ethnicOriginRepository.delete(id);
+      ethnicOriginRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -205,7 +180,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<EthnicOriginDTO>> bulkCreateEthnicOrigin(@Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save EthnicOriginDtos : {}", ethnicOriginDTOS);
@@ -219,7 +193,7 @@ public class EthnicOriginResource {
       }
     }
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
-    ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
+      ethnicOrigins = ethnicOriginRepository.saveAll(ethnicOrigins);
     List<EthnicOriginDTO> result = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()
         .body(result);
@@ -235,7 +209,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<EthnicOriginDTO>> bulkUpdateEthnicOrigin(@Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update EthnicOriginDTOs : {}", ethnicOriginDTOS);
@@ -250,7 +223,7 @@ public class EthnicOriginResource {
       }
     }
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
-    ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
+      ethnicOrigins = ethnicOriginRepository.saveAll(ethnicOrigins);
     List<EthnicOriginDTO> results = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()
         .body(results);

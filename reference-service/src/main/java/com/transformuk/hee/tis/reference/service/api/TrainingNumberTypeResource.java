@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.TrainingNumberType
 import com.transformuk.hee.tis.reference.service.service.mapper.TrainingNumberTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -77,7 +64,6 @@ public class TrainingNumberTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/training-number-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrainingNumberTypeDTO> createTrainingNumberType(@Valid @RequestBody TrainingNumberTypeDTO trainingNumberTypeDTO) throws URISyntaxException {
     log.debug("REST request to save TrainingNumberType : {}", trainingNumberTypeDTO);
@@ -102,7 +88,6 @@ public class TrainingNumberTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/training-number-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TrainingNumberTypeDTO> updateTrainingNumberType(@Valid @RequestBody TrainingNumberTypeDTO trainingNumberTypeDTO) throws URISyntaxException {
     log.debug("REST request to update TrainingNumberType : {}", trainingNumberTypeDTO);
@@ -123,18 +108,11 @@ public class TrainingNumberTypeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of training number types in body
    */
-  @ApiOperation(value = "Lists training number types",
-      notes = "Returns a list of training number types with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "training number types list")})
   @GetMapping("/training-number-types")
-  @Timed
   public ResponseEntity<List<TrainingNumberTypeDTO>> getAllTrainingNumberTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of training number types begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -157,10 +135,9 @@ public class TrainingNumberTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the trainingNumberTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/training-number-types/{id}")
-  @Timed
   public ResponseEntity<TrainingNumberTypeDTO> getTrainingNumberType(@PathVariable Long id) {
     log.debug("REST request to get TrainingNumberType : {}", id);
-    TrainingNumberType trainingNumberType = trainingNumberTypeRepository.findOne(id);
+    TrainingNumberType trainingNumberType = trainingNumberTypeRepository.findById(id).orElse(null);
     TrainingNumberTypeDTO trainingNumberTypeDTO = trainingNumberTypeMapper.trainingNumberTypeToTrainingNumberTypeDTO(trainingNumberType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trainingNumberTypeDTO));
   }
@@ -172,11 +149,10 @@ public class TrainingNumberTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/training-number-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteTrainingNumberType(@PathVariable Long id) {
     log.debug("REST request to delete TrainingNumberType : {}", id);
-    trainingNumberTypeRepository.delete(id);
+    trainingNumberTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -189,21 +165,20 @@ public class TrainingNumberTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-training-number-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TrainingNumberTypeDTO>> bulkCreateTrainingNumberType(@Valid @RequestBody List<TrainingNumberTypeDTO> trainingNumberTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save TrainingNumberTypeDtos : {}", trainingNumberTypeDTOS);
     if (!Collections.isEmpty(trainingNumberTypeDTOS)) {
       List<Long> entityIds = trainingNumberTypeDTOS.stream()
           .filter(tnt -> tnt.getId() != null)
-          .map(tnt -> tnt.getId())
+              .map(TrainingNumberTypeDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new trainingNumberTypes cannot already have an ID")).body(null);
       }
     }
     List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeMapper.trainingNumberTypeDTOsToTrainingNumberTypes(trainingNumberTypeDTOS);
-    trainingNumberTypes = trainingNumberTypeRepository.save(trainingNumberTypes);
+    trainingNumberTypes = trainingNumberTypeRepository.saveAll(trainingNumberTypes);
     List<TrainingNumberTypeDTO> result = trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -219,7 +194,6 @@ public class TrainingNumberTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-training-number-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TrainingNumberTypeDTO>> bulkUpdateTrainingNumberType(@Valid @RequestBody List<TrainingNumberTypeDTO> trainingNumberTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update TrainingNumberTypeDtos : {}", trainingNumberTypeDTOS);
@@ -234,7 +208,7 @@ public class TrainingNumberTypeResource {
       }
     }
     List<TrainingNumberType> trainingNumberTypes = trainingNumberTypeMapper.trainingNumberTypeDTOsToTrainingNumberTypes(trainingNumberTypeDTOS);
-    trainingNumberTypes = trainingNumberTypeRepository.save(trainingNumberTypes);
+    trainingNumberTypes = trainingNumberTypeRepository.saveAll(trainingNumberTypes);
     List<TrainingNumberTypeDTO> results = trainingNumberTypeMapper.trainingNumberTypesToTrainingNumberTypeDTOs(trainingNumberTypes);
     return ResponseEntity.ok()
         .body(results);

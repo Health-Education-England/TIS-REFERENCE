@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +63,6 @@ public class RoleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/roles")
-    @Timed
     @PreAuthorize("hasAuthority('reference:add:modify:entities')")
     public ResponseEntity<RoleDTO> createRole(@Valid @RequestBody RoleDTO roleDTO) throws URISyntaxException {
         log.debug("REST request to save Role : {}", roleDTO);
@@ -93,7 +87,6 @@ public class RoleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/roles")
-    @Timed
     @PreAuthorize("hasAuthority('reference:add:modify:entities')")
     public ResponseEntity<RoleDTO> updateRole(@Valid @RequestBody RoleDTO roleDTO) throws URISyntaxException {
         log.debug("REST request to update Role : {}", roleDTO);
@@ -115,17 +108,10 @@ public class RoleResource {
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of roles in body
      */
-    @ApiOperation(value = "Lists roles",
-            notes = "Returns a list of roles with support for pagination, sorting, smart search and column filters \n")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "role list")})
     @GetMapping("/roles")
-    @Timed
     public ResponseEntity<List<RoleDTO>> getAllRoles(
-            @ApiParam Pageable pageable,
-            @ApiParam(value = "any wildcard string to be searched")
+            Pageable pageable,
             @RequestParam(value = "searchQuery", required = false) String searchQuery,
-            @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
             @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
         log.info("REST request to get a page of roles begin");
         searchQuery = sanitize(searchQuery);
@@ -143,14 +129,8 @@ public class RoleResource {
     }
 
 
-    @ApiOperation(value = "Lists roles",
-            notes = "Returns a list of roles with support for pagination, sorting, smart search and column filters \n")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "role list")})
     @GetMapping("/roles/categories/{categoryId}")
-    @Timed
     public ResponseEntity<List<RoleDTO>> getAllRolesByCategory(
-            @ApiParam(value = "The role category id", required = true)
             @PathVariable(value = "categoryId") final Long categoryId) {
         log.debug("Received request to load '{}' for category with ID '{}'",
                 RoleDTO.class.getSimpleName(), categoryId);
@@ -168,7 +148,6 @@ public class RoleResource {
      * @return the ResponseEntity with status 200 (OK) and the list of roles in body
      */
     @GetMapping("/current/roles")
-    @Timed
     public List<RoleDTO> getAllCurrentRoles() {
         log.debug("REST request to get all current Roles");
         Role role = new Role().status(Status.CURRENT);
@@ -183,10 +162,9 @@ public class RoleResource {
      * @return the ResponseEntity with status 200 (OK) and with body the roleDTO, or with status 404 (Not Found)
      */
     @GetMapping("/roles/{id}")
-    @Timed
     public ResponseEntity<RoleDTO> getRole(@PathVariable Long id) {
         log.debug("REST request to get Role : {}", id);
-        Role role = roleRepository.findOne(id);
+        Role role = roleRepository.findById(id).orElse(null);
         RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(roleDTO));
     }
@@ -198,11 +176,10 @@ public class RoleResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/roles/{id}")
-    @Timed
     @PreAuthorize("hasAuthority('reference:delete:entities')")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         log.debug("REST request to delete Role : {}", id);
-        roleRepository.delete(id);
+        roleRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
@@ -215,7 +192,6 @@ public class RoleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/bulk-roles")
-    @Timed
     @PreAuthorize("hasAuthority('reference:add:modify:entities')")
     public ResponseEntity<List<RoleDTO>> bulkCreateRole(@Valid @RequestBody List<RoleDTO> roleDTOS) throws URISyntaxException {
         log.debug("REST request to bulk save RoleDtos : {}", roleDTOS);
@@ -229,7 +205,7 @@ public class RoleResource {
             }
         }
         List<Role> roles = roleMapper.roleDTOsToRoles(roleDTOS);
-        roles = roleRepository.save(roles);
+        roles = roleRepository.saveAll(roles);
         List<RoleDTO> result = roleMapper.rolesToRoleDTOs(roles);
         return ResponseEntity.ok()
                 .body(result);
@@ -245,7 +221,6 @@ public class RoleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/bulk-roles")
-    @Timed
     @PreAuthorize("hasAuthority('reference:add:modify:entities')")
     public ResponseEntity<List<RoleDTO>> bulkUpdateRole(@Valid @RequestBody List<RoleDTO> roleDTOS) throws URISyntaxException {
         log.debug("REST request to bulk update RoleDtos : {}", roleDTOS);
@@ -260,7 +235,7 @@ public class RoleResource {
             }
         }
         List<Role> roleList = roleMapper.roleDTOsToRoles(roleDTOS);
-        roleList = roleRepository.save(roleList);
+        roleList = roleRepository.saveAll(roleList);
         List<RoleDTO> results = roleMapper.rolesToRoleDTOs(roleList);
         return ResponseEntity.ok()
                 .body(results);

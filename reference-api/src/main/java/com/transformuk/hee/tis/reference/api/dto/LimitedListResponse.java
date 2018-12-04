@@ -1,8 +1,6 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@ApiModel(description = "A search response containing a limited number of results and a warning if the limit has been reached")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LimitedListResponse<T> implements Serializable{
 
@@ -41,7 +38,6 @@ public class LimitedListResponse<T> implements Serializable{
     this.setTotal(list.size());
   }
 
-  @ApiModelProperty(required = true, value = "The total number of results, this will be the limit if the maximum limit has been reached")
   public int getTotal() {
     return total;
   }
@@ -50,7 +46,6 @@ public class LimitedListResponse<T> implements Serializable{
     this.total = total;
   }
 
-  @ApiModelProperty(required = true, value = "The message - warns if the result maximum limit has been reached")
   public String getMessageCode() {
     return messageCode;
   }
@@ -59,7 +54,6 @@ public class LimitedListResponse<T> implements Serializable{
     this.messageCode = messageCode;
   }
 
-  @ApiModelProperty(required = true, value = "the list of results")
   public List<T> getList() {
     return list;
   }

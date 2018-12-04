@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.NationalityService
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -76,7 +63,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<NationalityDTO> createNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
     log.debug("REST request to save Nationality : {}", nationalityDTO);
@@ -101,7 +87,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<NationalityDTO> updateNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
     log.debug("REST request to update Nationality : {}", nationalityDTO);
@@ -123,18 +108,11 @@ public class NationalityResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of nationalities in body
    */
-  @ApiOperation(value = "Lists nationalities",
-      notes = "Returns a list of nationalities with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/nationalities")
-  @Timed
   public ResponseEntity<List<NationalityDTO>> getAllNationalities(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of nationalities begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -157,10 +135,9 @@ public class NationalityResource {
    * @return the ResponseEntity with status 200 (OK) and with body the nationalityDTO, or with status 404 (Not Found)
    */
   @GetMapping("/nationalities/{id}")
-  @Timed
   public ResponseEntity<NationalityDTO> getNationality(@PathVariable Long id) {
     log.debug("REST request to get Nationality : {}", id);
-    Nationality nationality = nationalityRepository.findOne(id);
+      Nationality nationality = nationalityRepository.findById(id).orElse(null);
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(nationalityDTO));
   }
@@ -172,7 +149,6 @@ public class NationalityResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/nationalities/exists/")
-  @Timed
   public ResponseEntity<Boolean> nationalityExists(@RequestBody String code) {
     log.debug("REST request to check Nationality exists : {}", code);
     Nationality nationality = nationalityRepository.findFirstByCountryNumber(code);
@@ -189,11 +165,10 @@ public class NationalityResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/nationalities/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteNationality(@PathVariable Long id) {
     log.debug("REST request to delete Nationality : {}", id);
-    nationalityRepository.delete(id);
+      nationalityRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -205,7 +180,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<NationalityDTO>> bulkCreateNationality(@Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save NationalityDtos : {}", nationalityDTOS);
@@ -219,7 +193,7 @@ public class NationalityResource {
       }
     }
     List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
-    nationalities = nationalityRepository.save(nationalities);
+      nationalities = nationalityRepository.saveAll(nationalities);
     List<NationalityDTO> result = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()
         .body(result);
@@ -235,7 +209,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<NationalityDTO>> bulkUpdateNationality(@Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update NationalityDtos : {}", nationalityDTOS);
@@ -250,7 +223,7 @@ public class NationalityResource {
       }
     }
     List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
-    nationalities = nationalityRepository.save(nationalities);
+      nationalities = nationalityRepository.saveAll(nationalities);
     List<NationalityDTO> results = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()
         .body(results);

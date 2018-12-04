@@ -26,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the NationalityResource REST controller.
@@ -226,7 +221,7 @@ public class NationalityResourceIntTest {
     int databaseSizeBeforeUpdate = nationalityRepository.findAll().size();
 
     // Update the nationality
-    Nationality updatedNationality = nationalityRepository.findOne(nationality.getId());
+      Nationality updatedNationality = nationalityRepository.findById(nationality.getId()).orElse(null);
     updatedNationality
         .countryNumber(UPDATED_COUNTRY_NUMBER)
         .nationality(UPDATED_NATIONALITY);

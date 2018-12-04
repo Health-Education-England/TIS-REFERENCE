@@ -10,7 +10,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.CountryServiceImpl
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -30,13 +29,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the CountryResource REST controller.
@@ -246,7 +240,7 @@ public class CountryResourceIntTest {
     int databaseSizeBeforeUpdate = countryRepository.findAll().size();
 
     // Update the country
-    Country updatedCountry = countryRepository.findOne(country.getId());
+      Country updatedCountry = countryRepository.findById(country.getId()).orElse(null);
     updatedCountry
         .countryNumber(UPDATED_COUNTRY_NUMBER)
         .nationality(UPDATED_NATIONALITY);

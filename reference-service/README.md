@@ -9,7 +9,7 @@ You will need to set up your local proxy to work with the app. For nginx do:
     vi nginx.conf 
 Then copy paste in the following:
 
-    location ~ ^/reference/(api|management|swagger-resources|v2) {
+    location ~ ^/reference/(api|management|v2) {
         proxy_pass http://127.0.0.1:8088;
         proxy_set_header OIDC_access_token $token;
         proxy_pass_request_headers on;

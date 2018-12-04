@@ -8,7 +8,6 @@ import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,19 +24,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the TrustResource REST controller.
@@ -300,7 +293,7 @@ public class TrustResourceIntTest {
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
 
     // Update the trust
-    Trust updatedTrust = trustRepository.findOne(trust.getId());
+      Trust updatedTrust = trustRepository.findById(trust.getId()).orElse(null);
     updatedTrust
         .localOffice(UPDATED_LOCAL_OFFICE)
         .status(UPDATED_STATUS)

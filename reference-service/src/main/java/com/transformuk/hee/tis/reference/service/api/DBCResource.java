@@ -1,58 +1,41 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.DBCServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
+import com.transformuk.hee.tis.security.model.UserProfile;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
-import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
-import com.transformuk.hee.tis.security.model.UserProfile;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
+import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
 /**
  * REST controller for managing DBC.
@@ -82,7 +65,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<DBCDTO> createDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
     log.debug("REST request to save DBC : {}", dBCDTO);
@@ -107,7 +89,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<DBCDTO> updateDBC(@Valid @RequestBody DBCDTO dBCDTO) throws URISyntaxException {
     log.debug("REST request to update DBC : {}", dBCDTO);
@@ -128,18 +109,11 @@ public class DBCResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
-  @ApiOperation(value = "Lists countries",
-      notes = "Returns a list of countries with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "dbcs list")})
   @GetMapping("/dbcs")
-  @Timed
   public ResponseEntity<List<DBCDTO>> getAllDbcs(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of dbcs begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -162,10 +136,9 @@ public class DBCResource {
    * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404 (Not Found)
    */
   @GetMapping("/dbcs/{id}")
-  @Timed
   public ResponseEntity<DBCDTO> getDBC(@PathVariable Long id) {
     log.debug("REST request to get DBC : {}", id);
-    DBC dBC = dBCRepository.findOne(id);
+      DBC dBC = dBCRepository.findById(id).orElse(null);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(dBCDTO));
   }
@@ -177,7 +150,6 @@ public class DBCResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/dbcs/user")
-  @Timed
   public ResponseEntity<List<DBCDTO>> getUserDbcs(){
     log.debug("REST request to get page of DBCs for current user");
     UserProfile userProfile = getProfileFromContext();
@@ -194,7 +166,6 @@ public class DBCResource {
    * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404 (Not Found)
    */
   @GetMapping("/dbcs/code/{code}")
-  @Timed
   public ResponseEntity<DBCDTO> getDBCByCode(@PathVariable String code) {
     log.debug("REST request to get DBC by code: {}", code);
     DBC dBC = dBCRepository.findByDbc(code);
@@ -209,11 +180,10 @@ public class DBCResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/dbcs/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteDBC(@PathVariable Long id) {
     log.debug("REST request to delete DBC : {}", id);
-    dBCRepository.delete(id);
+      dBCRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -226,7 +196,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<DBCDTO>> bulkCreateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos) throws URISyntaxException {
     log.debug("REST request to bulk save DBCs : {}", dbcdtos);
@@ -240,7 +209,7 @@ public class DBCResource {
       }
     }
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
-    dbcs = dBCRepository.save(dbcs);
+      dbcs = dBCRepository.saveAll(dbcs);
     List<DBCDTO> result = dBCMapper.dBCSToDBCDTOs(dbcs);
     return ResponseEntity.ok()
         .body(result);
@@ -256,7 +225,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<DBCDTO>> bulkUpdateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos) throws URISyntaxException {
     log.debug("REST request to bulk update DBCs : {}", dbcdtos);
@@ -269,7 +237,7 @@ public class DBCResource {
           "bulk.update.failed.noId", "The request body for this end point cannot be empty")).body(null);
     }
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
-    dbcs = dBCRepository.save(dbcs);
+      dbcs = dBCRepository.saveAll(dbcs);
     List<DBCDTO> results = dBCMapper.dBCSToDBCDTOs(dbcs);
     return ResponseEntity.ok()
         .body(results);

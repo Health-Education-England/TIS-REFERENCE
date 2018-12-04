@@ -6,7 +6,6 @@ import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingIssueServiceImpl;
-import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the FundingIssueResource REST controller.
@@ -202,7 +196,7 @@ public class FundingIssueResourceIntTest {
     int databaseSizeBeforeUpdate = fundingIssueRepository.findAll().size();
 
     // Update the fundingIssue
-    FundingIssue updatedFundingIssue = fundingIssueRepository.findOne(fundingIssue.getId());
+      FundingIssue updatedFundingIssue = fundingIssueRepository.findById(fundingIssue.getId()).orElse(null);
     updatedFundingIssue
         .code(UPDATED_CODE);
     FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(updatedFundingIssue);

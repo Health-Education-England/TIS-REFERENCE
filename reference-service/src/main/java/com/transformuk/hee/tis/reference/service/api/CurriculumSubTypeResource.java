@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,7 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeServic
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -74,7 +64,6 @@ public class CurriculumSubTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/curriculum-sub-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CurriculumSubTypeDTO> createCurriculumSubType(@Valid @RequestBody CurriculumSubTypeDTO curriculumSubTypeDTO) throws URISyntaxException {
     log.debug("REST request to save CurriculumSubType : {}", curriculumSubTypeDTO);
@@ -99,7 +88,6 @@ public class CurriculumSubTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/curriculum-sub-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CurriculumSubTypeDTO> updateCurriculumSubType(@Valid @RequestBody CurriculumSubTypeDTO curriculumSubTypeDTO) throws URISyntaxException {
     log.debug("REST request to update CurriculumSubType : {}", curriculumSubTypeDTO);
@@ -120,13 +108,10 @@ public class CurriculumSubTypeResource {
    * @return the ResponseEntity with status 200 (OK) and the list of curriculumSubTypes in body
    */
   @GetMapping("/curriculum-sub-types")
-  @Timed
   public ResponseEntity<List<CurriculumSubTypeDTO>> getAllCurriculumSubTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get all CurriculumSubTypes");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -149,10 +134,9 @@ public class CurriculumSubTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the curriculumSubTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/curriculum-sub-types/{id}")
-  @Timed
   public ResponseEntity<CurriculumSubTypeDTO> getCurriculumSubType(@PathVariable Long id) {
     log.debug("REST request to get CurriculumSubType : {}", id);
-    CurriculumSubType curriculumSubType = curriculumSubTypeRepository.findOne(id);
+    CurriculumSubType curriculumSubType = curriculumSubTypeRepository.findById(id).orElse(null);
     CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(curriculumSubTypeDTO));
   }
@@ -164,7 +148,6 @@ public class CurriculumSubTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the curriculumSubTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/curriculum-sub-types/code/{code}")
-  @Timed
   public ResponseEntity<CurriculumSubTypeDTO> getCurriculumSubTypeByCode(@PathVariable String code) {
     log.debug("REST request to get CurriculumSubType code: [{}]", code);
     CurriculumSubType curriculumSubType = curriculumSubTypeRepository.findByCode(code);
@@ -179,11 +162,10 @@ public class CurriculumSubTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/curriculum-sub-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteCurriculumSubType(@PathVariable Long id) {
     log.debug("REST request to delete CurriculumSubType : {}", id);
-    curriculumSubTypeRepository.delete(id);
+    curriculumSubTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -196,21 +178,20 @@ public class CurriculumSubTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-curriculum-sub-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CurriculumSubTypeDTO>> bulkCreateCurriculumSubType(@Valid @RequestBody List<CurriculumSubTypeDTO> curriculumSubTypeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save CurriculumSubType : {}", curriculumSubTypeDTOs);
     if (!Collections.isEmpty(curriculumSubTypeDTOs)) {
       List<Long> entityIds = curriculumSubTypeDTOs.stream()
           .filter(cst -> cst.getId() != null)
-          .map(cst -> cst.getId())
+              .map(CurriculumSubTypeDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new curriculumSubTypes cannot already have an ID")).body(null);
       }
     }
     List<CurriculumSubType> curriculumSubTypes = curriculumSubTypeMapper.curriculumSubTypeDTOsToCurriculumSubTypes(curriculumSubTypeDTOs);
-    curriculumSubTypes = curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypes = curriculumSubTypeRepository.saveAll(curriculumSubTypes);
     List<CurriculumSubTypeDTO> result = curriculumSubTypeMapper.curriculumSubTypesToCurriculumSubTypeDTOs(curriculumSubTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -226,7 +207,6 @@ public class CurriculumSubTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-curriculum-sub-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CurriculumSubTypeDTO>> bulkUpdateCurriculumSubType(@Valid @RequestBody List<CurriculumSubTypeDTO> curriculumSubTypeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk update CurriculumSubType : {}", curriculumSubTypeDTOs);
@@ -241,7 +221,7 @@ public class CurriculumSubTypeResource {
       }
     }
     List<CurriculumSubType> curriculumSubTypes = curriculumSubTypeMapper.curriculumSubTypeDTOsToCurriculumSubTypes(curriculumSubTypeDTOs);
-    curriculumSubTypes = curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypes = curriculumSubTypeRepository.saveAll(curriculumSubTypes);
     List<CurriculumSubTypeDTO> results = curriculumSubTypeMapper.curriculumSubTypesToCurriculumSubTypeDTOs(curriculumSubTypes);
     return ResponseEntity.ok()
         .body(results);

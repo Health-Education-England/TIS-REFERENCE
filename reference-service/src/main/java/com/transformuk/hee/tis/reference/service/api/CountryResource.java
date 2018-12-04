@@ -1,15 +1,12 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
-import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
@@ -17,10 +14,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.CountryServiceImpl
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -81,7 +66,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CountryDTO> createCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
     log.debug("REST request to save Country : {}", countryDTO);
@@ -106,7 +90,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CountryDTO> updateCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
     log.debug("REST request to update Country : {}", countryDTO);
@@ -127,18 +110,11 @@ public class CountryResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
-  @ApiOperation(value = "Lists countries",
-      notes = "Returns a list of countries with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/countries")
-  @Timed
   public ResponseEntity<List<CountryDTO>> getAllCountries(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of countries begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -162,8 +138,7 @@ public class CountryResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/current/countries")
-  @Timed
-  public ResponseEntity<List<CountryDTO>> getAllCurrentCountries(@ApiParam Pageable pageable) {
+  public ResponseEntity<List<CountryDTO>> getAllCurrentCountries(Pageable pageable) {
     log.debug("REST request to get a page of current Countries");
     Country country = new Country();
     country.setStatus(Status.CURRENT);
@@ -179,7 +154,6 @@ public class CountryResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/countries/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> countriesExists(@RequestBody List<String> values) {
     Map<String, Boolean> countriesExistsMap = Maps.newHashMap();
     log.debug("REST request to check Countries exists : {}", values);
@@ -201,10 +175,9 @@ public class CountryResource {
    * @return the ResponseEntity with status 200 (OK) and with body the countryDTO, or with status 404 (Not Found)
    */
   @GetMapping("/countries/{id}")
-  @Timed
   public ResponseEntity<CountryDTO> getCountry(@PathVariable Long id) {
     log.debug("REST request to get Country : {}", id);
-    Country country = countryRepository.findOne(id);
+      Country country = countryRepository.findById(id).orElse(null);
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(countryDTO));
   }
@@ -216,11 +189,10 @@ public class CountryResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/countries/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
     log.debug("REST request to delete Country : {}", id);
-    countryRepository.delete(id);
+      countryRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -233,7 +205,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CountryDTO>> bulkCreateCountry(@Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save CountryDTOs : {}", countryDTOS);
@@ -247,7 +218,7 @@ public class CountryResource {
       }
     }
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
-    countries = countryRepository.save(countries);
+      countries = countryRepository.saveAll(countries);
     List<CountryDTO> result = countryMapper.countriesToCountryDTOs(countries);
     return ResponseEntity.ok()
         .body(result);
@@ -263,7 +234,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CountryDTO>> bulkUpdateCountry(@Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update CountryDTO : {}", countryDTOS);
@@ -278,7 +248,7 @@ public class CountryResource {
       }
     }
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
-    countries = countryRepository.save(countries);
+      countries = countryRepository.saveAll(countries);
     List<CountryDTO> results = countryMapper.countriesToCountryDTOs(countries);
     return ResponseEntity.ok()
         .body(results);

@@ -29,13 +29,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the GradeResource REST controller.
@@ -277,7 +272,7 @@ public class GradeResourceIntTest {
     int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
 
     // Update the grade
-    Grade updatedGrade = gradeRepository.findOne(grade.getId());
+      Grade updatedGrade = gradeRepository.findById(grade.getId()).orElse(null);
     updatedGrade
         .name(UPDATED_NAME)
         .label(UPDATED_LABEL)

@@ -8,7 +8,6 @@ import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.CollegeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -27,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the CollegeResource REST controller.
@@ -208,7 +202,7 @@ public class CollegeResourceIntTest {
     int databaseSizeBeforeUpdate = collegeRepository.findAll().size();
 
     // Update the college
-    College updatedCollege = collegeRepository.findOne(college.getId());
+      College updatedCollege = collegeRepository.findById(college.getId()).orElse(null);
     updatedCollege
         .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME);

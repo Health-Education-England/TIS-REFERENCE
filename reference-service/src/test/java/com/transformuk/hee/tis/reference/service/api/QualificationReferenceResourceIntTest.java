@@ -223,7 +223,7 @@ public class QualificationReferenceResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationReferenceRepository.findAll().size();
 
     // Update the qualificationReference
-    QualificationReference updatedQualificationReference = qualificationReferenceRepository.findOne(qualificationReference.getId());
+      QualificationReference updatedQualificationReference = qualificationReferenceRepository.findById(qualificationReference.getId()).orElse(null);
     updatedQualificationReference
             .code(UPDATED_CODE)
             .label(UPDATED_LABEL);

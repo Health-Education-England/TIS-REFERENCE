@@ -7,7 +7,6 @@ import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
-import net.sf.cglib.core.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,16 +26,11 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.core.IsNot.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the LocalOfficeResource REST controller.
@@ -306,7 +300,7 @@ public class LocalOfficeResourceIntTest {
     int databaseSizeBeforeUpdate = localOfficeRepository.findAll().size();
 
     // Update the localOffice
-    LocalOffice updatedLocalOffice = localOfficeRepository.findOne(localOffice.getId());
+      LocalOffice updatedLocalOffice = localOfficeRepository.findById(localOffice.getId()).orElse(null);
     updatedLocalOffice
         .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME);

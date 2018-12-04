@@ -109,7 +109,7 @@ public class RotationServiceImpl implements RotationService {
   @Transactional(readOnly = true)
   public RotationDTO findOne(Long id) {
     log.debug("Request to get Rotation : {}", id);
-    Rotation rotation = rotationRepository.findOne(id);
+      Rotation rotation = rotationRepository.findById(id).orElse(null);
     return rotationMapper.toDto(rotation);
   }
 
@@ -121,7 +121,7 @@ public class RotationServiceImpl implements RotationService {
   @Override
   public void delete(Long id) {
     log.debug("Request to delete Rotation : {}", id);
-    rotationRepository.delete(id);
+      rotationRepository.deleteById(id);
   }
 
   @Transactional(readOnly = true)

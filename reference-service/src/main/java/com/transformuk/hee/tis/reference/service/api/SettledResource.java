@@ -1,44 +1,28 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.Settled;
 import com.transformuk.hee.tis.reference.service.repository.SettledRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SettledServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SettledMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -78,7 +62,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SettledDTO> createSettled(@Valid @RequestBody SettledDTO settledDTO) throws URISyntaxException {
     log.debug("REST request to save Settled : {}", settledDTO);
@@ -103,7 +86,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SettledDTO> updateSettled(@Valid @RequestBody SettledDTO settledDTO) throws URISyntaxException {
     log.debug("REST request to update Settled : {}", settledDTO);
@@ -125,18 +107,11 @@ public class SettledResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of settled in body
    */
-  @ApiOperation(value = "Lists settled",
-      notes = "Returns a list of settled with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "settled list")})
   @GetMapping("/settleds")
-  @Timed
   public ResponseEntity<List<SettledDTO>> getAllSettleds(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of settled begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -159,10 +134,9 @@ public class SettledResource {
    * @return the ResponseEntity with status 200 (OK) and with body the settledDTO, or with status 404 (Not Found)
    */
   @GetMapping("/settleds/{id}")
-  @Timed
   public ResponseEntity<SettledDTO> getSettled(@PathVariable Long id) {
     log.debug("REST request to get Settled : {}", id);
-    Settled settled = settledRepository.findOne(id);
+    Settled settled = settledRepository.findById(id).orElse(null);
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(settled);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(settledDTO));
   }
@@ -174,11 +148,10 @@ public class SettledResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/settleds/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteSettled(@PathVariable Long id) {
     log.debug("REST request to delete Settled : {}", id);
-    settledRepository.delete(id);
+    settledRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -191,21 +164,20 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SettledDTO>> bulkCreateSettled(@Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save SettledDtos : {}", settledDTOS);
     if (!Collections.isEmpty(settledDTOS)) {
       List<Long> entityIds = settledDTOS.stream()
           .filter(settledDTO -> settledDTO.getId() != null)
-          .map(settledDTO -> settledDTO.getId())
+              .map(SettledDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new settledList cannot already have an ID")).body(null);
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
-    settledList = settledRepository.save(settledList);
+    settledList = settledRepository.saveAll(settledList);
     List<SettledDTO> result = settledMapper.settledsToSettledDTOs(settledList);
     return ResponseEntity.ok()
         .body(result);
@@ -221,7 +193,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SettledDTO>> bulkUpdateSettled(@Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update SettledDtos : {}", settledDTOS);
@@ -236,7 +207,7 @@ public class SettledResource {
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
-    settledList = settledRepository.save(settledList);
+    settledList = settledRepository.saveAll(settledList);
     List<SettledDTO> results = settledMapper.settledsToSettledDTOs(settledList);
     return ResponseEntity.ok()
         .body(results);

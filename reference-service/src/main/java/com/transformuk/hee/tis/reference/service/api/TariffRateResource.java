@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.TariffRateServiceI
 import com.transformuk.hee.tis.reference.service.service.mapper.TariffRateMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -76,7 +63,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TariffRateDTO> createTariffRate(@Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
     log.debug("REST request to save TariffRate : {}", tariffRateDTO);
@@ -101,7 +87,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TariffRateDTO> updateTariffRate(@Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
     log.debug("REST request to update TariffRate : {}", tariffRateDTO);
@@ -122,18 +107,11 @@ public class TariffRateResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of tariff rates in body
    */
-  @ApiOperation(value = "Lists tariff rates",
-      notes = "Returns a list of tariff rates with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "tariff rates list")})
   @GetMapping("/tariff-rates")
-  @Timed
   public ResponseEntity<List<TariffRateDTO>> getAllTariffRates(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of tariff rates begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -156,10 +134,9 @@ public class TariffRateResource {
    * @return the ResponseEntity with status 200 (OK) and with body the tariffRateDTO, or with status 404 (Not Found)
    */
   @GetMapping("/tariff-rates/{id}")
-  @Timed
   public ResponseEntity<TariffRateDTO> getTariffRate(@PathVariable Long id) {
     log.debug("REST request to get TariffRate : {}", id);
-    TariffRate tariffRate = tariffRateRepository.findOne(id);
+      TariffRate tariffRate = tariffRateRepository.findById(id).orElse(null);
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(tariffRate);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(tariffRateDTO));
   }
@@ -171,11 +148,10 @@ public class TariffRateResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/tariff-rates/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteTariffRate(@PathVariable Long id) {
     log.debug("REST request to delete TariffRate : {}", id);
-    tariffRateRepository.delete(id);
+      tariffRateRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -188,7 +164,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TariffRateDTO>> bulkCreateTariffRate(@Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save TariffRateDtos : {}", tariffRateDTOS);
@@ -202,7 +177,7 @@ public class TariffRateResource {
       }
     }
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
-    tariffRates = tariffRateRepository.save(tariffRates);
+      tariffRates = tariffRateRepository.saveAll(tariffRates);
     List<TariffRateDTO> result = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
     return ResponseEntity.ok()
         .body(result);
@@ -218,7 +193,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TariffRateDTO>> bulkUpdateTariffRate(@Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update TariffRateDto : {}", tariffRateDTOS);
@@ -233,7 +207,7 @@ public class TariffRateResource {
       }
     }
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
-    tariffRates = tariffRateRepository.save(tariffRates);
+      tariffRates = tariffRateRepository.saveAll(tariffRates);
     List<TariffRateDTO> results = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
     return ResponseEntity.ok()
         .body(results);

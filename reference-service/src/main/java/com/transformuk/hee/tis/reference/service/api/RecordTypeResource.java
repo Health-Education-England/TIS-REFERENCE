@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -14,10 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.RecordTypeServiceI
 import com.transformuk.hee.tis.reference.service.service.mapper.RecordTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -76,7 +63,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RecordTypeDTO> createRecordType(@Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
     log.debug("REST request to save RecordType : {}", recordTypeDTO);
@@ -101,7 +87,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RecordTypeDTO> updateRecordType(@Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
     log.debug("REST request to update RecordType : {}", recordTypeDTO);
@@ -122,18 +107,11 @@ public class RecordTypeResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of record types in body
    */
-  @ApiOperation(value = "Lists record types",
-      notes = "Returns a list of record types with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "record types list")})
   @GetMapping("/record-types")
-  @Timed
   public ResponseEntity<List<RecordTypeDTO>> getAllRecordTypes(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of record types begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -156,10 +134,9 @@ public class RecordTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the recordTypeDTO, or with status 404 (Not Found)
    */
   @GetMapping("/record-types/{id}")
-  @Timed
   public ResponseEntity<RecordTypeDTO> getRecordType(@PathVariable Long id) {
     log.debug("REST request to get RecordType : {}", id);
-    RecordType recordType = recordTypeRepository.findOne(id);
+    RecordType recordType = recordTypeRepository.findById(id).orElse(null);
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(recordType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(recordTypeDTO));
   }
@@ -171,11 +148,10 @@ public class RecordTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/record-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteRecordType(@PathVariable Long id) {
     log.debug("REST request to delete RecordType : {}", id);
-    recordTypeRepository.delete(id);
+    recordTypeRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -188,7 +164,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RecordTypeDTO>> bulkCreateRecordType(@Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save RecordTypeDtos : {}", recordTypeDTOS);
@@ -202,7 +177,7 @@ public class RecordTypeResource {
       }
     }
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
-    recordTypes = recordTypeRepository.save(recordTypes);
+    recordTypes = recordTypeRepository.saveAll(recordTypes);
     List<RecordTypeDTO> result = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -218,7 +193,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RecordTypeDTO>> bulkUpdateRecordType(@Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update RecordTypeDtos : {}", recordTypeDTOS);
@@ -233,7 +207,7 @@ public class RecordTypeResource {
       }
     }
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
-    recordTypes = recordTypeRepository.save(recordTypes);
+    recordTypes = recordTypeRepository.saveAll(recordTypes);
     List<RecordTypeDTO> results = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
     return ResponseEntity.ok()
         .body(results);

@@ -26,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the MaritalStatusResource REST controller.
@@ -227,7 +222,7 @@ public class MaritalStatusResourceIntTest {
     int databaseSizeBeforeUpdate = maritalStatusRepository.findAll().size();
 
     // Update the maritalStatus
-    MaritalStatus updatedMaritalStatus = maritalStatusRepository.findOne(maritalStatus.getId());
+      MaritalStatus updatedMaritalStatus = maritalStatusRepository.findById(maritalStatus.getId()).orElse(null);
     updatedMaritalStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);

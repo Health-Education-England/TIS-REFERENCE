@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.Status;
@@ -13,14 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -55,7 +47,6 @@ public class StatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<StatusDTO> createStatus(@Valid @RequestBody StatusDTO statusDTO) throws URISyntaxException {
     log.debug("REST request to save Status : {}", statusDTO);
@@ -80,7 +71,6 @@ public class StatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<StatusDTO> updateStatus(@Valid @RequestBody StatusDTO statusDTO) throws URISyntaxException {
     log.debug("REST request to update Status : {}", statusDTO);
@@ -101,7 +91,6 @@ public class StatusResource {
    * @return the ResponseEntity with status 200 (OK) and the list of statuses in body
    */
   @GetMapping("/statuses")
-  @Timed
   public List<StatusDTO> getAllStatuses() {
     log.debug("REST request to get all Statuses");
     List<Status> statuses = statusRepository.findAll();
@@ -115,10 +104,9 @@ public class StatusResource {
    * @return the ResponseEntity with status 200 (OK) and with body the statusDTO, or with status 404 (Not Found)
    */
   @GetMapping("/statuses/{id}")
-  @Timed
   public ResponseEntity<StatusDTO> getStatus(@PathVariable Long id) {
     log.debug("REST request to get Status : {}", id);
-    Status status = statusRepository.findOne(id);
+    Status status = statusRepository.findById(id).orElse(null);
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(status);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(statusDTO));
   }
@@ -130,11 +118,10 @@ public class StatusResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/statuses/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteStatus(@PathVariable Long id) {
     log.debug("REST request to delete Status : {}", id);
-    statusRepository.delete(id);
+    statusRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -147,21 +134,20 @@ public class StatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<StatusDTO>> bulkCreateStatus(@Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save StatusDtos : {}", statusDTOS);
     if (!Collections.isEmpty(statusDTOS)) {
       List<Long> entityIds = statusDTOS.stream()
           .filter(statusDTO -> statusDTO.getId() != null)
-          .map(statusDTO -> statusDTO.getId())
+              .map(StatusDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new statuses cannot already have an ID")).body(null);
       }
     }
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);
-    statuses = statusRepository.save(statuses);
+    statuses = statusRepository.saveAll(statuses);
     List<StatusDTO> result = statusMapper.statusesToStatusDTOs(statuses);
     return ResponseEntity.ok()
         .body(result);
@@ -177,7 +163,6 @@ public class StatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<StatusDTO>> bulkUpdateStatus(@Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update StatusDtos : {}", statusDTOS);
@@ -192,7 +177,7 @@ public class StatusResource {
       }
     }
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);
-    statuses = statusRepository.save(statuses);
+    statuses = statusRepository.saveAll(statuses);
     List<StatusDTO> results = statusMapper.statusesToStatusDTOs(statuses);
     return ResponseEntity.ok()
         .body(results);

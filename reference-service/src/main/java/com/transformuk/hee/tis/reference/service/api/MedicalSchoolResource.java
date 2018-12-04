@@ -1,30 +1,22 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.MedicalSchoolServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -32,15 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -82,7 +66,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MedicalSchoolDTO> createMedicalSchool(@Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
     log.debug("REST request to save MedicalSchool : {}", medicalSchoolDTO);
@@ -107,7 +90,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MedicalSchoolDTO> updateMedicalSchool(@Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
     log.debug("REST request to update MedicalSchool : {}", medicalSchoolDTO);
@@ -128,18 +110,11 @@ public class MedicalSchoolResource {
    * @param pageable the pagination information
    * @return the ResponseEntity with status 200 (OK) and the list of medical schools in body
    */
-  @ApiOperation(value = "Lists medical schools",
-      notes = "Returns a list of medical schools with support for pagination, sorting, smart search and column filters \n")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "medical schools list")})
   @GetMapping("/medical-schools")
-  @Timed
   public ResponseEntity<List<MedicalSchoolDTO>> getAllMedicalSchools(
-      @ApiParam Pageable pageable,
-      @ApiParam(value = "any wildcard string to be searched")
-      @RequestParam(value = "searchQuery", required = false) String searchQuery,
-      @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+          Pageable pageable,
+          @RequestParam(value = "searchQuery", required = false) String searchQuery,
+          @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of medical schools begin");
     searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
@@ -163,10 +138,9 @@ public class MedicalSchoolResource {
    * @return the ResponseEntity with status 200 (OK) and with body the medicalSchoolDTO, or with status 404 (Not Found)
    */
   @GetMapping("/medical-schools/{id}")
-  @Timed
   public ResponseEntity<MedicalSchoolDTO> getMedicalSchool(@PathVariable Long id) {
     log.debug("REST request to get MedicalSchool : {}", id);
-    MedicalSchool medicalSchool = medicalSchoolRepository.findOne(id);
+      MedicalSchool medicalSchool = medicalSchoolRepository.findById(id).orElse(null);
     MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(medicalSchoolDTO));
   }
@@ -178,7 +152,6 @@ public class MedicalSchoolResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/medical-schools/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> medicalSchoolExists(@RequestBody List<String> values) {
     Map<String, Boolean> medicalSchoolExistsMap = Maps.newHashMap();
     log.debug("REST request to check MedicalSchool exists : {}", values);
@@ -200,11 +173,10 @@ public class MedicalSchoolResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/medical-schools/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteMedicalSchool(@PathVariable Long id) {
     log.debug("REST request to delete MedicalSchool : {}", id);
-    medicalSchoolRepository.delete(id);
+      medicalSchoolRepository.deleteById(id);
     return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
@@ -216,7 +188,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MedicalSchoolDTO>> bulkCreateMedicalSchool(@Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save MedicalSchools : {}", medicalSchoolDTOS);
@@ -230,7 +201,7 @@ public class MedicalSchoolResource {
       }
     }
     List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
-    medicalSchools = medicalSchoolRepository.save(medicalSchools);
+      medicalSchools = medicalSchoolRepository.saveAll(medicalSchools);
     List<MedicalSchoolDTO> result = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
     return ResponseEntity.ok()
         .body(result);
@@ -246,7 +217,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MedicalSchoolDTO>> bulkUpdateMedicalSchool(@Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update MedicalSchools : {}", medicalSchoolDTOS);
@@ -261,7 +231,7 @@ public class MedicalSchoolResource {
       }
     }
     List<MedicalSchool> medicalSchools = medicalSchoolMapper.medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
-    medicalSchools = medicalSchoolRepository.save(medicalSchools);
+      medicalSchools = medicalSchoolRepository.saveAll(medicalSchools);
     List<MedicalSchoolDTO> results = medicalSchoolMapper.medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
     return ResponseEntity.ok()
         .body(results);

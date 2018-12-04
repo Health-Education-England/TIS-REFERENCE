@@ -25,10 +25,6 @@ jhipster:
     authentication:
       jwt:
         secret: 20fb0c95203947e254dd09243256257d9abc1f9a
-  metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-    prometheus:
-      enabled: true
-      endpoint: /management/prometheus
 
 application:
 

@@ -26,13 +26,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the SettledResource REST controller.
@@ -226,7 +221,7 @@ public class SettledResourceIntTest {
     int databaseSizeBeforeUpdate = settledRepository.findAll().size();
 
     // Update the settled
-    Settled updatedSettled = settledRepository.findOne(settled.getId());
+    Settled updatedSettled = settledRepository.findById(settled.getId()).orElse(null);
     updatedSettled
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
