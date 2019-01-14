@@ -26,6 +26,9 @@ management:
   server:
     add-application-context-header: false
     servlet.context-path: /management
+  endpoint:
+    health:
+      enabled: true
 
 spring:
   application:
