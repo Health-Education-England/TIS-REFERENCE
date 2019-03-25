@@ -372,7 +372,11 @@ public class TrustResourceIntTest {
 
     trustRepository.saveAndFlush(anotherTrust);
 
-    restTrustMockMvc.perform(get("/api/trusts?page=0&size=200&sort=asc&searchQuery=AAA"))
+     restTrustMockMvc.perform(get("/api/trusts")
+         .param("page", "0")
+         .param("size", "200")
+         .param("sort", "id,asc")
+         .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
