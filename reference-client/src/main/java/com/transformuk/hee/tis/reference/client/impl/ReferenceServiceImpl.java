@@ -116,7 +116,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       sitesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
-      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"localOfficeName\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
+      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       e.printStackTrace();
     }
