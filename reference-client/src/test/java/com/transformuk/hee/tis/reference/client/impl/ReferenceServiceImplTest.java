@@ -1,15 +1,34 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNotNull;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.verify;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -17,17 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.verify;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ReferenceServiceImplTest {
@@ -91,7 +99,6 @@ public class ReferenceServiceImplTest {
   public void shouldFindSiteByName() {
     // given
     String siteNameWithSpecialCharacters = "siteNameWithSpecialCharacters@!£&£$%@/\\";
-    Set<String> codes = Sets.newHashSet(siteNameWithSpecialCharacters, "code2");
     SiteDTO siteDTO = new SiteDTO();
     siteDTO.setSiteName(siteNameWithSpecialCharacters);
     List<SiteDTO> sites = Collections.singletonList(siteDTO);
@@ -133,7 +140,6 @@ public class ReferenceServiceImplTest {
   public void shouldFindGradeByName() {
     // given
     String gradeNameWithSpecialCharacters = "gradeNameWithSpecialCharacters@!£&£$%@/\\";
-    Set<String> codes = Sets.newHashSet(gradeNameWithSpecialCharacters, "code2");
     GradeDTO gradeDTO = new GradeDTO();
     gradeDTO.setName(gradeNameWithSpecialCharacters);
     List<GradeDTO> grades = Collections.singletonList(gradeDTO);
@@ -151,6 +157,52 @@ public class ReferenceServiceImplTest {
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any());
     assertEquals(grades, respList);
+  }
+
+  @Test
+  public void shouldFindTrustByTrustKnownAs() {
+    // given
+    String trustNameWithSpecialCharacters = "trustNameWithSpecialCharacters@!£&£$%@/\\";
+    TrustDTO trustDto = new TrustDTO();
+    trustDto.setTrustKnownAs(trustNameWithSpecialCharacters);
+    List<TrustDTO> trusts = Collections.singletonList(trustDto);
+
+    ResponseEntity<List<TrustDTO>> responseEntity = new ResponseEntity(trusts, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<TrustDTO>>>any())).willReturn(responseEntity);
+
+    // when
+    List<TrustDTO> respList = referenceServiceImpl.findTrustByTrustKnownAs(trustNameWithSpecialCharacters);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/trusts?columnFilters=%7B%22trustKnownAs%22%3A%5B%22trustNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(trusts, respList);
+  }
+
+  @Test
+  public void shouldFindLocalOfficesByName() {
+    // given
+    String localOfficeNameWithSpecialCharacters = "localOfficeNameWithSpecialCharacters@!£&£$%@/\\";
+    LocalOfficeDTO localOfficeDTO = new LocalOfficeDTO();
+    localOfficeDTO.setName(localOfficeNameWithSpecialCharacters);
+    List<LocalOfficeDTO> localOffices = Collections.singletonList(localOfficeDTO);
+
+    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class),isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any())).willReturn(responseEntity);
+
+    // when
+    List<LocalOfficeDTO> respList = referenceServiceImpl.findLocalOfficesByName(localOfficeNameWithSpecialCharacters);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/local-offices?columnFilters=%7B%22localOfficeName%22%3A%5B%22PARAMETER_localOfficeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(localOffices, respList);
   }
 
   @Test

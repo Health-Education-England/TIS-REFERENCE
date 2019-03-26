@@ -190,6 +190,28 @@ public class SitesTrustsService {
     return result;
   }
 
+  @Transactional(readOnly = true)
+  public Page<Trust> advanceSearchTrust(List<ColumnFilter> columnFilters, Pageable pageable) {
+
+    List<Specification<Trust>> specs = new ArrayList<>();
+    //add the column filters criteria
+    if (columnFilters != null && !columnFilters.isEmpty()) {
+      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
+    }
+
+    Page<Trust> result;
+    if (!specs.isEmpty()) {
+      Specifications<Trust> fullSpec = Specifications.where(specs.get(0));
+      //add the rest of the specs that made it in
+      for (int i = 1; i < specs.size(); i++) {
+        fullSpec = fullSpec.and(specs.get(i));
+      }
+      result = trustRepository.findAll(fullSpec, pageable);
+    } else {
+      result = trustRepository.findAll(pageable);
+    }
+    return result;
+  }
 
   @Transactional(readOnly = true)
   public Page<LocalOffice> advanceSearchLocalOffice(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {

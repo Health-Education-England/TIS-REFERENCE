@@ -1,14 +1,18 @@
 package com.transformuk.hee.tis.reference.client;
 
 import com.transformuk.hee.tis.client.ClientService;
-import com.transformuk.hee.tis.reference.api.dto.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
+import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public interface ReferenceService extends ClientService {
 
@@ -66,6 +70,16 @@ public interface ReferenceService extends ClientService {
    * @return the found grades or an empty list
    */
   List<GradeDTO> findGradesByName(String name);
+
+  /**
+   * Find the trusts given the trustKnownAs. This does one API call and one SQL call to retrieve
+   * all the trusts.
+   * @param trustKnownAs The trustKnownAs to look for.
+   * @return The found trusts or an empty list.
+   */
+  List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs);
+
+  List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
