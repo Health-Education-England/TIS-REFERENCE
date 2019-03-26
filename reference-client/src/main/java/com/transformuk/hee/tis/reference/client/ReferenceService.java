@@ -79,6 +79,8 @@ public interface ReferenceService extends ClientService {
    */
   List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs);
 
+  List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
+
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
   HttpStatus siteTrustMatch(String siteCode, String trustCode);

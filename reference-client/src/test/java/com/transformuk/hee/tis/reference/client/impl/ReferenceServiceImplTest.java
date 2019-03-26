@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 
@@ -12,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import java.util.ArrayList;
@@ -178,6 +180,29 @@ public class ReferenceServiceImplTest {
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(trusts, respList);
+  }
+
+  @Test
+  public void shouldFindLocalOfficesByName() {
+    // given
+    String localOfficeNameWithSpecialCharacters = "localOfficeNameWithSpecialCharacters@!£&£$%@/\\";
+    LocalOfficeDTO localOfficeDTO = new LocalOfficeDTO();
+    localOfficeDTO.setName(localOfficeNameWithSpecialCharacters);
+    List<LocalOfficeDTO> localOffices = Collections.singletonList(localOfficeDTO);
+
+    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class),isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any())).willReturn(responseEntity);
+
+    // when
+    List<LocalOfficeDTO> respList = referenceServiceImpl.findLocalOfficesByName(localOfficeNameWithSpecialCharacters);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/local-offices?columnFilters=%7B%22localOfficeName%22%3A%5B%22PARAMETER_localOfficeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(localOffices, respList);
   }
 
   @Test
