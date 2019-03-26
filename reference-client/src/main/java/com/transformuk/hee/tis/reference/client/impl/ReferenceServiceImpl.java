@@ -77,6 +77,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_BY_TRUSTKNOWNAS_ENDPOINT = "/api/trusts?columnFilters=";
+  private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT = "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
@@ -108,12 +109,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String sitesJsonQuerystringURLEncoded;
   private static String gradesJsonQuerystringURLEncoded;
   private static String trustsJsonQuerystringURLEncoded;
+  private static String localOfficesJsonQuerystringURLEncoded;
 
   static {
     try {
       sitesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"localOfficeName\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       e.printStackTrace();
     }
@@ -414,6 +417,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling findTrustByTrustKnownAs with {}", trustKnownAs);
     return referenceRestTemplate
         .exchange(serviceUrl + FIND_TRUSTS_BY_TRUSTKNOWNAS_ENDPOINT + trustsJsonQuerystringURLEncoded.replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs)), HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {})
+        .getBody();
+  }
+
+  @Cacheable("localOffices")
+  @Override
+  public List<LocalOfficeDTO> findLocalOfficesByName(String owner) {
+    LOG.debug("calling getLocalOfficesByName with {}", owner);
+    return referenceRestTemplate
+        .exchange(serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded.replace("LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
         .getBody();
   }
 
