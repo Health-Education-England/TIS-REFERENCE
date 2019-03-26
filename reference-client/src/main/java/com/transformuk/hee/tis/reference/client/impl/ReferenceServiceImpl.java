@@ -425,7 +425,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<LocalOfficeDTO> findLocalOfficesByName(String owner) {
     LOG.debug("calling getLocalOfficesByName with {}", owner);
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded.replace("LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
+        .exchange(serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded.replace("PARAMETER_LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
         .getBody();
   }
 
