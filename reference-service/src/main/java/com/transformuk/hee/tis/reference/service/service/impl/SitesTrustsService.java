@@ -191,9 +191,14 @@ public class SitesTrustsService {
   }
 
   @Transactional(readOnly = true)
-  public Page<Trust> advanceSearchTrust(List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<Trust> advanceSearchTrust(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
 
     List<Specification<Trust>> specs = new ArrayList<>();
+    //add the text search criteria
+    if (StringUtils.isNotEmpty(searchString)) {
+      specs.add(Specifications.where(containsLike("trustName", searchString))
+      );
+    }
     //add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
       columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
