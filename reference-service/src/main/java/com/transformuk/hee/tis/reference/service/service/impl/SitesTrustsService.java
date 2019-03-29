@@ -196,7 +196,8 @@ public class SitesTrustsService {
     List<Specification<Trust>> specs = new ArrayList<>();
     //add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("trustName", searchString))
+      specs.add(Specifications.where(containsLike("trustName", searchString)).
+          or(containsLike("trustCode", searchString))
       );
     }
     //add the column filters criteria
