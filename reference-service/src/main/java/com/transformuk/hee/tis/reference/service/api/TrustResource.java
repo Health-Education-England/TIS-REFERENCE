@@ -140,9 +140,11 @@ public class TrustResource {
   @Timed
   public ResponseEntity<List<TrustDTO>> getAllTrusts(
       @ApiParam Pageable pageable,
+      @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get a page of Trusts");
+    searchQuery = sanitize(searchQuery);
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
@@ -152,7 +154,7 @@ public class TrustResource {
     if (StringUtils.isEmpty(columnFilterJson)) {
       page = trustRepository.findAll(pageable);
     } else {
-      page = sitesTrustsService.advanceSearchTrust(columnFilters, pageable);
+      page = sitesTrustsService.advanceSearchTrust(searchQuery,columnFilters, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
     return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
