@@ -7,6 +7,8 @@ import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +82,10 @@ public interface ReferenceService extends ClientService {
   List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs);
 
   List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
+
+  List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs);
+
+  List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels);
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
