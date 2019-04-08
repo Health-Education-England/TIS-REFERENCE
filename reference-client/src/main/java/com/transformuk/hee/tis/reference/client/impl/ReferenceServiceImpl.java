@@ -69,6 +69,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
+  private static final String FIND_FUNDING_TYPES_ENDPOINT = "/api/funding-types?columnFilters=";
   private static final String FIND_GRADES_BY_NAME_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
   private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
@@ -76,7 +77,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
-  private static final String FIND_TRUSTS_BY_TRUSTKNOWNAS_ENDPOINT = "/api/trusts?columnFilters=";
+  private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT = "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
@@ -105,18 +106,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT = "/api/qualification-types/exists/";
   private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
 
-
-  private static String sitesJsonQuerystringURLEncoded;
   private static String gradesJsonQuerystringURLEncoded;
-  private static String trustsJsonQuerystringURLEncoded;
+  private static String labelJsonQuerystringURLEncoded;
   private static String localOfficesJsonQuerystringURLEncoded;
+  private static String sitesKnownAsJsonQuerystringURLEncoded;
+  private static String trustKnownAsJsonQuerystringURLEncoded;
 
   static {
     try {
-      sitesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
-      trustsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      labelJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
+      sitesKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      trustKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       e.printStackTrace();
     }
@@ -319,7 +321,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getSitesByName with {}", siteName);
 
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_SITES_BY_NAME_ENDPOINT + sitesJsonQuerystringURLEncoded.replace("PARAMETER_NAME", urlEncode(siteName)), HttpMethod.GET, null, new ParameterizedTypeReference<List<SiteDTO>>() {})
+        .exchange(serviceUrl + FIND_SITES_BY_NAME_ENDPOINT
+            + sitesKnownAsJsonQuerystringURLEncoded
+            .replace("PARAMETER_NAME", urlEncode(siteName)), HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<SiteDTO>>() {})
         .getBody();
   }
 
@@ -346,7 +351,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     } catch(Exception e) {
       LOG.error("Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
           joinedIds, e.getMessage());
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
   }
 
@@ -386,6 +391,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels) {
+    String joinedLabels = StringUtils.join(labels, "\",\"");
+    String url = serviceUrl + FIND_FUNDING_TYPES_ENDPOINT
+        + labelJsonQuerystringURLEncoded.replace("PARAMETER_LABEL", urlEncode(joinedLabels));
+    ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<FundingTypeDTO>>() {});
+    return responseEntity.getBody();
+  }
+
+  @Override
   public List<GradeDTO> findGradesIn(Set<String> codes) {
     String url = serviceUrl + FIND_GRADES_IN_ENDPOINT + String.join(",", codes);
     ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
@@ -408,16 +423,24 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     }catch (Exception e) {
       LOG.error("Exception during find grade id in for ids [{}], returning empty list. Here's the error message {}",
           joinedIds, e.getMessage());
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
   }
 
   @Override
   public List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs) {
     LOG.debug("calling findTrustByTrustKnownAs with {}", trustKnownAs);
+    String url = serviceUrl + FIND_TRUSTS_ENDPOINT
+        +trustKnownAsJsonQuerystringURLEncoded.replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs));
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_TRUSTS_BY_TRUSTKNOWNAS_ENDPOINT + trustsJsonQuerystringURLEncoded.replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs)), HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {})
+        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {})
         .getBody();
+  }
+
+  @Override
+  public List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs) {
+    String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, "\",\"");
+    return findTrustByTrustKnownAs(joinedTrustKnownAs);
   }
 
   @Cacheable("localOffices")
