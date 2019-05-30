@@ -1,0 +1,2 @@
+-- Blank migration script for tests as updating the data is not relevant to these tests.
+-- Also, update statements with joins don't work in H2
