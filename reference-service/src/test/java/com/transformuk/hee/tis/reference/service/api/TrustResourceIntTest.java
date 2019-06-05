@@ -8,7 +8,6 @@ import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,13 +24,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -50,27 +47,35 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNESCAPED_CODE = "cccccccccc";
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
+  private static final String UNESCAPED_LOCAL_OFFICE = "CCCCCCCCCC";
 
   private static final Status DEFAULT_STATUS = Status.CURRENT;
   private static final Status UPDATED_STATUS = Status.INACTIVE;
+  private static final Status UNESCAPED_STATUS = Status.CURRENT;
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
+  private static final String UNESCAPED_TRUST_KNOWN_AS = "Guy's and St Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NAME = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NAME = "BBBBBBBBBB";
+  private static final String UNESCAPED_TRUST_NAME = "Guy's & St Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NUMBER = "BBBBBBBBBB";
+  private static final String UNESCAPED_TRUST_NUMBER = "BBBBBBBBBB";
 
   private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
   private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
+  private static final String UNESCAPED_ADDRESS = "BBBBBBBBBB";
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
+  private static final String UNESCAPED_POST_CODE = "BBBBBBBBBB";
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
@@ -377,15 +382,44 @@ public class TrustResourceIntTest {
          .param("size", "200")
          .param("sort", "id,asc")
          .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
-        .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
-        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
-        .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
-        .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
-        .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))
-        .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS))
-        .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE));
+         .andExpect(status().isOk())
+         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
+         .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
+         .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
+         .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
+         .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
+         .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))
+         .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS))
+         .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE));
+  }
+
+  @Test
+  @Transactional
+  public void getTrustsWithEscapedCharacterSearchShouldReturnTrust() throws Exception {
+    //Set up trust with reserved character.
+    Trust unescapedTrust = new Trust()
+        .code(UNESCAPED_CODE)
+        .localOffice(UNESCAPED_LOCAL_OFFICE)
+        .status(UNESCAPED_STATUS)
+        .trustKnownAs(UNESCAPED_TRUST_KNOWN_AS)
+        .address(UNESCAPED_ADDRESS)
+        .postCode(UNESCAPED_POST_CODE)
+        .trustName(UNESCAPED_TRUST_NAME)
+        .trustNumber(UNESCAPED_TRUST_NUMBER);
+
+    trustRepository.saveAndFlush(unescapedTrust);
+
+    //Search using URLEncoded characters
+    restTrustMockMvc.perform(get("/api/trusts")
+        .param("searchQuery", UNESCAPED_TRUST_NAME)
+        .param("page", "0")
+        .param("size", "200")
+        .param("sort", "trustKnownAs,asc")
+        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+    //Verify field values
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+      .andExpect(jsonPath("$.[*].trustName").value(UNESCAPED_TRUST_NAME));
   }
 }
