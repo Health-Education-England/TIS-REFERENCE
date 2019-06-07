@@ -47,37 +47,39 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNESCAPED_CODE = "cccccccccc";
+  private static final String UNENCODED_CODE = "cccccccccc";
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
-  private static final String UNESCAPED_LOCAL_OFFICE = "CCCCCCCCCC";
+  private static final String UNENCODED_LOCAL_OFFICE = "CCCCCCCCCC";
 
   private static final Status DEFAULT_STATUS = Status.CURRENT;
   private static final Status UPDATED_STATUS = Status.INACTIVE;
-  private static final Status UNESCAPED_STATUS = Status.CURRENT;
+  private static final Status UNENCODED_STATUS = Status.CURRENT;
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
-  private static final String UNESCAPED_TRUST_KNOWN_AS = "Guy's and St Thomas' NHS Foundation Trust";
+  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and St Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NAME = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NAME = "BBBBBBBBBB";
-  private static final String UNESCAPED_TRUST_NAME = "Guy's & St Thomas' NHS Foundation Trust";
+  private static final String UNENCODED_TRUST_NAME = "Guy's & St Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NUMBER = "BBBBBBBBBB";
-  private static final String UNESCAPED_TRUST_NUMBER = "BBBBBBBBBB";
+  private static final String UNENCODED_TRUST_NUMBER = "BBBBBBBBBB";
 
   private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
   private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
-  private static final String UNESCAPED_ADDRESS = "BBBBBBBBBB";
+  private static final String UNENCODED_ADDRESS = "BBBBBBBBBB";
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
-  private static final String UNESCAPED_POST_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_POST_CODE = "BBBBBBBBBB";
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
+
+  private static final String ENCODED_SEARCH_QUERY = "Guy's%20%26%20";
 
   @Autowired
   private TrustRepository trustRepository;
@@ -398,21 +400,21 @@ public class TrustResourceIntTest {
   @Transactional
   public void getTrustsWithEscapedCharacterSearchShouldReturnTrust() throws Exception {
     //Set up trust with reserved character.
-    Trust unescapedTrust = new Trust()
-        .code(UNESCAPED_CODE)
-        .localOffice(UNESCAPED_LOCAL_OFFICE)
-        .status(UNESCAPED_STATUS)
-        .trustKnownAs(UNESCAPED_TRUST_KNOWN_AS)
-        .address(UNESCAPED_ADDRESS)
-        .postCode(UNESCAPED_POST_CODE)
-        .trustName(UNESCAPED_TRUST_NAME)
-        .trustNumber(UNESCAPED_TRUST_NUMBER);
+    Trust unencodedTrust = new Trust()
+        .code(UNENCODED_CODE)
+        .localOffice(UNENCODED_LOCAL_OFFICE)
+        .status(UNENCODED_STATUS)
+        .trustKnownAs(UNENCODED_TRUST_KNOWN_AS)
+        .address(UNENCODED_ADDRESS)
+        .postCode(UNENCODED_POST_CODE)
+        .trustName(UNENCODED_TRUST_NAME)
+        .trustNumber(UNENCODED_TRUST_NUMBER);
 
-    trustRepository.saveAndFlush(unescapedTrust);
+    trustRepository.saveAndFlush(unencodedTrust);
 
     //Search using URLEncoded characters
     restTrustMockMvc.perform(get("/api/trusts")
-        .param("searchQuery", UNESCAPED_TRUST_NAME)
+        .param("searchQuery", ENCODED_SEARCH_QUERY)
         .param("page", "0")
         .param("size", "200")
         .param("sort", "trustKnownAs,asc")
@@ -420,6 +422,34 @@ public class TrustResourceIntTest {
     //Verify field values
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-      .andExpect(jsonPath("$.[*].trustName").value(UNESCAPED_TRUST_NAME));
+      .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
+  }
+
+  @Test
+  @Transactional
+  public void getCurrentTrustsWithEscapedCharacterSearchShouldReturnTrust() throws Exception {
+    //Set up trust with reserved character.
+    Trust unencodedTrust = new Trust()
+        .code(UNENCODED_CODE)
+        .localOffice(UNENCODED_LOCAL_OFFICE)
+        .status(UNENCODED_STATUS)
+        .trustKnownAs(UNENCODED_TRUST_KNOWN_AS)
+        .address(UNENCODED_ADDRESS)
+        .postCode(UNENCODED_POST_CODE)
+        .trustName(UNENCODED_TRUST_NAME)
+        .trustNumber(UNENCODED_TRUST_NUMBER);
+    
+    trustRepository.saveAndFlush(unencodedTrust);
+    
+    //Search using URLEncoded characters
+    restTrustMockMvc.perform(get("/api/current/trusts")
+        .param("searchQuery", ENCODED_SEARCH_QUERY)
+        .param("page", "0")
+        .param("size", "200")
+        .param("sort", "trustKnownAs,asc"))
+    //Verify field values
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
   }
 }
