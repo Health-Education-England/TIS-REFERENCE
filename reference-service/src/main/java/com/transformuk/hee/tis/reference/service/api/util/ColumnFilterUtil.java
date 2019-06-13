@@ -9,6 +9,7 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.nhs.tis.StringConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public final class ColumnFilterUtil {
           } else {
             List<Object> values = e.getValue().stream().map(v -> {
               if (!DateColumns.contains(e.getKey())) {
-                return StringUtil.sanitize(v);
+                return StringConverter.getConverter(v).toString();
               }
               return v;
             }).collect(toList());
