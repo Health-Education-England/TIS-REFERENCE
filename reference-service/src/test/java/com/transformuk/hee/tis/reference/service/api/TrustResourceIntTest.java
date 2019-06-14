@@ -59,11 +59,11 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
-  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and St Thomas' NHS Foundation Trust";
+  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and $t Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NAME = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NAME = "BBBBBBBBBB";
-  private static final String UNENCODED_TRUST_NAME = "Guy's & St Thomas' NHS Foundation Trust";
+  private static final String UNENCODED_TRUST_NAME = "Guy's & $t Thomas' NHS Foundation Trust";
 
   private static final String DEFAULT_TRUST_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NUMBER = "BBBBBBBBBB";
@@ -79,7 +79,7 @@ public class TrustResourceIntTest {
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
-  private static final String ENCODED_SEARCH_QUERY = "Guy's%20%26%20";
+  private static final String ENCODED_SEARCH_QUERY = "Guy's%20%26%20%24t%20T";
 
   @Autowired
   private TrustRepository trustRepository;
@@ -398,7 +398,7 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
-  public void getTrustsWithEscapedCharacterSearchShouldReturnTrust() throws Exception {
+  public void getTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
     //Set up trust with reserved character.
     Trust unencodedTrust = new Trust()
         .code(UNENCODED_CODE)
@@ -427,7 +427,7 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
-  public void getCurrentTrustsWithEscapedCharacterSearchShouldReturnTrust() throws Exception {
+  public void getCurrentTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
     //Set up trust with reserved character.
     Trust unencodedTrust = new Trust()
         .code(UNENCODED_CODE)

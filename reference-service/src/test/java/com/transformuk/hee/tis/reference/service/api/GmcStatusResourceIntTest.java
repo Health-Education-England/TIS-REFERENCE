@@ -45,9 +45,11 @@ public class GmcStatusResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Status";
 
   @Autowired
   private GmcStatusRepository gmcStatusRepository;
@@ -193,6 +195,24 @@ public class GmcStatusResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(gmcStatus.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getGmcStatusesWithQuery() throws Exception {
+    // Initialize the database
+    GmcStatus unencodedGmcStatus = new GmcStatus()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    gmcStatusRepository.saveAndFlush(unencodedGmcStatus);
+
+    // Get all the gmcStatusList
+    restGmcStatusMockMvc.perform(get("/api/gmc-statuses?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedGmcStatus.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

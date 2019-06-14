@@ -47,9 +47,11 @@ public class CurriculumSubTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "UnencCurr";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "\"Test/Validation Curriculum\"";
 
   @Autowired
   private CurriculumSubTypeRepository curriculumSubTypeRepository;
@@ -248,8 +250,32 @@ public class CurriculumSubTypeResourceIntTest {
     restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=med"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].code").value(hasItems("MEDICAL1", "MEDICAL2")))
-        .andExpect(jsonPath("$.[*].label").value(hasItems("Medical Curriculum - As defined by the GMC", "Medical SpR - As defined by the GMC")));
+        .andExpect(jsonPath("$.[*].code").value(hasItems(medicalCurriculum.getCode(), medicalSPR.getCode())))
+        .andExpect(jsonPath("$.[*].label").value(hasItems(medicalCurriculum.getLabel(), medicalSPR.getLabel())));
+  }
+
+  @Test
+  @Transactional
+  public void getCurriculumSubTypeWithEncodedQuery() throws Exception {
+    // Initialize the database
+    CurriculumSubType medicalCurriculum = new CurriculumSubType()
+        .code("MEDICAL1")
+        .label("Medical Curriculum - As defined by the GMC");
+
+    CurriculumSubType expectedCurriculum = new CurriculumSubType()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+
+    List<CurriculumSubType> curriculumSubTypes = Lists.newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
+    curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypeRepository.flush();
+
+    // Get the curriculumSubType
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=Test%2FVal"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

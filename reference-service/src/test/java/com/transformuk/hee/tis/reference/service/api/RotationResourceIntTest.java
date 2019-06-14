@@ -49,12 +49,15 @@ public class RotationResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Rotation";
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
+  private static final String UNENCODED_LOCAL_OFFICE = "CCCCCCCCCC";
 
   @Autowired
   private RotationRepository rotationRepository;
@@ -197,6 +200,26 @@ public class RotationResourceIntTest {
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getRotationsWithQuery() throws Exception {
+    // Initialize the database
+    Rotation unenodedRotation = new Rotation()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL)
+        .localOffice(UNENCODED_LOCAL_OFFICE);
+    rotationRepository.saveAndFlush(unenodedRotation);
+    
+    // Get the rotationList
+    restRotationMockMvc.perform(get("/api/rotations?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unenodedRotation.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL))
+    .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE));
   }
 
   @Test

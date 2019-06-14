@@ -46,9 +46,11 @@ public class CollegeResourceIntTest {
 
   private static final String DEFAULT_ABBREVIATION = "AAAAAAAAAA";
   private static final String UPDATED_ABBREVIATION = "BBBBBBBBBB";
+  private static final String UNENCODED_ABBREVIATION = "CCCCCCCCCC";
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
+  private static final String UNENCODED_NAME = "Faculty of Te$ting & Validation";
 
   @Autowired
   private CollegeRepository collegeRepository;
@@ -175,6 +177,24 @@ public class CollegeResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(college.getId().intValue())))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getCollegesWithEscapedCharacterSearchShouldFindShoudReturnCollege() throws Exception {
+    // Initialize the database
+    College unescapedCollege = new College()
+        .abbreviation(UNENCODED_ABBREVIATION)
+        .name(UNENCODED_NAME);
+    unescapedCollege = collegeRepository.saveAndFlush(unescapedCollege);
+    
+    // Get all the collegeList
+    restCollegeMockMvc.perform(get("/api/colleges?searchQuery=Te%24ting%20%26%20&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedCollege.getId().intValue())))
+    .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION.toString())))
+    .andExpect(jsonPath("$.[*].name").value(hasItem(UNENCODED_NAME.toString())));
   }
 
   @Test

@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,12 +49,15 @@ public class DBCResourceIntTest {
 
   private static final String DEFAULT_DBC = "AAAAAAAAAA";
   private static final String UPDATED_DBC = "BBBBBBBBBB";
+  private static final String UNENCODED_DBC = "TV-Code";
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
+  private static final String UNENCODED_NAME = "Te$ting & Validation Body";
 
   private static final String DEFAULT_ABBR = "AAAAAAAAAA";
   private static final String UPDATED_ABBR = "BBBBBBBBBB";
+  private static final String UNENCODED_ABBR = "T&V Body";
 
   private static final String HENE_DBC_CODE = "1-AIIDSI";
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
@@ -218,6 +223,28 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
         .andExpect(jsonPath("$.[*].abbr").value(hasItem(DEFAULT_ABBR.toString())));
   }
+  
+  @Test
+  @Transactional
+  public void getDBCWithEncodedQuery() throws Exception {
+    DBC encDbc = new DBC()
+        .dbc(UNENCODED_DBC)
+        .name(UNENCODED_NAME)
+        .abbr(UNENCODED_ABBR);
+    ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
+    // Initialize the database
+    dBCRepository.save(dbcs);
+    dBCRepository.flush();
+
+    // Get all the dBCList
+    restDBCMockMvc.perform(get("/api/dbcs?searchQuery=Te%24ting%20%26%20&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
+    .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
+    .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
+    .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
+  }
 
   @Test
   @Transactional
@@ -303,15 +330,15 @@ public class DBCResourceIntTest {
     assertThat(dBCList).hasSize(1);
   }
 
-    @Test
-    @Transactional
-    public void getDbcsUserAndCheckOnlyAllowedDbcsAreReturned() throws Exception {
-      // Given
-      // Create some variables for DBCRepository size comparison
-      int dbcRepositorySize;
+  @Test
+  @Transactional
+  public void getDbcsUserAndCheckOnlyAllowedDbcsAreReturned() throws Exception {
+    // Given
+    // Create some variables for DBCRepository size comparison
+    int dbcRepositorySize;
 
-      // Add the static DBC object
-      dBCRepository.saveAndFlush(dBC);
+    // Add the static DBC object
+    dBCRepository.saveAndFlush(dBC);
 
     // Create some more DBCs - with real Codes etc
     // Use counter to change abbreviation to satisfy check constraint on table
@@ -351,7 +378,6 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].dbc").value(hasItem(HENWL_DBC_CODE)))
         .andExpect(jsonPath("$.[*].dbc").value(not(contains(HENE_DBC_CODE))));
   }
-
 
   @Test
   @Transactional

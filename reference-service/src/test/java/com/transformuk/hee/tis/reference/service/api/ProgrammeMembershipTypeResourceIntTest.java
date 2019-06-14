@@ -45,9 +45,11 @@ public class ProgrammeMembershipTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Programme Membership Type";
 
   @Autowired
   private ProgrammeMembershipTypeRepository programmeMembershipTypeRepository;
@@ -194,6 +196,24 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(programmeMembershipType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getProgrammeMembershipTypesWithQuery() throws Exception {
+    // Initialize the database
+    ProgrammeMembershipType unencodedProgrammeMembershipType = new ProgrammeMembershipType()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    programmeMembershipTypeRepository.saveAndFlush(unencodedProgrammeMembershipType);
+    
+    // Get all the programmeMembershipTypeList
+    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedProgrammeMembershipType.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

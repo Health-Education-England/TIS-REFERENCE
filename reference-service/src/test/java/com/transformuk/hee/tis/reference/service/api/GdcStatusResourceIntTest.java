@@ -25,7 +25,6 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,9 +44,11 @@ public class GdcStatusResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t GDC Status";
 
   @Autowired
   private GdcStatusRepository gdcStatusRepository;
@@ -183,15 +184,18 @@ public class GdcStatusResourceIntTest {
   @Transactional
   public void getAllGdcStatuses() throws Exception {
     // Initialize the database
-    gdcStatusRepository.saveAndFlush(gdcStatus);
+    GdcStatus unencodedGdcStatus = new GdcStatus()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    gdcStatusRepository.saveAndFlush(unencodedGdcStatus);
 
     // Get all the gdcStatusList
-    restGdcStatusMockMvc.perform(get("/api/gdc-statuses?sort=id,desc"))
+    restGdcStatusMockMvc.perform(get("/api/gdc-statuses?searchQuery=Te$t&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(gdcStatus.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+        .andExpect(jsonPath("$.[*].id").value(unencodedGdcStatus.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

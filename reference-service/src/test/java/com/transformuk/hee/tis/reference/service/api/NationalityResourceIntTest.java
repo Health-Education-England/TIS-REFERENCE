@@ -45,9 +45,11 @@ public class NationalityResourceIntTest {
 
   private static final String DEFAULT_COUNTRY_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_COUNTRY_NUMBER = "BBBBBBBBBB";
+  private static final String UNENCODED_COUNTRY_NUMBER = "CCCCCCCCCC";
 
   private static final String DEFAULT_NATIONALITY = "AAAAAAAAAA";
   private static final String UPDATED_NATIONALITY = "BBBBBBBBBB";
+  private static final String UNENCODED_NATIONALITY = "Te$t Nationality";
 
   @Autowired
   private NationalityRepository nationalityRepository;
@@ -193,6 +195,24 @@ public class NationalityResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(nationality.getId().intValue())))
         .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
         .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getNationalitiesWithQuery() throws Exception {
+    // Initialize the database
+    Nationality unencodedNationality = new Nationality()
+        .nationality(UNENCODED_NATIONALITY)
+        .countryNumber(UNENCODED_COUNTRY_NUMBER);
+    nationalityRepository.saveAndFlush(unencodedNationality);
+
+    // Get all the nationalityList
+    restNationalityMockMvc.perform(get("/api/nationalities?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))
+    .andExpect(jsonPath("$.[*].countryNumber").value(UNENCODED_COUNTRY_NUMBER))
+    .andExpect(jsonPath("$.[*].nationality").value(UNENCODED_NATIONALITY));
   }
 
   @Test

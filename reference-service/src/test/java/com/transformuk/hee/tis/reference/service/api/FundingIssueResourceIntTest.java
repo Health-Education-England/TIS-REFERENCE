@@ -6,7 +6,6 @@ import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingIssueServiceImpl;
-import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +25,6 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,6 +44,7 @@ public class FundingIssueResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "Te$tIssue";
 
   @Autowired
   private FundingIssueRepository fundingIssueRepository;
@@ -161,15 +160,17 @@ public class FundingIssueResourceIntTest {
   @Test
   @Transactional
   public void getAllFundingIssues() throws Exception {
+    FundingIssue unencodedIssue = new FundingIssue()
+        .code(UNENCODED_CODE);
     // Initialize the database
-    fundingIssueRepository.saveAndFlush(fundingIssue);
+    fundingIssueRepository.saveAndFlush(unencodedIssue);
 
     // Get all the fundingIssueList
-    restFundingIssueMockMvc.perform(get("/api/funding-issues?sort=id,desc"))
+    restFundingIssueMockMvc.perform(get("/api/funding-issues?searchQuery=Te%24t&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(fundingIssue.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())));
+        .andExpect(jsonPath("$.[*].id").value(unencodedIssue.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE.toString()));
   }
 
   @Test

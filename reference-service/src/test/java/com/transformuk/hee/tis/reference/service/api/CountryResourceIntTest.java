@@ -49,9 +49,11 @@ public class CountryResourceIntTest {
 
   private static final String DEFAULT_COUNTRY_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_COUNTRY_NUMBER = "BBBBBBBBBB";
+  private static final String UNENCODED_COUNTRY_NUMBER = "CCCCCCCCCC";
 
   private static final String DEFAULT_NATIONALITY = "AAAAAAAAAA";
   private static final String UPDATED_NATIONALITY = "BBBBBBBBBB";
+  private static final String UNENCODED_NATIONALITY = "Check! national";
 
   @Autowired
   private CountryRepository countryRepository;
@@ -197,6 +199,39 @@ public class CountryResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
         .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
         .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getCountriesWithQueryShouldReturnMatch() throws Exception {
+    // Initialize the database
+    countryRepository.saveAndFlush(country);
+    
+    // Get all the countryList
+    restCountryMockMvc.perform(get("/api/countries?searchQuery=AAAAA&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
+    .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
+    .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getCountriesMatchingEncodedQueryShouldReturnMatch() throws Exception {
+    // Initialize the database
+    Country unencodedCountry = new Country()
+        .countryNumber(UNENCODED_COUNTRY_NUMBER)
+        .nationality(UNENCODED_NATIONALITY);
+    unencodedCountry = countryRepository.saveAndFlush(unencodedCountry);
+    
+    // Get all the countryList
+    restCountryMockMvc.perform(get("/api/countries?searchQuery=Check%21%20&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedCountry.getId().intValue())))
+    .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(UNENCODED_COUNTRY_NUMBER.toString())))
+    .andExpect(jsonPath("$.[*].nationality").value(hasItem(UNENCODED_NATIONALITY.toString())));
   }
 
   @Test

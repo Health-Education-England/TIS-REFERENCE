@@ -45,9 +45,11 @@ public class SettledResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Settled";
 
   @Autowired
   private SettledRepository settledRepository;
@@ -193,6 +195,24 @@ public class SettledResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(settled.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getSettledsWithQuery() throws Exception {
+    // Initialize the database
+    Settled unencodedSettled = new Settled()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    settledRepository.saveAndFlush(unencodedSettled);
+    
+    // Get all the settledList
+    restSettledMockMvc.perform(get("/api/settleds?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedSettled.getId().intValue())))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

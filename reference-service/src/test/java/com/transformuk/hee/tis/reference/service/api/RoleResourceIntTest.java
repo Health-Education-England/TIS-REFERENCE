@@ -43,9 +43,11 @@ public class RoleResourceIntTest {
 
     private static final String DEFAULT_CODE = "AAAAAAAAAA";
     private static final String UPDATED_CODE = "BBBBBBBBBB";
+    private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
     private static final String DEFAULT_LABEL = "AAAAAAAAAA";
     private static final String UPDATED_LABEL = "BBBBBBBBBB";
+    private static final String UNENCODED_LABEL = "Te$t Role";
 
     private static RoleCategory roleCategory;
 
@@ -198,6 +200,25 @@ public class RoleResourceIntTest {
                 .andExpect(jsonPath("$.[*].id").value(hasItem(role.getId().intValue())))
                 .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
                 .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)));
+    }
+    
+    @Test
+    @Transactional
+    public void getRolesWithQuery() throws Exception {
+      // Initialize the database
+      Role unencodedRole = new Role()
+          .code(UNENCODED_CODE)
+          .label(UNENCODED_LABEL)
+          .roleCategory(roleCategory);
+      roleRepository.saveAndFlush(unencodedRole);
+
+      // Get the roleList
+      restRoleMockMvc.perform(get("/api/roles?searchQuery=Te%24t&sort=id,desc"))
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+      .andExpect(jsonPath("$.[*].id").value(unencodedRole.getId().intValue()))
+      .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+      .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
     }
 
     @Test

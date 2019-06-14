@@ -45,9 +45,11 @@ public class TrainingNumberTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Training Number";
 
   @Autowired
   private TrainingNumberTypeRepository trainingNumberTypeRepository;
@@ -194,6 +196,24 @@ public class TrainingNumberTypeResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(trainingNumberType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getTrainingNumberTypesWithQuery() throws Exception {
+    // Initialize the database
+    TrainingNumberType unencodedTrainingNumberType = new TrainingNumberType()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    trainingNumberTypeRepository.saveAndFlush(unencodedTrainingNumberType);
+    
+    // Get all the trainingNumberTypeList
+    restTrainingNumberTypeMockMvc.perform(get("/api/training-number-types?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedTrainingNumberType.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
