@@ -217,7 +217,7 @@ public class GradeResourceIntTest {
     gradeRepository.saveAndFlush(unencodedGrade);
     
     // Get grades given the codes
-    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=%22Te%24t%22"))
+    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=\"Te%24t\""))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION)))
@@ -274,7 +274,7 @@ public class GradeResourceIntTest {
 
     gradeRepository.saveAndFlush(anotherGrade);
 
-    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=%22AAA%22"))
+    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=\"AAA\""))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))

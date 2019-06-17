@@ -193,7 +193,7 @@ public class MedicalSchoolResourceIntTest {
     medicalSchoolRepository.saveAndFlush(unencodedMedicalSchool);
 
     // Get all the medicalSchoolList
-    restMedicalSchoolMockMvc.perform(get("/api/medical-schools?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restMedicalSchoolMockMvc.perform(get("/api/medical-schools?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedMedicalSchool.getId().intValue()))

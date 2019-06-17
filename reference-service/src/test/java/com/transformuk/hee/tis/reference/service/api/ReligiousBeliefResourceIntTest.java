@@ -207,7 +207,7 @@ public class ReligiousBeliefResourceIntTest {
     religiousBeliefRepository.saveAndFlush(unencodedReligiousBelief);
     
     // Get the religiousBeliefList
-    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedReligiousBelief.getId().intValue()))

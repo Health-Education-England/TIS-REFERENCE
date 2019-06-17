@@ -206,7 +206,7 @@ public class GradeResource {
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of grades begin");
-    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().fromJson().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
@@ -232,7 +232,7 @@ public class GradeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Grades");
-    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().fromJson().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     Page<Grade> page;
     if (StringUtils.isEmpty(searchQuery)) {
       Grade gradeExample = new Grade();

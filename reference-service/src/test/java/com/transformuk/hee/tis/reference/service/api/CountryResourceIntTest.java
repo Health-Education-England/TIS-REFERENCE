@@ -208,7 +208,7 @@ public class CountryResourceIntTest {
     countryRepository.saveAndFlush(country);
     
     // Get all the countryList
-    restCountryMockMvc.perform(get("/api/countries?searchQuery=%22AAAAA%22&sort=id,desc"))
+    restCountryMockMvc.perform(get("/api/countries?searchQuery=\"AAAAA\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
@@ -226,7 +226,7 @@ public class CountryResourceIntTest {
     unencodedCountry = countryRepository.saveAndFlush(unencodedCountry);
     
     // Get all the countryList
-    restCountryMockMvc.perform(get("/api/countries?searchQuery=%22Check%21%20%22&sort=id,desc"))
+    restCountryMockMvc.perform(get("/api/countries?searchQuery=\"Check%21%20\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedCountry.getId().intValue())))

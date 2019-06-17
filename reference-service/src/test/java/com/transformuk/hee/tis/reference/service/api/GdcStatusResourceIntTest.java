@@ -190,7 +190,7 @@ public class GdcStatusResourceIntTest {
     gdcStatusRepository.saveAndFlush(unencodedGdcStatus);
 
     // Get all the gdcStatusList
-    restGdcStatusMockMvc.perform(get("/api/gdc-statuses?searchQuery=%22Te$t%22&sort=id,desc"))
+    restGdcStatusMockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te$t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGdcStatus.getId().intValue()))

@@ -207,7 +207,7 @@ public class TitleResourceIntTest {
     titleRepository.saveAndFlush(unencodedTitle);
     
     // Get all the titleList
-    restTitleMockMvc.perform(get("/api/titles?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restTitleMockMvc.perform(get("/api/titles?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedTitle.getId().intValue()))

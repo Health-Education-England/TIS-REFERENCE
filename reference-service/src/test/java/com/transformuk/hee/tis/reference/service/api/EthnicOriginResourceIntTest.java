@@ -181,7 +181,7 @@ public class EthnicOriginResourceIntTest {
     ethnicOriginRepository.saveAndFlush(unencodedEthnicOrigin);
 
     // Get all the ethnicOriginList
-    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?searchQuery=%22%24ome%22&sort=id,desc"))
+    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?searchQuery=\"%24ome\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedEthnicOrigin.getId().intValue()))

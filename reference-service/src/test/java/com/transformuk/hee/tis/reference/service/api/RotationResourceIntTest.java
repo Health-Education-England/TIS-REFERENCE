@@ -213,7 +213,7 @@ public class RotationResourceIntTest {
     rotationRepository.saveAndFlush(unenodedRotation);
     
     // Get the rotationList
-    restRotationMockMvc.perform(get("/api/rotations?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restRotationMockMvc.perform(get("/api/rotations?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unenodedRotation.getId().intValue()))

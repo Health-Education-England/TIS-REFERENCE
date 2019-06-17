@@ -211,7 +211,7 @@ public class TariffRateResourceIntTest {
     tariffRateRepository.saveAndFlush(unencodedTariffRate);
     
     // Get all the tariffRateList
-    restTariffRateMockMvc.perform(get("/api/tariff-rates?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restTariffRateMockMvc.perform(get("/api/tariff-rates?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedTariffRate.getId().intValue()))

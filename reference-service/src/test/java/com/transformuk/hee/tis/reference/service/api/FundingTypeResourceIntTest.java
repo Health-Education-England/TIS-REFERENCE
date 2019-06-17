@@ -206,7 +206,7 @@ public class FundingTypeResourceIntTest {
     fundingTypeRepository.saveAndFlush(unencodedFundingType);
 
     // Get all the fundingTypeList
-    restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedFundingType.getId().intValue()))

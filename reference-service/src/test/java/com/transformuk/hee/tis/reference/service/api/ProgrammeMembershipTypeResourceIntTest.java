@@ -208,7 +208,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     programmeMembershipTypeRepository.saveAndFlush(unencodedProgrammeMembershipType);
     
     // Get all the programmeMembershipTypeList
-    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types?searchQuery=%22Te%24t%22&sort=id,desc"))
+    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedProgrammeMembershipType.getId().intValue()))

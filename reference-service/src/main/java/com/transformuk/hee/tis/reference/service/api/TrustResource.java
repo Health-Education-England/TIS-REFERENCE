@@ -145,7 +145,7 @@ public class TrustResource {
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().fromJson().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
@@ -175,7 +175,7 @@ public class TrustResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().fromJson().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     Page<Trust> page;
     if (StringUtils.isEmpty(searchQuery)) {
       Trust trust = new Trust().status(Status.CURRENT);

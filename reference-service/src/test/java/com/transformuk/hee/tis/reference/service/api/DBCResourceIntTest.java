@@ -237,7 +237,7 @@ public class DBCResourceIntTest {
     dBCRepository.flush();
 
     // Get all the dBCList
-    restDBCMockMvc.perform(get("/api/dbcs?searchQuery=%22Te%24ting%20%26%20%22&sort=id,desc"))
+    restDBCMockMvc.perform(get("/api/dbcs?searchQuery=\"Te%24ting%20%26%20\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))

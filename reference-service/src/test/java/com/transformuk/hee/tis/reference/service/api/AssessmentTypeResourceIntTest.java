@@ -225,7 +225,7 @@ public class AssessmentTypeResourceIntTest {
     Page<AssessmentType> pageResults = new PageImpl<>(allAssessmentTypes);
     when(assessmentTypeServiceMock.advancedSearch(eq(UNENCODED_LABEL), any(), any())).thenReturn(pageResults);
 
-    testObjMockMvc.perform(get("/api/assessment-types?searchQuery=%22Te%24t%20Assessment%22&sort=id,desc"))
+    testObjMockMvc.perform(get("/api/assessment-types?searchQuery=\"Te%24t%20Assessment\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
