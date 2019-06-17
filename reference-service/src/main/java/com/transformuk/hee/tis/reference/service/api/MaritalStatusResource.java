@@ -135,7 +135,7 @@ public class MaritalStatusResource {
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.info("REST request to get a page of marital statuses begin");
-    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().fromJson().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<MaritalStatus> page;
