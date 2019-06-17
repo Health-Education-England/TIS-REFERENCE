@@ -211,7 +211,7 @@ public class PlacementTypeResourceIntTest {
     placementTypeRepository.saveAndFlush(unencodedPlacementType);
     
     // Get all the placementTypeList
-    restPlacementTypeMockMvc.perform(get("/api/placement-types?searchQuery=Te%24t&sort=id,desc"))
+    restPlacementTypeMockMvc.perform(get("/api/placement-types?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedPlacementType.getId().intValue()))

@@ -207,7 +207,7 @@ public class LeavingDestinationResourceIntTest {
     leavingDestinationRepository.saveAndFlush(unencodedLeavingDestination);
 
     // Get all the leavingDestinationList
-    restLeavingDestinationMockMvc.perform(get("/api/leaving-destinations?searchQuery=Te%24t&sort=id,desc"))
+    restLeavingDestinationMockMvc.perform(get("/api/leaving-destinations?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedLeavingDestination.getId().intValue()))

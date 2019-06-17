@@ -204,7 +204,7 @@ public class QualificationReferenceResourceIntTest {
     qualificationReferenceRepository.saveAndFlush(unencodedQualificationReference);
     
     // Get the qualificationReferenceList
-    restQualificationReferenceMockMvc.perform(get("/api/qualification-reference?searchQuery=Te%24t&sort=id,desc"))
+    restQualificationReferenceMockMvc.perform(get("/api/qualification-reference?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedQualificationReference.getId().intValue()))

@@ -207,7 +207,7 @@ public class GmcStatusResourceIntTest {
     gmcStatusRepository.saveAndFlush(unencodedGmcStatus);
 
     // Get all the gmcStatusList
-    restGmcStatusMockMvc.perform(get("/api/gmc-statuses?searchQuery=Te%24t&sort=id,desc"))
+    restGmcStatusMockMvc.perform(get("/api/gmc-statuses?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedGmcStatus.getId().intValue()))

@@ -208,7 +208,7 @@ public class TrainingNumberTypeResourceIntTest {
     trainingNumberTypeRepository.saveAndFlush(unencodedTrainingNumberType);
     
     // Get all the trainingNumberTypeList
-    restTrainingNumberTypeMockMvc.perform(get("/api/training-number-types?searchQuery=Te%24t&sort=id,desc"))
+    restTrainingNumberTypeMockMvc.perform(get("/api/training-number-types?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedTrainingNumberType.getId().intValue()))

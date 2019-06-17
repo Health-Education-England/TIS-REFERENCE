@@ -203,7 +203,7 @@ public class PermitToWorkResourceIntTest {
     permitToWorkRepository.saveAndFlush(unencodedPermitToWork);
 
     // Get the permitToWorkList
-    restPermitToWorkMockMvc.perform(get("/api/permit-to-works?searchQuery=Te%24t&sort=id,desc"))
+    restPermitToWorkMockMvc.perform(get("/api/permit-to-works?searchQuery=%22Te%24t%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))

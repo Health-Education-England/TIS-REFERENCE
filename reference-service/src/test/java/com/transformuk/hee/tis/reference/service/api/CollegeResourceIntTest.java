@@ -189,7 +189,7 @@ public class CollegeResourceIntTest {
     unescapedCollege = collegeRepository.saveAndFlush(unescapedCollege);
     
     // Get all the collegeList
-    restCollegeMockMvc.perform(get("/api/colleges?searchQuery=Te%24ting%20%26%20&sort=id,desc"))
+    restCollegeMockMvc.perform(get("/api/colleges?searchQuery=%22Te%24ting%20%26%20%22&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedCollege.getId().intValue())))
