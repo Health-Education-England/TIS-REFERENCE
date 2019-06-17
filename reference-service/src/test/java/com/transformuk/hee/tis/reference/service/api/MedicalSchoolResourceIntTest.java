@@ -45,9 +45,11 @@ public class MedicalSchoolResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Medical School";
 
   @Autowired
   private MedicalSchoolRepository medicalSchoolRepository;
@@ -185,15 +187,18 @@ public class MedicalSchoolResourceIntTest {
   @Transactional
   public void getAllMedicalSchools() throws Exception {
     // Initialize the database
-    medicalSchoolRepository.saveAndFlush(medicalSchool);
+    MedicalSchool unencodedMedicalSchool = new MedicalSchool()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    medicalSchoolRepository.saveAndFlush(unencodedMedicalSchool);
 
     // Get all the medicalSchoolList
-    restMedicalSchoolMockMvc.perform(get("/api/medical-schools?sort=id,desc"))
+    restMedicalSchoolMockMvc.perform(get("/api/medical-schools?searchQuery=Te%24t&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(medicalSchool.getId().intValue())))
-        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+        .andExpect(jsonPath("$.[*].id").value(unencodedMedicalSchool.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

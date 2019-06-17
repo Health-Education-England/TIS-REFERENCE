@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DBC.
+ * A DBC (Designated Body Code).
  */
 @Entity
 public class DBC implements Serializable {

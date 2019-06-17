@@ -45,6 +45,7 @@ public class EthnicOriginResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "$omeEthnicity";
 
   @Autowired
   private EthnicOriginRepository ethnicOriginRepository;
@@ -169,6 +170,22 @@ public class EthnicOriginResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(ethnicOrigin.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getEthnicOriginsWithQuery() throws Exception {
+    // Initialize the database
+    EthnicOrigin unencodedEthnicOrigin = new EthnicOrigin()
+        .code(UNENCODED_CODE);
+    ethnicOriginRepository.saveAndFlush(unencodedEthnicOrigin);
+
+    // Get all the ethnicOriginList
+    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?searchQuery=%24ome&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedEthnicOrigin.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE));
   }
 
   @Test

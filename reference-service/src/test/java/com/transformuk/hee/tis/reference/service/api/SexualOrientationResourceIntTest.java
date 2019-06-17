@@ -45,9 +45,11 @@ public class SexualOrientationResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Sexual Orientation";
 
   @Autowired
   private SexualOrientationRepository sexualOrientationRepository;
@@ -193,6 +195,24 @@ public class SexualOrientationResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(sexualOrientation.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getSexualOrientationsWithQuery() throws Exception {
+    // Initialize the database
+    SexualOrientation unencodedSexualOrientation = new SexualOrientation()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    sexualOrientationRepository.saveAndFlush(unencodedSexualOrientation);
+    
+    // Get the sexualOrientationList
+    restSexualOrientationMockMvc.perform(get("/api/sexual-orientations?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedSexualOrientation.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

@@ -55,7 +55,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.transformuk.hee.tis.reference.service.api.util.StringUtil.sanitize;
+import uk.nhs.tis.StringConverter;
+
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -144,7 +145,7 @@ public class TrustResource {
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = sanitize(searchQuery);
+    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
@@ -174,7 +175,7 @@ public class TrustResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = sanitize(searchQuery);
+    searchQuery = StringConverter.getConverter(searchQuery).decodeUrl().escapeForSql().toString();
     Page<Trust> page;
     if (StringUtils.isEmpty(searchQuery)) {
       Trust trust = new Trust().status(Status.CURRENT);

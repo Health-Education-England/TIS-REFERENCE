@@ -48,9 +48,11 @@ public class PlacementTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Placement Type";
 
   @Autowired
   private PlacementTypeRepository placementTypeRepository;
@@ -197,6 +199,24 @@ public class PlacementTypeResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(placementType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getPlacementTypesWithQuery() throws Exception {
+    // Initialize the database
+    PlacementType unencodedPlacementType = new PlacementType()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    placementTypeRepository.saveAndFlush(unencodedPlacementType);
+    
+    // Get all the placementTypeList
+    restPlacementTypeMockMvc.perform(get("/api/placement-types?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedPlacementType.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

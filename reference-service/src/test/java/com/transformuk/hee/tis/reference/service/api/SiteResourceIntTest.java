@@ -50,30 +50,39 @@ public class SiteResourceIntTest {
 
   private static final String DEFAULT_SITE_CODE = "AAAAAAAAAA";
   private static final String UPDATED_SITE_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_SITE_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
+  private static final String UNENCODED_LOCAL_OFFICE = "CCCCCCCCCC";
 
   private static final String DEFAULT_TRUST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_TRUST_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_SITE_NAME = "AAAAAAAAAA";
   private static final String UPDATED_SITE_NAME = "BBBBBBBBBB";
+  private static final String UNENCODED_SITE_NAME = "Te$t Site";
 
   private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
   private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
+  private static final String UNENCODED_ADDRESS = "CCCCCCCCCC";
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_POST_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_SITE_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_SITE_KNOWN_AS = "BBBBBBBBBB";
+  private static final String UNENCODED_SITE_KNOWN_AS = "Te$t Site";
 
   private static final String DEFAULT_SITE_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_SITE_NUMBER = "BBBBBBBBBB";
+  private static final String UNENCODED_SITE_NUMBER = "CCCCCCCCCC";
 
   private static final String DEFAULT_ORGANISATIONAL_UNIT = "AAAAAAAAAA";
   private static final String UPDATED_ORGANISATIONAL_UNIT = "BBBBBBBBBB";
+  private static final String UNENCODED_ORGANISATIONAL_UNIT = "CCCCCCCCCC";
 
   private static final String SITE_CODE_NOT_IN_DB = "X1G5H9V";
   private static final String TRUST_CODE_NOT_IN_DB = "J8D4VTF";
@@ -206,6 +215,37 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].siteKnownAs").value(hasItem(DEFAULT_SITE_KNOWN_AS)))
         .andExpect(jsonPath("$.[*].siteNumber").value(hasItem(DEFAULT_SITE_NUMBER)))
         .andExpect(jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
+  }
+  
+  @Test
+  @Transactional
+  public void getSitesWithQuery() throws Exception {
+    // Initialize the database
+    Site unencodedSite = new Site()
+        .siteCode(UNENCODED_SITE_CODE)
+        .localOffice(UNENCODED_LOCAL_OFFICE)
+        .trustCode(UNENCODED_TRUST_CODE)
+        .siteName(UNENCODED_SITE_NAME)
+        .address(UNENCODED_ADDRESS)
+        .postCode(UNENCODED_POST_CODE)
+        .siteKnownAs(UNENCODED_SITE_KNOWN_AS)
+        .siteNumber(UNENCODED_SITE_NUMBER)
+        .organisationalUnit(UNENCODED_ORGANISATIONAL_UNIT);
+    siteRepository.saveAndFlush(unencodedSite);
+    
+    // Get all the siteList
+    restSiteMockMvc.perform(get("/api/sites?searchQuery=Te%24t&sort=siteCode,asc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
+    .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE))
+    .andExpect(jsonPath("$.[*].trustCode").value(UNENCODED_TRUST_CODE))
+    .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME))
+    .andExpect(jsonPath("$.[*].address").value(UNENCODED_ADDRESS))
+    .andExpect(jsonPath("$.[*].postCode").value(UNENCODED_POST_CODE))
+    .andExpect(jsonPath("$.[*].siteKnownAs").value(UNENCODED_SITE_KNOWN_AS))
+    .andExpect(jsonPath("$.[*].siteNumber").value(UNENCODED_SITE_NUMBER))
+    .andExpect(jsonPath("$.[*].organisationalUnit").value(UNENCODED_ORGANISATIONAL_UNIT));
   }
 
   @Test

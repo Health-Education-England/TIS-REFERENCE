@@ -29,7 +29,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -48,12 +47,15 @@ public class GradeResourceIntTest {
 
   private static final String DEFAULT_ABBREVIATION = "AAAAAAAAAA";
   private static final String UPDATED_ABBREVIATION = "BBBBBBBBBB";
+  private static final String UNENCODED_ABBREVIATION = "CCCCCCCCCC";
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
+  private static final String UNENCODED_NAME = "Te$t Grade";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Grade Label";
 
   private static final Boolean DEFAULT_TRAINING_GRADE = false;
   private static final Boolean UPDATED_TRAINING_GRADE = true;
@@ -199,6 +201,28 @@ public class GradeResourceIntTest {
         .andExpect(jsonPath("$.[*].trainingGrade").value(hasItem(DEFAULT_TRAINING_GRADE)))
         .andExpect(jsonPath("$.[*].postGrade").value(hasItem(DEFAULT_POST_GRADE)))
         .andExpect(jsonPath("$.[*].placementGrade").value(hasItem(DEFAULT_PLACEMENT_GRADE)));
+  }
+
+  @Test
+  @Transactional
+  public void getGradesWithQuery() throws Exception {
+    // Initialize the database
+    Grade unencodedGrade = new Grade()
+        .abbreviation(UNENCODED_ABBREVIATION)
+        .name(UNENCODED_NAME)
+        .label(UNENCODED_LABEL)
+        .trainingGrade(DEFAULT_TRAINING_GRADE)
+        .postGrade(DEFAULT_POST_GRADE)
+        .placementGrade(DEFAULT_PLACEMENT_GRADE);
+    gradeRepository.saveAndFlush(unencodedGrade);
+    
+    // Get grades given the codes
+    restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=Te%24t"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION)))
+    .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

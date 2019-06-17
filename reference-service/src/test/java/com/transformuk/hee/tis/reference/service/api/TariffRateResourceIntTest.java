@@ -45,18 +45,23 @@ public class TariffRateResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_GRADE_ABBREVIATION = "AAAAAAAAAA";
   private static final String UPDATED_GRADE_ABBREVIATION = "BBBBBBBBBB";
+  private static final String UNENCODED_GRADE_ABBREVIATION = "Te$t Grade";
 
   private static final String DEFAULT_TARIFF_RATE = "AAAAAAAAAA";
   private static final String UPDATED_TARIFF_RATE = "BBBBBBBBBB";
+  private static final String UNENCODED_TARIFF_RATE = "CCCCCCCCCC";
 
   private static final String DEFAULT_TARIFF_RATE_FRINGE = "AAAAAAAAAA";
   private static final String UPDATED_TARIFF_RATE_FRINGE = "BBBBBBBBBB";
+  private static final String UNENCODED_TARIFF_RATE_FRINGE = "BBBBBBBBBB";
 
   private static final String DEFAULT_TARIFF_RATE_LONDON = "AAAAAAAAAA";
   private static final String UPDATED_TARIFF_RATE_LONDON = "BBBBBBBBBB";
+  private static final String UNENCODED_TARIFF_RATE_LONDON = "BBBBBBBBBB";
 
   @Autowired
   private TariffRateRepository tariffRateRepository;
@@ -191,6 +196,30 @@ public class TariffRateResourceIntTest {
         .andExpect(jsonPath("$.[*].tariffRate").value(hasItem(DEFAULT_TARIFF_RATE.toString())))
         .andExpect(jsonPath("$.[*].tariffRateFringe").value(hasItem(DEFAULT_TARIFF_RATE_FRINGE.toString())))
         .andExpect(jsonPath("$.[*].tariffRateLondon").value(hasItem(DEFAULT_TARIFF_RATE_LONDON.toString())));
+  }
+  
+  @Test
+  @Transactional
+  public void getTariffRatesWithQuery() throws Exception {
+    // Initialize the database
+    TariffRate unencodedTariffRate = new TariffRate()
+        .code(UNENCODED_CODE)
+        .gradeAbbreviation(UNENCODED_GRADE_ABBREVIATION)
+        .tariffRate(UNENCODED_TARIFF_RATE)
+        .tariffRateFringe(UNENCODED_TARIFF_RATE_FRINGE)
+        .tariffRateLondon(UNENCODED_TARIFF_RATE_LONDON);
+    tariffRateRepository.saveAndFlush(unencodedTariffRate);
+    
+    // Get all the tariffRateList
+    restTariffRateMockMvc.perform(get("/api/tariff-rates?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedTariffRate.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].gradeAbbreviation").value(UNENCODED_GRADE_ABBREVIATION))
+    .andExpect(jsonPath("$.[*].tariffRate").value(UNENCODED_TARIFF_RATE))
+    .andExpect(jsonPath("$.[*].tariffRateFringe").value(UNENCODED_TARIFF_RATE_FRINGE))
+    .andExpect(jsonPath("$.[*].tariffRateLondon").value(UNENCODED_TARIFF_RATE_LONDON));
   }
 
   @Test

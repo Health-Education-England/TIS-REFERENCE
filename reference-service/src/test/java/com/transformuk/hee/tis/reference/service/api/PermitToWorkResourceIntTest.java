@@ -40,9 +40,11 @@ public class PermitToWorkResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Permit";
 
   @Autowired
   private PermitToWorkRepository permitToWorkRepository;
@@ -178,17 +180,35 @@ public class PermitToWorkResourceIntTest {
 
   @Test
   @Transactional
-  public void getAllPermitToWorkes() throws Exception {
+  public void getAllPermitToWorks() throws Exception {
     // Initialize the database
     permitToWorkRepository.saveAndFlush(permitToWork);
 
-    // Get all the maritalStatusList
+    // Get all the permitToWorkList
     restPermitToWorkMockMvc.perform(get("/api/permit-to-works?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(permitToWork.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getPermitToWorksWithQuery() throws Exception {
+    // Initialize the database
+    PermitToWork unencodedPermitToWork = new PermitToWork()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    permitToWorkRepository.saveAndFlush(unencodedPermitToWork);
+
+    // Get the permitToWorkList
+    restPermitToWorkMockMvc.perform(get("/api/permit-to-works?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

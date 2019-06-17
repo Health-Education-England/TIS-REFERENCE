@@ -45,9 +45,11 @@ public class FundingTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "BBBBBBBBBB";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Funding";
 
   @Autowired
   private FundingTypeRepository fundingTypeRepository;
@@ -192,6 +194,24 @@ public class FundingTypeResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(fundingType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+  }
+
+  @Test
+  @Transactional
+  public void getFundingTypesWithQuery() throws Exception {
+    // Initialize the database
+    FundingType unencodedFundingType = new FundingType()
+        .code(UNENCODED_CODE)
+        .label(UNENCODED_LABEL);
+    fundingTypeRepository.saveAndFlush(unencodedFundingType);
+
+    // Get all the fundingTypeList
+    restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedFundingType.getId().intValue()))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

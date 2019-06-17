@@ -8,7 +8,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServ
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -34,8 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,9 +57,12 @@ public class AssessmentTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "CCCCCCCCCC";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String UNENCODED_LABEL = "Te$t Assessment";
+  
   public static final String LOCATION_HEADER = "Location";
 
   @InjectMocks
@@ -123,8 +126,8 @@ public class AssessmentTypeResourceIntTest {
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.code").value(is(DEFAULT_CODE)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL)))
+        .andExpect(jsonPath("$.code").value(equalTo(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.label").value(equalTo(DEFAULT_LABEL)))
         .andExpect(header().string(LOCATION_HEADER, "/api/assessment-types/" + DEFAULT_CODE));
 
     verify(assessmentTypeRepositoryMock).save(assessmentType);
@@ -153,8 +156,8 @@ public class AssessmentTypeResourceIntTest {
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.code").value(is(DEFAULT_CODE)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL)));
+        .andExpect(jsonPath("$.code").value(equalTo(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.label").value(equalTo(DEFAULT_LABEL)));
 
     verify(assessmentTypeRepositoryMock).save(assessmentType);
   }
@@ -169,8 +172,8 @@ public class AssessmentTypeResourceIntTest {
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.code").value(is(DEFAULT_CODE)))
-        .andExpect(jsonPath("$.label").value(is(DEFAULT_LABEL)));
+        .andExpect(jsonPath("$.code").value(equalTo(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.label").value(equalTo(DEFAULT_LABEL)));
 
     verify(assessmentTypeRepositoryMock).save(assessmentType);
   }
@@ -209,6 +212,24 @@ public class AssessmentTypeResourceIntTest {
     Pageable captorValue = pageableArgumentCaptor.getValue();
     Sort expectedSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
     Assert.assertEquals(expectedSort, captorValue.getSort());
+  }
+
+  @Test
+  @Transactional
+  public void getAssessmentTypesForSearchQuery() throws Exception {
+    AssessmentType unencodedAssessmentType = new AssessmentType()
+        .name(UNENCODED_LABEL);
+    unencodedAssessmentType.setCode(UNENCODED_CODE);
+    
+    List<AssessmentType> allAssessmentTypes = Lists.newArrayList(unencodedAssessmentType);
+    Page<AssessmentType> pageResults = new PageImpl<>(allAssessmentTypes);
+    when(assessmentTypeServiceMock.advancedSearch(eq(UNENCODED_LABEL), any(), any())).thenReturn(pageResults);
+
+    testObjMockMvc.perform(get("/api/assessment-types?searchQuery=Te%24t%20Assessment&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

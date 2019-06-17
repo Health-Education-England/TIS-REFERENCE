@@ -7,7 +7,6 @@ import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
-import net.sf.cglib.core.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,17 +49,19 @@ public class LocalOfficeResourceIntTest {
   private static final String DEFAULT_ABBREVIATION = "AAAAAAAAAA";
   private static final String UPDATED_ABBREVIATION = "BBBBBBBBBB";
   private static final String SEARCH_LOCAL_OFFICE_ABBREVIATTION = "SEARCHLO";
+  private static final String UNENCODED_ABBREVIATION = "CCCCCCCCCC";
 
   private static final String DEFAULT_NAME = "AAAAAAAAAA";
   private static final String UPDATED_NAME = "BBBBBBBBBB";
   private static final String SEARCH_LOCAL_OFFICE_NAME = "SEARCHLO";
+  private static final String UNENCODED_NAME = "Te$t Local Office";
 
   private static final String HENE_NAME = "Health Education England North East";
   private static final String HENWL_NAME = "Health Education England North West London";
   private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
 
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
-  private static final String UPDATED_POST_ABBREVIATION = "BBB";
+  private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
   private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};
 
@@ -117,8 +118,8 @@ public class LocalOfficeResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
-		TestUtil.mockUserProfile("jamesh", "1-AIIDR8", "1-AIIDWA");
-		// jamesh has dbcs for North West London and Kent, Surrey & Sussex
+    // jamesh has dbcs for North West London and Kent, Surrey & Sussex
+    TestUtil.mockUserProfile("jamesh", "1-AIIDR8", "1-AIIDWA");
   }
 
   @Before
@@ -219,61 +220,78 @@ public class LocalOfficeResourceIntTest {
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
   }
 
-	@Test
-	@Transactional
-	public void getAllLocalOfficesUserAndCheckOnlyAllowedLOsAreReturned() throws Exception {
-	// Given
-  	// Create some variables for localOfficeRepository size comparison
-		int localOfficeRepositoryPreSize, localOfficeRepositoryPostSize;
-		// Find the initial size of the localOfficeRepository
-		localOfficeRepositoryPreSize = localOfficeRepository.findAll().size();
+  @Test
+  @Transactional
+  public void getLocalOfficesWithQuery() throws Exception {
+    // Initialize the database
+    LocalOffice unencodedLocalOffice = new LocalOffice()
+        .abbreviation(UNENCODED_ABBREVIATION)
+        .name(UNENCODED_NAME)
+        .postAbbreviation(UNENCODED_POST_ABBREVIATION);
+    localOfficeRepository.saveAndFlush(unencodedLocalOffice);
+    
+    // Get all the localOfficeList
+    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=Te%24t&sort=id,desc"))
+    .andExpect(status().isOk())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+    .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
+    .andExpect(jsonPath("$.[*].abbreviation").value(UNENCODED_ABBREVIATION))
+    .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME));
+  }
 
-		// Add the static localOffice object
-		localOfficeRepository.saveAndFlush(localOffice);
+  @Test
+  @Transactional
+  public void getAllLocalOfficesUserAndCheckOnlyAllowedLOsAreReturned() throws Exception {
+    // Given
+    // Create some variables for localOfficeRepository size comparison
+    int localOfficeRepositoryPreSize, localOfficeRepositoryPostSize;
+    // Find the initial size of the localOfficeRepository
+    localOfficeRepositoryPreSize = localOfficeRepository.findAll().size();
 
-		// Create some more localOffices - with real Codes etc
-		// Use counter to change abbreviation to satisfy check constraint on table
+    // Add the static localOffice object
+    localOfficeRepository.saveAndFlush(localOffice);
 
-		Integer count = 1;
-		for (String lo : localOfficeArray) {
-			LocalOffice localOfficeReal = new LocalOffice()
-					.abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
-					.name(lo)
+    // Create some more localOffices - with real Codes etc
+    // Use counter to change abbreviation to satisfy check constraint on table
+    Integer count = 1;
+    for (String lo : localOfficeArray) {
+      LocalOffice localOfficeReal = new LocalOffice()
+          .abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
+          .name(lo)
           .postAbbreviation(DEFAULT_POST_ABBREVIATION + count.toString());
-			localOfficeRepository.saveAndFlush(localOfficeReal);
-			count++;
-		}
+      localOfficeRepository.saveAndFlush(localOfficeReal);
+      count++;
+    }
 
-// Check the localRepository contains the expected values
-		assertThat(localOfficeRepository.findAll()).extracting("name").contains(HEKSS_NAME,HENE_NAME,HENWL_NAME,DEFAULT_NAME);
-		// Check that the localOfficeRepository now has 4 more rows
-		localOfficeRepositoryPostSize = localOfficeRepository.findAll().size();
-		assertThat(localOfficeRepositoryPostSize-localOfficeRepositoryPreSize == 4);
+    // Check the localRepository contains the expected values
+    assertThat(localOfficeRepository.findAll()).extracting("name").contains(HEKSS_NAME,HENE_NAME,HENWL_NAME,DEFAULT_NAME);
+    // Check that the localOfficeRepository now has 4 more rows
+    localOfficeRepositoryPostSize = localOfficeRepository.findAll().size();
+    assertThat(localOfficeRepositoryPostSize-localOfficeRepositoryPreSize == 4);
 
-// Get a valid ID that the user has access to from the localOfficeRepository
-		int testID = 0; // initialise it in case no local office is found
-		List<LocalOffice> allLocalOffices = localOfficeRepository.findAll();
-		for (LocalOffice lo : allLocalOffices) {
-			if (lo.getName().equals("Health Education England North West London")) {
-				testID = lo.getId().intValue();
-				break;
-			}
-		}
-		// When & Then
-		// Get the local offices
-		ResultActions resultActions = restLocalOfficeMockMvc.perform(get("/api/local-offices/user"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-				.andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
-				.andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA3")))
-				.andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA2")))
-				.andExpect(jsonPath("$.[*].name").value(hasItem(HEKSS_NAME)))
-				.andExpect(jsonPath("$.[*].name").value(hasItem(HENWL_NAME)))
-				.andExpect(jsonPath("$.[*].name").value(not(contains(HENE_NAME))))
-				.andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA3")))
-				.andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA2")))
-        ;
-	}
+    // Get a valid ID that the user has access to from the localOfficeRepository
+    int testID = 0; // initialise it in case no local office is found
+    List<LocalOffice> allLocalOffices = localOfficeRepository.findAll();
+    for (LocalOffice lo : allLocalOffices) {
+      if (lo.getName().equals("Health Education England North West London")) {
+        testID = lo.getId().intValue();
+        break;
+      }
+    }
+    // When & Then
+    // Get the local offices
+    ResultActions resultActions = restLocalOfficeMockMvc.perform(get("/api/local-offices/user"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA3")))
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA2")))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(HEKSS_NAME)))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(HENWL_NAME)))
+        .andExpect(jsonPath("$.[*].name").value(not(contains(HENE_NAME))))
+        .andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA3")))
+        .andExpect(jsonPath("$.[*].postAbbreviation").value(hasItem("AAA2")));
+  }
 
   @Test
   @Transactional
