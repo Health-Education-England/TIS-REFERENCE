@@ -7,7 +7,6 @@ import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
-import net.sf.cglib.core.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +61,6 @@ public class LocalOfficeResourceIntTest {
   private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
 
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
-  private static final String UPDATED_POST_ABBREVIATION = "BBB";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
   private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};

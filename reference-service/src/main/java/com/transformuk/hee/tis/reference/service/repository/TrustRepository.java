@@ -15,8 +15,7 @@ import java.util.Set;
 /**
  * Spring Data JPA repository for the Trust entity.
  */
-@SuppressWarnings("unused")
-public interface TrustRepository extends JpaRepository<Trust, Long>, JpaSpecificationExecutor {
+public interface TrustRepository extends JpaRepository<Trust, Long>, JpaSpecificationExecutor<Trust> {
 
   Trust findByCode(String code);
 

@@ -51,7 +51,7 @@ public class CurriculumSubTypeResourceIntTest {
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
-  private static final String UNENCODED_LABEL = "\"Test/Validation Curriculum\"";
+  private static final String UNENCODED_LABEL = "\"Te$t/Validation Curriculum\"";
 
   @Autowired
   private CurriculumSubTypeRepository curriculumSubTypeRepository;
@@ -271,7 +271,7 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=Test%2FVal"))
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=Te%24t%2FVal"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
