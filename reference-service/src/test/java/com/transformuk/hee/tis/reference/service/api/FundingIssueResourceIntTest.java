@@ -166,7 +166,7 @@ public class FundingIssueResourceIntTest {
     fundingIssueRepository.saveAndFlush(unencodedIssue);
 
     // Get all the fundingIssueList
-    restFundingIssueMockMvc.perform(get("/api/funding-issues?searchQuery=Te%24t&sort=id,desc"))
+    restFundingIssueMockMvc.perform(get("/api/funding-issues?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedIssue.getId().intValue()))

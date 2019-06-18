@@ -207,7 +207,7 @@ public class SettledResourceIntTest {
     settledRepository.saveAndFlush(unencodedSettled);
     
     // Get all the settledList
-    restSettledMockMvc.perform(get("/api/settleds?searchQuery=Te%24t&sort=id,desc"))
+    restSettledMockMvc.perform(get("/api/settleds?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedSettled.getId().intValue())))

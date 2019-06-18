@@ -207,7 +207,7 @@ public class SexualOrientationResourceIntTest {
     sexualOrientationRepository.saveAndFlush(unencodedSexualOrientation);
     
     // Get the sexualOrientationList
-    restSexualOrientationMockMvc.perform(get("/api/sexual-orientations?searchQuery=Te%24t&sort=id,desc"))
+    restSexualOrientationMockMvc.perform(get("/api/sexual-orientations?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedSexualOrientation.getId().intValue()))

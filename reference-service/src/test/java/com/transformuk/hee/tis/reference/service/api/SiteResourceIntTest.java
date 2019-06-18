@@ -234,7 +234,7 @@ public class SiteResourceIntTest {
     siteRepository.saveAndFlush(unencodedSite);
     
     // Get all the siteList
-    restSiteMockMvc.perform(get("/api/sites?searchQuery=Te%24t&sort=siteCode,asc"))
+    restSiteMockMvc.perform(get("/api/sites?searchQuery=\"Te%24t\"&sort=siteCode,asc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
@@ -533,7 +533,7 @@ public class SiteResourceIntTest {
     siteRepository.saveAndFlush(anotherSite);
 
 
-    restSiteMockMvc.perform(get("/api/sites?searchQuery=AAA"))
+    restSiteMockMvc.perform(get("/api/sites?searchQuery=\"AAA\""))
         .andExpect(status().isOk())
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(site.getSiteCode())))

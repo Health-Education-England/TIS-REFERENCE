@@ -247,7 +247,7 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=med"))
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=\"med\""))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItems(medicalCurriculum.getCode(), medicalSPR.getCode())))
@@ -271,7 +271,7 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=Te%24t%2FVal"))
+    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t%2FVal\""))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))

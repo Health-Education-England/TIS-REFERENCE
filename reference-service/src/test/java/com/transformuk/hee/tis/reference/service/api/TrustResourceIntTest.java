@@ -79,7 +79,7 @@ public class TrustResourceIntTest {
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
-  private static final String ENCODED_SEARCH_QUERY = "Guy's%20%26%20%24t%20T";
+  private static final String ENCODED_SEARCH_QUERY = "\"Guy's%20%26%20%24t%20T\"";
 
   @Autowired
   private TrustRepository trustRepository;

@@ -207,7 +207,7 @@ public class NationalityResourceIntTest {
     nationalityRepository.saveAndFlush(unencodedNationality);
 
     // Get all the nationalityList
-    restNationalityMockMvc.perform(get("/api/nationalities?searchQuery=Te%24t&sort=id,desc"))
+    restNationalityMockMvc.perform(get("/api/nationalities?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))

@@ -204,7 +204,7 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(unencodedQualificationType);
     
     // Get the qualificationTypeList
-    restQualificationTypeMockMvc.perform(get("/api/qualification-types?searchQuery=Te%24t&sort=id,desc"))
+    restQualificationTypeMockMvc.perform(get("/api/qualification-types?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedQualificationType.getId().intValue()))

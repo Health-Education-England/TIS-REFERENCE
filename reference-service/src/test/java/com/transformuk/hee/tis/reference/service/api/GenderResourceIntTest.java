@@ -207,7 +207,7 @@ public class GenderResourceIntTest {
     genderRepository.saveAndFlush(unencodedGender);
 
     // Get all the genderList
-    restGenderMockMvc.perform(get("/api/genders?searchQuery=Te%24t&sort=id,desc"))
+    restGenderMockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedGender.getId().intValue()))

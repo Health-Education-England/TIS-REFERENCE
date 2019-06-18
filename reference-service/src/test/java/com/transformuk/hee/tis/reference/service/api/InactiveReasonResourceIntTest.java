@@ -208,7 +208,7 @@ public class InactiveReasonResourceIntTest {
     inactiveReasonRepository.saveAndFlush(unencodedInactiveReason);
 
     // Get all the inactiveReasonList
-    restInactiveReasonMockMvc.perform(get("/api/inactive-reasons?searchQuery=Te%24t&sort=id,desc"))
+    restInactiveReasonMockMvc.perform(get("/api/inactive-reasons?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedInactiveReason.getId().intValue()))

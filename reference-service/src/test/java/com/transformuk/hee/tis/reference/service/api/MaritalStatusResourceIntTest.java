@@ -208,7 +208,7 @@ public class MaritalStatusResourceIntTest {
     maritalStatusRepository.saveAndFlush(unencodedMaritalStatus);
 
     // Get all the maritalStatusList
-    restMaritalStatusMockMvc.perform(get("/api/marital-statuses?searchQuery=Te%24t&sort=id,desc"))
+    restMaritalStatusMockMvc.perform(get("/api/marital-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedMaritalStatus.getId().intValue()))

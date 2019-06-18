@@ -213,7 +213,7 @@ public class RoleResourceIntTest {
       roleRepository.saveAndFlush(unencodedRole);
 
       // Get the roleList
-      restRoleMockMvc.perform(get("/api/roles?searchQuery=Te%24t&sort=id,desc"))
+      restRoleMockMvc.perform(get("/api/roles?searchQuery=\"Te%24t\"&sort=id,desc"))
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
       .andExpect(jsonPath("$.[*].id").value(unencodedRole.getId().intValue()))

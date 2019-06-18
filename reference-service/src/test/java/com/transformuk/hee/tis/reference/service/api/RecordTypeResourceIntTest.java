@@ -207,7 +207,7 @@ public class RecordTypeResourceIntTest {
     recordTypeRepository.saveAndFlush(unencodedRecordType);
 
     // Get all the recordTypeList
-    restRecordTypeMockMvc.perform(get("/api/record-types?searchQuery=Te%24t&sort=id,desc"))
+    restRecordTypeMockMvc.perform(get("/api/record-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedRecordType.getId().intValue()))

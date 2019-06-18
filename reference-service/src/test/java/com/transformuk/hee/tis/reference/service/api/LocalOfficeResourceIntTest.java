@@ -231,7 +231,7 @@ public class LocalOfficeResourceIntTest {
     localOfficeRepository.saveAndFlush(unencodedLocalOffice);
     
     // Get all the localOfficeList
-    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=Te%24t&sort=id,desc"))
+    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"Te%24t\"&sort=id,desc"))
     .andExpect(status().isOk())
     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
     .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
@@ -392,7 +392,7 @@ public class LocalOfficeResourceIntTest {
     localOfficeRepository.saveAndFlush(searchLO);
 
     // Get all the trustList
-    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=CHLO"))
+    restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"CHLO\""))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(SEARCH_LOCAL_OFFICE_ABBREVIATTION))
