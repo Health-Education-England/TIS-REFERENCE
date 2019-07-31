@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the ProgrammeMembershipType entity.
  */
 @SuppressWarnings("unused")
-public interface ProgrammeMembershipTypeRepository extends JpaRepository<ProgrammeMembershipType, Long>, JpaSpecificationExecutor {
+public interface ProgrammeMembershipTypeRepository extends
+    JpaRepository<ProgrammeMembershipType, Long>, JpaSpecificationExecutor {
 
 }

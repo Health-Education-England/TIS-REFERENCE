@@ -1,30 +1,24 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import com.google.common.base.Preconditions;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
-import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeService;
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
 @Service
 public class CurriculumSubTypeServiceImpl implements CurriculumSubTypeService {
@@ -43,7 +37,8 @@ public class CurriculumSubTypeServiceImpl implements CurriculumSubTypeService {
 
 
   @Transactional(readOnly = true)
-  public Page<CurriculumSubTypeDTO> advancedSearch(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<CurriculumSubTypeDTO> advancedSearch(String searchString,
+      List<ColumnFilter> columnFilters, Pageable pageable) {
 
     List<Specification<CurriculumSubType>> specs = new ArrayList<>();
     //add the text search criteria

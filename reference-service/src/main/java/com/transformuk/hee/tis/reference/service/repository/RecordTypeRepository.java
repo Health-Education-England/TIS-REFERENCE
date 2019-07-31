@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the RecordType entity.
  */
 @SuppressWarnings("unused")
-public interface RecordTypeRepository extends JpaRepository<RecordType, Long>, JpaSpecificationExecutor {
+public interface RecordTypeRepository extends JpaRepository<RecordType, Long>,
+    JpaSpecificationExecutor {
 
 }

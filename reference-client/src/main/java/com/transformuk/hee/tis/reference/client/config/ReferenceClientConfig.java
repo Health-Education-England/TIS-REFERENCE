@@ -12,9 +12,9 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Configuration class to define a rest template to be used by the Reference Client
  * <p>
- * This rest template is to only be used when a service needs to communicate with the reference service
- * on behalf of itself, where there is no interaction if a browser or end client.
- * e.g. during an ETL, some batch processing etc.
+ * This rest template is to only be used when a service needs to communicate with the reference
+ * service on behalf of itself, where there is no interaction if a browser or end client. e.g.
+ * during an ETL, some batch processing etc.
  * <p>
  */
 public class ReferenceClientConfig {
@@ -22,7 +22,8 @@ public class ReferenceClientConfig {
   /**
    * This rest template makes requests to other services for back end services such as ETLs
    * <p>
-   * It adds auth headers to the request before sending it. This one is used for all environments but production
+   * It adds auth headers to the request before sending it. This one is used for all environments
+   * but production
    *
    * @return
    */
@@ -37,13 +38,14 @@ public class ReferenceClientConfig {
    * @return
    */
   public RestTemplate prodReferenceRestTemplate(Keycloak keycloak) {
-    final KeycloakClientRequestFactory keycloakClientRequestFactory = new KeycloakClientRequestFactory(keycloak);
+    final KeycloakClientRequestFactory keycloakClientRequestFactory = new KeycloakClientRequestFactory(
+        keycloak);
     return new KeycloakRestTemplate(keycloakClientRequestFactory);
   }
 
   /**
-   * This rest template adds auth headers retrieved from the Spring security context. its for use in prod when making
-   * rest calls that were initiated by a browser
+   * This rest template adds auth headers retrieved from the Spring security context. its for use in
+   * prod when making rest calls that were initiated by a browser
    *
    * @return
    */
@@ -52,7 +54,8 @@ public class ReferenceClientConfig {
     return new RestTemplate(internalClientRequestFactory);
   }
 
-  private static class LocalClientRequestFactory extends HttpComponentsClientHttpRequestFactory implements ClientHttpRequestFactory {
+  private static class LocalClientRequestFactory extends
+      HttpComponentsClientHttpRequestFactory implements ClientHttpRequestFactory {
 
     private static final String TOKEN_HEADER = "OIDC_access_token";
     private static final String AUTH_TOKEN_HEADER = "Authorization";

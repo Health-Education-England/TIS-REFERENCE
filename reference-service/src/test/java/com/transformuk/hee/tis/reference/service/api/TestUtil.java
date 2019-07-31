@@ -1,39 +1,27 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.internal.util.collections.Sets.newSet;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.transformuk.hee.tis.security.model.AuthenticatedUser;
 import com.transformuk.hee.tis.security.model.UserProfile;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.internal.util.collections.Sets.newSet;
-
 /**
  * Utility class for testing REST controllers.
  */
 public class TestUtil {
-
-	public static void mockUserProfile(String userName, String... designatedBodyCodes) {
-		UserProfile userProfile = new UserProfile();
-		userProfile.setUserName(userName);
-		userProfile.setDesignatedBodyCodes(newSet(designatedBodyCodes));
-		AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToken", userProfile, null);
-		UsernamePasswordAuthenticationToken authenticationToken = new
-				UsernamePasswordAuthenticationToken(authenticatedUser, null);
-
-		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-	}
 
   /**
    * MediaType for JSON UTF8
@@ -41,6 +29,18 @@ public class TestUtil {
   public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
       MediaType.APPLICATION_JSON.getType(),
       MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+
+  public static void mockUserProfile(String userName, String... designatedBodyCodes) {
+    UserProfile userProfile = new UserProfile();
+    userProfile.setUserName(userName);
+    userProfile.setDesignatedBodyCodes(newSet(designatedBodyCodes));
+    AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToken", userProfile,
+        null);
+    UsernamePasswordAuthenticationToken authenticationToken = new
+        UsernamePasswordAuthenticationToken(authenticatedUser, null);
+
+    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+  }
 
   /**
    * Convert an object to JSON byte array.
@@ -62,11 +62,12 @@ public class TestUtil {
 
   /**
    * Convert an object to JSON string
+   *
    * @param object
    * @return the JSON String
    * @throws IOException
    */
-  public static String convertObjectToJson(Object object) throws IOException{
+  public static String convertObjectToJson(Object object) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(object);
   }
@@ -87,7 +88,8 @@ public class TestUtil {
   }
 
   /**
-   * Creates a matcher that matches when the examined string reprensents the same instant as the reference datetime
+   * Creates a matcher that matches when the examined string reprensents the same instant as the
+   * reference datetime
    *
    * @param date the reference datetime against which the examined string is checked
    */
@@ -114,7 +116,8 @@ public class TestUtil {
   }
 
   /**
-   * A matcher that tests that the examined string represents the same instant as the reference datetime.
+   * A matcher that tests that the examined string represents the same instant as the reference
+   * datetime.
    */
   public static class ZonedDateTimeMatcher extends TypeSafeDiagnosingMatcher<String> {
 

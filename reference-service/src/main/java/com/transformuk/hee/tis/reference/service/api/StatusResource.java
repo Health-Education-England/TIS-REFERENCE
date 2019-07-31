@@ -8,6 +8,12 @@ import com.transformuk.hee.tis.reference.service.repository.StatusRepository;
 import com.transformuk.hee.tis.reference.service.service.mapper.StatusMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +27,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Status.
@@ -51,16 +50,20 @@ public class StatusResource {
    * POST  /statuses : Create a new status.
    *
    * @param statusDTO the statusDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new statusDTO, or with status 400 (Bad Request) if the status has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new statusDTO, or with
+   * status 400 (Bad Request) if the status has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<StatusDTO> createStatus(@Valid @RequestBody StatusDTO statusDTO) throws URISyntaxException {
+  public ResponseEntity<StatusDTO> createStatus(@Valid @RequestBody StatusDTO statusDTO)
+      throws URISyntaxException {
     log.debug("REST request to save Status : {}", statusDTO);
     if (statusDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new status cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A new status cannot already have an ID"))
+          .body(null);
     }
     Status status = statusMapper.statusDTOToStatus(statusDTO);
     status = statusRepository.save(status);
@@ -74,15 +77,16 @@ public class StatusResource {
    * PUT  /statuses : Updates an existing status.
    *
    * @param statusDTO the statusDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated statusDTO,
-   * or with status 400 (Bad Request) if the statusDTO is not valid,
-   * or with status 500 (Internal Server Error) if the statusDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated statusDTO, or with
+   * status 400 (Bad Request) if the statusDTO is not valid, or with status 500 (Internal Server
+   * Error) if the statusDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<StatusDTO> updateStatus(@Valid @RequestBody StatusDTO statusDTO) throws URISyntaxException {
+  public ResponseEntity<StatusDTO> updateStatus(@Valid @RequestBody StatusDTO statusDTO)
+      throws URISyntaxException {
     log.debug("REST request to update Status : {}", statusDTO);
     if (statusDTO.getId() == null) {
       return createStatus(statusDTO);
@@ -112,7 +116,8 @@ public class StatusResource {
    * GET  /statuses/:id : get the "id" status.
    *
    * @param id the id of the statusDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the statusDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the statusDTO, or with status 404
+   * (Not Found)
    */
   @GetMapping("/statuses/{id}")
   @Timed
@@ -135,7 +140,8 @@ public class StatusResource {
   public ResponseEntity<Void> deleteStatus(@PathVariable Long id) {
     log.debug("REST request to delete Status : {}", id);
     statusRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
 
@@ -143,13 +149,15 @@ public class StatusResource {
    * POST  /bulk-statuses : Bulk create a new statuses.
    *
    * @param statusDTOS List of the statusDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new statusDTOS, or with status 400 (Bad Request) if the StatusDto has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new statusDTOS, or with
+   * status 400 (Bad Request) if the StatusDto has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<StatusDTO>> bulkCreateStatus(@Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
+  public ResponseEntity<List<StatusDTO>> bulkCreateStatus(
+      @Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save StatusDtos : {}", statusDTOS);
     if (!Collections.isEmpty(statusDTOS)) {
       List<Long> entityIds = statusDTOS.stream()
@@ -157,7 +165,9 @@ public class StatusResource {
           .map(statusDTO -> statusDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new statuses cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new statuses cannot already have an ID")).body(null);
       }
     }
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);
@@ -171,24 +181,30 @@ public class StatusResource {
    * PUT  /bulk-statuses : Updates an existing statuses.
    *
    * @param statusDTOS List of the statusDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated statusDTOS,
-   * or with status 400 (Bad Request) if the statusDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the statusDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated statusDTOS, or with
+   * status 400 (Bad Request) if the statusDTOS is not valid, or with status 500 (Internal Server
+   * Error) if the statusDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<StatusDTO>> bulkUpdateStatus(@Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
+  public ResponseEntity<List<StatusDTO>> bulkUpdateStatus(
+      @Valid @RequestBody List<StatusDTO> statusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update StatusDtos : {}", statusDTOS);
     if (Collections.isEmpty(statusDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(statusDTOS)) {
-      List<StatusDTO> entitiesWithNoId = statusDTOS.stream().filter(statusDTO -> statusDTO.getId() == null).collect(Collectors.toList());
+      List<StatusDTO> entitiesWithNoId = statusDTOS.stream()
+          .filter(statusDTO -> statusDTO.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
     List<Status> statuses = statusMapper.statusDTOsToStatuses(statusDTOS);

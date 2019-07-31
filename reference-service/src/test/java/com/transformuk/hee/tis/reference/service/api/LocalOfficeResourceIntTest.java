@@ -1,5 +1,17 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.IsNot.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +19,8 @@ import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,21 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the LocalOfficeResource REST controller.
@@ -63,39 +62,33 @@ public class LocalOfficeResourceIntTest {
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
-  private static String[] localOfficeArray = new String[]{HENE_NAME,HENWL_NAME,HEKSS_NAME};
-
-
+  private static String[] localOfficeArray = new String[]{HENE_NAME, HENWL_NAME, HEKSS_NAME};
+  LocalOffice searchLO = new LocalOffice()
+      .abbreviation("SEARCHLO")
+      .name("SEARCHLO")
+      .postAbbreviation("SEARCHLO");
   @Autowired
   private LocalOfficeRepository localOfficeRepository;
-
   @Autowired
   private SitesTrustsService sitesTrustsService;
-
   @Autowired
   private LocalOfficeMapper localOfficeMapper;
-
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
   @Autowired
   private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
   @Autowired
   private ExceptionTranslator exceptionTranslator;
-
   @Autowired
   private EntityManager em;
-
   private MockMvc restLocalOfficeMockMvc;
-
   private LocalOffice localOffice;
 
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static LocalOffice createEntity(EntityManager em) {
     LocalOffice localOffice = new LocalOffice()
@@ -105,15 +98,11 @@ public class LocalOfficeResourceIntTest {
     return localOffice;
   }
 
-  LocalOffice searchLO = new LocalOffice()
-      .abbreviation("SEARCHLO")
-      .name("SEARCHLO")
-      .postAbbreviation("SEARCHLO");
-
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeRepository, sitesTrustsService, localOfficeMapper);
+    LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeRepository,
+        sitesTrustsService, localOfficeMapper);
     this.restLocalOfficeMockMvc = MockMvcBuilders.standaloneSetup(localOfficeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -229,14 +218,14 @@ public class LocalOfficeResourceIntTest {
         .name(UNENCODED_NAME)
         .postAbbreviation(UNENCODED_POST_ABBREVIATION);
     localOfficeRepository.saveAndFlush(unencodedLocalOffice);
-    
+
     // Get all the localOfficeList
     restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
-    .andExpect(jsonPath("$.[*].abbreviation").value(UNENCODED_ABBREVIATION))
-    .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
+        .andExpect(jsonPath("$.[*].abbreviation").value(UNENCODED_ABBREVIATION))
+        .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME));
   }
 
   @Test
@@ -264,10 +253,11 @@ public class LocalOfficeResourceIntTest {
     }
 
     // Check the localRepository contains the expected values
-    assertThat(localOfficeRepository.findAll()).extracting("name").contains(HEKSS_NAME,HENE_NAME,HENWL_NAME,DEFAULT_NAME);
+    assertThat(localOfficeRepository.findAll()).extracting("name")
+        .contains(HEKSS_NAME, HENE_NAME, HENWL_NAME, DEFAULT_NAME);
     // Check that the localOfficeRepository now has 4 more rows
     localOfficeRepositoryPostSize = localOfficeRepository.findAll().size();
-    assertThat(localOfficeRepositoryPostSize-localOfficeRepositoryPreSize == 4);
+    assertThat(localOfficeRepositoryPostSize - localOfficeRepositoryPreSize == 4);
 
     // Get a valid ID that the user has access to from the localOfficeRepository
     int testID = 0; // initialise it in case no local office is found
@@ -328,7 +318,8 @@ public class LocalOfficeResourceIntTest {
     updatedLocalOffice
         .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME);
-    LocalOfficeDTO localOfficeDTO = localOfficeMapper.localOfficeToLocalOfficeDTO(updatedLocalOffice);
+    LocalOfficeDTO localOfficeDTO = localOfficeMapper
+        .localOfficeToLocalOfficeDTO(updatedLocalOffice);
 
     restLocalOfficeMockMvc.perform(put("/api/local-offices")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)

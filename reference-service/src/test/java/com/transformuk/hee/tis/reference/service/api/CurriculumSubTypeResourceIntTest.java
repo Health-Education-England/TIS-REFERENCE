@@ -1,5 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +18,8 @@ import com.transformuk.hee.tis.reference.service.model.CurriculumSubType;
 import com.transformuk.hee.tis.reference.service.repository.CurriculumSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.CurriculumSubTypeService;
 import com.transformuk.hee.tis.reference.service.service.mapper.CurriculumSubTypeMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,20 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the CurriculumSubTypeResource REST controller.
@@ -81,8 +80,8 @@ public class CurriculumSubTypeResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static CurriculumSubType createEntity(EntityManager em) {
     CurriculumSubType curriculumSubType = new CurriculumSubType()
@@ -94,7 +93,8 @@ public class CurriculumSubTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    CurriculumSubTypeResource curriculumSubTypeResource = new CurriculumSubTypeResource(curriculumSubTypeRepository, curriculumSubTypeMapper, curriculumSubTypeService);
+    CurriculumSubTypeResource curriculumSubTypeResource = new CurriculumSubTypeResource(
+        curriculumSubTypeRepository, curriculumSubTypeMapper, curriculumSubTypeService);
     this.restCurriculumSubTypeMockMvc = MockMvcBuilders.standaloneSetup(curriculumSubTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -112,7 +112,8 @@ public class CurriculumSubTypeResourceIntTest {
     int databaseSizeBeforeCreate = curriculumSubTypeRepository.findAll().size();
 
     // Create the CurriculumSubType
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
@@ -121,7 +122,8 @@ public class CurriculumSubTypeResourceIntTest {
     // Validate the CurriculumSubType in the database
     List<CurriculumSubType> curriculumSubTypeList = curriculumSubTypeRepository.findAll();
     assertThat(curriculumSubTypeList).hasSize(databaseSizeBeforeCreate + 1);
-    CurriculumSubType testCurriculumSubType = curriculumSubTypeList.get(curriculumSubTypeList.size() - 1);
+    CurriculumSubType testCurriculumSubType = curriculumSubTypeList
+        .get(curriculumSubTypeList.size() - 1);
     assertThat(testCurriculumSubType.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testCurriculumSubType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -133,7 +135,8 @@ public class CurriculumSubTypeResourceIntTest {
 
     // Create the CurriculumSubType with an existing ID
     curriculumSubType.setId(1L);
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
@@ -154,7 +157,8 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubType.setCode(null);
 
     // Create the CurriculumSubType, which fails.
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -173,7 +177,8 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubType.setLabel(null);
 
     // Create the CurriculumSubType, which fails.
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -206,7 +211,8 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubTypeRepository.saveAndFlush(curriculumSubType);
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types/{id}", curriculumSubType.getId()))
+    restCurriculumSubTypeMockMvc
+        .perform(get("/api/curriculum-sub-types/{id}", curriculumSubType.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
@@ -221,7 +227,8 @@ public class CurriculumSubTypeResourceIntTest {
     curriculumSubTypeRepository.saveAndFlush(curriculumSubType);
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types/code/{code}", curriculumSubType.getCode()))
+    restCurriculumSubTypeMockMvc
+        .perform(get("/api/curriculum-sub-types/code/{code}", curriculumSubType.getCode()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
@@ -242,7 +249,8 @@ public class CurriculumSubTypeResourceIntTest {
         .code("MEDICAL2")
         .label("Medical SpR - As defined by the GMC");
 
-    List<CurriculumSubType> curriculumSubTypes = Lists.newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
+    List<CurriculumSubType> curriculumSubTypes = Lists
+        .newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
     curriculumSubTypeRepository.save(curriculumSubTypes);
     curriculumSubTypeRepository.flush();
 
@@ -250,8 +258,10 @@ public class CurriculumSubTypeResourceIntTest {
     restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=\"med\""))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.[*].code").value(hasItems(medicalCurriculum.getCode(), medicalSPR.getCode())))
-        .andExpect(jsonPath("$.[*].label").value(hasItems(medicalCurriculum.getLabel(), medicalSPR.getLabel())));
+        .andExpect(jsonPath("$.[*].code")
+            .value(hasItems(medicalCurriculum.getCode(), medicalSPR.getCode())))
+        .andExpect(jsonPath("$.[*].label")
+            .value(hasItems(medicalCurriculum.getLabel(), medicalSPR.getLabel())));
   }
 
   @Test
@@ -266,16 +276,18 @@ public class CurriculumSubTypeResourceIntTest {
         .code(UNENCODED_CODE)
         .label(UNENCODED_LABEL);
 
-    List<CurriculumSubType> curriculumSubTypes = Lists.newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
+    List<CurriculumSubType> curriculumSubTypes = Lists
+        .newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
     curriculumSubTypeRepository.save(curriculumSubTypes);
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t%2FVal\""))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restCurriculumSubTypeMockMvc
+        .perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t%2FVal\""))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -294,11 +306,13 @@ public class CurriculumSubTypeResourceIntTest {
     int databaseSizeBeforeUpdate = curriculumSubTypeRepository.findAll().size();
 
     // Update the curriculumSubType
-    CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository.findOne(curriculumSubType.getId());
+    CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository
+        .findOne(curriculumSubType.getId());
     updatedCurriculumSubType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(updatedCurriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(updatedCurriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(put("/api/curriculum-sub-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -308,7 +322,8 @@ public class CurriculumSubTypeResourceIntTest {
     // Validate the CurriculumSubType in the database
     List<CurriculumSubType> curriculumSubTypeList = curriculumSubTypeRepository.findAll();
     assertThat(curriculumSubTypeList).hasSize(databaseSizeBeforeUpdate);
-    CurriculumSubType testCurriculumSubType = curriculumSubTypeList.get(curriculumSubTypeList.size() - 1);
+    CurriculumSubType testCurriculumSubType = curriculumSubTypeList
+        .get(curriculumSubTypeList.size() - 1);
     assertThat(testCurriculumSubType.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testCurriculumSubType.getLabel()).isEqualTo(UPDATED_LABEL);
   }
@@ -319,7 +334,8 @@ public class CurriculumSubTypeResourceIntTest {
     int databaseSizeBeforeUpdate = curriculumSubTypeRepository.findAll().size();
 
     // Create the CurriculumSubType
-    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper.curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
+    CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
+        .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restCurriculumSubTypeMockMvc.perform(put("/api/curriculum-sub-types")
@@ -340,8 +356,9 @@ public class CurriculumSubTypeResourceIntTest {
     int databaseSizeBeforeDelete = curriculumSubTypeRepository.findAll().size();
 
     // Get the curriculumSubType
-    restCurriculumSubTypeMockMvc.perform(delete("/api/curriculum-sub-types/{id}", curriculumSubType.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+    restCurriculumSubTypeMockMvc
+        .perform(delete("/api/curriculum-sub-types/{id}", curriculumSubType.getId())
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
     // Validate the database is empty

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the FundingType entity.
  */
 @SuppressWarnings("unused")
-public interface FundingTypeRepository extends JpaRepository<FundingType, Long>, JpaSpecificationExecutor {
+public interface FundingTypeRepository extends JpaRepository<FundingType, Long>,
+    JpaSpecificationExecutor {
 
 }

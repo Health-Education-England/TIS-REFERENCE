@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the ReligiousBelief entity.
  */
 @SuppressWarnings("unused")
-public interface ReligiousBeliefRepository extends JpaRepository<ReligiousBelief, Long>, JpaSpecificationExecutor {
+public interface ReligiousBeliefRepository extends JpaRepository<ReligiousBelief, Long>,
+    JpaSpecificationExecutor {
+
   ReligiousBelief findFirstByCode(String code);
 }

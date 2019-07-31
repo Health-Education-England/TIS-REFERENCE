@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.QualificationReference;
 import com.transformuk.hee.tis.reference.service.repository.QualificationReferenceRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.QualificationReferenceServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.QualificationReferenceMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the QualificationReferenceResource REST controller.
@@ -74,26 +78,28 @@ public class QualificationReferenceResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static QualificationReference createEntity(EntityManager em) {
     QualificationReference qualificationReference = new QualificationReference()
-            .code(DEFAULT_CODE)
-            .label(DEFAULT_LABEL);
+        .code(DEFAULT_CODE)
+        .label(DEFAULT_LABEL);
     return qualificationReference;
   }
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    QualificationReferenceResource qualificationReferenceResource = new QualificationReferenceResource(qualificationReferenceRepository,
-            qualificationReferenceMapper,
-            qualificationReferenceService);
-    this.restQualificationReferenceMockMvc = MockMvcBuilders.standaloneSetup(qualificationReferenceResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setMessageConverters(jacksonMessageConverter).build();
+    QualificationReferenceResource qualificationReferenceResource = new QualificationReferenceResource(
+        qualificationReferenceRepository,
+        qualificationReferenceMapper,
+        qualificationReferenceService);
+    this.restQualificationReferenceMockMvc = MockMvcBuilders
+        .standaloneSetup(qualificationReferenceResource)
+        .setCustomArgumentResolvers(pageableArgumentResolver)
+        .setControllerAdvice(exceptionTranslator)
+        .setMessageConverters(jacksonMessageConverter).build();
   }
 
   @Before
@@ -107,16 +113,19 @@ public class QualificationReferenceResourceIntTest {
     int databaseSizeBeforeCreate = qualificationReferenceRepository.findAll().size();
 
     // Create the QualificationReference
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(qualificationReference);
     restQualificationReferenceMockMvc.perform(post("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isCreated());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isCreated());
 
     // Validate the QualificationReference in the database
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeCreate + 1);
-    QualificationReference testQualificationReference = qualificationReferenceList.get(qualificationReferenceList.size() - 1);
+    QualificationReference testQualificationReference = qualificationReferenceList
+        .get(qualificationReferenceList.size() - 1);
     assertThat(testQualificationReference.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testQualificationReference.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -128,16 +137,18 @@ public class QualificationReferenceResourceIntTest {
 
     // Create the QualificationReference with an existing ID
     qualificationReference.setId(1L);
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(qualificationReference);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restQualificationReferenceMockMvc.perform(post("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isBadRequest());
 
     // Validate the Alice in the database
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeCreate);
   }
 
@@ -149,14 +160,16 @@ public class QualificationReferenceResourceIntTest {
     qualificationReference.setCode(null);
 
     // Create the QualificationReference, which fails.
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(qualificationReference);
 
     restQualificationReferenceMockMvc.perform(post("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isBadRequest());
 
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeTest);
   }
 
@@ -168,14 +181,16 @@ public class QualificationReferenceResourceIntTest {
     qualificationReference.setLabel(null);
 
     // Create the QualificationReference, which fails.
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(qualificationReference);
 
     restQualificationReferenceMockMvc.perform(post("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isBadRequest());
 
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeTest);
   }
 
@@ -187,13 +202,13 @@ public class QualificationReferenceResourceIntTest {
 
     // Get all the qualificationReferenceList
     restQualificationReferenceMockMvc.perform(get("/api/qualification-reference?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationReference.getId().intValue())))
-            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-            .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationReference.getId().intValue())))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
   }
-  
+
   @Test
   @Transactional
   public void getQualificationReferences() throws Exception {
@@ -202,14 +217,15 @@ public class QualificationReferenceResourceIntTest {
         .code(UNENCODED_CODE)
         .label(UNENCODED_LABEL);
     qualificationReferenceRepository.saveAndFlush(unencodedQualificationReference);
-    
+
     // Get the qualificationReferenceList
-    restQualificationReferenceMockMvc.perform(get("/api/qualification-reference?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedQualificationReference.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restQualificationReferenceMockMvc
+        .perform(get("/api/qualification-reference?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedQualificationReference.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -219,20 +235,22 @@ public class QualificationReferenceResourceIntTest {
     qualificationReferenceRepository.saveAndFlush(qualificationReference);
 
     // Get the qualificationReference
-    restQualificationReferenceMockMvc.perform(get("/api/qualification-reference/{id}", qualificationReference.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(qualificationReference.getId().intValue()))
-            .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-            .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+    restQualificationReferenceMockMvc
+        .perform(get("/api/qualification-reference/{id}", qualificationReference.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id").value(qualificationReference.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
   }
 
   @Test
   @Transactional
   public void getNonExistingQualificationReference() throws Exception {
     // Get the qualificationReference
-    restQualificationReferenceMockMvc.perform(get("/api/qualification-reference/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
+    restQualificationReferenceMockMvc
+        .perform(get("/api/qualification-reference/{id}", Long.MAX_VALUE))
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -243,21 +261,25 @@ public class QualificationReferenceResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationReferenceRepository.findAll().size();
 
     // Update the qualificationReference
-    QualificationReference updatedQualificationReference = qualificationReferenceRepository.findOne(qualificationReference.getId());
+    QualificationReference updatedQualificationReference = qualificationReferenceRepository
+        .findOne(qualificationReference.getId());
     updatedQualificationReference
-            .code(UPDATED_CODE)
-            .label(UPDATED_LABEL);
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(updatedQualificationReference);
+        .code(UPDATED_CODE)
+        .label(UPDATED_LABEL);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(updatedQualificationReference);
 
     restQualificationReferenceMockMvc.perform(put("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isOk());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isOk());
 
     // Validate the QualificationReference in the database
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeUpdate);
-    QualificationReference testQualificationReference = qualificationReferenceList.get(qualificationReferenceList.size() - 1);
+    QualificationReference testQualificationReference = qualificationReferenceList
+        .get(qualificationReferenceList.size() - 1);
     assertThat(testQualificationReference.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testQualificationReference.getLabel()).isEqualTo(UPDATED_LABEL);
   }
@@ -268,16 +290,18 @@ public class QualificationReferenceResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationReferenceRepository.findAll().size();
 
     // Create the QualificationReference
-    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper.qualificationReferenceToQualificationReferenceDTO(qualificationReference);
+    QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
+        .qualificationReferenceToQualificationReferenceDTO(qualificationReference);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restQualificationReferenceMockMvc.perform(put("/api/qualification-reference")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
-            .andExpect(status().isCreated());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationReferenceDTO)))
+        .andExpect(status().isCreated());
 
     // Validate the QualificationReference in the database
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeUpdate + 1);
   }
 
@@ -289,12 +313,14 @@ public class QualificationReferenceResourceIntTest {
     int databaseSizeBeforeDelete = qualificationReferenceRepository.findAll().size();
 
     // Get the QualificationReference
-    restQualificationReferenceMockMvc.perform(delete("/api/qualification-reference/{id}", qualificationReference.getId())
+    restQualificationReferenceMockMvc
+        .perform(delete("/api/qualification-reference/{id}", qualificationReference.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk());
+        .andExpect(status().isOk());
 
     // Validate the database is empty
-    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository.findAll();
+    List<QualificationReference> qualificationReferenceList = qualificationReferenceRepository
+        .findAll();
     assertThat(qualificationReferenceList).hasSize(databaseSizeBeforeDelete - 1);
   }
 

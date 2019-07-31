@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the CurriculumSubType entity.
  */
 @SuppressWarnings("unused")
-public interface CurriculumSubTypeRepository extends JpaRepository<CurriculumSubType, Long>, JpaSpecificationExecutor {
+public interface CurriculumSubTypeRepository extends JpaRepository<CurriculumSubType, Long>,
+    JpaSpecificationExecutor {
 
   CurriculumSubType findByCode(String code);
 }

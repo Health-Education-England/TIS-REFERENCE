@@ -1,7 +1,8 @@
 package com.transformuk.hee.tis.reference.service.model;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
-
+import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,8 +10,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * A Rotation.
@@ -49,17 +48,21 @@ public class Rotation implements Serializable {
     return code;
   }
 
+  public void setCode(String code) {
+    this.code = code;
+  }
+
   public Rotation code(String code) {
     this.code = code;
     return this;
   }
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
   public String getLabel() {
     return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public Rotation label(String label) {
@@ -67,21 +70,17 @@ public class Rotation implements Serializable {
     return this;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
   public String getLocalOffice() {
     return localOffice;
+  }
+
+  public void setLocalOffice(String localOffice) {
+    this.localOffice = localOffice;
   }
 
   public Rotation localOffice(String localOffice) {
     this.localOffice = localOffice;
     return this;
-  }
-
-  public void setLocalOffice(String localOffice) {
-    this.localOffice = localOffice;
   }
 
   public Status getStatus() {

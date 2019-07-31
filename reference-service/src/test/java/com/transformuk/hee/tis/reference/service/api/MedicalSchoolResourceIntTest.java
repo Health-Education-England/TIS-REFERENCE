@@ -1,5 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +16,8 @@ import com.transformuk.hee.tis.reference.service.model.MedicalSchool;
 import com.transformuk.hee.tis.reference.service.repository.MedicalSchoolRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.MedicalSchoolServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MedicalSchoolMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the MedicalSchoolResource REST controller.
@@ -79,8 +77,8 @@ public class MedicalSchoolResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static MedicalSchool createEntity(EntityManager em) {
     MedicalSchool medicalSchool = new MedicalSchool()
@@ -111,7 +109,8 @@ public class MedicalSchoolResourceIntTest {
     int databaseSizeBeforeCreate = medicalSchoolRepository.findAll().size();
 
     // Create the MedicalSchool
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(medicalSchool);
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
@@ -132,7 +131,8 @@ public class MedicalSchoolResourceIntTest {
 
     // Create the MedicalSchool with an existing ID
     medicalSchool.setId(1L);
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
@@ -153,7 +153,8 @@ public class MedicalSchoolResourceIntTest {
     medicalSchool.setCode(null);
 
     // Create the MedicalSchool, which fails.
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -172,7 +173,8 @@ public class MedicalSchoolResourceIntTest {
     medicalSchool.setLabel(null);
 
     // Create the MedicalSchool, which fails.
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -193,7 +195,8 @@ public class MedicalSchoolResourceIntTest {
     medicalSchoolRepository.saveAndFlush(unencodedMedicalSchool);
 
     // Get all the medicalSchoolList
-    restMedicalSchoolMockMvc.perform(get("/api/medical-schools?searchQuery=\"Te%24t\"&sort=id,desc"))
+    restMedicalSchoolMockMvc
+        .perform(get("/api/medical-schools?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedMedicalSchool.getId().intValue()))
@@ -236,7 +239,8 @@ public class MedicalSchoolResourceIntTest {
     updatedMedicalSchool
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(updatedMedicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(updatedMedicalSchool);
 
     restMedicalSchoolMockMvc.perform(put("/api/medical-schools")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -257,7 +261,8 @@ public class MedicalSchoolResourceIntTest {
     int databaseSizeBeforeUpdate = medicalSchoolRepository.findAll().size();
 
     // Create the MedicalSchool
-    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper.medicalSchoolToMedicalSchoolDTO(medicalSchool);
+    MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
+        .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restMedicalSchoolMockMvc.perform(put("/api/medical-schools")

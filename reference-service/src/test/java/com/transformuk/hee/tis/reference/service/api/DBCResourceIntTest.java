@@ -1,5 +1,17 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.IsNot.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -8,6 +20,9 @@ import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.DBCServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,22 +36,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.core.IsNot.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the DBCResource REST controller.
@@ -63,7 +62,7 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
-  private static String[] dbcArray = new String[]{HENE_DBC_CODE,HENWL_DBC_CODE,HEKSS_DBC_CODE};
+  private static String[] dbcArray = new String[]{HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
   private DBCRepository dBCRepository;
@@ -93,8 +92,8 @@ public class DBCResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static DBC createEntity() {
     DBC dBC = new DBC()
@@ -223,7 +222,7 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
         .andExpect(jsonPath("$.[*].abbr").value(hasItem(DEFAULT_ABBR.toString())));
   }
-  
+
   @Test
   @Transactional
   public void getDBCWithEncodedQuery() throws Exception {
@@ -238,12 +237,12 @@ public class DBCResourceIntTest {
 
     // Get all the dBCList
     restDBCMockMvc.perform(get("/api/dbcs?searchQuery=\"Te%24ting%20%26%20\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
-    .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
-    .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
-    .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
+        .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
+        .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
+        .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
   }
 
   @Test
@@ -349,12 +348,13 @@ public class DBCResourceIntTest {
           .dbc(dbc)
           .name(dbc)
           .abbr("AAA" + count.toString());
-        dBCRepository.saveAndFlush(dbcReal);
+      dBCRepository.saveAndFlush(dbcReal);
       count++;
     }
 
     // Check the dbcRepository contains the expected values
-    assertThat(dBCRepository.findAll()).extracting("dbc").contains(HEKSS_DBC_CODE,HENE_DBC_CODE,HEKSS_DBC_CODE);
+    assertThat(dBCRepository.findAll()).extracting("dbc")
+        .contains(HEKSS_DBC_CODE, HENE_DBC_CODE, HEKSS_DBC_CODE);
     // Check that the dbcRepository now has the correct number of additions
     dbcRepositorySize = dBCRepository.findAll().size();
     assertThat(dbcRepositorySize == 4);

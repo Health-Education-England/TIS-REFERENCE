@@ -1,5 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -8,6 +17,9 @@ import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,19 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the TrustResource REST controller.
@@ -109,8 +108,8 @@ public class TrustResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static Trust createEntity(EntityManager em) {
     Trust trust = new Trust()
@@ -128,7 +127,8 @@ public class TrustResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TrustResource trustResource = new TrustResource(trustRepository, trustMapper, sitesTrustsService, 100);
+    TrustResource trustResource = new TrustResource(trustRepository, trustMapper,
+        sitesTrustsService, 100);
     this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -240,7 +240,8 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.total").value(1))
         .andExpect(jsonPath("$.list[0].code").value("R1A"))
-        .andExpect(jsonPath("$.list[0].trustName").value("Worcestershire Health and Care NHS Trust"));
+        .andExpect(
+            jsonPath("$.list[0].trustName").value("Worcestershire Health and Care NHS Trust"));
   }
 
   @Test
@@ -379,21 +380,21 @@ public class TrustResourceIntTest {
 
     trustRepository.saveAndFlush(anotherTrust);
 
-     restTrustMockMvc.perform(get("/api/trusts")
-         .param("page", "0")
-         .param("size", "200")
-         .param("sort", "id,asc")
-         .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
-         .andExpect(status().isOk())
-         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
-         .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
-         .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
-         .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
-         .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
-         .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))
-         .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS))
-         .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE));
+    restTrustMockMvc.perform(get("/api/trusts")
+        .param("page", "0")
+        .param("size", "200")
+        .param("sort", "id,asc")
+        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
+        .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
+        .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
+        .andExpect(jsonPath("$.[*].trustKnownAs").value(DEFAULT_TRUST_KNOWN_AS))
+        .andExpect(jsonPath("$.[*].trustName").value(DEFAULT_TRUST_NAME))
+        .andExpect(jsonPath("$.[*].trustNumber").value(DEFAULT_TRUST_NUMBER))
+        .andExpect(jsonPath("$.[*].address").value(DEFAULT_ADDRESS))
+        .andExpect(jsonPath("$.[*].postCode").value(DEFAULT_POST_CODE));
   }
 
   @Test
@@ -419,10 +420,10 @@ public class TrustResourceIntTest {
         .param("size", "200")
         .param("sort", "trustKnownAs,asc")
         .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
-    //Verify field values
-      .andExpect(status().isOk())
-      .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-      .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
+        //Verify field values
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
   }
 
   @Test
@@ -438,18 +439,18 @@ public class TrustResourceIntTest {
         .postCode(UNENCODED_POST_CODE)
         .trustName(UNENCODED_TRUST_NAME)
         .trustNumber(UNENCODED_TRUST_NUMBER);
-    
+
     trustRepository.saveAndFlush(unencodedTrust);
-    
+
     //Search using URLEncoded characters
     restTrustMockMvc.perform(get("/api/current/trusts")
         .param("searchQuery", ENCODED_SEARCH_QUERY)
         .param("page", "0")
         .param("size", "200")
         .param("sort", "trustKnownAs,asc"))
-    //Verify field values
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
+        //Verify field values
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
   }
 }

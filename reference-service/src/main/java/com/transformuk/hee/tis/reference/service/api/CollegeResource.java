@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing College.
@@ -64,7 +63,8 @@ public class CollegeResource {
   @Autowired
   private CollegeServiceImpl collegeService;
 
-  public CollegeResource(CollegeRepository collegeRepository, CollegeMapper collegeMapper, CollegeServiceImpl collegeService) {
+  public CollegeResource(CollegeRepository collegeRepository, CollegeMapper collegeMapper,
+      CollegeServiceImpl collegeService) {
     this.collegeRepository = collegeRepository;
     this.collegeMapper = collegeMapper;
     this.collegeService = collegeService;
@@ -74,16 +74,20 @@ public class CollegeResource {
    * POST  /colleges : Create a new college.
    *
    * @param collegeDTO the collegeDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new collegeDTO, or with status 400 (Bad Request) if the college has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new collegeDTO, or with
+   * status 400 (Bad Request) if the college has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/colleges")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<CollegeDTO> createCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
+  public ResponseEntity<CollegeDTO> createCollege(@Valid @RequestBody CollegeDTO collegeDTO)
+      throws URISyntaxException {
     log.debug("REST request to save College : {}", collegeDTO);
     if (collegeDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new college cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A new college cannot already have an ID"))
+          .body(null);
     }
     College college = collegeMapper.collegeDTOToCollege(collegeDTO);
     college = collegeRepository.save(college);
@@ -97,15 +101,16 @@ public class CollegeResource {
    * PUT  /colleges : Updates an existing college.
    *
    * @param collegeDTO the collegeDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated collegeDTO,
-   * or with status 400 (Bad Request) if the collegeDTO is not valid,
-   * or with status 500 (Internal Server Error) if the collegeDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated collegeDTO, or with
+   * status 400 (Bad Request) if the collegeDTO is not valid, or with status 500 (Internal Server
+   * Error) if the collegeDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/colleges")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<CollegeDTO> updateCollege(@Valid @RequestBody CollegeDTO collegeDTO) throws URISyntaxException {
+  public ResponseEntity<CollegeDTO> updateCollege(@Valid @RequestBody CollegeDTO collegeDTO)
+      throws URISyntaxException {
     log.debug("REST request to update College : {}", collegeDTO);
     if (collegeDTO.getId() == null) {
       return createCollege(collegeDTO);
@@ -136,11 +141,14 @@ public class CollegeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of assessment types begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<College> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = collegeRepository.findAll(pageable);
@@ -156,7 +164,8 @@ public class CollegeResource {
    * GET  /colleges/:id : get the "id" college.
    *
    * @param id the id of the collegeDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the collegeDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the collegeDTO, or with status
+   * 404 (Not Found)
    */
   @GetMapping("/colleges/{id}")
   @Timed
@@ -179,20 +188,23 @@ public class CollegeResource {
   public ResponseEntity<Void> deleteCollege(@PathVariable Long id) {
     log.debug("REST request to delete College : {}", id);
     collegeRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
    * POST  /bulk-colleges : Bulk create a new colleges.
    *
    * @param collegeDTOS List of the collegeDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new collegeDTOS, or with status 400 (Bad Request) if the CollegeDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new collegeDTOS, or with
+   * status 400 (Bad Request) if the CollegeDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-colleges")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<CollegeDTO>> bulkCreateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
+  public ResponseEntity<List<CollegeDTO>> bulkCreateCollege(
+      @Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save CollegeDTOs : {}", collegeDTOS);
     if (!Collections.isEmpty(collegeDTOS)) {
       List<Long> entityIds = collegeDTOS.stream()
@@ -200,7 +212,9 @@ public class CollegeResource {
           .map(collegeDTO -> collegeDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new colleges cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new colleges cannot already have an ID")).body(null);
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
@@ -214,24 +228,30 @@ public class CollegeResource {
    * PUT  /bulk-colleges : Updates an existing curriculumSubType.
    *
    * @param collegeDTOS List of the collegeDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated collegeDTOS,
-   * or with status 400 (Bad Request) if the collegeDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the collegeDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated collegeDTOS, or with
+   * status 400 (Bad Request) if the collegeDTOS is not valid, or with status 500 (Internal Server
+   * Error) if the collegeDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-colleges")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<CollegeDTO>> bulkUpdateCollege(@Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
+  public ResponseEntity<List<CollegeDTO>> bulkUpdateCollege(
+      @Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update CollegeDTO : {}", collegeDTOS);
     if (Collections.isEmpty(collegeDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(collegeDTOS)) {
-      List<CollegeDTO> entitiesWithNoId = collegeDTOS.stream().filter(c -> c.getId() == null).collect(Collectors.toList());
+      List<CollegeDTO> entitiesWithNoId = collegeDTOS.stream().filter(c -> c.getId() == null)
+          .collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);

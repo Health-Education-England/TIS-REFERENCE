@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.PermitToWork;
 import com.transformuk.hee.tis.reference.service.repository.PermitToWorkRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.PermitToWorkServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.PermitToWorkMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the PermitToWorkResource REST controller.
@@ -74,8 +78,8 @@ public class PermitToWorkResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static PermitToWork createEntity(EntityManager em) {
     PermitToWork permitToWork = new PermitToWork()
@@ -87,8 +91,9 @@ public class PermitToWorkResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    PermitToWorkResource permitToWorkResource = new PermitToWorkResource(permitToWorkRepository, permitToWorkMapper,
-            permitToWorkService);
+    PermitToWorkResource permitToWorkResource = new PermitToWorkResource(permitToWorkRepository,
+        permitToWorkMapper,
+        permitToWorkService);
     this.restPermitToWorkMockMvc = MockMvcBuilders.standaloneSetup(permitToWorkResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -106,7 +111,8 @@ public class PermitToWorkResourceIntTest {
     int databaseSizeBeforeCreate = permitToWorkRepository.findAll().size();
 
     // Create the PermitToWork
-    PermitToWorkDTO permitToWorkDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
+    PermitToWorkDTO permitToWorkDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(permitToWork);
     restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(permitToWorkDTO)))
@@ -127,7 +133,8 @@ public class PermitToWorkResourceIntTest {
 
     // Create the PermitToWork with an existing ID
     permitToWork.setId(1L);
-    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
+    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(permitToWork);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
@@ -148,7 +155,8 @@ public class PermitToWorkResourceIntTest {
     permitToWork.setCode(null);
 
     // Create the PermitToWork, which fails.
-    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
+    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(permitToWork);
 
     restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -167,7 +175,8 @@ public class PermitToWorkResourceIntTest {
     permitToWork.setLabel(null);
 
     // Create the PermitToWork, which fails.
-    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
+    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(permitToWork);
 
     restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -204,11 +213,11 @@ public class PermitToWorkResourceIntTest {
 
     // Get the permitToWorkList
     restPermitToWorkMockMvc.perform(get("/api/permit-to-works?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -246,7 +255,8 @@ public class PermitToWorkResourceIntTest {
     updatedPermitToWork
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(updatedPermitToWork);
+    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(updatedPermitToWork);
 
     restPermitToWorkMockMvc.perform(put("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -267,7 +277,8 @@ public class PermitToWorkResourceIntTest {
     int databaseSizeBeforeUpdate = permitToWorkRepository.findAll().size();
 
     // Create the PermitToWork
-    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper.permitToWorkToPermitToWorkDTO(permitToWork);
+    PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
+        .permitToWorkToPermitToWorkDTO(permitToWork);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restPermitToWorkMockMvc.perform(put("/api/permit-to-works")

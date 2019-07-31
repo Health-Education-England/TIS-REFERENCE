@@ -1,10 +1,10 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 /**
  * A DTO for the RebaseJson entity.

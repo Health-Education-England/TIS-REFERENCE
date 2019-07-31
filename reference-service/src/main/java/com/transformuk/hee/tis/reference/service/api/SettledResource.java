@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Settled.
@@ -60,7 +59,8 @@ public class SettledResource {
   private final SettledMapper settledMapper;
   private final SettledServiceImpl settledService;
 
-  public SettledResource(SettledRepository settledRepository, SettledMapper settledMapper, SettledServiceImpl settledService) {
+  public SettledResource(SettledRepository settledRepository, SettledMapper settledMapper,
+      SettledServiceImpl settledService) {
     this.settledRepository = settledRepository;
     this.settledMapper = settledMapper;
     this.settledService = settledService;
@@ -70,16 +70,20 @@ public class SettledResource {
    * POST  /settleds : Create a new settled.
    *
    * @param settledDTO the settledDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new settledDTO, or with status 400 (Bad Request) if the settled has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new settledDTO, or with
+   * status 400 (Bad Request) if the settled has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/settleds")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<SettledDTO> createSettled(@Valid @RequestBody SettledDTO settledDTO) throws URISyntaxException {
+  public ResponseEntity<SettledDTO> createSettled(@Valid @RequestBody SettledDTO settledDTO)
+      throws URISyntaxException {
     log.debug("REST request to save Settled : {}", settledDTO);
     if (settledDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new settled cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A new settled cannot already have an ID"))
+          .body(null);
     }
     Settled settled = settledMapper.settledDTOToSettled(settledDTO);
     settled = settledRepository.save(settled);
@@ -93,15 +97,16 @@ public class SettledResource {
    * PUT  /settleds : Updates an existing settled.
    *
    * @param settledDTO the settledDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated settledDTO,
-   * or with status 400 (Bad Request) if the settledDTO is not valid,
-   * or with status 500 (Internal Server Error) if the settledDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated settledDTO, or with
+   * status 400 (Bad Request) if the settledDTO is not valid, or with status 500 (Internal Server
+   * Error) if the settledDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/settleds")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<SettledDTO> updateSettled(@Valid @RequestBody SettledDTO settledDTO) throws URISyntaxException {
+  public ResponseEntity<SettledDTO> updateSettled(@Valid @RequestBody SettledDTO settledDTO)
+      throws URISyntaxException {
     log.debug("REST request to update Settled : {}", settledDTO);
     if (settledDTO.getId() == null) {
       return createSettled(settledDTO);
@@ -132,11 +137,14 @@ public class SettledResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of settled begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Settled> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = settledRepository.findAll(pageable);
@@ -152,7 +160,8 @@ public class SettledResource {
    * GET  /settleds/:id : get the "id" settled.
    *
    * @param id the id of the settledDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the settledDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the settledDTO, or with status
+   * 404 (Not Found)
    */
   @GetMapping("/settleds/{id}")
   @Timed
@@ -175,7 +184,8 @@ public class SettledResource {
   public ResponseEntity<Void> deleteSettled(@PathVariable Long id) {
     log.debug("REST request to delete Settled : {}", id);
     settledRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
 
@@ -183,13 +193,15 @@ public class SettledResource {
    * POST  /bulk-settleds : Bulk create a new settleds.
    *
    * @param settledDTOS List of the settledDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new settledDTOS, or with status 400 (Bad Request) if the SettledDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new settledDTOS, or with
+   * status 400 (Bad Request) if the SettledDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-settleds")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<SettledDTO>> bulkCreateSettled(@Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
+  public ResponseEntity<List<SettledDTO>> bulkCreateSettled(
+      @Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save SettledDtos : {}", settledDTOS);
     if (!Collections.isEmpty(settledDTOS)) {
       List<Long> entityIds = settledDTOS.stream()
@@ -197,7 +209,9 @@ public class SettledResource {
           .map(settledDTO -> settledDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new settledList cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new settledList cannot already have an ID")).body(null);
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
@@ -211,24 +225,30 @@ public class SettledResource {
    * PUT  /bulk-settleds : Updates an existing settleds.
    *
    * @param settledDTOS List of the settledDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated settledDTOS,
-   * or with status 400 (Bad Request) if the settledDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the settledDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated settledDTOS, or with
+   * status 400 (Bad Request) if the settledDTOS is not valid, or with status 500 (Internal Server
+   * Error) if the settledDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-settleds")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<SettledDTO>> bulkUpdateSettled(@Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
+  public ResponseEntity<List<SettledDTO>> bulkUpdateSettled(
+      @Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update SettledDtos : {}", settledDTOS);
     if (Collections.isEmpty(settledDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(settledDTOS)) {
-      List<SettledDTO> entitiesWithNoId = settledDTOS.stream().filter(settledDTO -> settledDTO.getId() == null).collect(Collectors.toList());
+      List<SettledDTO> entitiesWithNoId = settledDTOS.stream()
+          .filter(settledDTO -> settledDTO.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);

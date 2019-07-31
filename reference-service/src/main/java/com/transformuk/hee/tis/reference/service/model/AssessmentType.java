@@ -4,15 +4,14 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
-
+import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * An Assessment type.
@@ -23,10 +22,12 @@ public class AssessmentType implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @NotNull(groups = {Update.class, Create.class}, message = "code is needed for both create and update")
+  @NotNull(groups = {Update.class,
+      Create.class}, message = "code is needed for both create and update")
   private String code;
 
-  @NotNull(groups = {Update.class, Create.class}, message = "label is needed for both create and update")
+  @NotNull(groups = {Update.class,
+      Create.class}, message = "label is needed for both create and update")
   private String label;
 
   @Enumerated(value = EnumType.STRING)

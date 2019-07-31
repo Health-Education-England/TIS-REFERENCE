@@ -1,27 +1,25 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
+
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SitesTrustsServiceTest {
@@ -75,7 +73,8 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrust() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
+    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT))
+        .willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, SEARCH_STRING);
@@ -87,7 +86,8 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
+    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT))
+        .willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
@@ -139,7 +139,8 @@ public class SitesTrustsServiceTest {
   public void shouldGetLocalOfficeWithGivenAbbreviation() {
     // given
     LocalOffice localOffice = new LocalOffice();
-    given(localOfficeRepository.findByAbbreviation(LOCAL_OFFICE_ABBREVIATION)).willReturn(localOffice);
+    given(localOfficeRepository.findByAbbreviation(LOCAL_OFFICE_ABBREVIATION))
+        .willReturn(localOffice);
 
     // when
     LocalOffice actualLocalOffice = service.getLocalOfficeByAbbreviation(LOCAL_OFFICE_ABBREVIATION);

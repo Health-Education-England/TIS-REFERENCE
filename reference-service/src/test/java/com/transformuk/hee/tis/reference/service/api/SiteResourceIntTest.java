@@ -1,5 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -8,6 +19,9 @@ import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.EntityManager;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,22 +36,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the SiteResource REST controller.
@@ -116,8 +114,8 @@ public class SiteResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static Site createEntity(EntityManager em) {
     Site site = new Site()
@@ -136,7 +134,8 @@ public class SiteResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService, 100);
+    SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService,
+        100);
     this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -214,9 +213,10 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)))
         .andExpect(jsonPath("$.[*].siteKnownAs").value(hasItem(DEFAULT_SITE_KNOWN_AS)))
         .andExpect(jsonPath("$.[*].siteNumber").value(hasItem(DEFAULT_SITE_NUMBER)))
-        .andExpect(jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
+        .andExpect(
+            jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
   }
-  
+
   @Test
   @Transactional
   public void getSitesWithQuery() throws Exception {
@@ -232,20 +232,20 @@ public class SiteResourceIntTest {
         .siteNumber(UNENCODED_SITE_NUMBER)
         .organisationalUnit(UNENCODED_ORGANISATIONAL_UNIT);
     siteRepository.saveAndFlush(unencodedSite);
-    
+
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites?searchQuery=\"Te%24t\"&sort=siteCode,asc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
-    .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE))
-    .andExpect(jsonPath("$.[*].trustCode").value(UNENCODED_TRUST_CODE))
-    .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME))
-    .andExpect(jsonPath("$.[*].address").value(UNENCODED_ADDRESS))
-    .andExpect(jsonPath("$.[*].postCode").value(UNENCODED_POST_CODE))
-    .andExpect(jsonPath("$.[*].siteKnownAs").value(UNENCODED_SITE_KNOWN_AS))
-    .andExpect(jsonPath("$.[*].siteNumber").value(UNENCODED_SITE_NUMBER))
-    .andExpect(jsonPath("$.[*].organisationalUnit").value(UNENCODED_ORGANISATIONAL_UNIT));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
+        .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE))
+        .andExpect(jsonPath("$.[*].trustCode").value(UNENCODED_TRUST_CODE))
+        .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME))
+        .andExpect(jsonPath("$.[*].address").value(UNENCODED_ADDRESS))
+        .andExpect(jsonPath("$.[*].postCode").value(UNENCODED_POST_CODE))
+        .andExpect(jsonPath("$.[*].siteKnownAs").value(UNENCODED_SITE_KNOWN_AS))
+        .andExpect(jsonPath("$.[*].siteNumber").value(UNENCODED_SITE_NUMBER))
+        .andExpect(jsonPath("$.[*].organisationalUnit").value(UNENCODED_ORGANISATIONAL_UNIT));
   }
 
   @Test
@@ -266,7 +266,8 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)))
         .andExpect(jsonPath("$.[*].siteKnownAs").value(hasItem(DEFAULT_SITE_KNOWN_AS)))
         .andExpect(jsonPath("$.[*].siteNumber").value(hasItem(DEFAULT_SITE_NUMBER)))
-        .andExpect(jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
+        .andExpect(
+            jsonPath("$.[*].organisationalUnit").value(hasItem(DEFAULT_ORGANISATIONAL_UNIT)));
   }
 
   @Test
@@ -531,7 +532,6 @@ public class SiteResourceIntTest {
         .siteNumber(UPDATED_SITE_NUMBER)
         .organisationalUnit(UPDATED_ORGANISATIONAL_UNIT);
     siteRepository.saveAndFlush(anotherSite);
-
 
     restSiteMockMvc.perform(get("/api/sites?searchQuery=\"AAA\""))
         .andExpect(status().isOk())

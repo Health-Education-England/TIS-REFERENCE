@@ -1,10 +1,25 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,22 +45,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * Test class for the AssessmentType REST controller.
  *
@@ -55,16 +54,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 public class AssessmentTypeResourceIntTest {
 
+  public static final String LOCATION_HEADER = "Location";
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
   private static final String UNENCODED_CODE = "CCCCCCCCCC";
-
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
   private static final String UNENCODED_LABEL = "Te$t Assessment";
-  
-  public static final String LOCATION_HEADER = "Location";
-
   @InjectMocks
   private AssessmentTypeResource testObj;
 
@@ -92,8 +88,8 @@ public class AssessmentTypeResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static AssessmentType createEntity() {
     AssessmentType assessmentType = new AssessmentType();
@@ -105,7 +101,8 @@ public class AssessmentTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    AssessmentTypeResource testObj = new AssessmentTypeResource(assessmentTypeRepositoryMock, assessmentTypeServiceMock);
+    AssessmentTypeResource testObj = new AssessmentTypeResource(assessmentTypeRepositoryMock,
+        assessmentTypeServiceMock);
     this.testObjMockMvc = MockMvcBuilders.standaloneSetup(testObj)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -164,7 +161,8 @@ public class AssessmentTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void updateAssessmentTypeShouldReturnCreateAssessmentTypeWhenItDoesntExist() throws Exception {
+  public void updateAssessmentTypeShouldReturnCreateAssessmentTypeWhenItDoesntExist()
+      throws Exception {
     when(assessmentTypeRepositoryMock.findOne(assessmentType.getCode())).thenReturn(null);
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(assessmentType);
 
@@ -201,7 +199,8 @@ public class AssessmentTypeResourceIntTest {
 
     List<AssessmentType> allAssessmentTypes = Lists.newArrayList(assessmentType1, assessmentType2);
     Page<AssessmentType> pageResults = new PageImpl<>(allAssessmentTypes);
-    when(assessmentTypeRepositoryMock.findAll(pageableArgumentCaptor.capture())).thenReturn(pageResults);
+    when(assessmentTypeRepositoryMock.findAll(pageableArgumentCaptor.capture()))
+        .thenReturn(pageResults);
 
     testObjMockMvc.perform(get("/api/assessment-types?sort=id,desc"))
         .andExpect(status().isOk())
@@ -220,16 +219,18 @@ public class AssessmentTypeResourceIntTest {
     AssessmentType unencodedAssessmentType = new AssessmentType()
         .name(UNENCODED_LABEL);
     unencodedAssessmentType.setCode(UNENCODED_CODE);
-    
+
     List<AssessmentType> allAssessmentTypes = Lists.newArrayList(unencodedAssessmentType);
     Page<AssessmentType> pageResults = new PageImpl<>(allAssessmentTypes);
-    when(assessmentTypeServiceMock.advancedSearch(eq(UNENCODED_LABEL), any(), any())).thenReturn(pageResults);
+    when(assessmentTypeServiceMock.advancedSearch(eq(UNENCODED_LABEL), any(), any()))
+        .thenReturn(pageResults);
 
-    testObjMockMvc.perform(get("/api/assessment-types?searchQuery=\"Te%24t%20Assessment\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    testObjMockMvc
+        .perform(get("/api/assessment-types?searchQuery=\"Te%24t%20Assessment\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test

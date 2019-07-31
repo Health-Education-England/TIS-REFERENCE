@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the Nationality entity.
  */
 @SuppressWarnings("unused")
-public interface NationalityRepository extends JpaRepository<Nationality, Long>, JpaSpecificationExecutor {
+public interface NationalityRepository extends JpaRepository<Nationality, Long>,
+    JpaSpecificationExecutor {
+
   Nationality findFirstByCountryNumber(String code);
 }

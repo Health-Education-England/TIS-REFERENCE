@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the TariffRate entity.
  */
 @SuppressWarnings("unused")
-public interface TariffRateRepository extends JpaRepository<TariffRate, Long>, JpaSpecificationExecutor {
+public interface TariffRateRepository extends JpaRepository<TariffRate, Long>,
+    JpaSpecificationExecutor {
 
 }

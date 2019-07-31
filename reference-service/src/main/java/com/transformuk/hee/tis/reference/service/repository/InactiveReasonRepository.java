@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the InactiveReason entity.
  */
 @SuppressWarnings("unused")
-public interface InactiveReasonRepository extends JpaRepository<InactiveReason, Long>, JpaSpecificationExecutor {
+public interface InactiveReasonRepository extends JpaRepository<InactiveReason, Long>,
+    JpaSpecificationExecutor {
 
 }

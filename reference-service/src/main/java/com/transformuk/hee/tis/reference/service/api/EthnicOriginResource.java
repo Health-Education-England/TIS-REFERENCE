@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing EthnicOrigin.
@@ -60,8 +59,9 @@ public class EthnicOriginResource {
   private final EthnicOriginMapper ethnicOriginMapper;
   private final EthnicOriginServiceImpl ethnicOriginService;
 
-  public EthnicOriginResource(EthnicOriginRepository ethnicOriginRepository, EthnicOriginMapper ethnicOriginMapper,
-                              EthnicOriginServiceImpl ethnicOriginService) {
+  public EthnicOriginResource(EthnicOriginRepository ethnicOriginRepository,
+      EthnicOriginMapper ethnicOriginMapper,
+      EthnicOriginServiceImpl ethnicOriginService) {
     this.ethnicOriginRepository = ethnicOriginRepository;
     this.ethnicOriginMapper = ethnicOriginMapper;
     this.ethnicOriginService = ethnicOriginService;
@@ -71,16 +71,20 @@ public class EthnicOriginResource {
    * POST  /ethnic-origins : Create a new ethnicOrigin.
    *
    * @param ethnicOriginDTO the ethnicOriginDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new ethnicOriginDTO, or with status 400 (Bad Request) if the ethnicOrigin has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new ethnicOriginDTO, or
+   * with status 400 (Bad Request) if the ethnicOrigin has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/ethnic-origins")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<EthnicOriginDTO> createEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
+  public ResponseEntity<EthnicOriginDTO> createEthnicOrigin(
+      @Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
     log.debug("REST request to save EthnicOrigin : {}", ethnicOriginDTO);
     if (ethnicOriginDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new ethnicOrigin cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists",
+              "A new ethnicOrigin cannot already have an ID")).body(null);
     }
     EthnicOrigin ethnicOrigin = ethnicOriginMapper.ethnicOriginDTOToEthnicOrigin(ethnicOriginDTO);
     ethnicOrigin = ethnicOriginRepository.save(ethnicOrigin);
@@ -94,15 +98,16 @@ public class EthnicOriginResource {
    * PUT  /ethnic-origins : Updates an existing ethnicOrigin.
    *
    * @param ethnicOriginDTO the ethnicOriginDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTO,
-   * or with status 400 (Bad Request) if the ethnicOriginDTO is not valid,
-   * or with status 500 (Internal Server Error) if the ethnicOriginDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTO, or
+   * with status 400 (Bad Request) if the ethnicOriginDTO is not valid, or with status 500 (Internal
+   * Server Error) if the ethnicOriginDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/ethnic-origins")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<EthnicOriginDTO> updateEthnicOrigin(@Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
+  public ResponseEntity<EthnicOriginDTO> updateEthnicOrigin(
+      @Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
     log.debug("REST request to update EthnicOrigin : {}", ethnicOriginDTO);
     if (ethnicOriginDTO.getId() == null) {
       return createEthnicOrigin(ethnicOriginDTO);
@@ -111,7 +116,8 @@ public class EthnicOriginResource {
     ethnicOrigin = ethnicOriginRepository.save(ethnicOrigin);
     EthnicOriginDTO result = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, ethnicOriginDTO.getId().toString()))
+        .headers(
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, ethnicOriginDTO.getId().toString()))
         .body(result);
   }
 
@@ -133,11 +139,14 @@ public class EthnicOriginResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of ethnic origins begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<EthnicOrigin> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = ethnicOriginRepository.findAll(pageable);
@@ -153,14 +162,16 @@ public class EthnicOriginResource {
    * GET  /ethnic-origins/:id : get the "id" ethnicOrigin.
    *
    * @param id the id of the ethnicOriginDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the ethnicOriginDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the ethnicOriginDTO, or with
+   * status 404 (Not Found)
    */
   @GetMapping("/ethnic-origins/{id}")
   @Timed
   public ResponseEntity<EthnicOriginDTO> getEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to get EthnicOrigin : {}", id);
     EthnicOrigin ethnicOrigin = ethnicOriginRepository.findOne(id);
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(ethnicOriginDTO));
   }
 
@@ -175,7 +186,7 @@ public class EthnicOriginResource {
   public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code) {
     log.debug("REST request to check EthnicOrigin exists : {}", code);
     EthnicOrigin ethnicOrigin = ethnicOriginRepository.findFirstByCode(code);
-    if(ethnicOrigin == null){
+    if (ethnicOrigin == null) {
       return new ResponseEntity<>(false, HttpStatus.OK);
     }
     return new ResponseEntity<>(true, HttpStatus.OK);
@@ -193,20 +204,23 @@ public class EthnicOriginResource {
   public ResponseEntity<Void> deleteEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to delete EthnicOrigin : {}", id);
     ethnicOriginRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
    * POST  /bulk-ethnic-origins : Bulk create a new ethnic-origins.
    *
    * @param ethnicOriginDTOS List of the ethnicOriginDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new ethnicOriginDTOS, or with status 400 (Bad Request) if the EthnicOriginDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new ethnicOriginDTOS, or
+   * with status 400 (Bad Request) if the EthnicOriginDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-ethnic-origins")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<EthnicOriginDTO>> bulkCreateEthnicOrigin(@Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
+  public ResponseEntity<List<EthnicOriginDTO>> bulkCreateEthnicOrigin(
+      @Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save EthnicOriginDtos : {}", ethnicOriginDTOS);
     if (!Collections.isEmpty(ethnicOriginDTOS)) {
       List<Long> entityIds = ethnicOriginDTOS.stream()
@@ -214,12 +228,16 @@ public class EthnicOriginResource {
           .map(ethnicOriginDTO -> ethnicOriginDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new ethnicOrigins cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new ethnicOrigins cannot already have an ID")).body(null);
       }
     }
-    List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
+    List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper
+        .ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
-    List<EthnicOriginDTO> result = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
+    List<EthnicOriginDTO> result = ethnicOriginMapper
+        .ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()
         .body(result);
   }
@@ -228,29 +246,37 @@ public class EthnicOriginResource {
    * PUT  /bulk-ethnic-origins : Updates an existing EthnicOrigin.
    *
    * @param ethnicOriginDTOS List of the ethnicOriginDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTOS,
-   * or with status 400 (Bad Request) if the ethnicOriginDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the ethnicOriginDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTOS, or
+   * with status 400 (Bad Request) if the ethnicOriginDTOS is not valid, or with status 500
+   * (Internal Server Error) if the ethnicOriginDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-ethnic-origins")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<EthnicOriginDTO>> bulkUpdateEthnicOrigin(@Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
+  public ResponseEntity<List<EthnicOriginDTO>> bulkUpdateEthnicOrigin(
+      @Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update EthnicOriginDTOs : {}", ethnicOriginDTOS);
     if (Collections.isEmpty(ethnicOriginDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(ethnicOriginDTOS)) {
-      List<EthnicOriginDTO> entitiesWithNoId = ethnicOriginDTOS.stream().filter(eo -> eo.getId() == null).collect(Collectors.toList());
+      List<EthnicOriginDTO> entitiesWithNoId = ethnicOriginDTOS.stream()
+          .filter(eo -> eo.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
-    List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper.ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
+    List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper
+        .ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
     ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
-    List<EthnicOriginDTO> results = ethnicOriginMapper.ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
+    List<EthnicOriginDTO> results = ethnicOriginMapper
+        .ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()
         .body(results);
   }

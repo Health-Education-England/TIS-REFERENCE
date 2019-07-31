@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface TitleRepository extends JpaRepository<Title, Long>, JpaSpecificationExecutor {
+
   Title findFirstByCode(String code);
 }

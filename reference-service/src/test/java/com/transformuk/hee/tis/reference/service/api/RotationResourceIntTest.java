@@ -1,5 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -8,6 +19,9 @@ import com.transformuk.hee.tis.reference.service.model.Rotation;
 import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.EntityManager;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,21 +36,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the RotationResource REST controller.
@@ -84,21 +83,11 @@ public class RotationResourceIntTest {
 
   private Rotation rotation;
 
-  @Before
-  public void setup() {
-    MockitoAnnotations.initMocks(this);
-    final RotationResource rotationResource = new RotationResource(rotationRepository, rotationMapper, rotationService);
-    this.restRotationMockMvc = MockMvcBuilders.standaloneSetup(rotationResource)
-        .setCustomArgumentResolvers(pageableArgumentResolver)
-        .setControllerAdvice(exceptionTranslator)
-        .setMessageConverters(jacksonMessageConverter).build();
-  }
-
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static Rotation createEntity(EntityManager em) {
     Rotation rotation = new Rotation()
@@ -106,6 +95,17 @@ public class RotationResourceIntTest {
         .label(DEFAULT_LABEL)
         .localOffice(DEFAULT_LOCAL_OFFICE);
     return rotation;
+  }
+
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    final RotationResource rotationResource = new RotationResource(rotationRepository,
+        rotationMapper, rotationService);
+    this.restRotationMockMvc = MockMvcBuilders.standaloneSetup(rotationResource)
+        .setCustomArgumentResolvers(pageableArgumentResolver)
+        .setControllerAdvice(exceptionTranslator)
+        .setMessageConverters(jacksonMessageConverter).build();
   }
 
   @Before
@@ -147,7 +147,7 @@ public class RotationResourceIntTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.message").value("error.validation"))
         .andExpect(jsonPath("$.fieldErrors[*].field").
-            value(containsInAnyOrder("code","label","localOffice")));
+            value(containsInAnyOrder("code", "label", "localOffice")));
   }
 
   @Test
@@ -163,7 +163,7 @@ public class RotationResourceIntTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.message").value("error.validation"))
         .andExpect(jsonPath("$.fieldErrors[*].field").
-            value(containsInAnyOrder("id", "code","label","localOffice")));
+            value(containsInAnyOrder("id", "code", "label", "localOffice")));
   }
 
   @Test
@@ -201,7 +201,7 @@ public class RotationResourceIntTest {
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE.toString())));
   }
-  
+
   @Test
   @Transactional
   public void getRotationsWithQuery() throws Exception {
@@ -211,20 +211,20 @@ public class RotationResourceIntTest {
         .label(UNENCODED_LABEL)
         .localOffice(UNENCODED_LOCAL_OFFICE);
     rotationRepository.saveAndFlush(unenodedRotation);
-    
+
     // Get the rotationList
     restRotationMockMvc.perform(get("/api/rotations?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unenodedRotation.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL))
-    .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unenodedRotation.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL))
+        .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE));
   }
 
   @Test
   @Transactional
-  public void shouldReturnTrueIfRotationExists() throws Exception{
+  public void shouldReturnTrueIfRotationExists() throws Exception {
     // Initialize the database
     rotationRepository.saveAndFlush(rotation);
     Map<String, Boolean> expectedMap = Maps.newHashMap(rotation.getLabel(), true);

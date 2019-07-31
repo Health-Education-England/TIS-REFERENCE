@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.repository.LeavingDestinationRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.LeavingDestinationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingDestinationMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the LeavingDestinationResource REST controller.
@@ -79,8 +78,8 @@ public class LeavingDestinationResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static LeavingDestination createEntity(EntityManager em) {
     LeavingDestination leavingDestination = new LeavingDestination()
@@ -111,7 +110,8 @@ public class LeavingDestinationResourceIntTest {
     int databaseSizeBeforeCreate = leavingDestinationRepository.findAll().size();
 
     // Create the LeavingDestination
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(leavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(leavingDestination);
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
@@ -120,7 +120,8 @@ public class LeavingDestinationResourceIntTest {
     // Validate the LeavingDestination in the database
     List<LeavingDestination> leavingDestinationList = leavingDestinationRepository.findAll();
     assertThat(leavingDestinationList).hasSize(databaseSizeBeforeCreate + 1);
-    LeavingDestination testLeavingDestination = leavingDestinationList.get(leavingDestinationList.size() - 1);
+    LeavingDestination testLeavingDestination = leavingDestinationList
+        .get(leavingDestinationList.size() - 1);
     assertThat(testLeavingDestination.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testLeavingDestination.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -132,7 +133,8 @@ public class LeavingDestinationResourceIntTest {
 
     // Create the LeavingDestination with an existing ID
     leavingDestination.setId(1L);
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(leavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
@@ -153,7 +155,8 @@ public class LeavingDestinationResourceIntTest {
     leavingDestination.setCode(null);
 
     // Create the LeavingDestination, which fails.
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(leavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -172,7 +175,8 @@ public class LeavingDestinationResourceIntTest {
     leavingDestination.setLabel(null);
 
     // Create the LeavingDestination, which fails.
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(leavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -197,6 +201,7 @@ public class LeavingDestinationResourceIntTest {
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
   }
+
   @Test
   @Transactional
   public void getLeavingDestinationsWithQuery() throws Exception {
@@ -207,12 +212,13 @@ public class LeavingDestinationResourceIntTest {
     leavingDestinationRepository.saveAndFlush(unencodedLeavingDestination);
 
     // Get all the leavingDestinationList
-    restLeavingDestinationMockMvc.perform(get("/api/leaving-destinations?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedLeavingDestination.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restLeavingDestinationMockMvc
+        .perform(get("/api/leaving-destinations?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedLeavingDestination.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -222,7 +228,8 @@ public class LeavingDestinationResourceIntTest {
     leavingDestinationRepository.saveAndFlush(leavingDestination);
 
     // Get the leavingDestination
-    restLeavingDestinationMockMvc.perform(get("/api/leaving-destinations/{id}", leavingDestination.getId()))
+    restLeavingDestinationMockMvc
+        .perform(get("/api/leaving-destinations/{id}", leavingDestination.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(leavingDestination.getId().intValue()))
@@ -246,11 +253,13 @@ public class LeavingDestinationResourceIntTest {
     int databaseSizeBeforeUpdate = leavingDestinationRepository.findAll().size();
 
     // Update the leavingDestination
-    LeavingDestination updatedLeavingDestination = leavingDestinationRepository.findOne(leavingDestination.getId());
+    LeavingDestination updatedLeavingDestination = leavingDestinationRepository
+        .findOne(leavingDestination.getId());
     updatedLeavingDestination
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(updatedLeavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(updatedLeavingDestination);
 
     restLeavingDestinationMockMvc.perform(put("/api/leaving-destinations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -260,7 +269,8 @@ public class LeavingDestinationResourceIntTest {
     // Validate the LeavingDestination in the database
     List<LeavingDestination> leavingDestinationList = leavingDestinationRepository.findAll();
     assertThat(leavingDestinationList).hasSize(databaseSizeBeforeUpdate);
-    LeavingDestination testLeavingDestination = leavingDestinationList.get(leavingDestinationList.size() - 1);
+    LeavingDestination testLeavingDestination = leavingDestinationList
+        .get(leavingDestinationList.size() - 1);
     assertThat(testLeavingDestination.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testLeavingDestination.getLabel()).isEqualTo(UPDATED_LABEL);
   }
@@ -271,7 +281,8 @@ public class LeavingDestinationResourceIntTest {
     int databaseSizeBeforeUpdate = leavingDestinationRepository.findAll().size();
 
     // Create the LeavingDestination
-    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper.leavingDestinationToLeavingDestinationDTO(leavingDestination);
+    LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
+        .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restLeavingDestinationMockMvc.perform(put("/api/leaving-destinations")
@@ -292,8 +303,9 @@ public class LeavingDestinationResourceIntTest {
     int databaseSizeBeforeDelete = leavingDestinationRepository.findAll().size();
 
     // Get the leavingDestination
-    restLeavingDestinationMockMvc.perform(delete("/api/leaving-destinations/{id}", leavingDestination.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+    restLeavingDestinationMockMvc
+        .perform(delete("/api/leaving-destinations/{id}", leavingDestination.getId())
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
     // Validate the database is empty

@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing GmcStatus.
@@ -61,7 +60,7 @@ public class GmcStatusResource {
   private final GmcStatusServiceImpl gmcStatusService;
 
   public GmcStatusResource(GmcStatusRepository gmcStatusRepository, GmcStatusMapper gmcStatusMapper,
-                           GmcStatusServiceImpl gmcStatusService) {
+      GmcStatusServiceImpl gmcStatusService) {
     this.gmcStatusRepository = gmcStatusRepository;
     this.gmcStatusMapper = gmcStatusMapper;
     this.gmcStatusService = gmcStatusService;
@@ -71,16 +70,20 @@ public class GmcStatusResource {
    * POST  /gmc-statuses : Create a new gmcStatus.
    *
    * @param gmcStatusDTO the gmcStatusDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new gmcStatusDTO, or with status 400 (Bad Request) if the gmcStatus has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new gmcStatusDTO, or
+   * with status 400 (Bad Request) if the gmcStatus has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/gmc-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GmcStatusDTO> createGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO) throws URISyntaxException {
+  public ResponseEntity<GmcStatusDTO> createGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO)
+      throws URISyntaxException {
     log.debug("REST request to save GmcStatus : {}", gmcStatusDTO);
     if (gmcStatusDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new gmcStatus cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A new gmcStatus cannot already have an ID"))
+          .body(null);
     }
     GmcStatus gmcStatus = gmcStatusMapper.gmcStatusDTOToGmcStatus(gmcStatusDTO);
     gmcStatus = gmcStatusRepository.save(gmcStatus);
@@ -94,15 +97,16 @@ public class GmcStatusResource {
    * PUT  /gmc-statuses : Updates an existing gmcStatus.
    *
    * @param gmcStatusDTO the gmcStatusDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTO,
-   * or with status 400 (Bad Request) if the gmcStatusDTO is not valid,
-   * or with status 500 (Internal Server Error) if the gmcStatusDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTO, or with
+   * status 400 (Bad Request) if the gmcStatusDTO is not valid, or with status 500 (Internal Server
+   * Error) if the gmcStatusDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/gmc-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GmcStatusDTO> updateGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO) throws URISyntaxException {
+  public ResponseEntity<GmcStatusDTO> updateGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO)
+      throws URISyntaxException {
     log.debug("REST request to update GmcStatus : {}", gmcStatusDTO);
     if (gmcStatusDTO.getId() == null) {
       return createGmcStatus(gmcStatusDTO);
@@ -133,11 +137,14 @@ public class GmcStatusResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of gmc statuses begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<GmcStatus> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = gmcStatusRepository.findAll(pageable);
@@ -153,7 +160,8 @@ public class GmcStatusResource {
    * GET  /gmc-statuses/:id : get the "id" gmcStatus.
    *
    * @param id the id of the gmcStatusDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the gmcStatusDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the gmcStatusDTO, or with status
+   * 404 (Not Found)
    */
   @GetMapping("/gmc-statuses/{id}")
   @Timed
@@ -175,7 +183,7 @@ public class GmcStatusResource {
   public ResponseEntity<Boolean> gmcStatusExists(@RequestBody String code) {
     log.debug("REST request to check GmcStatus exists : {}", code);
     GmcStatus gmcStatus = gmcStatusRepository.findFirstByCode(code);
-    if(gmcStatus == null){
+    if (gmcStatus == null) {
       return new ResponseEntity<>(false, HttpStatus.OK);
     }
     return new ResponseEntity<>(true, HttpStatus.OK);
@@ -193,20 +201,23 @@ public class GmcStatusResource {
   public ResponseEntity<Void> deleteGmcStatus(@PathVariable Long id) {
     log.debug("REST request to delete GmcStatus : {}", id);
     gmcStatusRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
    * POST  /bulk-gmc-statuses : Bulk create a new gmc-statuses.
    *
    * @param gmcStatusDTOS List of the gmcStatusDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new gmcStatusDTOS, or with status 400 (Bad Request) if the GmcStatusDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new gmcStatusDTOS, or
+   * with status 400 (Bad Request) if the GmcStatusDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-gmc-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<GmcStatusDTO>> bulkCreateGmcStatus(@Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
+  public ResponseEntity<List<GmcStatusDTO>> bulkCreateGmcStatus(
+      @Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save gmcstatus : {}", gmcStatusDTOS);
     if (!Collections.isEmpty(gmcStatusDTOS)) {
       List<Long> entityIds = gmcStatusDTOS.stream()
@@ -214,7 +225,9 @@ public class GmcStatusResource {
           .map(GmcStatusDTO::getId)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new gmcStatuses cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new gmcStatuses cannot already have an ID")).body(null);
       }
     }
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
@@ -228,24 +241,30 @@ public class GmcStatusResource {
    * PUT  /bulk-gmc-statuses : Updates an existing gmc-statuses.
    *
    * @param gmcStatusDTOS List of the gmcStatusDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTOS,
-   * or with status 400 (Bad Request) if the gmcStatusDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the gmcStatusDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTOS, or
+   * with status 400 (Bad Request) if the gmcStatusDTOS is not valid, or with status 500 (Internal
+   * Server Error) if the gmcStatusDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-gmc-statuses")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<GmcStatusDTO>> bulkUpdateGmcStatus(@Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
+  public ResponseEntity<List<GmcStatusDTO>> bulkUpdateGmcStatus(
+      @Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update GmcStatus : {}", gmcStatusDTOS);
     if (Collections.isEmpty(gmcStatusDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(gmcStatusDTOS)) {
-      List<GmcStatusDTO> entitiesWithNoId = gmcStatusDTOS.stream().filter(status -> status.getId() == null).collect(Collectors.toList());
+      List<GmcStatusDTO> entitiesWithNoId = gmcStatusDTOS.stream()
+          .filter(status -> status.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);

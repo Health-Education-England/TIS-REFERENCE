@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing FundingIssue.
@@ -60,8 +59,9 @@ public class FundingIssueResource {
   private final FundingIssueMapper fundingIssueMapper;
   private final FundingIssueServiceImpl fundingIssueService;
 
-  public FundingIssueResource(FundingIssueRepository fundingIssueRepository, FundingIssueMapper fundingIssueMapper,
-                              FundingIssueServiceImpl fundingIssueService) {
+  public FundingIssueResource(FundingIssueRepository fundingIssueRepository,
+      FundingIssueMapper fundingIssueMapper,
+      FundingIssueServiceImpl fundingIssueService) {
     this.fundingIssueRepository = fundingIssueRepository;
     this.fundingIssueMapper = fundingIssueMapper;
     this.fundingIssueService = fundingIssueService;
@@ -71,16 +71,20 @@ public class FundingIssueResource {
    * POST  /funding-issues : Create a new fundingIssue.
    *
    * @param fundingIssueDTO the fundingIssueDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new fundingIssueDTO, or with status 400 (Bad Request) if the fundingIssue has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new fundingIssueDTO, or
+   * with status 400 (Bad Request) if the fundingIssue has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/funding-issues")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<FundingIssueDTO> createFundingIssue(@Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
+  public ResponseEntity<FundingIssueDTO> createFundingIssue(
+      @Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
     log.debug("REST request to save FundingIssue : {}", fundingIssueDTO);
     if (fundingIssueDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new fundingIssue cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists",
+              "A new fundingIssue cannot already have an ID")).body(null);
     }
     FundingIssue fundingIssue = fundingIssueMapper.fundingIssueDTOToFundingIssue(fundingIssueDTO);
     fundingIssue = fundingIssueRepository.save(fundingIssue);
@@ -94,15 +98,16 @@ public class FundingIssueResource {
    * PUT  /funding-issues : Updates an existing fundingIssue.
    *
    * @param fundingIssueDTO the fundingIssueDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated fundingIssueDTO,
-   * or with status 400 (Bad Request) if the fundingIssueDTO is not valid,
-   * or with status 500 (Internal Server Error) if the fundingIssueDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated fundingIssueDTO, or
+   * with status 400 (Bad Request) if the fundingIssueDTO is not valid, or with status 500 (Internal
+   * Server Error) if the fundingIssueDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/funding-issues")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<FundingIssueDTO> updateFundingIssue(@Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
+  public ResponseEntity<FundingIssueDTO> updateFundingIssue(
+      @Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
     log.debug("REST request to update FundingIssue : {}", fundingIssueDTO);
     if (fundingIssueDTO.getId() == null) {
       return createFundingIssue(fundingIssueDTO);
@@ -111,7 +116,8 @@ public class FundingIssueResource {
     fundingIssue = fundingIssueRepository.save(fundingIssue);
     FundingIssueDTO result = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, fundingIssueDTO.getId().toString()))
+        .headers(
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, fundingIssueDTO.getId().toString()))
         .body(result);
   }
 
@@ -132,11 +138,14 @@ public class FundingIssueResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of countries begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<FundingIssue> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = fundingIssueRepository.findAll(pageable);
@@ -152,14 +161,16 @@ public class FundingIssueResource {
    * GET  /funding-issues/:id : get the "id" fundingIssue.
    *
    * @param id the id of the fundingIssueDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the fundingIssueDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the fundingIssueDTO, or with
+   * status 404 (Not Found)
    */
   @GetMapping("/funding-issues/{id}")
   @Timed
   public ResponseEntity<FundingIssueDTO> getFundingIssue(@PathVariable Long id) {
     log.debug("REST request to get FundingIssue : {}", id);
     FundingIssue fundingIssue = fundingIssueRepository.findOne(id);
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(fundingIssue);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingIssueDTO));
   }
 
@@ -175,20 +186,23 @@ public class FundingIssueResource {
   public ResponseEntity<Void> deleteFundingIssue(@PathVariable Long id) {
     log.debug("REST request to delete FundingIssue : {}", id);
     fundingIssueRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
    * POST  /bulk-funding-issues : Bulk create a new funding-issues.
    *
    * @param fundingIssueDTOS List of the fundingIssueDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new fundingIssueDTOS, or with status 400 (Bad Request) if the FundingIssueDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new fundingIssueDTOS, or
+   * with status 400 (Bad Request) if the FundingIssueDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-funding-issues")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<FundingIssueDTO>> bulkCreateFundingIssue(@Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
+  public ResponseEntity<List<FundingIssueDTO>> bulkCreateFundingIssue(
+      @Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save FundingIssueDTO : {}", fundingIssueDTOS);
     if (!Collections.isEmpty(fundingIssueDTOS)) {
       List<Long> entityIds = fundingIssueDTOS.stream()
@@ -196,12 +210,16 @@ public class FundingIssueResource {
           .map(fi -> fi.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new assessmentTypes cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new assessmentTypes cannot already have an ID")).body(null);
       }
     }
-    List<FundingIssue> fundingIssues = fundingIssueMapper.fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
+    List<FundingIssue> fundingIssues = fundingIssueMapper
+        .fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
     fundingIssues = fundingIssueRepository.save(fundingIssues);
-    List<FundingIssueDTO> result = fundingIssueMapper.fundingIssuesToFundingIssueDTOs(fundingIssues);
+    List<FundingIssueDTO> result = fundingIssueMapper
+        .fundingIssuesToFundingIssueDTOs(fundingIssues);
     return ResponseEntity.ok()
         .body(result);
   }
@@ -210,29 +228,37 @@ public class FundingIssueResource {
    * PUT  /bulk-funding-issues : Updates an existing FundingIssue.
    *
    * @param fundingIssueDTOS List of the fundingIssueDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated fundingIssueDTOS,
-   * or with status 400 (Bad Request) if the fundingIssueDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the fundingIssueDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated fundingIssueDTOS, or
+   * with status 400 (Bad Request) if the fundingIssueDTOS is not valid, or with status 500
+   * (Internal Server Error) if the fundingIssueDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-funding-issues")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<FundingIssueDTO>> bulkUpdateFundingIssue(@Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
+  public ResponseEntity<List<FundingIssueDTO>> bulkUpdateFundingIssue(
+      @Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update FundingIssues : {}", fundingIssueDTOS);
     if (Collections.isEmpty(fundingIssueDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(fundingIssueDTOS)) {
-      List<FundingIssueDTO> entitiesWithNoId = fundingIssueDTOS.stream().filter(fi -> fi.getId() == null).collect(Collectors.toList());
+      List<FundingIssueDTO> entitiesWithNoId = fundingIssueDTOS.stream()
+          .filter(fi -> fi.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
-    List<FundingIssue> fundingIssues = fundingIssueMapper.fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
+    List<FundingIssue> fundingIssues = fundingIssueMapper
+        .fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
     fundingIssues = fundingIssueRepository.save(fundingIssues);
-    List<FundingIssueDTO> results = fundingIssueMapper.fundingIssuesToFundingIssueDTOs(fundingIssues);
+    List<FundingIssueDTO> results = fundingIssueMapper
+        .fundingIssuesToFundingIssueDTOs(fundingIssues);
     return ResponseEntity.ok()
         .body(results);
   }

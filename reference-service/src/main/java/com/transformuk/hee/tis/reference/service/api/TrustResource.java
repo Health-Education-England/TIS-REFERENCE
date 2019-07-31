@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,6 +23,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,23 +55,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import uk.nhs.tis.StringConverter;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * REST controller for managing Trust.
@@ -74,8 +72,9 @@ public class TrustResource {
 
   private final int limit;
 
-  public TrustResource(TrustRepository trustRepository, TrustMapper trustMapper, SitesTrustsService sitesTrustsService,
-                       @Value("${search.result.limit:100}") int limit) {
+  public TrustResource(TrustRepository trustRepository, TrustMapper trustMapper,
+      SitesTrustsService sitesTrustsService,
+      @Value("${search.result.limit:100}") int limit) {
     this.trustRepository = trustRepository;
     this.trustMapper = trustMapper;
     this.sitesTrustsService = sitesTrustsService;
@@ -86,16 +85,20 @@ public class TrustResource {
    * POST  /trusts : Create a new trust.
    *
    * @param trustDTO the trustDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new trustDTO, or with status 400 (Bad Request) if the trust has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new trustDTO, or with
+   * status 400 (Bad Request) if the trust has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/trusts")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO) throws URISyntaxException {
+  public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO)
+      throws URISyntaxException {
     log.debug("REST request to save Trust : {}", trustDTO);
     if (trustDTO.getId() != null && trustRepository.findOne(trustDTO.getId()) != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that Code")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that Code"))
+          .body(null);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
     trust = trustRepository.save(trust);
@@ -109,15 +112,16 @@ public class TrustResource {
    * PUT  /trusts : Updates an existing trust.
    *
    * @param trustDTO the trustDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTO,
-   * or with status 400 (Bad Request) if the trustDTO is not valid,
-   * or with status 500 (Internal Server Error) if the trustDTO couldn't be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTO, or with
+   * status 400 (Bad Request) if the trustDTO is not valid, or with status 500 (Internal Server
+   * Error) if the trustDTO couldn't be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/trusts")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<TrustDTO> updateTrust(@RequestBody TrustDTO trustDTO) throws URISyntaxException {
+  public ResponseEntity<TrustDTO> updateTrust(@RequestBody TrustDTO trustDTO)
+      throws URISyntaxException {
     log.debug("REST request to update Trust : {}", trustDTO);
     if (trustDTO.getId() == null) {
       return createTrust(trustDTO);
@@ -143,22 +147,26 @@ public class TrustResource {
       @ApiParam Pageable pageable,
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
     }
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Trust> page;
     if (StringUtils.isEmpty(columnFilterJson)) {
       page = trustRepository.findAll(pageable);
     } else {
-      page = sitesTrustsService.advanceSearchTrust(searchQuery,columnFilters, pageable);
+      page = sitesTrustsService.advanceSearchTrust(searchQuery, columnFilters, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
-    return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers,
+        HttpStatus.OK);
   }
 
   /**
@@ -175,7 +183,8 @@ public class TrustResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Trusts");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     Page<Trust> page;
     if (StringUtils.isEmpty(searchQuery)) {
       Trust trust = new Trust().status(Status.CURRENT);
@@ -184,15 +193,16 @@ public class TrustResource {
       page = sitesTrustsService.searchTrusts(searchQuery, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/trusts");
-    return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(trustMapper.trustsToTrustDTOs(page.getContent()), headers,
+        HttpStatus.OK);
   }
 
   /**
-   * GET  /trusts/in/:codes : get trusts given to codes.
-   * Ignores malformed or not found trusts
+   * GET  /trusts/in/:codes : get trusts given to codes. Ignores malformed or not found trusts
    *
    * @param codes the codes to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty
+   * list
    */
   @GetMapping("/trusts/in/{codes}")
   @Timed
@@ -217,11 +227,11 @@ public class TrustResource {
   }
 
   /**
-   * GET  /trusts/ids/in : get trusts given to ids.
-   * Ignores malformed or not found trusts
+   * GET  /trusts/ids/in : get trusts given to ids. Ignores malformed or not found trusts
    *
    * @param ids the ids to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty
+   * list
    */
   @ApiOperation("Get a list of trusts by id")
   @GetMapping("/trusts/ids/in")
@@ -235,7 +245,8 @@ public class TrustResource {
     } else {
       List<Trust> trusts = trustRepository.findAll(ids);
       resp = trustMapper.trustsToTrustDTOs(trusts);
-      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+      return new ResponseEntity<>(resp,
+          CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
   }
 
@@ -245,8 +256,10 @@ public class TrustResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Trusts list", response = LimitedListResponse.class)})
   @RequestMapping(method = GET, value = "/trusts/search")
-  public LimitedListResponse<TrustDTO> searchTrusts(@RequestParam(value = "searchString") String searchString) {
-    List<TrustDTO> ret = trustMapper.trustsToTrustDTOs(sitesTrustsService.searchTrusts(searchString));
+  public LimitedListResponse<TrustDTO> searchTrusts(
+      @RequestParam(value = "searchString") String searchString) {
+    List<TrustDTO> ret = trustMapper
+        .trustsToTrustDTOs(sitesTrustsService.searchTrusts(searchString));
     return new LimitedListResponse<>(ret, limit);
   }
 
@@ -254,7 +267,8 @@ public class TrustResource {
    * GET  /trusts/:id : get trust by id.
    *
    * @param id the code of the trustDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404
+   * (Not Found)
    */
   @GetMapping("/trusts/{id}")
   @Timed
@@ -269,7 +283,8 @@ public class TrustResource {
    * GET  /trusts/code/:code : get the "code" trust.
    *
    * @param code the code of the trustDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404
+   * (Not Found)
    */
   @GetMapping("/trusts/code/{code}")
   @Timed
@@ -284,13 +299,15 @@ public class TrustResource {
    * POST  /bulk-trusts : Create a new trust.
    *
    * @param trustDTOs the trustDTOs to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new trustDTOs, or with status 400 (Bad Request) if the trust has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new trustDTOs, or with
+   * status 400 (Bad Request) if the trust has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-trusts")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<TrustDTO>> bulkCreateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
+  public ResponseEntity<List<TrustDTO>> bulkCreateTrust(
+      @Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
     log.info("REST request to bulk save Trust : {}", trustDTOs);
     if (!Collections.isEmpty(trustDTOs)) {
       List<String> entityIds = trustDTOs.stream()
@@ -298,7 +315,9 @@ public class TrustResource {
           .map(TrustDTO::getCode)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new Trust cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new Trust cannot already have an ID")).body(null);
       }
     }
     List<Trust> trusts = trustMapper.trustDTOsToTrusts(trustDTOs);
@@ -312,24 +331,30 @@ public class TrustResource {
    * PUT  /bulk-trusts : Updates an existing trust.
    *
    * @param trustDTOs the trustDTOs to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTOs,
-   * or with status 400 (Bad Request) if the trustDTOs is not valid,
-   * or with status 500 (Internal Server Error) if the trustDTOs couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTOs, or with
+   * status 400 (Bad Request) if the trustDTOs is not valid, or with status 500 (Internal Server
+   * Error) if the trustDTOs couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-trusts")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<TrustDTO>> bulkUpdateTrust(@Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
+  public ResponseEntity<List<TrustDTO>> bulkUpdateTrust(
+      @Valid @RequestBody List<TrustDTO> trustDTOs) throws URISyntaxException {
     log.info("REST request to update Trust : {}", trustDTOs);
     if (Collections.isEmpty(trustDTOs)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(trustDTOs)) {
-      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null).collect(Collectors.toList());
+      List<TrustDTO> entitiesWithNoId = trustDTOs.stream().filter(trust -> trust.getId() == null)
+          .collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
 
@@ -375,7 +400,8 @@ public class TrustResource {
     Map<Long, Boolean> trustExistsMap = Maps.newHashMap();
     log.debug("REST request to check Trust exists : {}", ids);
     if (!CollectionUtils.isEmpty(ids)) {
-      Set<Long> dbIds = trustRepository.findAll(ids).stream().map(Trust::getId).collect(Collectors.toSet());
+      Set<Long> dbIds = trustRepository.findAll(ids).stream().map(Trust::getId)
+          .collect(Collectors.toSet());
       ids.forEach(code -> {
         if (dbIds.contains(code)) {
           trustExistsMap.put(code, true);

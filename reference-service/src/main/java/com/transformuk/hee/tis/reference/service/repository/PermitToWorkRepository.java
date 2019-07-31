@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the PermitToWork entity.
  */
 @SuppressWarnings("unused")
-public interface PermitToWorkRepository extends JpaRepository<PermitToWork, Long>, JpaSpecificationExecutor {
+public interface PermitToWorkRepository extends JpaRepository<PermitToWork, Long>,
+    JpaSpecificationExecutor {
 
 }

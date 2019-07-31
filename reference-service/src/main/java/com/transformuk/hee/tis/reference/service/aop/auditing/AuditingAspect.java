@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.aop.auditing;
 
+import static com.transformuk.hee.tis.audit.enumeration.GenericAuditEventType.createEvent;
+import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -8,6 +11,11 @@ import com.transformuk.hee.tis.audit.enumeration.GenericAuditEventType;
 import com.transformuk.hee.tis.reference.service.model.JsonPatch;
 import com.transformuk.hee.tis.reference.service.repository.JsonPatchRepository;
 import com.transformuk.hee.tis.security.model.UserProfile;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -20,15 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.http.ResponseEntity;
-
-import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static com.transformuk.hee.tis.audit.enumeration.GenericAuditEventType.createEvent;
-import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
 /**
  * Aspect for auditing execution of rest calls Spring components.
@@ -93,8 +92,8 @@ public class AuditingAspect {
   }
 
   /**
-   * Advice that Audit method before execution
-   * check if any modification then its creating a jsonPatch and stored into JsonPatch table
+   * Advice that Audit method before execution check if any modification then its creating a
+   * jsonPatch and stored into JsonPatch table
    */
   @Before("execution(* com.transformuk.hee.tis.reference.service.api.*.update*(..))")
   public void auditUpdateBeforeExecution(JoinPoint joinPoint) throws Throwable {
@@ -108,7 +107,8 @@ public class AuditingAspect {
         if (StringUtils.isEmpty(fieldName)) {
           fieldName = ID_KEY;
         }
-        String entityName = StringUtils.left(className, StringUtils.length(className) - StringUtils.length(DTO_POSTFIX));
+        String entityName = StringUtils
+            .left(className, StringUtils.length(className) - StringUtils.length(DTO_POSTFIX));
         if (StringUtils.isNoneEmpty(fieldName)) {
           final Field idField = newValue.getClass().getDeclaredField(fieldName);
           idField.setAccessible(true);
@@ -123,11 +123,14 @@ public class AuditingAspect {
             final Method method;
             if (classToIdClass.containsKey(className)) {
               Class idClass = classToIdClass.get(className);
-              method = joinPoint.getTarget().getClass().getDeclaredMethod(GET_PREFIX + entityName, idClass);
+              method = joinPoint.getTarget().getClass()
+                  .getDeclaredMethod(GET_PREFIX + entityName, idClass);
             } else {
-              method = joinPoint.getTarget().getClass().getDeclaredMethod(GET_PREFIX + entityName, new Class[]{Long.class});
+              method = joinPoint.getTarget().getClass()
+                  .getDeclaredMethod(GET_PREFIX + entityName, new Class[]{Long.class});
             }
-            final Object responseEntity = method.invoke(joinPoint.getTarget(), idField.get(newValue));
+            final Object responseEntity = method
+                .invoke(joinPoint.getTarget(), idField.get(newValue));
             oldValue = ((ResponseEntity) responseEntity).getBody();
             oldJsonNode = mapper.convertValue(oldValue, JsonNode.class);
           }
@@ -170,11 +173,13 @@ public class AuditingAspect {
     setAuditEvent(GenericAuditEventType.delete, joinPoint);
   }
 
-  private void setAuditEvent(GenericAuditEventType auditEventType, JoinPoint joinPoint) throws Throwable {
+  private void setAuditEvent(GenericAuditEventType auditEventType, JoinPoint joinPoint)
+      throws Throwable {
     try {
       UserProfile userPofile = getProfileFromContext();
       // Audit event
-      AuditEvent auditEvent = createEvent(userPofile.getUserName(), REFERENCE_PREFIX, joinPoint.getSignature().getName()
+      AuditEvent auditEvent = createEvent(userPofile.getUserName(), REFERENCE_PREFIX,
+          joinPoint.getSignature().getName()
           , auditEventType, joinPoint.getArgs());
       auditEventRepository.add(auditEvent);
     } catch (IllegalArgumentException e) {
