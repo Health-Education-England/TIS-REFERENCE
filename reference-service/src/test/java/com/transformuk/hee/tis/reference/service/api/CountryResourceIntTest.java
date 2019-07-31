@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -8,9 +18,11 @@ import com.transformuk.hee.tis.reference.service.model.Country;
 import com.transformuk.hee.tis.reference.service.repository.CountryRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.CountryServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CountryMapper;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.EntityManager;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -23,20 +35,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the CountryResource REST controller.
@@ -83,8 +81,8 @@ public class CountryResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static Country createEntity(EntityManager em) {
     Country country = new Country()
@@ -96,7 +94,8 @@ public class CountryResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    CountryResource countryResource = new CountryResource(countryRepository, countryMapper, countryService);
+    CountryResource countryResource = new CountryResource(countryRepository, countryMapper,
+        countryService);
     this.restCountryMockMvc = MockMvcBuilders.standaloneSetup(countryResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -197,7 +196,8 @@ public class CountryResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
-        .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
+        .andExpect(
+            jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
         .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
   }
 
@@ -206,16 +206,17 @@ public class CountryResourceIntTest {
   public void getCountriesWithQueryShouldReturnMatch() throws Exception {
     // Initialize the database
     countryRepository.saveAndFlush(country);
-    
+
     // Get all the countryList
     restCountryMockMvc.perform(get("/api/countries?searchQuery=\"AAAAA\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
-    .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
-    .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
+        .andExpect(
+            jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
+        .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
   }
-  
+
   @Test
   @Transactional
   public void getCountriesMatchingEncodedQueryShouldReturnMatch() throws Exception {
@@ -224,14 +225,15 @@ public class CountryResourceIntTest {
         .countryNumber(UNENCODED_COUNTRY_NUMBER)
         .nationality(UNENCODED_NATIONALITY);
     unencodedCountry = countryRepository.saveAndFlush(unencodedCountry);
-    
+
     // Get all the countryList
     restCountryMockMvc.perform(get("/api/countries?searchQuery=\"Check%21%20\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedCountry.getId().intValue())))
-    .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(UNENCODED_COUNTRY_NUMBER.toString())))
-    .andExpect(jsonPath("$.[*].nationality").value(hasItem(UNENCODED_NATIONALITY.toString())));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedCountry.getId().intValue())))
+        .andExpect(
+            jsonPath("$.[*].countryNumber").value(hasItem(UNENCODED_COUNTRY_NUMBER.toString())))
+        .andExpect(jsonPath("$.[*].nationality").value(hasItem(UNENCODED_NATIONALITY.toString())));
   }
 
   @Test

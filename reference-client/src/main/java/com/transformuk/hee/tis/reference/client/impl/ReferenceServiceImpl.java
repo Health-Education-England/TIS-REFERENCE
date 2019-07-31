@@ -61,8 +61,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The default implementation of the reference service client. Provides method for which we use to communicate with
- * the tis reference service
+ * The default implementation of the reference service client. Provides method for which we use to
+ * communicate with the tis reference service
  */
 @Service
 public class ReferenceServiceImpl extends AbstractClientService implements ReferenceService {
@@ -114,11 +114,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   static {
     try {
-      gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
-      labelJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
-      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
-      sitesKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
-      trustKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec().encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+          .encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      labelJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+          .encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
+      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+          .encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
+      sitesKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+          .encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      trustKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+          .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       e.printStackTrace();
     }
@@ -126,64 +131,86 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
-    classToParamTypeRefMap.put(CollegeDTO.class, new ParameterizedTypeReference<List<CollegeDTO>>() {
-    });
-    classToParamTypeRefMap.put(CountryDTO.class, new ParameterizedTypeReference<List<CountryDTO>>() {
-    });
-    classToParamTypeRefMap.put(CurriculumSubTypeDTO.class, new ParameterizedTypeReference<List<CurriculumSubTypeDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(CollegeDTO.class, new ParameterizedTypeReference<List<CollegeDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(CountryDTO.class, new ParameterizedTypeReference<List<CountryDTO>>() {
+        });
+    classToParamTypeRefMap.put(CurriculumSubTypeDTO.class,
+        new ParameterizedTypeReference<List<CurriculumSubTypeDTO>>() {
+        });
     classToParamTypeRefMap.put(DBCDTO.class, new ParameterizedTypeReference<List<DBCDTO>>() {
     });
-    classToParamTypeRefMap.put(EthnicOriginDTO.class, new ParameterizedTypeReference<List<EthnicOriginDTO>>() {
-    });
-    classToParamTypeRefMap.put(FundingIssueDTO.class, new ParameterizedTypeReference<List<FundingIssueDTO>>() {
-    });
-    classToParamTypeRefMap.put(FundingTypeDTO.class, new ParameterizedTypeReference<List<FundingTypeDTO>>() {
-    });
-    classToParamTypeRefMap.put(GdcStatusDTO.class, new ParameterizedTypeReference<List<GdcStatusDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(EthnicOriginDTO.class, new ParameterizedTypeReference<List<EthnicOriginDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(FundingIssueDTO.class, new ParameterizedTypeReference<List<FundingIssueDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(FundingTypeDTO.class, new ParameterizedTypeReference<List<FundingTypeDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(GdcStatusDTO.class, new ParameterizedTypeReference<List<GdcStatusDTO>>() {
+        });
     classToParamTypeRefMap.put(GenderDTO.class, new ParameterizedTypeReference<List<GenderDTO>>() {
     });
-    classToParamTypeRefMap.put(GmcStatusDTO.class, new ParameterizedTypeReference<List<GmcStatusDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(GmcStatusDTO.class, new ParameterizedTypeReference<List<GmcStatusDTO>>() {
+        });
     classToParamTypeRefMap.put(GradeDTO.class, new ParameterizedTypeReference<List<GradeDTO>>() {
     });
-    classToParamTypeRefMap.put(InactiveReasonDTO.class, new ParameterizedTypeReference<List<InactiveReasonDTO>>() {
-    });
-    classToParamTypeRefMap.put(LeavingDestinationDTO.class, new ParameterizedTypeReference<List<LeavingDestinationDTO>>() {
-    });
-    classToParamTypeRefMap.put(LocalOfficeDTO.class, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
-    });
-    classToParamTypeRefMap.put(MaritalStatusDTO.class, new ParameterizedTypeReference<List<MaritalStatusDTO>>() {
-    });
-    classToParamTypeRefMap.put(MedicalSchoolDTO.class, new ParameterizedTypeReference<List<MedicalSchoolDTO>>() {
-    });
-    classToParamTypeRefMap.put(NationalityDTO.class, new ParameterizedTypeReference<List<NationalityDTO>>() {
-    });
-    classToParamTypeRefMap.put(PlacementTypeDTO.class, new ParameterizedTypeReference<List<PlacementTypeDTO>>() {
-    });
-    classToParamTypeRefMap.put(ProgrammeMembershipTypeDTO.class, new ParameterizedTypeReference<List<ProgrammeMembershipTypeDTO>>() {
-    });
-    classToParamTypeRefMap.put(RecordTypeDTO.class, new ParameterizedTypeReference<List<RecordTypeDTO>>() {
-    });
-    classToParamTypeRefMap.put(ReligiousBeliefDTO.class, new ParameterizedTypeReference<List<ReligiousBeliefDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(InactiveReasonDTO.class, new ParameterizedTypeReference<List<InactiveReasonDTO>>() {
+        });
+    classToParamTypeRefMap.put(LeavingDestinationDTO.class,
+        new ParameterizedTypeReference<List<LeavingDestinationDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(LocalOfficeDTO.class, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(MaritalStatusDTO.class, new ParameterizedTypeReference<List<MaritalStatusDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(MedicalSchoolDTO.class, new ParameterizedTypeReference<List<MedicalSchoolDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(NationalityDTO.class, new ParameterizedTypeReference<List<NationalityDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(PlacementTypeDTO.class, new ParameterizedTypeReference<List<PlacementTypeDTO>>() {
+        });
+    classToParamTypeRefMap.put(ProgrammeMembershipTypeDTO.class,
+        new ParameterizedTypeReference<List<ProgrammeMembershipTypeDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(RecordTypeDTO.class, new ParameterizedTypeReference<List<RecordTypeDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(ReligiousBeliefDTO.class, new ParameterizedTypeReference<List<ReligiousBeliefDTO>>() {
+        });
     classToParamTypeRefMap.put(RoleDTO.class, new ParameterizedTypeReference<List<RoleDTO>>() {
     });
-    classToParamTypeRefMap.put(SettledDTO.class, new ParameterizedTypeReference<List<SettledDTO>>() {
-    });
-    classToParamTypeRefMap.put(SexualOrientationDTO.class, new ParameterizedTypeReference<List<SexualOrientationDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(SettledDTO.class, new ParameterizedTypeReference<List<SettledDTO>>() {
+        });
+    classToParamTypeRefMap.put(SexualOrientationDTO.class,
+        new ParameterizedTypeReference<List<SexualOrientationDTO>>() {
+        });
     classToParamTypeRefMap.put(SiteDTO.class, new ParameterizedTypeReference<List<SiteDTO>>() {
     });
     classToParamTypeRefMap.put(StatusDTO.class, new ParameterizedTypeReference<List<StatusDTO>>() {
     });
-    classToParamTypeRefMap.put(TariffRateDTO.class, new ParameterizedTypeReference<List<TariffRateDTO>>() {
-    });
+    classToParamTypeRefMap
+        .put(TariffRateDTO.class, new ParameterizedTypeReference<List<TariffRateDTO>>() {
+        });
     classToParamTypeRefMap.put(TitleDTO.class, new ParameterizedTypeReference<List<TitleDTO>>() {
     });
-    classToParamTypeRefMap.put(TrainingNumberTypeDTO.class, new ParameterizedTypeReference<List<TrainingNumberTypeDTO>>() {
-    });
+    classToParamTypeRefMap.put(TrainingNumberTypeDTO.class,
+        new ParameterizedTypeReference<List<TrainingNumberTypeDTO>>() {
+        });
     classToParamTypeRefMap.put(TrustDTO.class, new ParameterizedTypeReference<List<TrustDTO>>() {
     });
   }
@@ -194,16 +221,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Value("${reference.service.url}")
   private String serviceUrl;
 
-  public ReferenceServiceImpl(@Value("${reference.client.rate.limit}") double standardRequestsPerSecondLimit,
-                              @Value("${reference.client.bulk.rate.limit}") double bulkRequestsPerSecondLimit) {
+  public ReferenceServiceImpl(
+      @Value("${reference.client.rate.limit}") double standardRequestsPerSecondLimit,
+      @Value("${reference.client.bulk.rate.limit}") double bulkRequestsPerSecondLimit) {
     super(standardRequestsPerSecondLimit, bulkRequestsPerSecondLimit);
   }
 
   @Override
-  public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl, Class objectDTO) {
+  public List<JsonPatchDTO> getJsonPathByTableDtoNameOrderByDateAddedAsc(String endpointUrl,
+      Class objectDTO) {
     ParameterizedTypeReference<List<JsonPatchDTO>> typeReference = getJsonPatchDtoReference();
-    ResponseEntity<List<JsonPatchDTO>> response = referenceRestTemplate.exchange(serviceUrl + endpointUrl + objectDTO.getSimpleName(),
-        HttpMethod.GET, null, typeReference);
+    ResponseEntity<List<JsonPatchDTO>> response = referenceRestTemplate
+        .exchange(serviceUrl + endpointUrl + objectDTO.getSimpleName(),
+            HttpMethod.GET, null, typeReference);
     return response.getBody();
   }
 
@@ -260,32 +290,36 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private Map<Long, Boolean> existsWithLong(String url, List<Long> ids) {
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsWithLongReference();
-    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getBody();
   }
 
   private Map<String, Boolean> exists(String url, List<String> ids) {
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
-    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getBody();
   }
 
   private Map<Long, Boolean> idExists(String url, List<Long> ids) {
     HttpEntity<List<Long>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<Long, Boolean>> responseType = getExistsLongReference();
-    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<Map<Long, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getBody();
   }
 
   private Map<String, Boolean> valuesExists(String url, List<String> values) {
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(values);
     ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
-    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getBody();
   }
 
@@ -293,8 +327,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     HttpEntity<String> requestEntity = new HttpEntity<>(code);
     ParameterizedTypeReference<HttpStatus> responseType = getCodeExistsReference();
     LOG.info("Trying codeExists with URL: {}", url);
-    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getStatusCode();
   }
 
@@ -302,7 +337,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     HttpEntity<String> requestEntity = new HttpEntity<>(code);
     ParameterizedTypeReference<Boolean> responseType = getCodeExistsDto();
     LOG.info("Trying codeExists with URL: {}", url);
-    ResponseEntity<Boolean> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
+    ResponseEntity<Boolean> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
             responseType);
     return responseEntity.getBody();
   }
@@ -310,8 +346,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private HttpStatus siteTrustMatchExists(String url, String siteCode) {
     HttpEntity<String> requestEntity = new HttpEntity<>(siteCode);
     ParameterizedTypeReference<HttpStatus> responseType = getSiteTrustMatchReference();
-    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        responseType);
+    ResponseEntity<HttpStatus> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
     return responseEntity.getStatusCode();
   }
 
@@ -322,9 +359,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
     return referenceRestTemplate
         .exchange(serviceUrl + FIND_SITES_BY_NAME_ENDPOINT
-            + sitesKnownAsJsonQuerystringURLEncoded
-            .replace("PARAMETER_NAME", urlEncode(siteName)), HttpMethod.GET, null,
-            new ParameterizedTypeReference<List<SiteDTO>>() {})
+                + sitesKnownAsJsonQuerystringURLEncoded
+                .replace("PARAMETER_NAME", urlEncode(siteName)), HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<SiteDTO>>() {
+            })
         .getBody();
   }
 
@@ -346,10 +384,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     try {
       ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
           exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
-              new ParameterizedTypeReference<List<SiteDTO>>() {});
+              new ParameterizedTypeReference<List<SiteDTO>>() {
+              });
       return responseEntity.getBody();
-    } catch(Exception e) {
-      LOG.error("Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
+    } catch (Exception e) {
+      LOG.error(
+          "Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
           joinedIds, e.getMessage());
       return Collections.emptyList();
     }
@@ -360,7 +400,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<GradeDTO> findGradesByName(String gradeName) {
     LOG.debug("calling getGradesByName with {}", gradeName);
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_GRADES_BY_NAME_ENDPOINT + gradesJsonQuerystringURLEncoded.replace("PARAMETER_NAME", urlEncode(gradeName)), HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {})
+        .exchange(serviceUrl + FIND_GRADES_BY_NAME_ENDPOINT + gradesJsonQuerystringURLEncoded
+                .replace("PARAMETER_NAME", urlEncode(gradeName)), HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<GradeDTO>>() {
+            })
         .getBody();
   }
 
@@ -368,7 +411,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<LocalOfficeDTO> findAllLocalOffice() {
     LOG.debug("calling getGradesByName with {}");
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_ALL_LOCAL_OFFICE_ENDPOINT, HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
+        .exchange(serviceUrl + FIND_ALL_LOCAL_OFFICE_ENDPOINT, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
+            })
         .getBody();
   }
 
@@ -377,8 +422,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getRolesByCategory with {}", categoryId);
 
     return referenceRestTemplate
-            .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + String.valueOf(categoryId), HttpMethod.GET, null, new ParameterizedTypeReference<List<RoleDTO>>() {})
-            .getBody();
+        .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + String.valueOf(categoryId), HttpMethod.GET,
+            null, new ParameterizedTypeReference<List<RoleDTO>>() {
+            })
+        .getBody();
   }
 
 
@@ -396,7 +443,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     String url = serviceUrl + FIND_FUNDING_TYPES_ENDPOINT
         + labelJsonQuerystringURLEncoded.replace("PARAMETER_LABEL", urlEncode(joinedLabels));
     ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
-        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<FundingTypeDTO>>() {});
+        .exchange(url, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<FundingTypeDTO>>() {
+            });
     return responseEntity.getBody();
   }
 
@@ -417,11 +466,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .queryParam("ids", joinedIds);
     try {
       ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
-          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null, new ParameterizedTypeReference<List<GradeDTO>>() {
-          });
+          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
+              new ParameterizedTypeReference<List<GradeDTO>>() {
+              });
       return responseEntity.getBody();
-    }catch (Exception e) {
-      LOG.error("Exception during find grade id in for ids [{}], returning empty list. Here's the error message {}",
+    } catch (Exception e) {
+      LOG.error(
+          "Exception during find grade id in for ids [{}], returning empty list. Here's the error message {}",
           joinedIds, e.getMessage());
       return Collections.emptyList();
     }
@@ -431,9 +482,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs) {
     LOG.debug("calling findTrustByTrustKnownAs with {}", trustKnownAs);
     String url = serviceUrl + FIND_TRUSTS_ENDPOINT
-        +trustKnownAsJsonQuerystringURLEncoded.replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs));
+        + trustKnownAsJsonQuerystringURLEncoded
+        .replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs));
     return referenceRestTemplate
-        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {})
+        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {
+        })
         .getBody();
   }
 
@@ -448,7 +501,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<LocalOfficeDTO> findLocalOfficesByName(String owner) {
     LOG.debug("calling getLocalOfficesByName with {}", owner);
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded.replace("PARAMETER_LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null, new ParameterizedTypeReference<List<LocalOfficeDTO>>() {})
+        .exchange(
+            serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded
+                .replace("PARAMETER_LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
+            })
         .getBody();
   }
 
@@ -539,30 +596,30 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public Boolean isValueExists(Class dtoClass, String value) {
     String url = serviceUrl;
-    if(dtoClass.equals(TitleDTO.class)){
+    if (dtoClass.equals(TitleDTO.class)) {
       url = url + TITLE_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(GmcStatusDTO.class)){
+    } else if (dtoClass.equals(GmcStatusDTO.class)) {
       url = url + GMC_STATUS_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(GdcStatusDTO.class)){
+    } else if (dtoClass.equals(GdcStatusDTO.class)) {
       url = url + GDC_STATUS_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(GenderDTO.class)){
+    } else if (dtoClass.equals(GenderDTO.class)) {
       url = url + GENDER_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(NationalityDTO.class)){
+    } else if (dtoClass.equals(NationalityDTO.class)) {
       url = url + NATIONALITY_STATUS_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(EthnicOriginDTO.class)){
-      url= url + ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(MaritalStatusDTO.class)){
-      url= url + MARITAL_STATUS_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(SexualOrientationDTO.class)){
-      url= url + SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(ReligiousBeliefDTO.class)){
-      url= url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(QualificationReferenceDTO.class)){
-      url= url + QUALIFICATION_MAPPINGS_ENDPOINT;
-    } else if(dtoClass.equals(QualificationTypeDTO.class)){
-      url= url + QUALIFICATION_TYPE_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(EthnicOriginDTO.class)) {
+      url = url + ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(MaritalStatusDTO.class)) {
+      url = url + MARITAL_STATUS_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(SexualOrientationDTO.class)) {
+      url = url + SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(ReligiousBeliefDTO.class)) {
+      url = url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(QualificationReferenceDTO.class)) {
+      url = url + QUALIFICATION_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(QualificationTypeDTO.class)) {
+      url = url + QUALIFICATION_TYPE_MAPPINGS_ENDPOINT;
     }
-    return codeExistsDto(url,value);
+    return codeExistsDto(url, value);
   }
 
   @Override
@@ -592,7 +649,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public Set<DBCDTO> getAllDBCs() {
-    ResponseEntity<Set<DBCDTO>> responseEntity = referenceRestTemplate.exchange(serviceUrl + "/api/dbcs?size=100&page=0", HttpMethod.GET, null, getDBCDto());
+    ResponseEntity<Set<DBCDTO>> responseEntity = referenceRestTemplate
+        .exchange(serviceUrl + "/api/dbcs?size=100&page=0", HttpMethod.GET, null, getDBCDto());
     return responseEntity.getBody();
   }
 }

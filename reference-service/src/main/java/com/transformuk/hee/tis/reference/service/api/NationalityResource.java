@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Nationality.
@@ -60,8 +59,9 @@ public class NationalityResource {
   private final NationalityMapper nationalityMapper;
   private final NationalityServiceImpl nationalityService;
 
-  public NationalityResource(NationalityRepository nationalityRepository, NationalityMapper nationalityMapper,
-                             NationalityServiceImpl nationalityService) {
+  public NationalityResource(NationalityRepository nationalityRepository,
+      NationalityMapper nationalityMapper,
+      NationalityServiceImpl nationalityService) {
     this.nationalityRepository = nationalityRepository;
     this.nationalityMapper = nationalityMapper;
     this.nationalityService = nationalityService;
@@ -71,16 +71,20 @@ public class NationalityResource {
    * POST  /nationalities : Create a new nationality.
    *
    * @param nationalityDTO the nationalityDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new nationalityDTO, or with status 400 (Bad Request) if the nationality has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new nationalityDTO, or
+   * with status 400 (Bad Request) if the nationality has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/nationalities")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<NationalityDTO> createNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
+  public ResponseEntity<NationalityDTO> createNationality(
+      @Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
     log.debug("REST request to save Nationality : {}", nationalityDTO);
     if (nationalityDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new nationality cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists",
+              "A new nationality cannot already have an ID")).body(null);
     }
     Nationality nationality = nationalityMapper.nationalityDTOToNationality(nationalityDTO);
     nationality = nationalityRepository.save(nationality);
@@ -94,15 +98,16 @@ public class NationalityResource {
    * PUT  /nationalities : Updates an existing nationality.
    *
    * @param nationalityDTO the nationalityDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTO,
-   * or with status 400 (Bad Request) if the nationalityDTO is not valid,
-   * or with status 500 (Internal Server Error) if the nationalityDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTO, or
+   * with status 400 (Bad Request) if the nationalityDTO is not valid, or with status 500 (Internal
+   * Server Error) if the nationalityDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/nationalities")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<NationalityDTO> updateNationality(@Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
+  public ResponseEntity<NationalityDTO> updateNationality(
+      @Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
     log.debug("REST request to update Nationality : {}", nationalityDTO);
     if (nationalityDTO.getId() == null) {
       return createNationality(nationalityDTO);
@@ -133,11 +138,14 @@ public class NationalityResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of nationalities begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Nationality> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = nationalityRepository.findAll(pageable);
@@ -153,7 +161,8 @@ public class NationalityResource {
    * GET  /nationalities/:id : get the "id" nationality.
    *
    * @param id the id of the nationalityDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the nationalityDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the nationalityDTO, or with
+   * status 404 (Not Found)
    */
   @GetMapping("/nationalities/{id}")
   @Timed
@@ -175,7 +184,7 @@ public class NationalityResource {
   public ResponseEntity<Boolean> nationalityExists(@RequestBody String code) {
     log.debug("REST request to check Nationality exists : {}", code);
     Nationality nationality = nationalityRepository.findFirstByCountryNumber(code);
-    if(nationality == null){
+    if (nationality == null) {
       return new ResponseEntity<>(false, HttpStatus.OK);
     }
     return new ResponseEntity<>(true, HttpStatus.OK);
@@ -193,20 +202,23 @@ public class NationalityResource {
   public ResponseEntity<Void> deleteNationality(@PathVariable Long id) {
     log.debug("REST request to delete Nationality : {}", id);
     nationalityRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
    * POST  /bulk-nationalities : Bulk create a new nationalities.
    *
    * @param nationalityDTOS List of the nationalityDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new nationalityDTOS, or with status 400 (Bad Request) if the NationalityDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new nationalityDTOS, or
+   * with status 400 (Bad Request) if the NationalityDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-nationalities")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<NationalityDTO>> bulkCreateNationality(@Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
+  public ResponseEntity<List<NationalityDTO>> bulkCreateNationality(
+      @Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save NationalityDtos : {}", nationalityDTOS);
     if (!Collections.isEmpty(nationalityDTOS)) {
       List<Long> entityIds = nationalityDTOS.stream()
@@ -214,10 +226,13 @@ public class NationalityResource {
           .map(nationalityDTO -> nationalityDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new nationalities cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new nationalities cannot already have an ID")).body(null);
       }
     }
-    List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
+    List<Nationality> nationalities = nationalityMapper
+        .nationalityDTOsToNationalities(nationalityDTOS);
     nationalities = nationalityRepository.save(nationalities);
     List<NationalityDTO> result = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()
@@ -228,27 +243,34 @@ public class NationalityResource {
    * PUT  /bulk-nationalities : Updates an existing nationalities.
    *
    * @param nationalityDTOS List of the nationalityDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTOS,
-   * or with status 400 (Bad Request) if the nationalityDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the nationalityDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTOS, or
+   * with status 400 (Bad Request) if the nationalityDTOS is not valid, or with status 500 (Internal
+   * Server Error) if the nationalityDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-nationalities")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<NationalityDTO>> bulkUpdateNationality(@Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
+  public ResponseEntity<List<NationalityDTO>> bulkUpdateNationality(
+      @Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update NationalityDtos : {}", nationalityDTOS);
     if (Collections.isEmpty(nationalityDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(nationalityDTOS)) {
-      List<NationalityDTO> entitiesWithNoId = nationalityDTOS.stream().filter(nationalityDTO -> nationalityDTO.getId() == null).collect(Collectors.toList());
+      List<NationalityDTO> entitiesWithNoId = nationalityDTOS.stream()
+          .filter(nationalityDTO -> nationalityDTO.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
-    List<Nationality> nationalities = nationalityMapper.nationalityDTOsToNationalities(nationalityDTOS);
+    List<Nationality> nationalities = nationalityMapper
+        .nationalityDTOsToNationalities(nationalityDTOS);
     nationalities = nationalityRepository.save(nationalities);
     List<NationalityDTO> results = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()

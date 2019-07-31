@@ -2,13 +2,12 @@ package com.transformuk.hee.tis.reference.client;
 
 import com.transformuk.hee.tis.client.ClientService;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
-import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,8 @@ import org.springframework.http.ResponseEntity;
 public interface ReferenceService extends ClientService {
 
   /**
-   * Find the sites given the codes. This does one API call and one SQL call to retrieve
-   * all the sites.
+   * Find the sites given the codes. This does one API call and one SQL call to retrieve all the
+   * sites.
    *
    * @param codes the site codes to look for
    * @return the found sites or an empty list
@@ -28,8 +27,8 @@ public interface ReferenceService extends ClientService {
   List<SiteDTO> findSitesIn(Set<String> codes);
 
   /**
-   * Find the sites given the ids. This does one API call and one SQL call to retrieve
-   * all the sites.
+   * Find the sites given the ids. This does one API call and one SQL call to retrieve all the
+   * sites.
    *
    * @param ids the site ids to look for
    * @return the found sites or an empty list
@@ -37,8 +36,8 @@ public interface ReferenceService extends ClientService {
   List<SiteDTO> findSitesIdIn(Set<Long> ids);
 
   /**
-   * Find the sites given the name. This does one API call and one SQL call to retrieve
-   * all the sites.
+   * Find the sites given the name. This does one API call and one SQL call to retrieve all the
+   * sites.
    *
    * @param name the site name to look for
    * @return the found sites or an empty list
@@ -46,8 +45,8 @@ public interface ReferenceService extends ClientService {
   List<SiteDTO> findSitesByName(String name);
 
   /**
-   * Find the grades given the codes. This does one API call and one SQL call to retrieve
-   * all the grades.
+   * Find the grades given the codes. This does one API call and one SQL call to retrieve all the
+   * grades.
    *
    * @param codes the grade codes to look for
    * @return the found grades or an empty list
@@ -56,8 +55,8 @@ public interface ReferenceService extends ClientService {
 
 
   /**
-   * Find the grades given the Ids. This does one API call and one SQL call to retrieve
-   * all the grades.
+   * Find the grades given the Ids. This does one API call and one SQL call to retrieve all the
+   * grades.
    *
    * @param ids the grade ids to look for
    * @return the found grades or an empty list
@@ -65,8 +64,8 @@ public interface ReferenceService extends ClientService {
   List<GradeDTO> findGradesIdIn(Set<Long> ids);
 
   /**
-   * Find the grades given the name. This does one API call and one SQL call to retrieve
-   * all the grades.
+   * Find the grades given the name. This does one API call and one SQL call to retrieve all the
+   * grades.
    *
    * @param name the grade name to look for
    * @return the found grades or an empty list
@@ -74,8 +73,9 @@ public interface ReferenceService extends ClientService {
   List<GradeDTO> findGradesByName(String name);
 
   /**
-   * Find the trusts given the trustKnownAs. This does one API call and one SQL call to retrieve
-   * all the trusts.
+   * Find the trusts given the trustKnownAs. This does one API call and one SQL call to retrieve all
+   * the trusts.
+   *
    * @param trustKnownAs The trustKnownAs to look for.
    * @return The found trusts or an empty list.
    */
@@ -115,7 +115,7 @@ public interface ReferenceService extends ClientService {
 
   Map<String, Boolean> placementTypeExists(List<String> values);
 
-  Boolean isValueExists(Class dtoClass,String value);
+  Boolean isValueExists(Class dtoClass, String value);
 
   List<LocalOfficeDTO> findAllLocalOffice();
 

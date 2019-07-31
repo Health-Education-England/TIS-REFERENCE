@@ -2,9 +2,8 @@ package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.service.model.InactiveReason;
-import org.mapstruct.Mapper;
-
 import java.util.List;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity InactiveReason and its DTO InactiveReasonDTO.
@@ -18,5 +17,6 @@ public interface InactiveReasonMapper {
 
   InactiveReason inactiveReasonDTOToInactiveReason(InactiveReasonDTO inactiveReasonDTO);
 
-  List<InactiveReason> inactiveReasonDTOsToInactiveReasons(List<InactiveReasonDTO> inactiveReasonDTOs);
+  List<InactiveReason> inactiveReasonDTOsToInactiveReasons(
+      List<InactiveReasonDTO> inactiveReasonDTOs);
 }

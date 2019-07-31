@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.ProgrammeMembershipTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the ProgrammeMembershipTypeResource REST controller.
@@ -79,8 +78,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static ProgrammeMembershipType createEntity(EntityManager em) {
     ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType()
@@ -93,8 +92,10 @@ public class ProgrammeMembershipTypeResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     ProgrammeMembershipTypeResource programmeMembershipTypeResource = new ProgrammeMembershipTypeResource(
-        programmeMembershipTypeRepository, programmeMembershipTypeMapper, programmeMembershipTypeService);
-    this.restProgrammeMembershipTypeMockMvc = MockMvcBuilders.standaloneSetup(programmeMembershipTypeResource)
+        programmeMembershipTypeRepository, programmeMembershipTypeMapper,
+        programmeMembershipTypeService);
+    this.restProgrammeMembershipTypeMockMvc = MockMvcBuilders
+        .standaloneSetup(programmeMembershipTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -111,16 +112,19 @@ public class ProgrammeMembershipTypeResourceIntTest {
     int databaseSizeBeforeCreate = programmeMembershipTypeRepository.findAll().size();
 
     // Create the ProgrammeMembershipType
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isCreated());
 
     // Validate the ProgrammeMembershipType in the database
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeCreate + 1);
-    ProgrammeMembershipType testProgrammeMembershipType = programmeMembershipTypeList.get(programmeMembershipTypeList.size() - 1);
+    ProgrammeMembershipType testProgrammeMembershipType = programmeMembershipTypeList
+        .get(programmeMembershipTypeList.size() - 1);
     assertThat(testProgrammeMembershipType.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testProgrammeMembershipType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -132,7 +136,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
 
     // Create the ProgrammeMembershipType with an existing ID
     programmeMembershipType.setId(1L);
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
@@ -141,7 +146,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .andExpect(status().isBadRequest());
 
     // Validate the Alice in the database
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeCreate);
   }
 
@@ -153,14 +159,16 @@ public class ProgrammeMembershipTypeResourceIntTest {
     programmeMembershipType.setCode(null);
 
     // Create the ProgrammeMembershipType, which fails.
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isBadRequest());
 
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeTest);
   }
 
@@ -172,14 +180,16 @@ public class ProgrammeMembershipTypeResourceIntTest {
     programmeMembershipType.setLabel(null);
 
     // Create the ProgrammeMembershipType, which fails.
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isBadRequest());
 
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeTest);
   }
 
@@ -206,14 +216,15 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .code(UNENCODED_CODE)
         .label(UNENCODED_LABEL);
     programmeMembershipTypeRepository.saveAndFlush(unencodedProgrammeMembershipType);
-    
+
     // Get all the programmeMembershipTypeList
-    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedProgrammeMembershipType.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restProgrammeMembershipTypeMockMvc
+        .perform(get("/api/programme-membership-types?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedProgrammeMembershipType.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -223,7 +234,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
     programmeMembershipTypeRepository.saveAndFlush(programmeMembershipType);
 
     // Get the programmeMembershipType
-    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types/{id}", programmeMembershipType.getId()))
+    restProgrammeMembershipTypeMockMvc
+        .perform(get("/api/programme-membership-types/{id}", programmeMembershipType.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(programmeMembershipType.getId().intValue()))
@@ -235,7 +247,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
   @Transactional
   public void getNonExistingProgrammeMembershipType() throws Exception {
     // Get the programmeMembershipType
-    restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types/{id}", Long.MAX_VALUE))
+    restProgrammeMembershipTypeMockMvc
+        .perform(get("/api/programme-membership-types/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -247,11 +260,13 @@ public class ProgrammeMembershipTypeResourceIntTest {
     int databaseSizeBeforeUpdate = programmeMembershipTypeRepository.findAll().size();
 
     // Update the programmeMembershipType
-    ProgrammeMembershipType updatedProgrammeMembershipType = programmeMembershipTypeRepository.findOne(programmeMembershipType.getId());
+    ProgrammeMembershipType updatedProgrammeMembershipType = programmeMembershipTypeRepository
+        .findOne(programmeMembershipType.getId());
     updatedProgrammeMembershipType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(updatedProgrammeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(updatedProgrammeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(put("/api/programme-membership-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -259,9 +274,11 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .andExpect(status().isOk());
 
     // Validate the ProgrammeMembershipType in the database
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeUpdate);
-    ProgrammeMembershipType testProgrammeMembershipType = programmeMembershipTypeList.get(programmeMembershipTypeList.size() - 1);
+    ProgrammeMembershipType testProgrammeMembershipType = programmeMembershipTypeList
+        .get(programmeMembershipTypeList.size() - 1);
     assertThat(testProgrammeMembershipType.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testProgrammeMembershipType.getLabel()).isEqualTo(UPDATED_LABEL);
   }
@@ -272,7 +289,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
     int databaseSizeBeforeUpdate = programmeMembershipTypeRepository.findAll().size();
 
     // Create the ProgrammeMembershipType
-    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper.programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
+    ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
+        .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restProgrammeMembershipTypeMockMvc.perform(put("/api/programme-membership-types")
@@ -281,7 +299,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .andExpect(status().isCreated());
 
     // Validate the ProgrammeMembershipType in the database
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeUpdate + 1);
   }
 
@@ -293,12 +312,14 @@ public class ProgrammeMembershipTypeResourceIntTest {
     int databaseSizeBeforeDelete = programmeMembershipTypeRepository.findAll().size();
 
     // Get the programmeMembershipType
-    restProgrammeMembershipTypeMockMvc.perform(delete("/api/programme-membership-types/{id}", programmeMembershipType.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+    restProgrammeMembershipTypeMockMvc
+        .perform(delete("/api/programme-membership-types/{id}", programmeMembershipType.getId())
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
     // Validate the database is empty
-    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository.findAll();
+    List<ProgrammeMembershipType> programmeMembershipTypeList = programmeMembershipTypeRepository
+        .findAll();
     assertThat(programmeMembershipTypeList).hasSize(databaseSizeBeforeDelete - 1);
   }
 

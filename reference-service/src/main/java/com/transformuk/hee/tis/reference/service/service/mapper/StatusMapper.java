@@ -2,9 +2,8 @@ package com.transformuk.hee.tis.reference.service.service.mapper;
 
 import com.transformuk.hee.tis.reference.api.dto.StatusDTO;
 import com.transformuk.hee.tis.reference.service.model.Status;
-import org.mapstruct.Mapper;
-
 import java.util.List;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity Status and its DTO StatusDTO.

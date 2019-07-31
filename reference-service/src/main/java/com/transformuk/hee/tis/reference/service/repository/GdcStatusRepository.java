@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the GdcStatus entity.
  */
 @SuppressWarnings("unused")
-public interface GdcStatusRepository extends JpaRepository<GdcStatus, Long>, JpaSpecificationExecutor {
+public interface GdcStatusRepository extends JpaRepository<GdcStatus, Long>,
+    JpaSpecificationExecutor {
 
   GdcStatus findFirstByCode(String code);
 

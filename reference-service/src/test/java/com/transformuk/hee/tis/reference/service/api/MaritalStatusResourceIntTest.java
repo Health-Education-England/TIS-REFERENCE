@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.MaritalStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the MaritalStatusResource REST controller.
@@ -79,8 +78,8 @@ public class MaritalStatusResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static MaritalStatus createEntity(EntityManager em) {
     MaritalStatus maritalStatus = new MaritalStatus()
@@ -92,7 +91,8 @@ public class MaritalStatusResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    MaritalStatusResource maritalStatusResource = new MaritalStatusResource(maritalStatusRepository, maritalStatusMapper,
+    MaritalStatusResource maritalStatusResource = new MaritalStatusResource(maritalStatusRepository,
+        maritalStatusMapper,
         maritalStatusService);
     this.restMaritalStatusMockMvc = MockMvcBuilders.standaloneSetup(maritalStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -111,7 +111,8 @@ public class MaritalStatusResourceIntTest {
     int databaseSizeBeforeCreate = maritalStatusRepository.findAll().size();
 
     // Create the MaritalStatus
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(maritalStatus);
     restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
@@ -132,7 +133,8 @@ public class MaritalStatusResourceIntTest {
 
     // Create the MaritalStatus with an existing ID
     maritalStatus.setId(1L);
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
@@ -153,7 +155,8 @@ public class MaritalStatusResourceIntTest {
     maritalStatus.setCode(null);
 
     // Create the MaritalStatus, which fails.
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -172,7 +175,8 @@ public class MaritalStatusResourceIntTest {
     maritalStatus.setLabel(null);
 
     // Create the MaritalStatus, which fails.
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -208,12 +212,13 @@ public class MaritalStatusResourceIntTest {
     maritalStatusRepository.saveAndFlush(unencodedMaritalStatus);
 
     // Get all the maritalStatusList
-    restMaritalStatusMockMvc.perform(get("/api/marital-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedMaritalStatus.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restMaritalStatusMockMvc
+        .perform(get("/api/marital-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedMaritalStatus.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -251,7 +256,8 @@ public class MaritalStatusResourceIntTest {
     updatedMaritalStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(updatedMaritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(updatedMaritalStatus);
 
     restMaritalStatusMockMvc.perform(put("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -272,7 +278,8 @@ public class MaritalStatusResourceIntTest {
     int databaseSizeBeforeUpdate = maritalStatusRepository.findAll().size();
 
     // Create the MaritalStatus
-    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper.maritalStatusToMaritalStatusDTO(maritalStatus);
+    MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
+        .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restMaritalStatusMockMvc.perform(put("/api/marital-statuses")

@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.NationalityServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the NationalityResource REST controller.
@@ -78,8 +77,8 @@ public class NationalityResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static Nationality createEntity(EntityManager em) {
     Nationality nationality = new Nationality()
@@ -91,7 +90,8 @@ public class NationalityResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    NationalityResource nationalityResource = new NationalityResource(nationalityRepository, nationalityMapper,
+    NationalityResource nationalityResource = new NationalityResource(nationalityRepository,
+        nationalityMapper,
         nationalityService);
     this.restNationalityMockMvc = MockMvcBuilders.standaloneSetup(nationalityResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -193,7 +193,8 @@ public class NationalityResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(nationality.getId().intValue())))
-        .andExpect(jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
+        .andExpect(
+            jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
         .andExpect(jsonPath("$.[*].nationality").value(hasItem(DEFAULT_NATIONALITY.toString())));
   }
 
@@ -208,11 +209,11 @@ public class NationalityResourceIntTest {
 
     // Get all the nationalityList
     restNationalityMockMvc.perform(get("/api/nationalities?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))
-    .andExpect(jsonPath("$.[*].countryNumber").value(UNENCODED_COUNTRY_NUMBER))
-    .andExpect(jsonPath("$.[*].nationality").value(UNENCODED_NATIONALITY));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))
+        .andExpect(jsonPath("$.[*].countryNumber").value(UNENCODED_COUNTRY_NUMBER))
+        .andExpect(jsonPath("$.[*].nationality").value(UNENCODED_NATIONALITY));
   }
 
   @Test
@@ -250,7 +251,8 @@ public class NationalityResourceIntTest {
     updatedNationality
         .countryNumber(UPDATED_COUNTRY_NUMBER)
         .nationality(UPDATED_NATIONALITY);
-    NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(updatedNationality);
+    NationalityDTO nationalityDTO = nationalityMapper
+        .nationalityToNationalityDTO(updatedNationality);
 
     restNationalityMockMvc.perform(put("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)

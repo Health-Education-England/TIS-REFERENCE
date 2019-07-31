@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.ReligiousBeliefServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the ReligiousBeliefResource REST controller.
@@ -78,8 +77,8 @@ public class ReligiousBeliefResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static ReligiousBelief createEntity(EntityManager em) {
     ReligiousBelief religiousBelief = new ReligiousBelief()
@@ -91,7 +90,8 @@ public class ReligiousBeliefResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    ReligiousBeliefResource religiousBeliefResource = new ReligiousBeliefResource(religiousBeliefRepository,
+    ReligiousBeliefResource religiousBeliefResource = new ReligiousBeliefResource(
+        religiousBeliefRepository,
         religiousBeliefMapper, religiousBeliefService);
     this.restReligiousBeliefMockMvc = MockMvcBuilders.standaloneSetup(religiousBeliefResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -110,7 +110,8 @@ public class ReligiousBeliefResourceIntTest {
     int databaseSizeBeforeCreate = religiousBeliefRepository.findAll().size();
 
     // Create the ReligiousBelief
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(religiousBelief);
     restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
@@ -131,7 +132,8 @@ public class ReligiousBeliefResourceIntTest {
 
     // Create the ReligiousBelief with an existing ID
     religiousBelief.setId(1L);
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
@@ -152,7 +154,8 @@ public class ReligiousBeliefResourceIntTest {
     religiousBelief.setCode(null);
 
     // Create the ReligiousBelief, which fails.
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -171,7 +174,8 @@ public class ReligiousBeliefResourceIntTest {
     religiousBelief.setLabel(null);
 
     // Create the ReligiousBelief, which fails.
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -196,7 +200,7 @@ public class ReligiousBeliefResourceIntTest {
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
   }
-  
+
   @Test
   @Transactional
   public void getReligiousBeliefsWithQuery() throws Exception {
@@ -205,14 +209,15 @@ public class ReligiousBeliefResourceIntTest {
         .code(UNENCODED_CODE)
         .label(UNENCODED_LABEL);
     religiousBeliefRepository.saveAndFlush(unencodedReligiousBelief);
-    
+
     // Get the religiousBeliefList
-    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedReligiousBelief.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restReligiousBeliefMockMvc
+        .perform(get("/api/religious-beliefs?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedReligiousBelief.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -246,11 +251,13 @@ public class ReligiousBeliefResourceIntTest {
     int databaseSizeBeforeUpdate = religiousBeliefRepository.findAll().size();
 
     // Update the religiousBelief
-    ReligiousBelief updatedReligiousBelief = religiousBeliefRepository.findOne(religiousBelief.getId());
+    ReligiousBelief updatedReligiousBelief = religiousBeliefRepository
+        .findOne(religiousBelief.getId());
     updatedReligiousBelief
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(updatedReligiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(updatedReligiousBelief);
 
     restReligiousBeliefMockMvc.perform(put("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -271,7 +278,8 @@ public class ReligiousBeliefResourceIntTest {
     int databaseSizeBeforeUpdate = religiousBeliefRepository.findAll().size();
 
     // Create the ReligiousBelief
-    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper.religiousBeliefToReligiousBeliefDTO(religiousBelief);
+    ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
+        .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restReligiousBeliefMockMvc.perform(put("/api/religious-beliefs")
@@ -292,8 +300,9 @@ public class ReligiousBeliefResourceIntTest {
     int databaseSizeBeforeDelete = religiousBeliefRepository.findAll().size();
 
     // Get the religiousBelief
-    restReligiousBeliefMockMvc.perform(delete("/api/religious-beliefs/{id}", religiousBelief.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+    restReligiousBeliefMockMvc
+        .perform(delete("/api/religious-beliefs/{id}", religiousBelief.getId())
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
     // Validate the database is empty

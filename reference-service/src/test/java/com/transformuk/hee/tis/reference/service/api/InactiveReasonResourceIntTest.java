@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.InactiveReason;
 import com.transformuk.hee.tis.reference.service.repository.InactiveReasonRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.InactiveReasonServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.InactiveReasonMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the InactiveReasonResource REST controller.
@@ -79,8 +78,8 @@ public class InactiveReasonResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static InactiveReason createEntity(EntityManager em) {
     InactiveReason inactiveReason = new InactiveReason()
@@ -92,7 +91,8 @@ public class InactiveReasonResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    InactiveReasonResource inactiveReasonResource = new InactiveReasonResource(inactiveReasonRepository,
+    InactiveReasonResource inactiveReasonResource = new InactiveReasonResource(
+        inactiveReasonRepository,
         inactiveReasonMapper, inactiveReasonService);
     this.restInactiveReasonMockMvc = MockMvcBuilders.standaloneSetup(inactiveReasonResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -111,7 +111,8 @@ public class InactiveReasonResourceIntTest {
     int databaseSizeBeforeCreate = inactiveReasonRepository.findAll().size();
 
     // Create the InactiveReason
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(inactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(inactiveReason);
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
@@ -132,7 +133,8 @@ public class InactiveReasonResourceIntTest {
 
     // Create the InactiveReason with an existing ID
     inactiveReason.setId(1L);
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(inactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
@@ -153,7 +155,8 @@ public class InactiveReasonResourceIntTest {
     inactiveReason.setCode(null);
 
     // Create the InactiveReason, which fails.
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(inactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -172,7 +175,8 @@ public class InactiveReasonResourceIntTest {
     inactiveReason.setLabel(null);
 
     // Create the InactiveReason, which fails.
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(inactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -208,12 +212,13 @@ public class InactiveReasonResourceIntTest {
     inactiveReasonRepository.saveAndFlush(unencodedInactiveReason);
 
     // Get all the inactiveReasonList
-    restInactiveReasonMockMvc.perform(get("/api/inactive-reasons?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedInactiveReason.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restInactiveReasonMockMvc
+        .perform(get("/api/inactive-reasons?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedInactiveReason.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -251,7 +256,8 @@ public class InactiveReasonResourceIntTest {
     updatedInactiveReason
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(updatedInactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(updatedInactiveReason);
 
     restInactiveReasonMockMvc.perform(put("/api/inactive-reasons")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -272,7 +278,8 @@ public class InactiveReasonResourceIntTest {
     int databaseSizeBeforeUpdate = inactiveReasonRepository.findAll().size();
 
     // Create the InactiveReason
-    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper.inactiveReasonToInactiveReasonDTO(inactiveReason);
+    InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
+        .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restInactiveReasonMockMvc.perform(put("/api/inactive-reasons")

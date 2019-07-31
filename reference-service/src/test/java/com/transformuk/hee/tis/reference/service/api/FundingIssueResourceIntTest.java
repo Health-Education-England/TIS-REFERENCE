@@ -1,5 +1,14 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +16,8 @@ import com.transformuk.hee.tis.reference.service.model.FundingIssue;
 import com.transformuk.hee.tis.reference.service.repository.FundingIssueRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingIssueServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingIssueMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,18 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the FundingIssueResource REST controller.
@@ -74,8 +73,8 @@ public class FundingIssueResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static FundingIssue createEntity(EntityManager em) {
     FundingIssue fundingIssue = new FundingIssue()
@@ -86,7 +85,8 @@ public class FundingIssueResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    FundingIssueResource fundingIssueResource = new FundingIssueResource(fundingIssueRepository, fundingIssueMapper,
+    FundingIssueResource fundingIssueResource = new FundingIssueResource(fundingIssueRepository,
+        fundingIssueMapper,
         fundingIssueService);
     this.restFundingIssueMockMvc = MockMvcBuilders.standaloneSetup(fundingIssueResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -105,7 +105,8 @@ public class FundingIssueResourceIntTest {
     int databaseSizeBeforeCreate = fundingIssueRepository.findAll().size();
 
     // Create the FundingIssue
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(fundingIssue);
     restFundingIssueMockMvc.perform(post("/api/funding-issues")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(fundingIssueDTO)))
@@ -125,7 +126,8 @@ public class FundingIssueResourceIntTest {
 
     // Create the FundingIssue with an existing ID
     fundingIssue.setId(1L);
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(fundingIssue);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restFundingIssueMockMvc.perform(post("/api/funding-issues")
@@ -146,7 +148,8 @@ public class FundingIssueResourceIntTest {
     fundingIssue.setCode(null);
 
     // Create the FundingIssue, which fails.
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(fundingIssue);
 
     restFundingIssueMockMvc.perform(post("/api/funding-issues")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -206,7 +209,8 @@ public class FundingIssueResourceIntTest {
     FundingIssue updatedFundingIssue = fundingIssueRepository.findOne(fundingIssue.getId());
     updatedFundingIssue
         .code(UPDATED_CODE);
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(updatedFundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(updatedFundingIssue);
 
     restFundingIssueMockMvc.perform(put("/api/funding-issues")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -226,7 +230,8 @@ public class FundingIssueResourceIntTest {
     int databaseSizeBeforeUpdate = fundingIssueRepository.findAll().size();
 
     // Create the FundingIssue
-    FundingIssueDTO fundingIssueDTO = fundingIssueMapper.fundingIssueToFundingIssueDTO(fundingIssue);
+    FundingIssueDTO fundingIssueDTO = fundingIssueMapper
+        .fundingIssueToFundingIssueDTO(fundingIssue);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restFundingIssueMockMvc.perform(put("/api/funding-issues")

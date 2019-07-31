@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the EthnicOriginResource REST controller.
@@ -75,8 +74,8 @@ public class EthnicOriginResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static EthnicOrigin createEntity(EntityManager em) {
     EthnicOrigin ethnicOrigin = new EthnicOrigin()
@@ -87,7 +86,8 @@ public class EthnicOriginResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    EthnicOriginResource ethnicOriginResource = new EthnicOriginResource(ethnicOriginRepository, ethnicOriginMapper,
+    EthnicOriginResource ethnicOriginResource = new EthnicOriginResource(ethnicOriginRepository,
+        ethnicOriginMapper,
         ethnicOriginService);
     this.restEthnicOriginMockMvc = MockMvcBuilders.standaloneSetup(ethnicOriginResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -106,7 +106,8 @@ public class EthnicOriginResourceIntTest {
     int databaseSizeBeforeCreate = ethnicOriginRepository.findAll().size();
 
     // Create the EthnicOrigin
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
@@ -126,7 +127,8 @@ public class EthnicOriginResourceIntTest {
 
     // Create the EthnicOrigin with an existing ID
     ethnicOrigin.setId(1L);
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
@@ -147,7 +149,8 @@ public class EthnicOriginResourceIntTest {
     ethnicOrigin.setCode(null);
 
     // Create the EthnicOrigin, which fails.
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
     restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -182,10 +185,10 @@ public class EthnicOriginResourceIntTest {
 
     // Get all the ethnicOriginList
     restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?searchQuery=\"%24ome\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedEthnicOrigin.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedEthnicOrigin.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE));
   }
 
   @Test
@@ -221,7 +224,8 @@ public class EthnicOriginResourceIntTest {
     EthnicOrigin updatedEthnicOrigin = ethnicOriginRepository.findOne(ethnicOrigin.getId());
     updatedEthnicOrigin
         .code(UPDATED_CODE);
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(updatedEthnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(updatedEthnicOrigin);
 
     restEthnicOriginMockMvc.perform(put("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -241,7 +245,8 @@ public class EthnicOriginResourceIntTest {
     int databaseSizeBeforeUpdate = ethnicOriginRepository.findAll().size();
 
     // Create the EthnicOrigin
-    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper.ethnicOriginToEthnicOriginDTO(ethnicOrigin);
+    EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
+        .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restEthnicOriginMockMvc.perform(put("/api/ethnic-origins")

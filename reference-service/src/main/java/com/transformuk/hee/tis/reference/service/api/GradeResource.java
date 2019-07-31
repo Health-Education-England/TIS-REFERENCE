@@ -22,7 +22,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,19 +55,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Grade.
@@ -72,7 +71,8 @@ public class GradeResource {
   private final GradeMapper gradeMapper;
   private final GradeServiceImpl gradeService;
 
-  public GradeResource(GradeRepository gradeRepository, GradeMapper gradeMapper, GradeServiceImpl gradeService) {
+  public GradeResource(GradeRepository gradeRepository, GradeMapper gradeMapper,
+      GradeServiceImpl gradeService) {
     this.gradeRepository = gradeRepository;
     this.gradeMapper = gradeMapper;
     this.gradeService = gradeService;
@@ -82,13 +82,15 @@ public class GradeResource {
    * POST  /grades : Create a new grade.
    *
    * @param gradeDTO the gradeDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new gradeDTO, or with status 400 (Bad Request) if the grade has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new gradeDTO, or with
+   * status 400 (Bad Request) if the grade has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> createGrade(@Validated(Create.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> createGrade(
+      @Validated(Create.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to save Grade : {}", gradeDTO);
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
@@ -102,15 +104,16 @@ public class GradeResource {
    * PUT  /grades : Updates an existing grade.
    *
    * @param gradeDTO the gradeDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated gradeDTO,
-   * or with status 400 (Bad Request) if the gradeDTO is not valid,
-   * or with status 500 (Internal Server Error) if the gradeDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated gradeDTO, or with
+   * status 400 (Bad Request) if the gradeDTO is not valid, or with status 500 (Internal Server
+   * Error) if the gradeDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<GradeDTO> updateGrade(@Validated(Update.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
+  public ResponseEntity<GradeDTO> updateGrade(
+      @Validated(Update.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
     log.debug("REST request to update Grade : {}", gradeDTO);
     Grade grade = gradeMapper.gradeDTOToGrade(gradeDTO);
     grade = gradeRepository.save(grade);
@@ -124,7 +127,8 @@ public class GradeResource {
    * GET  /grades/:id : get the grade by id.
    *
    * @param id the id of the gradeDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the gradeDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the gradeDTO, or with status 404
+   * (Not Found)
    */
   @GetMapping("/grades/{id}")
   @Timed
@@ -136,11 +140,11 @@ public class GradeResource {
   }
 
   /**
-   * GET  /grades/in/:codes : get grades given to codes.
-   * Ignores malformed or not found grades
+   * GET  /grades/in/:codes : get grades given to codes. Ignores malformed or not found grades
    *
    * @param codes the codes to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty
+   * list
    */
   @GetMapping("/grades/in/{codes}")
   @Timed
@@ -165,11 +169,12 @@ public class GradeResource {
   }
 
   /**
-   * GET  /grades/ids/in : get grades by a list of ids in query param.
-   * Ignores malformed or not found grades
+   * GET  /grades/ids/in : get grades by a list of ids in query param. Ignores malformed or not
+   * found grades
    *
    * @param ids the ids to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of gradeDTOs, or empty
+   * list
    */
   @GetMapping("/grades/ids/in")
   @Timed
@@ -182,7 +187,8 @@ public class GradeResource {
     } else {
       List<Grade> grades = gradeRepository.findAll(ids);
       resp = gradeMapper.gradesToGradeDTOs(grades);
-      return new ResponseEntity<>(resp, CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+      return new ResponseEntity<>(resp,
+          CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
   }
 
@@ -204,14 +210,17 @@ public class GradeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of grades begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     if (columnFilterJson != null) {
       columnFilterJson = UrlDecoderUtil.decode(columnFilterJson);
     }
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Grade> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = gradeRepository.findAll(pageable);
@@ -232,7 +241,8 @@ public class GradeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery) {
     log.debug("REST request to get a page of Grades");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     Page<Grade> page;
     if (StringUtils.isEmpty(searchQuery)) {
       Grade gradeExample = new Grade();
@@ -242,7 +252,8 @@ public class GradeResource {
       page = gradeRepository.findByStatusAndSearchString(Status.CURRENT, searchQuery, pageable);
     }
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/grades");
-    return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(gradeMapper.gradesToGradeDTOs(page.getContent()), headers,
+        HttpStatus.OK);
   }
 
   /**
@@ -296,20 +307,24 @@ public class GradeResource {
    * POST  /bulk-grades : Bulk create a new grade.
    *
    * @param gradeDTOs the gradeDTOs to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new gradeDTOs, or with status 400 (Bad Request) if the grade has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new gradeDTOs, or with
+   * status 400 (Bad Request) if the grade has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<GradeDTO>> bulkCreateGrade(@Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
+  public ResponseEntity<List<GradeDTO>> bulkCreateGrade(
+      @Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk save Grade : {}", gradeDTOs);
     if (!Collections.isEmpty(gradeDTOs)) {
       List<GradeDTO> entitiesWithIds = gradeDTOs.stream()
           .filter(grade -> grade.getId() != null)
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithIds, ","), "ids.exist", "Bulk create grades failed because grades cannot be created with ids")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entitiesWithIds, ","), "ids.exist",
+                "Bulk create grades failed because grades cannot be created with ids")).body(null);
       }
     }
     List<Grade> grades = gradeMapper.gradeDTOsToGrades(gradeDTOs);
@@ -323,24 +338,30 @@ public class GradeResource {
    * PUT  /grades : Bulk updates an existing grade.
    *
    * @param gradeDTOs the gradeDTOs to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated gradeDTOs,
-   * or with status 400 (Bad Request) if the gradeDTOs is not valid,
-   * or with status 500 (Internal Server Error) if the gradeDTOs couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated gradeDTOs, or with
+   * status 400 (Bad Request) if the gradeDTOs is not valid, or with status 500 (Internal Server
+   * Error) if the gradeDTOs couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-grades")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<GradeDTO>> bulkUpdateGrade(@Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
+  public ResponseEntity<List<GradeDTO>> bulkUpdateGrade(
+      @Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
     log.debug("REST request to bulk update Grade : {}", gradeDTOs);
     if (Collections.isEmpty(gradeDTOs)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(gradeDTOs)) {
-      List<GradeDTO> entitiesWithNoId = gradeDTOs.stream().filter(grades -> grades.getId() == null).collect(Collectors.toList());
+      List<GradeDTO> entitiesWithNoId = gradeDTOs.stream().filter(grades -> grades.getId() == null)
+          .collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no id, cannot update entities that don't exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no id, cannot update entities that don't exist"))
+            .body(entitiesWithNoId);
       }
     }
 

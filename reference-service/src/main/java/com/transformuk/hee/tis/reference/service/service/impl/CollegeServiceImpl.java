@@ -1,8 +1,13 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+
 import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,12 +17,6 @@ import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
 @Service
 public class CollegeServiceImpl {
 
@@ -25,7 +24,8 @@ public class CollegeServiceImpl {
   private CollegeRepository collegeRepository;
 
   @Transactional(readOnly = true)
-  public Page<College> advancedSearch(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<College> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
+      Pageable pageable) {
 
     List<Specification<College>> specs = new ArrayList<>();
     //add the text search criteria

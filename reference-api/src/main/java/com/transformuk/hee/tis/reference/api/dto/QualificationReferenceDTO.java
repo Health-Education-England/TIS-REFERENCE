@@ -2,10 +2,9 @@ package com.transformuk.hee.tis.reference.api.dto;
 
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 /**
  * A DTO for the QualificationReference entity.

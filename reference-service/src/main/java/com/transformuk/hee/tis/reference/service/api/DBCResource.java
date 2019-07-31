@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
@@ -19,6 +21,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,17 +47,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import uk.nhs.tis.StringConverter;
-
-import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
 /**
  * REST controller for managing DBC.
@@ -74,7 +74,7 @@ public class DBCResource {
    *
    * @param dBCDTO the dBCDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new dBCDTO, or with
-   *         status 400 (Bad Request) if the dBC has already an ID
+   * status 400 (Bad Request) if the dBC has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/dbcs")
@@ -100,8 +100,8 @@ public class DBCResource {
    *
    * @param dBCDTO the dBCDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated dBCDTO, or with
-   *         status 400 (Bad Request) if the dBCDTO is not valid, or with status 500 (Internal
-   *         Server Error) if the dBCDTO couldnt be updated
+   * status 400 (Bad Request) if the dBCDTO is not valid, or with status 500 (Internal Server Error)
+   * if the dBCDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/dbcs")
@@ -137,10 +137,11 @@ public class DBCResource {
           required = false) String searchQuery,
       @ApiParam(
           value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"") @RequestParam(
-              value = "columnFilters", required = false) String columnFilterJson)
+          value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.info("REST request to get a page of dbcs begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
         ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
@@ -160,7 +161,7 @@ public class DBCResource {
    *
    * @param id the id of the dBCDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404
-   *         (Not Found)
+   * (Not Found)
    */
   @GetMapping("/dbcs/{id}")
   @Timed
@@ -193,7 +194,7 @@ public class DBCResource {
    *
    * @param code the code of the dBCDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404
-   *         (Not Found)
+   * (Not Found)
    */
   @GetMapping("/dbcs/code/{code}")
   @Timed
@@ -225,7 +226,7 @@ public class DBCResource {
    *
    * @param dbcdtos List of the dbcdtos to create
    * @return the ResponseEntity with status 200 (Created) and with body the new dbcdtos, or with
-   *         status 400 (Bad Request) if the DBCDto has already an ID
+   * status 400 (Bad Request) if the DBCDto has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-dbcs")
@@ -255,8 +256,8 @@ public class DBCResource {
    *
    * @param dbcdtos List of the dbcdtos to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated dbcdtos, or with
-   *         status 400 (Bad Request) if the dbcdtos is not valid, or with status 500 (Internal
-   *         Server Error) if the dbcdtos couldnt be updated
+   * status 400 (Bad Request) if the dbcdtos is not valid, or with status 500 (Internal Server
+   * Error) if the dbcdtos couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-dbcs")

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the MaritalStatus entity.
  */
 @SuppressWarnings("unused")
-public interface MaritalStatusRepository extends JpaRepository<MaritalStatus, Long>, JpaSpecificationExecutor {
+public interface MaritalStatusRepository extends JpaRepository<MaritalStatus, Long>,
+    JpaSpecificationExecutor {
+
   MaritalStatus findFirstByCode(String code);
 }

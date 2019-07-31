@@ -17,7 +17,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Assessment Types.
@@ -58,7 +57,7 @@ public class AssessmentTypeResource {
   private final AssessmentTypeServiceImpl assessmentTypeService;
 
   public AssessmentTypeResource(AssessmentTypeRepository assessmentTypeRepository,
-                                AssessmentTypeServiceImpl assessmentTypeService) {
+      AssessmentTypeServiceImpl assessmentTypeService) {
     this.assessmentTypeRepository = assessmentTypeRepository;
     this.assessmentTypeService = assessmentTypeService;
   }
@@ -67,16 +66,21 @@ public class AssessmentTypeResource {
    * POST  /assessment-types : Create a new Assessment type.
    *
    * @param assessmentType the Assessment type to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new AssessmentType, or with status 400 (Bad Request) if the AssessmentType has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new AssessmentType, or
+   * with status 400 (Bad Request) if the AssessmentType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> createAssessmentType(@Validated(Create.class) @RequestBody AssessmentType assessmentType) throws URISyntaxException {
+  public ResponseEntity<AssessmentType> createAssessmentType(
+      @Validated(Create.class) @RequestBody AssessmentType assessmentType)
+      throws URISyntaxException {
     log.debug("REST request to save AssessmentType : {}", assessmentType);
     if (assessmentType.getCode() == null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Assessment type must have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(
+          HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Assessment type must have an ID"))
+          .body(null);
     }
     AssessmentType newAssessmentType = assessmentTypeRepository.save(assessmentType);
     return ResponseEntity.created(new URI("/api/assessment-types/" + newAssessmentType.getCode()))
@@ -88,18 +92,20 @@ public class AssessmentTypeResource {
    * PUT  /assessment-types : Updates an existing Assessment Type.
    *
    * @param assessmentType the assessmentType to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated assessmentType,
-   * or with status 400 (Bad Request) if the assessmentType is not valid,
-   * or with status 500 (Internal Server Error) if the assessmentType couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated assessmentType, or
+   * with status 400 (Bad Request) if the assessmentType is not valid, or with status 500 (Internal
+   * Server Error) if the assessmentType couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> updateAssessmentType(@Validated(Update.class) @RequestBody AssessmentType assessmentType) throws URISyntaxException {
+  public ResponseEntity<AssessmentType> updateAssessmentType(
+      @Validated(Update.class) @RequestBody AssessmentType assessmentType)
+      throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
 
-    if(assessmentTypeRepository.findOne(assessmentType.getCode()) == null){
+    if (assessmentTypeRepository.findOne(assessmentType.getCode()) == null) {
       return createAssessmentType(assessmentType);
     }
 
@@ -126,18 +132,22 @@ public class AssessmentTypeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of assessment types begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<AssessmentType> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = assessmentTypeRepository.findAll(pageable);
     } else {
       page = assessmentTypeService.advancedSearch(searchQuery, columnFilters, pageable);
     }
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/assessment-type");
+    HttpHeaders headers = PaginationUtil
+        .generatePaginationHttpHeaders(page, "/api/assessment-type");
     return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
   }
 
@@ -145,7 +155,8 @@ public class AssessmentTypeResource {
    * GET  /assessment-types/:code : get the Assessment Type based on the code.
    *
    * @param code the code of the AssessmentType to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the AssessmentType, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the AssessmentType, or with
+   * status 404 (Not Found)
    */
   @GetMapping("/assessment-types/{code}")
   @Timed

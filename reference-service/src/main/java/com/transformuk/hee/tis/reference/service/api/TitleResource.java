@@ -18,7 +18,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Title.
@@ -59,7 +58,8 @@ public class TitleResource {
   private final TitleMapper titleMapper;
   private final TitleServiceImpl titleService;
 
-  public TitleResource(TitleRepository titleRepository, TitleMapper titleMapper, TitleServiceImpl titleService) {
+  public TitleResource(TitleRepository titleRepository, TitleMapper titleMapper,
+      TitleServiceImpl titleService) {
     this.titleRepository = titleRepository;
     this.titleMapper = titleMapper;
     this.titleService = titleService;
@@ -69,16 +69,20 @@ public class TitleResource {
    * POST  /titles : Create a new title.
    *
    * @param titleDTO the titleDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new titleDTO, or with status 400 (Bad Request) if the title has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new titleDTO, or with
+   * status 400 (Bad Request) if the title has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/titles")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<TitleDTO> createTitle(@Valid @RequestBody TitleDTO titleDTO) throws URISyntaxException {
+  public ResponseEntity<TitleDTO> createTitle(@Valid @RequestBody TitleDTO titleDTO)
+      throws URISyntaxException {
     log.debug("REST request to save Title : {}", titleDTO);
     if (titleDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new title cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists", "A new title cannot already have an ID"))
+          .body(null);
     }
     Title title = titleMapper.titleDTOToTitle(titleDTO);
     title = titleRepository.save(title);
@@ -92,15 +96,16 @@ public class TitleResource {
    * PUT  /titles : Updates an existing title.
    *
    * @param titleDTO the titleDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTO,
-   * or with status 400 (Bad Request) if the titleDTO is not valid,
-   * or with status 500 (Internal Server Error) if the titleDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTO, or with
+   * status 400 (Bad Request) if the titleDTO is not valid, or with status 500 (Internal Server
+   * Error) if the titleDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/titles")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<TitleDTO> updateTitle(@Valid @RequestBody TitleDTO titleDTO) throws URISyntaxException {
+  public ResponseEntity<TitleDTO> updateTitle(@Valid @RequestBody TitleDTO titleDTO)
+      throws URISyntaxException {
     log.debug("REST request to update Title : {}", titleDTO);
     if (titleDTO.getId() == null) {
       return createTitle(titleDTO);
@@ -130,11 +135,14 @@ public class TitleResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of titles begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Title> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = titleRepository.findAll(pageable);
@@ -151,7 +159,8 @@ public class TitleResource {
    * GET  /titles/:id : get the "id" title.
    *
    * @param id the id of the titleDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the titleDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the titleDTO, or with status 404
+   * (Not Found)
    */
   @GetMapping("/titles/{id}")
   @Timed
@@ -173,11 +182,12 @@ public class TitleResource {
   public ResponseEntity<Boolean> titleExists(@RequestBody String code) {
     log.debug("REST request to check Title exists : {}", code);
     Title title = titleRepository.findFirstByCode(code);
-    if(title == null){
+    if (title == null) {
       return new ResponseEntity<>(false, HttpStatus.OK);
     }
     return new ResponseEntity<>(true, HttpStatus.OK);
   }
+
   /**
    * DELETE  /titles/:id : delete the "id" title.
    *
@@ -190,7 +200,8 @@ public class TitleResource {
   public ResponseEntity<Void> deleteTitle(@PathVariable Long id) {
     log.debug("REST request to delete Title : {}", id);
     titleRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
 
@@ -198,13 +209,15 @@ public class TitleResource {
    * POST  /bulk-titles : Bulk create a new titles.
    *
    * @param titleDTOS List of the titleDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new titleDTOS, or with status 400 (Bad Request) if the TitleDto has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new titleDTOS, or with
+   * status 400 (Bad Request) if the TitleDto has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-titles")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<TitleDTO>> bulkCreateTitle(@Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
+  public ResponseEntity<List<TitleDTO>> bulkCreateTitle(
+      @Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save TitleDtos : {}", titleDTOS);
     if (!Collections.isEmpty(titleDTOS)) {
       List<Long> entityIds = titleDTOS.stream()
@@ -212,7 +225,9 @@ public class TitleResource {
           .map(titleDTO -> titleDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new titles cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new titles cannot already have an ID")).body(null);
       }
     }
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);
@@ -226,24 +241,30 @@ public class TitleResource {
    * PUT  /bulk-titles : Updates an existing titles.
    *
    * @param titleDTOS List of the titleDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTOS,
-   * or with status 400 (Bad Request) if the titleDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the titleDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTOS, or with
+   * status 400 (Bad Request) if the titleDTOS is not valid, or with status 500 (Internal Server
+   * Error) if the titleDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-titles")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<TitleDTO>> bulkUpdateTitle(@Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
+  public ResponseEntity<List<TitleDTO>> bulkUpdateTitle(
+      @Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update TitleDtos : {}", titleDTOS);
     if (Collections.isEmpty(titleDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(titleDTOS)) {
-      List<TitleDTO> entitiesWithNoId = titleDTOS.stream().filter(titleDTO -> titleDTO.getId() == null).collect(Collectors.toList());
+      List<TitleDTO> entitiesWithNoId = titleDTOS.stream()
+          .filter(titleDTO -> titleDTO.getId() == null).collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);

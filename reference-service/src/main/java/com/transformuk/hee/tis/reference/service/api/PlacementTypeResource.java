@@ -19,7 +19,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import uk.nhs.tis.StringConverter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +46,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing PlacementType.
@@ -63,8 +62,9 @@ public class PlacementTypeResource {
   private final PlacementTypeMapper placementTypeMapper;
   private final PlacementTypeServiceImpl placementTypeService;
 
-  public PlacementTypeResource(PlacementTypeRepository placementTypeRepository, PlacementTypeMapper placementTypeMapper,
-                               PlacementTypeServiceImpl placementTypeService) {
+  public PlacementTypeResource(PlacementTypeRepository placementTypeRepository,
+      PlacementTypeMapper placementTypeMapper,
+      PlacementTypeServiceImpl placementTypeService) {
     this.placementTypeRepository = placementTypeRepository;
     this.placementTypeMapper = placementTypeMapper;
     this.placementTypeService = placementTypeService;
@@ -85,7 +85,7 @@ public class PlacementTypeResource {
       List<String> dbPlaceTypeCodes = placementTypeRepository.findCodeByCodesIn(codes);
       codes.forEach(code -> {
         boolean isMatched = dbPlaceTypeCodes.stream().anyMatch(code::equalsIgnoreCase);
-        placementTypeExistsMap.put(code,isMatched);
+        placementTypeExistsMap.put(code, isMatched);
 
       });
     }
@@ -96,18 +96,23 @@ public class PlacementTypeResource {
    * POST  /placement-types : Create a new placementType.
    *
    * @param placementTypeDTO the placementTypeDTO to create
-   * @return the ResponseEntity with status 201 (Created) and with body the new placementTypeDTO, or with status 400 (Bad Request) if the placementType has already an ID
+   * @return the ResponseEntity with status 201 (Created) and with body the new placementTypeDTO, or
+   * with status 400 (Bad Request) if the placementType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/placement-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<PlacementTypeDTO> createPlacementType(@Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
+  public ResponseEntity<PlacementTypeDTO> createPlacementType(
+      @Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
     log.debug("REST request to save PlacementType : {}", placementTypeDTO);
     if (placementTypeDTO.getId() != null) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new placementType cannot already have an ID")).body(null);
+      return ResponseEntity.badRequest().headers(HeaderUtil
+          .createFailureAlert(ENTITY_NAME, "idexists",
+              "A new placementType cannot already have an ID")).body(null);
     }
-    PlacementType placementType = placementTypeMapper.placementTypeDTOToPlacementType(placementTypeDTO);
+    PlacementType placementType = placementTypeMapper
+        .placementTypeDTOToPlacementType(placementTypeDTO);
     placementType = placementTypeRepository.save(placementType);
     PlacementTypeDTO result = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
     return ResponseEntity.created(new URI("/api/placement-types/" + result.getId()))
@@ -119,24 +124,27 @@ public class PlacementTypeResource {
    * PUT  /placement-types : Updates an existing placementType.
    *
    * @param placementTypeDTO the placementTypeDTO to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated placementTypeDTO,
-   * or with status 400 (Bad Request) if the placementTypeDTO is not valid,
-   * or with status 500 (Internal Server Error) if the placementTypeDTO couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated placementTypeDTO, or
+   * with status 400 (Bad Request) if the placementTypeDTO is not valid, or with status 500
+   * (Internal Server Error) if the placementTypeDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/placement-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<PlacementTypeDTO> updatePlacementType(@Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
+  public ResponseEntity<PlacementTypeDTO> updatePlacementType(
+      @Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
     log.debug("REST request to update PlacementType : {}", placementTypeDTO);
     if (placementTypeDTO.getId() == null) {
       return createPlacementType(placementTypeDTO);
     }
-    PlacementType placementType = placementTypeMapper.placementTypeDTOToPlacementType(placementTypeDTO);
+    PlacementType placementType = placementTypeMapper
+        .placementTypeDTOToPlacementType(placementTypeDTO);
     placementType = placementTypeRepository.save(placementType);
     PlacementTypeDTO result = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, placementTypeDTO.getId().toString()))
+        .headers(
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, placementTypeDTO.getId().toString()))
         .body(result);
   }
 
@@ -158,11 +166,14 @@ public class PlacementTypeResource {
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. (Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
-      @RequestParam(value = "columnFilters", required = false) String columnFilterJson) throws IOException {
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.info("REST request to get a page of placement types begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
-    List<ColumnFilter> columnFilters = ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFilterJson, filterEnumList);
     Page<PlacementType> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = placementTypeRepository.findAll(pageable);
@@ -178,14 +189,16 @@ public class PlacementTypeResource {
    * GET  /placement-types/:id : get the "id" placementType.
    *
    * @param id the id of the placementTypeDTO to retrieve
-   * @return the ResponseEntity with status 200 (OK) and with body the placementTypeDTO, or with status 404 (Not Found)
+   * @return the ResponseEntity with status 200 (OK) and with body the placementTypeDTO, or with
+   * status 404 (Not Found)
    */
   @GetMapping("/placement-types/{id}")
   @Timed
   public ResponseEntity<PlacementTypeDTO> getPlacementType(@PathVariable Long id) {
     log.debug("REST request to get PlacementType : {}", id);
     PlacementType placementType = placementTypeRepository.findOne(id);
-    PlacementTypeDTO placementTypeDTO = placementTypeMapper.placementTypeToPlacementTypeDTO(placementType);
+    PlacementTypeDTO placementTypeDTO = placementTypeMapper
+        .placementTypeToPlacementTypeDTO(placementType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(placementTypeDTO));
   }
 
@@ -201,7 +214,8 @@ public class PlacementTypeResource {
   public ResponseEntity<Void> deletePlacementType(@PathVariable Long id) {
     log.debug("REST request to delete PlacementType : {}", id);
     placementTypeRepository.delete(id);
-    return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
 
@@ -209,13 +223,15 @@ public class PlacementTypeResource {
    * POST  /bulk-placement-types : Bulk create a new placement-types.
    *
    * @param placementTypeDTOS List of the placementTypeDTOS to create
-   * @return the ResponseEntity with status 200 (Created) and with body the new placementTypeDTOS, or with status 400 (Bad Request) if the PlacementTypeDTO has already an ID
+   * @return the ResponseEntity with status 200 (Created) and with body the new placementTypeDTOS,
+   * or with status 400 (Bad Request) if the PlacementTypeDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-placement-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<PlacementTypeDTO>> bulkCreatePlacementType(@Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
+  public ResponseEntity<List<PlacementTypeDTO>> bulkCreatePlacementType(
+      @Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save PlacementTypeDtos : {}", placementTypeDTOS);
     if (!Collections.isEmpty(placementTypeDTOS)) {
       List<Long> entityIds = placementTypeDTOS.stream()
@@ -223,12 +239,16 @@ public class PlacementTypeResource {
           .map(placementTypeDTO -> placementTypeDTO.getId())
           .collect(Collectors.toList());
       if (!Collections.isEmpty(entityIds)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist", "A new placementTypes cannot already have an ID")).body(null);
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new placementTypes cannot already have an ID")).body(null);
       }
     }
-    List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
+    List<PlacementType> placementTypes = placementTypeMapper
+        .placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
-    List<PlacementTypeDTO> result = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
+    List<PlacementTypeDTO> result = placementTypeMapper
+        .placementTypesToPlacementTypeDTOs(placementTypes);
     return ResponseEntity.ok()
         .body(result);
   }
@@ -237,29 +257,38 @@ public class PlacementTypeResource {
    * PUT  /bulk-placement-types : Updates an existing placement-types.
    *
    * @param placementTypeDTOS List of the placementTypeDTOS to update
-   * @return the ResponseEntity with status 200 (OK) and with body the updated placementTypeDTOS,
-   * or with status 400 (Bad Request) if the placementTypeDTOS is not valid,
-   * or with status 500 (Internal Server Error) if the placementTypeDTOS couldnt be updated
+   * @return the ResponseEntity with status 200 (OK) and with body the updated placementTypeDTOS, or
+   * with status 400 (Bad Request) if the placementTypeDTOS is not valid, or with status 500
+   * (Internal Server Error) if the placementTypeDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-placement-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<List<PlacementTypeDTO>> bulkUpdatePlacementType(@Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
+  public ResponseEntity<List<PlacementTypeDTO>> bulkUpdatePlacementType(
+      @Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update placementTypeDto : {}", placementTypeDTOS);
     if (Collections.isEmpty(placementTypeDTOS)) {
-      return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
-          "The request body for this end point cannot be empty")).body(null);
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
+              "The request body for this end point cannot be empty")).body(null);
     } else if (!Collections.isEmpty(placementTypeDTOS)) {
-      List<PlacementTypeDTO> entitiesWithNoId = placementTypeDTOS.stream().filter(placementTypeDTO -> placementTypeDTO.getId() == null).collect(Collectors.toList());
+      List<PlacementTypeDTO> entitiesWithNoId = placementTypeDTOS.stream()
+          .filter(placementTypeDTO -> placementTypeDTO.getId() == null)
+          .collect(Collectors.toList());
       if (!Collections.isEmpty(entitiesWithNoId)) {
-        return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
-            "bulk.update.failed.noId", "Some DTOs you've provided have no Id, cannot update entities that dont exist")).body(entitiesWithNoId);
+        return ResponseEntity.badRequest()
+            .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
+                "bulk.update.failed.noId",
+                "Some DTOs you've provided have no Id, cannot update entities that dont exist"))
+            .body(entitiesWithNoId);
       }
     }
-    List<PlacementType> placementTypes = placementTypeMapper.placementTypeDTOsToPlacementTypes(placementTypeDTOS);
+    List<PlacementType> placementTypes = placementTypeMapper
+        .placementTypeDTOsToPlacementTypes(placementTypeDTOS);
     placementTypes = placementTypeRepository.save(placementTypes);
-    List<PlacementTypeDTO> results = placementTypeMapper.placementTypesToPlacementTypeDTOs(placementTypes);
+    List<PlacementTypeDTO> results = placementTypeMapper
+        .placementTypesToPlacementTypeDTOs(placementTypes);
     return ResponseEntity.ok()
         .body(results);
   }

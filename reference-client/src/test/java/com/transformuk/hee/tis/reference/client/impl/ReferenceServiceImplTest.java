@@ -48,7 +48,8 @@ public class ReferenceServiceImplTest {
   private static final String UNKNOWN_CODE = "XXX";
 
   private List<String> ids = Lists.newArrayList("SSL", "ADL");
-  private List<String> medicalSchoolValues = Lists.newArrayList("University of London", "United Medical & Dental School, London");
+  private List<String> medicalSchoolValues = Lists
+      .newArrayList("University of London", "United Medical & Dental School, London");
   private List<String> countryValues = Lists.newArrayList("United Kingdom");
 
   @Mock
@@ -67,13 +68,15 @@ public class ReferenceServiceImplTest {
   public void shouldGetDBCByCode() {
     // given
     ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), any())).willReturn(responseEntity);
+    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), any()))
+        .willReturn(responseEntity);
 
     // when
     referenceServiceImpl.getDBCByCode(DBC);
 
     // then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
+    verify(referenceRestTemplate)
+        .getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
   }
 
   @Test
@@ -82,8 +85,9 @@ public class ReferenceServiceImplTest {
     Set<String> codes = Sets.newHashSet("code1", "code2");
     List<SiteDTO> sites = new ArrayList<>();
     ResponseEntity<List<SiteDTO>> responseEntity = new ResponseEntity(sites, HttpStatus.OK);
-    given(referenceRestTemplate.exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
-        any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
+            any(ParameterizedTypeReference.class))).willReturn(responseEntity);
 
     // when
     List<SiteDTO> respList = referenceServiceImpl.findSitesIn(codes);
@@ -105,13 +109,15 @@ public class ReferenceServiceImplTest {
     ResponseEntity<List<SiteDTO>> responseEntity = new ResponseEntity(sites, HttpStatus.OK);
     given(referenceRestTemplate.exchange(anyString(),
         any(HttpMethod.class), isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any())).willReturn(responseEntity);
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any()))
+        .willReturn(responseEntity);
 
     // when
     List<SiteDTO> respList = referenceServiceImpl.findSitesByName(siteNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites?columnFilters=%7B%22siteKnownAs%22%3A%5B%22siteNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+            + "/api/sites?columnFilters=%7B%22siteKnownAs%22%3A%5B%22siteNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(sites, respList);
@@ -123,8 +129,9 @@ public class ReferenceServiceImplTest {
     Set<String> codes = Sets.newHashSet("code1", "code2");
     List<GradeDTO> grades = new ArrayList<>();
     ResponseEntity<List<GradeDTO>> responseEntity = new ResponseEntity(grades, HttpStatus.OK);
-    given(referenceRestTemplate.exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
-        any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
+            any(ParameterizedTypeReference.class))).willReturn(responseEntity);
 
     // when
     List<GradeDTO> respList = referenceServiceImpl.findGradesIn(codes);
@@ -146,13 +153,15 @@ public class ReferenceServiceImplTest {
     ResponseEntity<List<GradeDTO>> responseEntity = new ResponseEntity(grades, HttpStatus.OK);
     given(referenceRestTemplate.exchange(anyString(),
         any(HttpMethod.class), isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any())).willReturn(responseEntity);
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any()))
+        .willReturn(responseEntity);
 
     // when
     List<GradeDTO> respList = referenceServiceImpl.findGradesByName(gradeNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/grades?columnFilters=%7B%22name%22%3A%5B%22gradeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+            + "/api/grades?columnFilters=%7B%22name%22%3A%5B%22gradeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any());
     assertEquals(grades, respList);
@@ -169,13 +178,16 @@ public class ReferenceServiceImplTest {
     ResponseEntity<List<TrustDTO>> responseEntity = new ResponseEntity(trusts, HttpStatus.OK);
     given(referenceRestTemplate.exchange(anyString(),
         any(HttpMethod.class), isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<java.util.List<TrustDTO>>>any())).willReturn(responseEntity);
+        Matchers.<ParameterizedTypeReference<java.util.List<TrustDTO>>>any()))
+        .willReturn(responseEntity);
 
     // when
-    List<TrustDTO> respList = referenceServiceImpl.findTrustByTrustKnownAs(trustNameWithSpecialCharacters);
+    List<TrustDTO> respList = referenceServiceImpl
+        .findTrustByTrustKnownAs(trustNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/trusts?columnFilters=%7B%22trustKnownAs%22%3A%5B%22trustNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+            + "/api/trusts?columnFilters=%7B%22trustKnownAs%22%3A%5B%22trustNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(trusts, respList);
@@ -189,16 +201,20 @@ public class ReferenceServiceImplTest {
     localOfficeDTO.setName(localOfficeNameWithSpecialCharacters);
     List<LocalOfficeDTO> localOffices = Collections.singletonList(localOfficeDTO);
 
-    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices, HttpStatus.OK);
+    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices,
+        HttpStatus.OK);
     given(referenceRestTemplate.exchange(anyString(),
-        any(HttpMethod.class),isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any())).willReturn(responseEntity);
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any()))
+        .willReturn(responseEntity);
 
     // when
-    List<LocalOfficeDTO> respList = referenceServiceImpl.findLocalOfficesByName(localOfficeNameWithSpecialCharacters);
+    List<LocalOfficeDTO> respList = referenceServiceImpl
+        .findLocalOfficesByName(localOfficeNameWithSpecialCharacters);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/local-offices?columnFilters=%7B%22name%22%3A%5B%22localOfficeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+            + "/api/local-offices?columnFilters=%7B%22name%22%3A%5B%22localOfficeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(localOffices, respList);
@@ -394,7 +410,9 @@ public class ReferenceServiceImplTest {
     referenceServiceImpl.siteTrustMatch(SITE_CODE, TRUST_CODE);
 
     // then
-    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST, requestEntity, responseType);
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST,
+            requestEntity, responseType);
   }
 
   @Test
@@ -410,7 +428,9 @@ public class ReferenceServiceImplTest {
     referenceServiceImpl.siteTrustMatch(UNKNOWN_CODE, TRUST_CODE);
 
     // then
-    verify(referenceRestTemplate).exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST, requestEntity, responseType);
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/sites/trustmatch/" + TRUST_CODE, HttpMethod.POST,
+            requestEntity, responseType);
   }
 
 }

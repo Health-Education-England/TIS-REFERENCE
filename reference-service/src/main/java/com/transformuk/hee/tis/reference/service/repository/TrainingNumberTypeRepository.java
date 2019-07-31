@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the TrainingNumberType entity.
  */
 @SuppressWarnings("unused")
-public interface TrainingNumberTypeRepository extends JpaRepository<TrainingNumberType, Long>, JpaSpecificationExecutor {
+public interface TrainingNumberTypeRepository extends JpaRepository<TrainingNumberType, Long>,
+    JpaSpecificationExecutor {
 
 }

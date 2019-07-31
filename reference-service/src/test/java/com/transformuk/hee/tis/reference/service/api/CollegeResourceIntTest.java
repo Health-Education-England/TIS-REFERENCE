@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,8 +17,9 @@ import com.transformuk.hee.tis.reference.service.model.College;
 import com.transformuk.hee.tis.reference.service.repository.CollegeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.CollegeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.CollegeMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -21,19 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the CollegeResource REST controller.
@@ -80,8 +78,8 @@ public class CollegeResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static College createEntity(EntityManager em) {
     College college = new College()
@@ -187,14 +185,14 @@ public class CollegeResourceIntTest {
         .abbreviation(UNENCODED_ABBREVIATION)
         .name(UNENCODED_NAME);
     unescapedCollege = collegeRepository.saveAndFlush(unescapedCollege);
-    
+
     // Get all the collegeList
     restCollegeMockMvc.perform(get("/api/colleges?searchQuery=\"Te%24ting%20%26%20\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedCollege.getId().intValue())))
-    .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION.toString())))
-    .andExpect(jsonPath("$.[*].name").value(hasItem(UNENCODED_NAME.toString())));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedCollege.getId().intValue())))
+        .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION.toString())))
+        .andExpect(jsonPath("$.[*].name").value(hasItem(UNENCODED_NAME.toString())));
   }
 
   @Test

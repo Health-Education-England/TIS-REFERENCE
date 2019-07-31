@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the QualificationReference entity.
  */
 @SuppressWarnings("unused")
-public interface QualificationReferenceRepository extends JpaRepository<QualificationReference, Long>, JpaSpecificationExecutor {
+public interface QualificationReferenceRepository extends
+    JpaRepository<QualificationReference, Long>, JpaSpecificationExecutor {
+
   QualificationReference findFirstByCode(String code);
 }

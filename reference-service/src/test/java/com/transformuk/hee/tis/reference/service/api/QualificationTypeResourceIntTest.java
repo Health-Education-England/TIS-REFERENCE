@@ -1,5 +1,15 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -7,6 +17,8 @@ import com.transformuk.hee.tis.reference.service.model.QualificationType;
 import com.transformuk.hee.tis.reference.service.repository.QualificationTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.QualificationTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.QualificationTypeMapper;
+import java.util.List;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the QualificationTypeResource REST controller.
@@ -74,26 +78,27 @@ public class QualificationTypeResourceIntTest {
   /**
    * Create an entity for this test.
    * <p>
-   * This is a static method, as tests for other entities might also need it,
-   * if they test an entity which requires the current entity.
+   * This is a static method, as tests for other entities might also need it, if they test an entity
+   * which requires the current entity.
    */
   public static QualificationType createEntity(EntityManager em) {
     QualificationType qualificationType = new QualificationType()
-            .code(DEFAULT_CODE)
-            .label(DEFAULT_LABEL);
+        .code(DEFAULT_CODE)
+        .label(DEFAULT_LABEL);
     return qualificationType;
   }
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    QualificationTypeResource qualificationTypeResource = new QualificationTypeResource(qualificationTypeRepository,
-            qualificationTypeMapper,
-            qualificationTypeService);
+    QualificationTypeResource qualificationTypeResource = new QualificationTypeResource(
+        qualificationTypeRepository,
+        qualificationTypeMapper,
+        qualificationTypeService);
     this.restQualificationTypeMockMvc = MockMvcBuilders.standaloneSetup(qualificationTypeResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setMessageConverters(jacksonMessageConverter).build();
+        .setCustomArgumentResolvers(pageableArgumentResolver)
+        .setControllerAdvice(exceptionTranslator)
+        .setMessageConverters(jacksonMessageConverter).build();
   }
 
   @Before
@@ -107,16 +112,18 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeCreate = qualificationTypeRepository.findAll().size();
 
     // Create the QualificationType
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(qualificationType);
     restQualificationTypeMockMvc.perform(post("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isCreated());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isCreated());
 
     // Validate the QualificationType in the database
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
     assertThat(qualificationTypeList).hasSize(databaseSizeBeforeCreate + 1);
-    QualificationType testQualificationType = qualificationTypeList.get(qualificationTypeList.size() - 1);
+    QualificationType testQualificationType = qualificationTypeList
+        .get(qualificationTypeList.size() - 1);
     assertThat(testQualificationType.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testQualificationType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -128,13 +135,14 @@ public class QualificationTypeResourceIntTest {
 
     // Create the QualificationType with an existing ID
     qualificationType.setId(1L);
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restQualificationTypeMockMvc.perform(post("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isBadRequest());
 
     // Validate the Alice in the database
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
@@ -149,12 +157,13 @@ public class QualificationTypeResourceIntTest {
     qualificationType.setCode(null);
 
     // Create the QualificationType, which fails.
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     restQualificationTypeMockMvc.perform(post("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isBadRequest());
 
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
     assertThat(qualificationTypeList).hasSize(databaseSizeBeforeTest);
@@ -168,12 +177,13 @@ public class QualificationTypeResourceIntTest {
     qualificationType.setLabel(null);
 
     // Create the QualificationType, which fails.
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     restQualificationTypeMockMvc.perform(post("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isBadRequest());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isBadRequest());
 
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
     assertThat(qualificationTypeList).hasSize(databaseSizeBeforeTest);
@@ -187,11 +197,11 @@ public class QualificationTypeResourceIntTest {
 
     // Get all the qualificationTypeList
     restQualificationTypeMockMvc.perform(get("/api/qualification-types?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationType.getId().intValue())))
-            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-            .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationType.getId().intValue())))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
   }
 
   @Test
@@ -202,14 +212,15 @@ public class QualificationTypeResourceIntTest {
         .code(UNENCODED_CODE)
         .label(UNENCODED_LABEL);
     qualificationTypeRepository.saveAndFlush(unencodedQualificationType);
-    
+
     // Get the qualificationTypeList
-    restQualificationTypeMockMvc.perform(get("/api/qualification-types?searchQuery=\"Te%24t\"&sort=id,desc"))
-    .andExpect(status().isOk())
-    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-    .andExpect(jsonPath("$.[*].id").value(unencodedQualificationType.getId().intValue()))
-    .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
-    .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+    restQualificationTypeMockMvc
+        .perform(get("/api/qualification-types?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(unencodedQualificationType.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 
   @Test
@@ -219,12 +230,13 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(qualificationType);
 
     // Get the qualificationType
-    restQualificationTypeMockMvc.perform(get("/api/qualification-types/{id}", qualificationType.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(qualificationType.getId().intValue()))
-            .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-            .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+    restQualificationTypeMockMvc
+        .perform(get("/api/qualification-types/{id}", qualificationType.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id").value(qualificationType.getId().intValue()))
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
   }
 
   @Test
@@ -232,7 +244,7 @@ public class QualificationTypeResourceIntTest {
   public void getNonExistingQualificationType() throws Exception {
     // Get the qualificationType
     restQualificationTypeMockMvc.perform(get("/api/qualification-types/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -243,21 +255,24 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationTypeRepository.findAll().size();
 
     // Update the qualificationType
-    QualificationType updatedQualificationType = qualificationTypeRepository.findOne(qualificationType.getId());
+    QualificationType updatedQualificationType = qualificationTypeRepository
+        .findOne(qualificationType.getId());
     updatedQualificationType
-            .code(UPDATED_CODE)
-            .label(UPDATED_LABEL);
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(updatedQualificationType);
+        .code(UPDATED_CODE)
+        .label(UPDATED_LABEL);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(updatedQualificationType);
 
     restQualificationTypeMockMvc.perform(put("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isOk());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isOk());
 
     // Validate the QualificationType in the database
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
     assertThat(qualificationTypeList).hasSize(databaseSizeBeforeUpdate);
-    QualificationType testQualificationType = qualificationTypeList.get(qualificationTypeList.size() - 1);
+    QualificationType testQualificationType = qualificationTypeList
+        .get(qualificationTypeList.size() - 1);
     assertThat(testQualificationType.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testQualificationType.getLabel()).isEqualTo(UPDATED_LABEL);
   }
@@ -268,13 +283,14 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeUpdate = qualificationTypeRepository.findAll().size();
 
     // Create the QualificationType
-    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper.qualificationTypeToQualificationTypeDTO(qualificationType);
+    QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
+        .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restQualificationTypeMockMvc.perform(put("/api/qualification-types")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
-            .andExpect(status().isCreated());
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
+        .andExpect(status().isCreated());
 
     // Validate the QualificationType in the database
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();
@@ -289,9 +305,10 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeDelete = qualificationTypeRepository.findAll().size();
 
     // Get the QualificationType
-    restQualificationTypeMockMvc.perform(delete("/api/qualification-types/{id}", qualificationType.getId())
+    restQualificationTypeMockMvc
+        .perform(delete("/api/qualification-types/{id}", qualificationType.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk());
+        .andExpect(status().isOk());
 
     // Validate the database is empty
     List<QualificationType> qualificationTypeList = qualificationTypeRepository.findAll();

@@ -6,6 +6,7 @@ import com.transformuk.hee.tis.security.JwtAuthenticationProvider;
 import com.transformuk.hee.tis.security.JwtAuthenticationSuccessHandler;
 import com.transformuk.hee.tis.security.RestAccessDeniedHandler;
 import com.transformuk.hee.tis.security.filter.JwtAuthenticationTokenFilter;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -13,14 +14,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -43,9 +41,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-    JwtAuthenticationTokenFilter authenticationTokenFilter = new JwtAuthenticationTokenFilter("/api/**");
+    JwtAuthenticationTokenFilter authenticationTokenFilter = new JwtAuthenticationTokenFilter(
+        "/api/**");
     authenticationTokenFilter.setAuthenticationManager(authenticationManager());
-    authenticationTokenFilter.setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
+    authenticationTokenFilter
+        .setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
     return authenticationTokenFilter;
   }
 
@@ -59,12 +59,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/scripts/**/*", "/styles/**/*", "/images/**/*", "/bower_components/**/*",
             "/app/**/*", "/index.html").permitAll()
         .and()
-        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler)
+        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+        .accessDeniedHandler(accessDeniedHandler)
         .and()
         // don't create session
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); //.and()
     // Custom JWT based security filter
     httpSecurity
-        .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(authenticationTokenFilterBean(),
+            UsernamePasswordAuthenticationFilter.class);
   }
 }

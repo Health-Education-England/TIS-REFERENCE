@@ -11,8 +11,8 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * Configuration for swagger to auto generate our REST API documentation.
- * For more info please {@see http://swagger.io/getting-started/}
+ * Configuration for swagger to auto generate our REST API documentation. For more info please {@see
+ * http://swagger.io/getting-started/}
  */
 @Configuration
 @EnableSwagger2

@@ -1,14 +1,20 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static org.springframework.util.StringUtils.isEmpty;
+
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
-import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
+import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
-import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,14 +25,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * Service to fetch reference data like sites and trusts
@@ -40,8 +38,9 @@ public class SitesTrustsService {
   private LocalOfficeRepository localOfficeRepository;
 
   @Autowired
-  public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository, LocalOfficeRepository localOfficeRepository,
-                            @Value("${search.result.limit:100}") int limit) {
+  public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
+      LocalOfficeRepository localOfficeRepository,
+      @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
     this.localOfficeRepository = localOfficeRepository;
@@ -92,7 +91,8 @@ public class SitesTrustsService {
    */
   public List<Site> searchSitesWithinTrust(String trustCode, String searchString) {
     if (!isEmpty(searchString)) {
-      return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString, new PageRequest(0, limit));
+      return siteRepository
+          .findBySearchStringAndTrustCode(trustCode, searchString, new PageRequest(0, limit));
     } else {
       return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
     }
@@ -117,7 +117,8 @@ public class SitesTrustsService {
    */
   public List<Trust> searchTrusts(String searchString) {
     if (!isEmpty(searchString)) {
-      return trustRepository.findBySearchString(searchString, new PageRequest(0, limit)).getContent();
+      return trustRepository.findBySearchString(searchString, new PageRequest(0, limit))
+          .getContent();
     } else {
       return trustRepository.findAll();
     }
@@ -158,7 +159,8 @@ public class SitesTrustsService {
 
 
   @Transactional(readOnly = true)
-  public Page<Site> advanceSearchSite(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<Site> advanceSearchSite(String searchString, List<ColumnFilter> columnFilters,
+      Pageable pageable) {
 
     List<Specification<Site>> specs = new ArrayList<>();
     //add the text search criteria
@@ -191,7 +193,8 @@ public class SitesTrustsService {
   }
 
   @Transactional(readOnly = true)
-  public Page<Trust> advanceSearchTrust(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<Trust> advanceSearchTrust(String searchString, List<ColumnFilter> columnFilters,
+      Pageable pageable) {
 
     List<Specification<Trust>> specs = new ArrayList<>();
     //add the text search criteria
@@ -220,7 +223,8 @@ public class SitesTrustsService {
   }
 
   @Transactional(readOnly = true)
-  public Page<LocalOffice> advanceSearchLocalOffice(String searchString, List<ColumnFilter> columnFilters, Pageable pageable) {
+  public Page<LocalOffice> advanceSearchLocalOffice(String searchString,
+      List<ColumnFilter> columnFilters, Pageable pageable) {
 
     List<Specification<LocalOffice>> specs = new ArrayList<>();
     //add the text search criteria
@@ -256,7 +260,8 @@ public class SitesTrustsService {
    * @return Page of {@link LocalOffice} matching searchString
    */
   public Page<LocalOffice> searchCurrentLocalOffices(String searchString, Pageable pageable) {
-    return localOfficeRepository.findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
+    return localOfficeRepository
+        .findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
   }
 
   /**
@@ -267,7 +272,8 @@ public class SitesTrustsService {
    */
   public List<LocalOffice> searchLocalOffices(String searchString) {
     if (!isEmpty(searchString)) {
-      return localOfficeRepository.findBySearchString(searchString, new PageRequest(0, limit)).getContent();
+      return localOfficeRepository.findBySearchString(searchString, new PageRequest(0, limit))
+          .getContent();
     } else {
       return localOfficeRepository.findAll();
     }

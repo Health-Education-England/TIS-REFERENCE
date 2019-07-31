@@ -1,83 +1,90 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class RoleCategory implements Serializable {
-    private static final long serialVersionUID = -3365258728986923380L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  private static final long serialVersionUID = -3365258728986923380L;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @OneToMany(mappedBy = "roleCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Role> roles = new HashSet<>();
+  @NotNull
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    public RoleCategory() {
+  @OneToMany(mappedBy = "roleCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Role> roles = new HashSet<>();
+
+  public RoleCategory() {
+  }
+
+  public RoleCategory(String name) {
+    this.name = name;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Set<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public RoleCategory(String name) {
-        this.name = name;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
-
-    public Long getId() {
-        return id;
+    RoleCategory roleCategory = (RoleCategory) o;
+    if (roleCategory.id == null || id == null) {
+      return false;
     }
+    return Objects.equals(id, roleCategory.id);
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        RoleCategory roleCategory = (RoleCategory) o;
-        if (roleCategory.id == null || id == null) {
-            return false;
-        }
-        return Objects.equals(id, roleCategory.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "RoleCategory{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "RoleCategory{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        '}';
+  }
 }
