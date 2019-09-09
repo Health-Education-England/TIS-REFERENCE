@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static org.springframework.util.StringUtils.isEmpty;
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -39,8 +38,7 @@ public class SitesTrustsService {
 
   @Autowired
   public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
-      LocalOfficeRepository localOfficeRepository,
-      @Value("${search.result.limit:100}") int limit) {
+      LocalOfficeRepository localOfficeRepository, @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
     this.localOfficeRepository = localOfficeRepository;
@@ -51,7 +49,7 @@ public class SitesTrustsService {
    * Searches all sites who have data containing given searchString
    *
    * @param searchString search string to be searched for site data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return List of {@link Site} matching searchString
    */
   public Page<Site> searchSites(String searchString, Pageable pageable) {
@@ -85,14 +83,14 @@ public class SitesTrustsService {
   }
 
   /**
-   * @param trustCode    Trust code for a trust inside which the sites have to be searched
+   * @param trustCode Trust code for a trust inside which the sites have to be searched
    * @param searchString search string to be searched for site data
    * @return List of {@link Site} matching searchString for given trustCode
    */
   public List<Site> searchSitesWithinTrust(String trustCode, String searchString) {
     if (!isEmpty(searchString)) {
-      return siteRepository
-          .findBySearchStringAndTrustCode(trustCode, searchString, new PageRequest(0, limit));
+      return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString,
+          new PageRequest(0, limit));
     } else {
       return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
     }
@@ -128,7 +126,7 @@ public class SitesTrustsService {
    * Searches all trusts who have data containing given searchString
    *
    * @param searchString search string to be searched for trust data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link Trust} matching searchString
    */
   public Page<Trust> searchTrusts(String searchString, Pageable pageable) {
@@ -139,7 +137,7 @@ public class SitesTrustsService {
    * Searches all current trusts who have data containing given searchString
    *
    * @param searchString search string to be searched for trust data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link Trust} matching searchString
    */
   public Page<Trust> searchCurrentTrusts(String searchString, Pageable pageable) {
@@ -163,16 +161,15 @@ public class SitesTrustsService {
       Pageable pageable) {
 
     List<Specification<Site>> specs = new ArrayList<>();
-    //add the text search criteria
+    // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("siteCode", searchString)).
-          or(containsLike("trustCode", searchString)).
-          or(containsLike("siteName", searchString)).
-          or(containsLike("postCode", searchString)).
-          or(containsLike("address", searchString))
-      );
+      specs.add(Specifications.where(containsLike("siteCode", searchString))
+          .or(containsLike("trustCode", searchString))
+          .or(containsLike("siteName", searchString))
+          .or(containsLike("postCode", searchString))
+          .or(containsLike("address", searchString)));
     }
-    //add the column filters criteria
+    // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
       columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
     }
@@ -180,7 +177,7 @@ public class SitesTrustsService {
     Page<Site> result;
     if (!specs.isEmpty()) {
       Specifications<Site> fullSpec = Specifications.where(specs.get(0));
-      //add the rest of the specs that made it in
+      // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
       }
@@ -197,13 +194,15 @@ public class SitesTrustsService {
       Pageable pageable) {
 
     List<Specification<Trust>> specs = new ArrayList<>();
-    //add the text search criteria
+    // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("trustName", searchString)).
-          or(containsLike("code", searchString))
-      );
+      specs.add(Specifications.where(containsLike("trustName", searchString))
+          .or(containsLike("trustKnownAs", searchString))
+          .or(containsLike("code", searchString))
+          .or(containsLike("postCode", searchString))
+          .or(containsLike("address", searchString)));
     }
-    //add the column filters criteria
+    // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
       columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
     }
@@ -211,7 +210,7 @@ public class SitesTrustsService {
     Page<Trust> result;
     if (!specs.isEmpty()) {
       Specifications<Trust> fullSpec = Specifications.where(specs.get(0));
-      //add the rest of the specs that made it in
+      // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
       }
@@ -227,12 +226,12 @@ public class SitesTrustsService {
       List<ColumnFilter> columnFilters, Pageable pageable) {
 
     List<Specification<LocalOffice>> specs = new ArrayList<>();
-    //add the text search criteria
+    // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("abbreviation", searchString)).
-          or(containsLike("name", searchString)));
+      specs.add(Specifications.where(containsLike("abbreviation", searchString))
+          .or(containsLike("name", searchString)));
     }
-    //add the column filters criteria
+    // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
       columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
     }
@@ -240,7 +239,7 @@ public class SitesTrustsService {
     Page<LocalOffice> result;
     if (!specs.isEmpty()) {
       Specifications<LocalOffice> fullSpec = Specifications.where(specs.get(0));
-      //add the rest of the specs that made it in
+      // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
       }
@@ -256,12 +255,12 @@ public class SitesTrustsService {
    * Searches current localOffices who have data containing given searchString
    *
    * @param searchString search string to be searched for localOffice data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link LocalOffice} matching searchString
    */
   public Page<LocalOffice> searchCurrentLocalOffices(String searchString, Pageable pageable) {
-    return localOfficeRepository
-        .findByStatusAndSearchString(Status.CURRENT, searchString, pageable);
+    return localOfficeRepository.findByStatusAndSearchString(Status.CURRENT, searchString,
+        pageable);
   }
 
   /**

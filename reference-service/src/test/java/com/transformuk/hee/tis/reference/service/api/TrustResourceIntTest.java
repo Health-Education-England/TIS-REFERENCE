@@ -58,7 +58,7 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
-  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and $t Thomas' NHS Foundation Trust";
+  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and $t Thomas' NHS Foundation Trust (G$T)";
 
   private static final String DEFAULT_TRUST_NAME = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NAME = "BBBBBBBBBB";
@@ -78,7 +78,9 @@ public class TrustResourceIntTest {
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
+  // The ADMINS-UI, json encodes the string, which wraps the value in quotes.
   private static final String ENCODED_SEARCH_QUERY = "\"Guy's%20%26%20%24t%20T\"";
+  private static final String ENCODED_KNOWN_AS_QUERY = "\"(G%24T)\"";
 
   @Autowired
   private TrustRepository trustRepository;
@@ -416,6 +418,19 @@ public class TrustResourceIntTest {
     //Search using URLEncoded characters
     restTrustMockMvc.perform(get("/api/trusts")
         .param("searchQuery", ENCODED_SEARCH_QUERY)
+        .param("page", "0")
+        .param("size", "200")
+        .param("sort", "trustKnownAs,asc")
+        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        //Verify field values
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
+    
+
+    //Search using the 'trustKnownAs'
+    restTrustMockMvc.perform(get("/api/trusts")
+        .param("searchQuery", ENCODED_KNOWN_AS_QUERY)
         .param("page", "0")
         .param("size", "200")
         .param("sort", "trustKnownAs,asc")
