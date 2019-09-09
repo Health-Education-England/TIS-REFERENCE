@@ -164,10 +164,8 @@ public class SitesTrustsService {
     // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
       specs.add(Specifications.where(containsLike("siteCode", searchString))
-          .or(containsLike("trustCode", searchString))
-          .or(containsLike("siteName", searchString))
-          .or(containsLike("postCode", searchString))
-          .or(containsLike("address", searchString)));
+          .or(containsLike("trustCode", searchString)).or(containsLike("siteName", searchString))
+          .or(containsLike("postCode", searchString)).or(containsLike("address", searchString)));
     }
     // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
@@ -197,10 +195,8 @@ public class SitesTrustsService {
     // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
       specs.add(Specifications.where(containsLike("trustName", searchString))
-          .or(containsLike("trustKnownAs", searchString))
-          .or(containsLike("code", searchString))
-          .or(containsLike("postCode", searchString))
-          .or(containsLike("address", searchString)));
+          .or(containsLike("trustKnownAs", searchString)).or(containsLike("code", searchString))
+          .or(containsLike("postCode", searchString)).or(containsLike("address", searchString)));
     }
     // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {

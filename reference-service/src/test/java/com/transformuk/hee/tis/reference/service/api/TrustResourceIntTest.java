@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -58,7 +57,8 @@ public class TrustResourceIntTest {
 
   private static final String DEFAULT_TRUST_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_KNOWN_AS = "BBBBBBBBBB";
-  private static final String UNENCODED_TRUST_KNOWN_AS = "Guy's and $t Thomas' NHS Foundation Trust (G$T)";
+  private static final String UNENCODED_TRUST_KNOWN_AS =
+      "Guy's and $t Thomas' NHS Foundation Trust (G$T)";
 
   private static final String DEFAULT_TRUST_NAME = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_NAME = "BBBBBBBBBB";
@@ -114,27 +114,21 @@ public class TrustResourceIntTest {
    * which requires the current entity.
    */
   public static Trust createEntity(EntityManager em) {
-    Trust trust = new Trust()
-        .code(DEFAULT_CODE)
-        .localOffice(DEFAULT_LOCAL_OFFICE)
-        .status(DEFAULT_STATUS)
-        .trustKnownAs(DEFAULT_TRUST_KNOWN_AS)
-        .trustName(DEFAULT_TRUST_NAME)
-        .trustNumber(DEFAULT_TRUST_NUMBER)
-        .address(DEFAULT_ADDRESS)
-        .postCode(DEFAULT_POST_CODE);
+    Trust trust = new Trust().code(DEFAULT_CODE).localOffice(DEFAULT_LOCAL_OFFICE)
+        .status(DEFAULT_STATUS).trustKnownAs(DEFAULT_TRUST_KNOWN_AS).trustName(DEFAULT_TRUST_NAME)
+        .trustNumber(DEFAULT_TRUST_NUMBER).address(DEFAULT_ADDRESS).postCode(DEFAULT_POST_CODE);
     return trust;
   }
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TrustResource trustResource = new TrustResource(trustRepository, trustMapper,
-        sitesTrustsService, 100);
+    TrustResource trustResource =
+        new TrustResource(trustRepository, trustMapper, sitesTrustsService, 100);
     this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
-        .setControllerAdvice(exceptionTranslator)
-        .setMessageConverters(jacksonMessageConverter).build();
+        .setControllerAdvice(exceptionTranslator).setMessageConverters(jacksonMessageConverter)
+        .build();
   }
 
   @Before
@@ -149,10 +143,8 @@ public class TrustResourceIntTest {
 
     // Create the Trust
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
-    restTrustMockMvc.perform(post("/api/trusts")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isCreated());
+    restTrustMockMvc.perform(post("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isCreated());
 
     // Validate the Trust in the database
     List<Trust> trustList = trustRepository.findAll();
@@ -179,9 +171,9 @@ public class TrustResourceIntTest {
     anotherTrust.setId(trust.getId());
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restTrustMockMvc.perform(post("/api/trusts")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
+    restTrustMockMvc
+        .perform(post("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
         .andExpect(status().isBadRequest());
 
     // Validate the Alice in the database
@@ -197,8 +189,7 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts?sort=code,asc"))
-        .andExpect(status().isOk())
+    restTrustMockMvc.perform(get("/api/trusts?sort=code,asc")).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
@@ -237,11 +228,9 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts/search/?searchString=R1A"))
-        .andExpect(status().isOk())
+    restTrustMockMvc.perform(get("/api/trusts/search/?searchString=R1A")).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-        .andExpect(jsonPath("$.total").value(1))
-        .andExpect(jsonPath("$.list[0].code").value("R1A"))
+        .andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.list[0].code").value("R1A"))
         .andExpect(
             jsonPath("$.list[0].trustName").value("Worcestershire Health and Care NHS Trust"));
   }
@@ -253,8 +242,7 @@ public class TrustResourceIntTest {
     trustRepository.saveAndFlush(trust);
 
     // Get all the trustList
-    restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId()))
-        .andExpect(status().isOk())
+    restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId())).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
@@ -272,9 +260,9 @@ public class TrustResourceIntTest {
     String trustCode = trust.getCode();
 
     // when and then
-    restTrustMockMvc.perform(post("/api/trusts/codeexists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJson(trustCode)))
+    restTrustMockMvc
+        .perform(post("/api/trusts/codeexists/").contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJson(trustCode)))
         .andExpect(status().isFound());
   }
 
@@ -288,9 +276,9 @@ public class TrustResourceIntTest {
     String trustCode = NON_EXISTING_TRUST_CODE;
 
     // when and then
-    restTrustMockMvc.perform(post("/api/trusts/codeexists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJson(trustCode)))
+    restTrustMockMvc
+        .perform(post("/api/trusts/codeexists/").contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJson(trustCode)))
         .andExpect(status().isNoContent());
   }
 
@@ -311,20 +299,13 @@ public class TrustResourceIntTest {
 
     // Update the trust
     Trust updatedTrust = trustRepository.findOne(trust.getId());
-    updatedTrust
-        .localOffice(UPDATED_LOCAL_OFFICE)
-        .status(UPDATED_STATUS)
-        .trustKnownAs(UPDATED_TRUST_KNOWN_AS)
-        .trustName(UPDATED_TRUST_NAME)
-        .trustNumber(UPDATED_TRUST_NUMBER)
-        .address(UPDATED_ADDRESS)
-        .postCode(UPDATED_POST_CODE);
+    updatedTrust.localOffice(UPDATED_LOCAL_OFFICE).status(UPDATED_STATUS)
+        .trustKnownAs(UPDATED_TRUST_KNOWN_AS).trustName(UPDATED_TRUST_NAME)
+        .trustNumber(UPDATED_TRUST_NUMBER).address(UPDATED_ADDRESS).postCode(UPDATED_POST_CODE);
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(updatedTrust);
 
-    restTrustMockMvc.perform(put("/api/trusts")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isOk());
+    restTrustMockMvc.perform(put("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isOk());
 
     // Validate the Trust in the database
     List<Trust> trustList = trustRepository.findAll();
@@ -349,10 +330,8 @@ public class TrustResourceIntTest {
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restTrustMockMvc.perform(put("/api/trusts")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(trustDTO)))
-        .andExpect(status().isCreated());
+    restTrustMockMvc.perform(put("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isCreated());
 
     // Validate the Trust in the database
     List<Trust> trustList = trustRepository.findAll();
@@ -370,23 +349,16 @@ public class TrustResourceIntTest {
   @Transactional
   public void findTrustShouldReturnTrustWithAttributesMatchingSearchTerm() throws Exception {
     trust = trustRepository.saveAndFlush(trust);
-    Trust anotherTrust = new Trust()
-        .code(UPDATED_CODE)
-        .localOffice(UPDATED_LOCAL_OFFICE)
-        .status(UPDATED_STATUS)
-        .trustKnownAs(UPDATED_TRUST_KNOWN_AS)
-        .address(UPDATED_ADDRESS)
-        .postCode(UPDATED_POST_CODE)
-        .trustName(UPDATED_TRUST_NAME)
+    Trust anotherTrust = new Trust().code(UPDATED_CODE).localOffice(UPDATED_LOCAL_OFFICE)
+        .status(UPDATED_STATUS).trustKnownAs(UPDATED_TRUST_KNOWN_AS).address(UPDATED_ADDRESS)
+        .postCode(UPDATED_POST_CODE).trustName(UPDATED_TRUST_NAME)
         .trustNumber(UPDATED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(anotherTrust);
 
-    restTrustMockMvc.perform(get("/api/trusts")
-        .param("page", "0")
-        .param("size", "200")
-        .param("sort", "id,asc")
-        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+    restTrustMockMvc
+        .perform(get("/api/trusts").param("page", "0").param("size", "200").param("sort", "id,asc")
+            .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
@@ -402,40 +374,31 @@ public class TrustResourceIntTest {
   @Test
   @Transactional
   public void getTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
-    //Set up trust with reserved character.
-    Trust unencodedTrust = new Trust()
-        .code(UNENCODED_CODE)
-        .localOffice(UNENCODED_LOCAL_OFFICE)
-        .status(UNENCODED_STATUS)
-        .trustKnownAs(UNENCODED_TRUST_KNOWN_AS)
-        .address(UNENCODED_ADDRESS)
-        .postCode(UNENCODED_POST_CODE)
-        .trustName(UNENCODED_TRUST_NAME)
+    // Set up trust with reserved character.
+    Trust unencodedTrust = new Trust().code(UNENCODED_CODE).localOffice(UNENCODED_LOCAL_OFFICE)
+        .status(UNENCODED_STATUS).trustKnownAs(UNENCODED_TRUST_KNOWN_AS).address(UNENCODED_ADDRESS)
+        .postCode(UNENCODED_POST_CODE).trustName(UNENCODED_TRUST_NAME)
         .trustNumber(UNENCODED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(unencodedTrust);
 
-    //Search using URLEncoded characters
-    restTrustMockMvc.perform(get("/api/trusts")
-        .param("searchQuery", ENCODED_SEARCH_QUERY)
-        .param("page", "0")
-        .param("size", "200")
-        .param("sort", "trustKnownAs,asc")
-        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
-        //Verify field values
+    // Search using URLEncoded characters
+    restTrustMockMvc
+        .perform(get("/api/trusts").param("searchQuery", ENCODED_SEARCH_QUERY).param("page", "0")
+            .param("size", "200").param("sort", "trustKnownAs,asc")
+            .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        // Verify field values
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
-    
 
-    //Search using the 'trustKnownAs'
-    restTrustMockMvc.perform(get("/api/trusts")
-        .param("searchQuery", ENCODED_KNOWN_AS_QUERY)
-        .param("page", "0")
-        .param("size", "200")
-        .param("sort", "trustKnownAs,asc")
-        .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
-        //Verify field values
+
+    // Search using the 'trustKnownAs'
+    restTrustMockMvc
+        .perform(get("/api/trusts").param("searchQuery", ENCODED_KNOWN_AS_QUERY).param("page", "0")
+            .param("size", "200").param("sort", "trustKnownAs,asc")
+            .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        // Verify field values
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
@@ -444,26 +407,19 @@ public class TrustResourceIntTest {
   @Test
   @Transactional
   public void getCurrentTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
-    //Set up trust with reserved character.
-    Trust unencodedTrust = new Trust()
-        .code(UNENCODED_CODE)
-        .localOffice(UNENCODED_LOCAL_OFFICE)
-        .status(UNENCODED_STATUS)
-        .trustKnownAs(UNENCODED_TRUST_KNOWN_AS)
-        .address(UNENCODED_ADDRESS)
-        .postCode(UNENCODED_POST_CODE)
-        .trustName(UNENCODED_TRUST_NAME)
+    // Set up trust with reserved character.
+    Trust unencodedTrust = new Trust().code(UNENCODED_CODE).localOffice(UNENCODED_LOCAL_OFFICE)
+        .status(UNENCODED_STATUS).trustKnownAs(UNENCODED_TRUST_KNOWN_AS).address(UNENCODED_ADDRESS)
+        .postCode(UNENCODED_POST_CODE).trustName(UNENCODED_TRUST_NAME)
         .trustNumber(UNENCODED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(unencodedTrust);
 
-    //Search using URLEncoded characters
-    restTrustMockMvc.perform(get("/api/current/trusts")
-        .param("searchQuery", ENCODED_SEARCH_QUERY)
-        .param("page", "0")
-        .param("size", "200")
-        .param("sort", "trustKnownAs,asc"))
-        //Verify field values
+    // Search using URLEncoded characters
+    restTrustMockMvc
+        .perform(get("/api/current/trusts").param("searchQuery", ENCODED_SEARCH_QUERY)
+            .param("page", "0").param("size", "200").param("sort", "trustKnownAs,asc"))
+        // Verify field values
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
