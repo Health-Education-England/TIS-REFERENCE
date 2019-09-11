@@ -16,12 +16,15 @@ import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
+
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
+
 import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,42 +53,56 @@ public class SiteResourceIntTest {
   private static final String DEFAULT_SITE_CODE = "AAAAAAAAAA";
   private static final String UPDATED_SITE_CODE = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_CODE = "CCCCCCCCCC";
+  private static final String UNENCODED_SITE_CODE1 = "RCC25";
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
   private static final String UNENCODED_LOCAL_OFFICE = "CCCCCCCCCC";
+  private static final String UNENCODED_LOCAL_OFFICE1 = "Scarborough General Hospital";
 
   private static final String DEFAULT_TRUST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_TRUST_CODE = "BBBBBBBBBB";
   private static final String UNENCODED_TRUST_CODE = "CCCCCCCCCC";
+  private static final String UNENCODED_TRUST_CODE1 = "RCB";
 
   private static final String DEFAULT_SITE_NAME = "AAAAAAAAAA";
   private static final String UPDATED_SITE_NAME = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_NAME = "Te$t Site";
+  private static final String UNENCODED_SITE_NAME1 = "Scarborough General Hospital";
 
   private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
   private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
   private static final String UNENCODED_ADDRESS = "CCCCCCCCCC";
+  private static final String UNENCODED_ADDRESS1 = "Scarborough Hospital Woodlands Drive Scarborough North Yorkshire";
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
   private static final String UNENCODED_POST_CODE = "CCCCCCCCCC";
+  private static final String UNENCODED_POST_CODE1 = "YO12 6QL";
 
   private static final String DEFAULT_SITE_KNOWN_AS = "AAAAAAAAAA";
   private static final String UPDATED_SITE_KNOWN_AS = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_KNOWN_AS = "Te$t Site";
+  private static final String UNENCODED_SITE_KNOWN_AS1 = "Scarborough General Hospital (RCBCA)";
 
   private static final String DEFAULT_SITE_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_SITE_NUMBER = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_NUMBER = "CCCCCCCCCC";
+  private static final String UNENCODED_SITE_NUMBER1 = "RCC25";
+
+  private static final Status UNENCODED_STATUS = Status.CURRENT;
 
   private static final String DEFAULT_ORGANISATIONAL_UNIT = "AAAAAAAAAA";
   private static final String UPDATED_ORGANISATIONAL_UNIT = "BBBBBBBBBB";
   private static final String UNENCODED_ORGANISATIONAL_UNIT = "CCCCCCCCCC";
+  private static final String UNENCODED_ORGANISATIONAL_UNIT1 = "OU1023";
 
   private static final String SITE_CODE_NOT_IN_DB = "X1G5H9V";
   private static final String TRUST_CODE_NOT_IN_DB = "J8D4VTF";
   private static final String SITE_CODE = "AAAA";
+
+  private static final String ENCODED_SEARCH_STRING = "\"Scarborough%20General%20Hospital\"";
+  private static final String ENCODED_SITE_KNOWN_AS_STRING = "\"Scarborough%20General%20Hospital%20(RCBCA)\"";
 
   @Autowired
   private SiteRepository siteRepository;
@@ -543,5 +561,41 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].siteName").value(not(hasItem(anotherSite.getSiteName()))))
         .andExpect(jsonPath("$.[*].address").value(not(hasItem(anotherSite.getAddress()))));
 
+  }
+
+  @Test
+  @Transactional
+  public void searchSitesWithEncodedCharacterShouldReturnCorrectSite() throws Exception {
+
+    //Given //Initialise test data
+    Site unEncodedSite = new Site()
+        .siteCode(UNENCODED_SITE_CODE1).localOffice(UNENCODED_LOCAL_OFFICE1)
+        .trustCode(UNENCODED_TRUST_CODE1).siteName(UNENCODED_SITE_NAME1)
+        .address(UNENCODED_ADDRESS1).postCode(UNENCODED_POST_CODE1)
+        .siteKnownAs(UNENCODED_SITE_KNOWN_AS1).siteNumber(UNENCODED_SITE_NUMBER1)
+        .status(UNENCODED_STATUS).organisationalUnit(UNENCODED_ORGANISATIONAL_UNIT1);
+    siteRepository.saveAndFlush(unEncodedSite);
+
+    //When Then //Search using URLEncoded characters
+    restSiteMockMvc
+        .perform(get("/api/sites")
+            .param("searchQuery", ENCODED_SEARCH_STRING).param("page", "0")
+            .param("size", "200").param("sort", "siteKnownAs,asc")
+            .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        //Verify field values
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
+
+    //When Then //Search using 'siteKnownAs'
+    restSiteMockMvc
+        .perform(get("/api/sites")
+            .param("searchQuery", ENCODED_SITE_KNOWN_AS_STRING).param("page", "0")
+            .param("size", "200").param("sort", "siteKnownAs,asc")
+            .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
+        // Verify field values
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
   }
 }
