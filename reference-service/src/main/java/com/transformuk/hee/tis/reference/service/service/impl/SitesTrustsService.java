@@ -165,7 +165,8 @@ public class SitesTrustsService {
     if (StringUtils.isNotEmpty(searchString)) {
       specs.add(Specifications.where(containsLike("siteCode", searchString))
           .or(containsLike("trustCode", searchString)).or(containsLike("siteName", searchString))
-          .or(containsLike("postCode", searchString)).or(containsLike("address", searchString)));
+          .or(containsLike("postCode", searchString)).or(containsLike("address", searchString))
+          .or(containsLike("siteKnownAs", searchString)));
     }
     // add the column filters criteria
     if (columnFilters != null && !columnFilters.isEmpty()) {
