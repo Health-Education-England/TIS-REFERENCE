@@ -215,6 +215,18 @@ public class SiteResource {
     }
   }
 
+  /**
+   * POST /sites/ids/in/query: post a query to fetch sites.
+   * Currently this is a fix for a large amount of sites requests(exceeding the requestParam length limit).
+   * @param idMap the siteIds to search by. Frontend sends a json.
+   * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
+   */
+  @ApiOperation(value = "get a collection of sites by id")
+  @PostMapping(path="/sites/ids/in/query")
+  @Timed
+  public ResponseEntity<List<SiteDTO>> getSitesInByIds(@RequestBody Map<String, List<Long>> idMap) {
+    return getSitesInById(idMap.get("ids"));
+  }
 
   @ApiOperation(value = "searchSites()",
       notes = "Returns a list of sites matching given search string",
