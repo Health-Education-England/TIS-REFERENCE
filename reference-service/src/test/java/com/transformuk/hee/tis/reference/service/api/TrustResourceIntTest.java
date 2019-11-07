@@ -284,6 +284,17 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
+  public void shouldNotReturnInactiveTrust() throws Exception {
+    Trust inactiveTrust = createEntity(em);
+    inactiveTrust.status(Status.INACTIVE);
+    trustRepository.saveAndFlush((inactiveTrust));
+
+    restTrustMockMvc.perform(get("/api/trusts/code/{code}", inactiveTrust.getCode()))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @Transactional
   public void getNonExistingTrust() throws Exception {
     // Get the trust
     restTrustMockMvc.perform(get("/api/trusts/code/{code}", UUID.randomUUID().toString()))

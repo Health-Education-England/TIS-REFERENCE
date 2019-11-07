@@ -19,6 +19,8 @@ public interface TrustRepository extends JpaRepository<Trust, Long>,
 
   Trust findByCode(String code);
 
+  List<Trust> findByCodeAndStatus(String code, Status status);
+
   @Query("SELECT t FROM Trust t WHERE t.code like %:param% or t.trustName like %:param%")
   Page<Trust> findBySearchString(@Param("param") String searchString, Pageable pageable);
 
