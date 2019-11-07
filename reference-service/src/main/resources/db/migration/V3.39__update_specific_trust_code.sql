@@ -1,0 +1,1 @@
+UPDATE Trust SET status = 'CURRENT' WHERE code = 'R0B' AND id = 2284;

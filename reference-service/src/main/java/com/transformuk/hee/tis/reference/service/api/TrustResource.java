@@ -290,8 +290,11 @@ public class TrustResource {
   @Timed
   public ResponseEntity<TrustDTO> getTrustByCode(@PathVariable String code) {
     log.debug("REST request to get Trust by code: {}", code);
-    Trust trust = trustRepository.findByCode(code);
-    TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
+    List<Trust> trusts = trustRepository.findByCodeAndStatus(code, Status.CURRENT);
+    TrustDTO trustDTO = null;
+    if (trusts.size() > 0) {
+      trustDTO = trustMapper.trustToTrustDTO(trusts.get(0));
+    }
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(trustDTO));
   }
 
