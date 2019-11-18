@@ -1,7 +1,12 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,8 +41,6 @@ public class LeavingReasonResourceIntegrationTest {
   LeavingReasonService service;
 
   private MockMvc mockMvc;
-
-  private LeavingReason leavingReason;
 
   @Before
   public void setUp() {
@@ -130,6 +133,45 @@ public class LeavingReasonResourceIntegrationTest {
         .andExpect(jsonPath(
             "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
             .exists());
+  }
+
+  /**
+   * Test that a 404 Not Found status is returned when no leaving reason with the given ID exists.
+   */
+  @Test
+  public void testDeleteLeavingReason_idNotExists_notFound() throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(delete("/api/leaving-reasons/1"))
+        .andExpect(status().isNotFound());
+  }
+
+  /**
+   * Test that the leaving reason is deleted when a leaving reason with the given ID exists.
+   */
+  @Test
+  public void testDeleteLeavingReason_idExists_leavingReason() throws Exception {
+    // Set up test data.
+    LeavingReason leavingReason = createLeavingReason("code one", "label one", Status.CURRENT);
+    leavingReason = repository.save(leavingReason);
+    Long id = leavingReason.getId();
+
+    long preDeleteCount = repository.count();
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(delete("/api/leaving-reasons/" + id))
+        .andExpect(status().isOk())
+        .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.deleted"))
+        .andExpect(header().string("X-referenceApp-params", id.toString()));
+
+    long postDeleteCount = repository.count();
+    assertThat("The number of leaving reasons did not match the expected value.", postDeleteCount,
+        is(preDeleteCount - 1));
+
+    leavingReason = repository.findOne(id);
+    assertThat("The leaving reason did not match the expected value.", leavingReason, nullValue());
   }
 
   /**

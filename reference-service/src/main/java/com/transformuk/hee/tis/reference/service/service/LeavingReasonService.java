@@ -8,5 +8,17 @@ import java.util.List;
  */
 public interface LeavingReasonService {
 
+  /**
+   * Find all LeavingReasons.
+   *
+   * @return A List of all found LeavingReasons as LeavingReasonDtos.
+   */
   List<LeavingReasonDto> findAll();
+
+  /**
+   * Delete the LeavingReason with the given ID.
+   *
+   * @param id The ID of the LeavingReason to delete.
+   */
+  void delete(Long id);
 }
