@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,24 @@ public class LeavingReasonResource {
     return ResponseEntity.created(new URI("/api/leaving-reasons/" + createdId))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, createdId.toString()))
         .body(createdDto);
+  }
+
+  @PutMapping("/leaving-reasons")
+  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  public ResponseEntity<LeavingReasonDto> updateLeavingReason(
+      @Valid @RequestBody LeavingReasonDto leavingReasonDto) throws URISyntaxException {
+    LOGGER.debug("REST request to update leaving reason.");
+
+    // If the leaving reason DTO contains an ID then it should be created instead of updated.
+    if (leavingReasonDto.getId() == null) {
+      return createLeavingReason(leavingReasonDto);
+    }
+
+    LeavingReasonDto updatedDto = service.save(leavingReasonDto);
+
+    return ResponseEntity.ok()
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, updatedDto.getId().toString()))
+        .body(updatedDto);
   }
 
   @GetMapping("/leaving-reasons")

@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,7 +59,8 @@ public class LeavingReasonResourceIntegrationTest {
   @Test
   public void testCreateLeavingReason_inputHasId_badRequest() throws Exception {
     // Set up test data.
-    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one");
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one",
+        Status.CURRENT);
     leavingReasonDto.setId(1L);
 
     // Call the code under test and perform assertions.
@@ -77,7 +79,7 @@ public class LeavingReasonResourceIntegrationTest {
   @Test
   public void testCreateLeavingReason_inputNullCode_badRequest() throws Exception {
     // Set up test data.
-    LeavingReasonDto leavingReasonDto = createLeavingReasonDto(null, "label one");
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto(null, "label one", Status.CURRENT);
 
     // Call the code under test and perform assertions.
     mockMvc.perform(post("/api/leaving-reasons")
@@ -92,7 +94,7 @@ public class LeavingReasonResourceIntegrationTest {
   @Test
   public void testCreateLeavingReason_inputNullLabel_badRequest() throws Exception {
     // Set up test data.
-    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", null);
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", null, Status.CURRENT);
 
     // Call the code under test and perform assertions.
     mockMvc.perform(post("/api/leaving-reasons")
@@ -107,7 +109,8 @@ public class LeavingReasonResourceIntegrationTest {
   @Test
   public void testCreateLeavingReason_inputNoId_leavingReasonCreated() throws Exception {
     // Set up test data.
-    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one");
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one",
+        Status.CURRENT);
 
     // Call the code under test and perform assertions.
     MvcResult result = mockMvc.perform(post("/api/leaving-reasons")
@@ -130,6 +133,116 @@ public class LeavingReasonResourceIntegrationTest {
         createdEntity.getLabel(), is("label one"));
     assertThat("The created entity's status did not match the expected value.",
         createdEntity.getStatus(), is(Status.CURRENT));
+  }
+
+  /**
+   * Test that a bad request returned when the input has no code.
+   */
+  @Test
+  public void testUpdateLeavingReason_inputNullCode_badRequest() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto(null, "label one", Status.CURRENT);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(put("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test that a bad request returned when the input has no label.
+   */
+  @Test
+  public void testUpdateLeavingReason_inputNullLabel_badRequest() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", null, Status.CURRENT);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(put("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test that the leaving reason is created and returned when the input has no ID.
+   */
+  @Test
+  public void testUpdateLeavingReason_inputNoId_leavingReasonCreated() throws Exception {
+    // Set up test data.
+    LeavingReason leavingReason = createLeavingReason("code one", "label one", Status.CURRENT);
+    leavingReason = repository.save(leavingReason);
+
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code two", "label two",
+        Status.INACTIVE);
+
+    // Call the code under test and perform assertions.
+    MvcResult result = mockMvc.perform(put("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isCreated())
+        .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.created"))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
+            .exists())
+        .andReturn();
+
+    LeavingReason originalEntity = repository.findOne(leavingReason.getId());
+    assertThat("The created entity was not found.", originalEntity, notNullValue());
+    assertThat("The created entity's code did not match the expected value.",
+        originalEntity.getCode(), is("code one"));
+    assertThat("The created entity's label did not match the expected value.",
+        originalEntity.getLabel(), is("label one"));
+    assertThat("The created entity's status did not match the expected value.",
+        originalEntity.getStatus(), is(Status.CURRENT));
+
+    String headerParam = result.getResponse().getHeader("X-referenceApp-params");
+    LeavingReason createdEntity = repository.findOne(Long.parseLong(headerParam));
+    assertThat("The created entity was not found.", createdEntity, notNullValue());
+    assertThat("The created entity's code did not match the expected value.",
+        createdEntity.getCode(), is("code two"));
+    assertThat("The created entity's label did not match the expected value.",
+        createdEntity.getLabel(), is("label two"));
+    assertThat("The created entity's status did not match the expected value.",
+        createdEntity.getStatus(), is(Status.INACTIVE));
+  }
+
+  /**
+   * Test that the leaving reason is updated and returned when the input has an ID.
+   */
+  @Test
+  public void testUpdateLeavingReason_inputHasId_leavingReasonUpdated() throws Exception {
+    // Set up test data.
+    LeavingReason leavingReason = createLeavingReason("code one", "label one", Status.CURRENT);
+    leavingReason = repository.save(leavingReason);
+
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code two", "label two",
+        Status.CURRENT);
+    leavingReasonDto.setId(leavingReason.getId());
+    leavingReasonDto.setStatus(Status.INACTIVE);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(put("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isOk())
+        .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.updated"))
+        .andExpect(header().string("X-referenceApp-params", leavingReason.getId().toString()))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
+            .exists());
+
+    LeavingReason createdEntity = repository.findOne(leavingReason.getId());
+    assertThat("The created entity was not found.", createdEntity, notNullValue());
+    assertThat("The created entity's code did not match the expected value.",
+        createdEntity.getCode(), is("code two"));
+    assertThat("The created entity's label did not match the expected value.",
+        createdEntity.getLabel(), is("label two"));
+    assertThat("The created entity's status did not match the expected value.",
+        createdEntity.getStatus(), is(Status.INACTIVE));
   }
 
   /**
@@ -284,11 +397,11 @@ public class LeavingReasonResourceIntegrationTest {
    * @param label The label to set.
    * @return The created, non-persisted, {@code LeavingReason}.
    */
-  private static LeavingReasonDto createLeavingReasonDto(String code, String label) {
+  private static LeavingReasonDto createLeavingReasonDto(String code, String label, Status status) {
     LeavingReasonDto leavingReasonDto = new LeavingReasonDto();
     leavingReasonDto.setCode(code);
     leavingReasonDto.setLabel(label);
-    leavingReasonDto.setStatus(Status.CURRENT);
+    leavingReasonDto.setStatus(status);
 
     return leavingReasonDto;
   }
