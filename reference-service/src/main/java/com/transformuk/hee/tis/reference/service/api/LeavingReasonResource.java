@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -74,6 +75,22 @@ public class LeavingReasonResource {
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, updatedDto.getId().toString()))
         .body(updatedDto);
+  }
+
+  @GetMapping("/leaving-reasons/{id}")
+  public ResponseEntity<LeavingReasonDto> getLeavingReason(@PathVariable Long id) {
+    LOGGER.debug("REST request to get leaving reason with id {}.", id);
+
+    LeavingReasonDto leavingReasonDto = service.find(id);
+
+    if (leavingReasonDto != null) {
+      return ResponseEntity.ok(leavingReasonDto);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idnotexists",
+              "A entity with the given ID could not be found."))
+          .body(null);
+    }
   }
 
   @GetMapping("/leaving-reasons")

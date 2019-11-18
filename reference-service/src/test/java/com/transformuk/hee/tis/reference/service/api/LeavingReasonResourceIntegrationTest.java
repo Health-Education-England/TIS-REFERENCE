@@ -246,6 +246,36 @@ public class LeavingReasonResourceIntegrationTest {
   }
 
   /**
+   * Test that a 404 Not Found status is returned when no leaving reason with the given ID exists.
+   */
+  @Test
+  public void testGetLeavingReason_idNotExists_notFound() throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons/1"))
+        .andExpect(status().isNotFound())
+        .andExpect(header().string("X-referenceApp-error", "error.idnotexists"))
+        .andExpect(header().string("X-referenceApp-params", "LeavingReason"));
+  }
+
+  /**
+   * Test that the leaving reason is returned when a leaving reason with the given ID exists.
+   */
+  @Test
+  public void testGetLeavingReason_idExists_leavingReason() throws Exception {
+    LeavingReason leavingReason = createLeavingReason("code one", "label one", Status.CURRENT);
+    leavingReason = repository.save(leavingReason);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons/" + leavingReason.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().json(TestUtil.convertObjectToJson(leavingReason)));
+  }
+
+  /**
    * Test that an empty array is returned when there are no leaving reasons.
    */
   @Test
@@ -351,7 +381,7 @@ public class LeavingReasonResourceIntegrationTest {
    * Test that the leaving reason is deleted when a leaving reason with the given ID exists.
    */
   @Test
-  public void testDeleteLeavingReason_idExists_leavingReason() throws Exception {
+  public void testDeleteLeavingReason_idExists_leavingReasonDeleted() throws Exception {
     // Set up test data.
     LeavingReason leavingReason = createLeavingReason("code one", "label one", Status.CURRENT);
     leavingReason = repository.save(leavingReason);

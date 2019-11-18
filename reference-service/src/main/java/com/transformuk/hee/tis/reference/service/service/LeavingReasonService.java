@@ -17,6 +17,14 @@ public interface LeavingReasonService {
   LeavingReasonDto save(LeavingReasonDto leavingReasonDto);
 
   /**
+   * Find the LeavingReason with the given ID.
+   *
+   * @param id The ID of the LeavingReason to find.
+   * @return The LeavingReason as a LeavingReasonDto if found, else an empty LeavingReasonDto.
+   */
+  LeavingReasonDto find(Long id);
+
+  /**
    * Find all LeavingReasons.
    *
    * @return A List of all found LeavingReasons as LeavingReasonDtos.

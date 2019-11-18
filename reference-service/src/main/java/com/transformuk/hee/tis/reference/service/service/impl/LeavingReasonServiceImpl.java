@@ -32,6 +32,12 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   }
 
   @Override
+  public LeavingReasonDto find(Long id) {
+    LOGGER.debug("Request to find leaving reason with id {}.", id);
+    return mapper.leavingReasonToLeavingReasonDto(repository.findOne(id));
+  }
+
+  @Override
   public List<LeavingReasonDto> findAll() {
     LOGGER.debug("Request to find all leaving reasons.");
     return mapper.leavingReasonsToLeavingReasonDtos(repository.findAll());
