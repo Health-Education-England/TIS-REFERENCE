@@ -9,6 +9,14 @@ import java.util.List;
 public interface LeavingReasonService {
 
   /**
+   * Save the given LeavingReasonDto.
+   *
+   * @param leavingReasonDto The LeavingReasonDto to save.
+   * @return The saved LeavingReasonDto.
+   */
+  LeavingReasonDto save(LeavingReasonDto leavingReasonDto);
+
+  /**
    * Find all LeavingReasons.
    *
    * @return A List of all found LeavingReasons as LeavingReasonDtos.

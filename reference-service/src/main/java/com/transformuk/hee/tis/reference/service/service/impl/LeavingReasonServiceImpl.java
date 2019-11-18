@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
+import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.repository.LeavingReasonRepository;
 import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingReasonMapper;
@@ -20,6 +21,14 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   public LeavingReasonServiceImpl(LeavingReasonMapper mapper, LeavingReasonRepository repository) {
     this.mapper = mapper;
     this.repository = repository;
+  }
+
+  @Override
+  public LeavingReasonDto save(LeavingReasonDto leavingReasonDto) {
+    LOGGER.debug("Request to save leaving reason.");
+    LeavingReason leavingReason = mapper.leavingReasonDtoToLeavingReason(leavingReasonDto);
+    leavingReason = repository.save(leavingReason);
+    return mapper.leavingReasonToLeavingReasonDto(leavingReason);
   }
 
   @Override

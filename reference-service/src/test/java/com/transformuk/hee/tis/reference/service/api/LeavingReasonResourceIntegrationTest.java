@@ -1,15 +1,18 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.LeavingReason;
@@ -23,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +50,86 @@ public class LeavingReasonResourceIntegrationTest {
   public void setUp() {
     LeavingReasonResource resource = new LeavingReasonResource(service);
     mockMvc = MockMvcBuilders.standaloneSetup(resource).build();
+  }
+
+  /**
+   * Test that a bad request error is returned when the input has an ID.
+   */
+  @Test
+  public void testCreateLeavingReason_inputHasId_badRequest() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one");
+    leavingReasonDto.setId(1L);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(post("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(header().string("X-referenceApp-error", "error.idexists"))
+        .andExpect(header().string("X-referenceApp-params", "LeavingReason"))
+        .andExpect(jsonPath("$").doesNotExist());
+  }
+
+  /**
+   * Test that a bad request returned when the input has no code.
+   */
+  @Test
+  public void testCreateLeavingReason_inputNullCode_badRequest() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto(null, "label one");
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(post("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test that a bad request returned when the input has no label.
+   */
+  @Test
+  public void testCreateLeavingReason_inputNullLabel_badRequest() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", null);
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(post("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test that the leaving reason is created and returned when the input has no ID.
+   */
+  @Test
+  public void testCreateLeavingReason_inputNoId_leavingReasonCreated() throws Exception {
+    // Set up test data.
+    LeavingReasonDto leavingReasonDto = createLeavingReasonDto("code one", "label one");
+
+    // Call the code under test and perform assertions.
+    MvcResult result = mockMvc.perform(post("/api/leaving-reasons")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
+        .andExpect(status().isCreated())
+        .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.created"))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
+            .exists())
+        .andReturn();
+
+    String headerParam = result.getResponse().getHeader("X-referenceApp-params");
+    LeavingReason createdEntity = repository.findOne(Long.parseLong(headerParam));
+    assertThat("The created entity was not found.", createdEntity, notNullValue());
+    assertThat("The created entity's code did not match the expected value.",
+        createdEntity.getCode(), is("code one"));
+    assertThat("The created entity's label did not match the expected value.",
+        createdEntity.getLabel(), is("label one"));
+    assertThat("The created entity's status did not match the expected value.",
+        createdEntity.getStatus(), is(Status.CURRENT));
   }
 
   /**
@@ -145,7 +229,9 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(delete("/api/leaving-reasons/1"))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound())
+        .andExpect(header().string("X-referenceApp-error", "error.idnotexists"))
+        .andExpect(header().string("X-referenceApp-params", "LeavingReason"));
   }
 
   /**
@@ -189,5 +275,21 @@ public class LeavingReasonResourceIntegrationTest {
     leavingReason.setStatus(status);
 
     return leavingReason;
+  }
+
+  /**
+   * Create a {@link LeavingReasonDto} with Status of CURRENT.
+   *
+   * @param code  The code to set.
+   * @param label The label to set.
+   * @return The created, non-persisted, {@code LeavingReason}.
+   */
+  private static LeavingReasonDto createLeavingReasonDto(String code, String label) {
+    LeavingReasonDto leavingReasonDto = new LeavingReasonDto();
+    leavingReasonDto.setCode(code);
+    leavingReasonDto.setLabel(label);
+    leavingReasonDto.setStatus(Status.CURRENT);
+
+    return leavingReasonDto;
   }
 }

@@ -4,7 +4,10 @@ import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +33,28 @@ public class LeavingReasonResource {
 
   public LeavingReasonResource(LeavingReasonService service) {
     this.service = service;
+  }
+
+  @PostMapping("/leaving-reasons")
+  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  public ResponseEntity<LeavingReasonDto> createLeavingReason(
+      @Valid @RequestBody LeavingReasonDto leavingReasonDto) throws URISyntaxException {
+    LOGGER.debug("REST request to create leaving reason.");
+
+    // If the leaving reason DTO contains an ID then it cannot be created.
+    if (leavingReasonDto.getId() != null) {
+      return ResponseEntity.badRequest()
+          .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists",
+              "A new entity cannot already have an ID."))
+          .body(null);
+    }
+
+    LeavingReasonDto createdDto = service.save(leavingReasonDto);
+    Long createdId = createdDto.getId();
+
+    return ResponseEntity.created(new URI("/api/leaving-reasons/" + createdId))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, createdId.toString()))
+        .body(createdDto);
   }
 
   @GetMapping("/leaving-reasons")
