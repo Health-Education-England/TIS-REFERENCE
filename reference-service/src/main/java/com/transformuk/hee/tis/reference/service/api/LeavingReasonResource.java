@@ -37,6 +37,15 @@ public class LeavingReasonResource {
     this.service = service;
   }
 
+  /**
+   * POST /leavning-reasons : Create a new leaving reason.
+   *
+   * @param leavingReasonDto The LeavingReasonDto to create.
+   * @return A {@link ResponseEntity} with status 201 (CREATED) and a body of the created leaving
+   * reason if the creation was successful, or with status 400 (BAD REQUEST) if the DTO contained an
+   * ID.
+   * @throws URISyntaxException If the new ID could not be built in to a URI to return.
+   */
   @PostMapping("/leaving-reasons")
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LeavingReasonDto> createLeavingReason(
@@ -59,6 +68,15 @@ public class LeavingReasonResource {
         .body(createdDto);
   }
 
+  /**
+   * PUT /leavning-reasons : Update an existing leaving reason, or create a new one.
+   *
+   * @param leavingReasonDto The LeavingReasonDto to use for the update.
+   * @return A {@link ResponseEntity} with a body of the new or updated leaving reason and with
+   * status 200 (OK) if the update was successful or with status 201 (CREATED) if no leaving reason
+   * exists with the ID.
+   * @throws URISyntaxException If the new ID could not be built in to a URI to return.
+   */
   @PutMapping("/leaving-reasons")
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LeavingReasonDto> updateLeavingReason(
@@ -77,6 +95,13 @@ public class LeavingReasonResource {
         .body(updatedDto);
   }
 
+  /**
+   * GET /leaving-reasons/:id : get the leaving reason with matching ID.
+   *
+   * @param id The id of the leaving reason to retrieve.
+   * @return A {@link ResponseEntity} with status 200 (OK) and body of LeavingReasonDto if found, or
+   * with status 404 (NOT FOUND) if no leaving reason exists with the ID
+   */
   @GetMapping("/leaving-reasons/{id}")
   public ResponseEntity<LeavingReasonDto> getLeavingReason(@PathVariable Long id) {
     LOGGER.debug("REST request to get leaving reason with id {}.", id);
@@ -93,12 +118,25 @@ public class LeavingReasonResource {
     }
   }
 
+  /**
+   * GET /leaving-reasons : get all leaving reasons.
+   *
+   * @return A {@link ResponseEntity} with status 200 (OK) and body of a List of LeavingReasonDtos,
+   * list is empty if no leaving reasons are found.
+   */
   @GetMapping("/leaving-reasons")
   public ResponseEntity<List<LeavingReasonDto>> getAllLeavingReasons() {
     LOGGER.debug("REST request to get all leaving reasons.");
     return ResponseEntity.ok(service.findAll());
   }
 
+  /**
+   * DELETE /leaving-reasons/:id : delete the leaving reason with matching ID.
+   *
+   * @param id The id of the leaving reason to delete.
+   * @return A {@link ResponseEntity} with status 200 (OK) if the delete was successful, or with
+   * status 404 (NOT FOUND) if no leaving reason exists with the ID.
+   */
   @DeleteMapping("/leaving-reasons/{id}")
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteLeavingReason(@PathVariable Long id) {
