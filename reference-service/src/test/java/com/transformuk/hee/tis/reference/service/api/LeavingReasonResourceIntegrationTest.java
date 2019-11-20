@@ -286,14 +286,16 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons"))
         .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().json("[]"));
   }
 
   /**
-   * Test that the CURRENT leaving reasons are returned when there are CURRENT leaving reasons.
+   * Test that the CURRENT leaving reasons are returned when there are CURRENT leaving reasons and
+   * no filters.
    */
   @Test
-  public void testGetAllLeavingReasons_currentLeavingReasons_currentLeavingReasons()
+  public void testGetAllLeavingReasons_currentLeavingReasonsNoFilter_currentLeavingReasons()
       throws Exception {
     // Set up test data.
     long leavingReasonCount = repository.count();
@@ -314,10 +316,11 @@ public class LeavingReasonResourceIntegrationTest {
   }
 
   /**
-   * Test that the INACTIVE leaving reasons are returned when there are INACTIVE leaving reasons.
+   * Test that the INACTIVE leaving reasons are returned when there are INACTIVE leaving reasons and
+   * no filters.
    */
   @Test
-  public void testGetAllLeavingReasons_inactiveLeavingReasons_inactiveLeavingReasons()
+  public void testGetAllLeavingReasons_inactiveLeavingReasonsNoFilter_inactiveLeavingReasons()
       throws Exception {
     // Set up test data.
     long leavingReasonCount = repository.count();
@@ -339,10 +342,10 @@ public class LeavingReasonResourceIntegrationTest {
 
   /**
    * Test that both CURRENT and INACTIVE leaving reasons are returned when there are CURRENT and
-   * INACTIVE leaving reasons.
+   * INACTIVE leaving reasons and no filters.
    */
   @Test
-  public void testGetAllLeavingReasons_mixedStatusLeavingReasons_mixedStatusLeavingReasons()
+  public void testGetAllLeavingReasons_mixedStatusLeavingReasonsNoFilter_mixedStatusLeavingReasons()
       throws Exception {
     // Set up test data.
     long leavingReasonCount = repository.count();
@@ -359,6 +362,145 @@ public class LeavingReasonResourceIntegrationTest {
             .exists())
         .andExpect(jsonPath(
             "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
+            .exists());
+  }
+
+  /**
+   * Test that the CURRENT leaving reasons are returned when there are CURRENT leaving reasons and
+   * an INACTIVE filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_currentLeavingReasonsInactiveFilter_emptyList()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    repository.save(createLeavingReason("code one", "label one", Status.CURRENT));
+    repository.save(createLeavingReason("code two", "label two", Status.CURRENT));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().json("[]"));
+  }
+
+  /**
+   * Test that the INACTIVE leaving reasons are returned when there are INACTIVE leaving reasons and
+   * an INACTIVE filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_inactiveLeavingReasonsInactiveFilter_inactiveLeavingReasons()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    repository.save(createLeavingReason("code one", "label one", Status.INACTIVE));
+    repository.save(createLeavingReason("code two", "label two", Status.INACTIVE));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"INACTIVE\")]")
+            .exists())
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
+            .exists());
+  }
+
+  /**
+   * Test that both CURRENT and INACTIVE leaving reasons are returned when there are CURRENT and
+   * INACTIVE leaving reasons and an INACTIVE filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_mixedStatusLeavingReasonsInactiveFilter_inactiveLeavingReasons()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    repository.save(createLeavingReason("code one", "label one", Status.CURRENT));
+    repository.save(createLeavingReason("code two", "label two", Status.INACTIVE));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
+            .exists());
+  }
+
+  /**
+   * Test that the CURRENT leaving reasons are returned when there are CURRENT leaving reasons and a
+   * CURRENT filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_currentLeavingReasonsCurrentFilter_currentLeavingReasons()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    long leavingReasonCount = repository.count();
+    repository.save(createLeavingReason("code one", "label one", Status.CURRENT));
+    repository.save(createLeavingReason("code two", "label two", Status.CURRENT));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
+            .exists())
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"CURRENT\")]")
+            .exists());
+  }
+
+  /**
+   * Test that the INACTIVE leaving reasons are returned when there are INACTIVE leaving reasons and
+   * a CURRENT filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_inactiveLeavingReasonsCurrentFilter_emptyList()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    repository.save(createLeavingReason("code one", "label one", Status.INACTIVE));
+    repository.save(createLeavingReason("code two", "label two", Status.INACTIVE));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().json("[]"));
+  }
+
+  /**
+   * Test that both CURRENT and INACTIVE leaving reasons are returned when there are CURRENT and
+   * INACTIVE leaving reasons and a CURRENT filter.
+   */
+  @Test
+  public void testGetAllLeavingReasons_mixedStatusLeavingReasonsCurrentFilter_currentLeavingReasons()
+      throws Exception {
+    // Set up test data.
+    repository.deleteAll();
+    repository.save(createLeavingReason("code one", "label one", Status.CURRENT));
+    repository.save(createLeavingReason("code two", "label two", Status.INACTIVE));
+
+    // Call the code under test and perform assertions.
+    mockMvc.perform(get("/api/leaving-reasons")
+        .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath(
+            "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
             .exists());
   }
 

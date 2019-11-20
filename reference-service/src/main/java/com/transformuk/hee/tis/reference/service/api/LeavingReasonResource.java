@@ -1,11 +1,16 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
+import com.transformuk.hee.tis.reference.api.enums.Status;
+import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -121,13 +127,22 @@ public class LeavingReasonResource {
   /**
    * GET /leaving-reasons : get all leaving reasons.
    *
+   * @param columnFiltersJson The column filter to apply as JSON. e.g. "columnFilters={ "status" :
+   *                          ["CURRENT"] }"
    * @return A {@link ResponseEntity} with status 200 (OK) and body of a List of LeavingReasonDtos,
-   * list is empty if no leaving reasons are found.
+   * matching the colummn filter, list is empty if no leaving reasons are found.
+   * @throws IOException If the column filter JSON could not be parsed.
    */
   @GetMapping("/leaving-reasons")
-  public ResponseEntity<List<LeavingReasonDto>> getAllLeavingReasons() {
+  public ResponseEntity<List<LeavingReasonDto>> getAllLeavingReasons(
+      @RequestParam(name = "columnFilters", required = false) String columnFiltersJson)
+      throws IOException {
     LOGGER.debug("REST request to get all leaving reasons.");
-    return ResponseEntity.ok(service.findAll());
+
+    List<Class> filterEnums = Collections.singletonList(Status.class);
+    List<ColumnFilter> columnFilters = ColumnFilterUtil
+        .getColumnFilters(columnFiltersJson, filterEnums);
+    return ResponseEntity.ok(service.findAll(columnFilters));
   }
 
   /**

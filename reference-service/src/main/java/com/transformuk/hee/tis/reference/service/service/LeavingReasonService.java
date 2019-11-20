@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service;
 
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
+import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import java.util.List;
 
 /**
@@ -30,6 +31,14 @@ public interface LeavingReasonService {
    * @return A List of all found LeavingReasons as LeavingReasonDtos.
    */
   List<LeavingReasonDto> findAll();
+
+  /**
+   * Find all LeavingReasons which match the column filters.
+   *
+   * @param columnFilters The columns filters to apply.
+   * @return A List of all found LeavingReasons as LeavingReasonDtos.
+   */
+  List<LeavingReasonDto> findAll(List<ColumnFilter> columnFilters);
 
   /**
    * Delete the LeavingReason with the given ID.
