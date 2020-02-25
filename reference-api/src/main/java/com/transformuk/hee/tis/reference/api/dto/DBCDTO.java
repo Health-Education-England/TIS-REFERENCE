@@ -24,6 +24,9 @@ public class DBCDTO implements Serializable {
 
   private Status status;
 
+  @NotNull
+  private String entity;
+
   public Long getId() {
     return id;
   }
@@ -63,6 +66,10 @@ public class DBCDTO implements Serializable {
   public void setStatus(Status status) {
     this.status = status;
   }
+
+  public String getEntity() { return entity; }
+
+  public void setEntity(String entity){ this.entity = entity; }
 
   @Override
   public boolean equals(Object o) {
