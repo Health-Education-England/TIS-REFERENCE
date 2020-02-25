@@ -26,12 +26,20 @@ public class LocalOffice implements Serializable {
   private Long id;
 
   @NotNull
+  @Column(name = "dbc", nullable = false)
+  private String dbc;
+
+  @NotNull
   @Column(name = "abbreviation", nullable = false)
   private String abbreviation;
 
   @NotNull
   @Column(name = "name", nullable = false)
   private String name;
+
+  @NotNull
+  @Column(name = "entityId", nullable = false)
+  private Long entityId;
 
   @NotNull
   @Column(name = "postAbbreviation", nullable = false)
@@ -47,6 +55,19 @@ public class LocalOffice implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getDbc() {
+    return dbc;
+  }
+
+  public void setDbc(String dbc) {
+    this.dbc = dbc;
+  }
+
+  public LocalOffice dbc(String dbc) {
+    this.dbc = dbc;
+    return this;
   }
 
   public String getAbbreviation() {
@@ -72,6 +93,19 @@ public class LocalOffice implements Serializable {
 
   public LocalOffice name(String name) {
     this.name = name;
+    return this;
+  }
+
+  public Long getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(Long entityId) {
+    this.entityId = entityId;
+  }
+
+  public LocalOffice entityId(Long entityId) {
+    this.entityId = entityId;
     return this;
   }
 
@@ -125,8 +159,10 @@ public class LocalOffice implements Serializable {
   public String toString() {
     return "LocalOffice{" +
         "id=" + id +
+        ", dbc='" + dbc + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
+        ", entityId='" + entityId + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
         ", status=" + status +
         '}';

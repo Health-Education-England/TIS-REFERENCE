@@ -62,6 +62,10 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
+  private static final Long DEFAULT_ENTITY = 1L;
+  private static final Long UPDATED_ENTITYID = 2L;
+
+
   private static String[] dbcArray = new String[]{HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
@@ -99,7 +103,8 @@ public class DBCResourceIntTest {
     DBC dBC = new DBC()
         .dbc(DEFAULT_DBC)
         .name(DEFAULT_NAME)
-        .abbr(DEFAULT_ABBR);
+        .abbr(DEFAULT_ABBR)
+        .entityId(DEFAULT_ENTITY);
     return dBC;
   }
 
@@ -133,6 +138,7 @@ public class DBCResourceIntTest {
     assertThat(testDBC.getDbc()).isEqualTo(DEFAULT_DBC);
     assertThat(testDBC.getName()).isEqualTo(DEFAULT_NAME);
     assertThat(testDBC.getAbbr()).isEqualTo(DEFAULT_ABBR);
+    assertThat(testDBC.getEntityId()).isEqualTo(DEFAULT_ENTITY);
   }
 
   @Test
@@ -220,7 +226,8 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(hasItem(dBC.getId().intValue())))
         .andExpect(jsonPath("$.[*].dbc").value(hasItem(DEFAULT_DBC.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-        .andExpect(jsonPath("$.[*].abbr").value(hasItem(DEFAULT_ABBR.toString())));
+        .andExpect(jsonPath("$.[*].abbr").value(hasItem(DEFAULT_ABBR.toString())))
+        .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY.intValue())));
   }
 
   @Test
@@ -229,7 +236,8 @@ public class DBCResourceIntTest {
     DBC encDbc = new DBC()
         .dbc(UNENCODED_DBC)
         .name(UNENCODED_NAME)
-        .abbr(UNENCODED_ABBR);
+        .abbr(UNENCODED_ABBR)
+        .entityId(DEFAULT_ENTITY);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
     dBCRepository.save(dbcs);
@@ -242,7 +250,8 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
         .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
-        .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
+        .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR))
+        .andExpect(jsonPath("$.[*].entityId").value(DEFAULT_ENTITY.intValue()));
   }
 
   @Test
@@ -258,7 +267,8 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.id").value(dBC.getId().intValue()))
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC.toString()))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR.toString()));
+        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR.toString()))
+        .andExpect(jsonPath("$.entityId").value(DEFAULT_ENTITY.intValue()));
   }
 
   @Test
@@ -273,7 +283,8 @@ public class DBCResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
+        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR))
+        .andExpect(jsonPath("$.entityId").value(DEFAULT_ENTITY.intValue()));
   }
 
   @Test
@@ -295,7 +306,8 @@ public class DBCResourceIntTest {
     updatedDBC
         .dbc(UPDATED_DBC)
         .name(UPDATED_NAME)
-        .abbr(UPDATED_ABBR);
+        .abbr(UPDATED_ABBR)
+        .entityId(UPDATED_ENTITYID);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(updatedDBC);
 
     restDBCMockMvc.perform(put("/api/dbcs")
@@ -310,6 +322,7 @@ public class DBCResourceIntTest {
     assertThat(testDBC.getDbc()).isEqualTo(UPDATED_DBC);
     assertThat(testDBC.getName()).isEqualTo(UPDATED_NAME);
     assertThat(testDBC.getAbbr()).isEqualTo(UPDATED_ABBR);
+    assertThat(testDBC.getEntityId()).isEqualTo(UPDATED_ENTITYID);
   }
 
   @Test
@@ -347,7 +360,8 @@ public class DBCResourceIntTest {
       DBC dbcReal = new DBC()
           .dbc(dbc)
           .name(dbc)
-          .abbr("AAA" + count.toString());
+          .abbr("AAA" + count.toString())
+          .entityId(DEFAULT_ENTITY);
       dBCRepository.saveAndFlush(dbcReal);
       count++;
     }

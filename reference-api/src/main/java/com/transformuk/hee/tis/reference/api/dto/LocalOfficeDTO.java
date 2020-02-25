@@ -14,10 +14,16 @@ public class LocalOfficeDTO implements Serializable {
   private Long id;
 
   @NotNull
+  private String dbc;
+
+  @NotNull
   private String abbreviation;
 
   @NotNull
   private String name;
+
+  @NotNull
+  private Long entityId;
 
   @NotNull
   private String postAbbreviation;
@@ -30,6 +36,14 @@ public class LocalOfficeDTO implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getDbc() {
+    return dbc;
+  }
+
+  public void setDbc(String dbc) {
+    this.dbc = dbc;
   }
 
   public String getAbbreviation() {
@@ -46,6 +60,14 @@ public class LocalOfficeDTO implements Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Long getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(Long entityId) {
+    this.entityId = entityId;
   }
 
   public String getPostAbbreviation() {
@@ -91,8 +113,10 @@ public class LocalOfficeDTO implements Serializable {
   public String toString() {
     return "LocalOfficeDTO{" +
         "id=" + id +
+        ", dbc='" + dbc + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
+        ", entityId='" + entityId + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
         ", status=" + status +
         '}';

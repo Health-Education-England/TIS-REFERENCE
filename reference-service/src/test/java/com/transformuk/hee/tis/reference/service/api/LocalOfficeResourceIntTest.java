@@ -62,10 +62,20 @@ public class LocalOfficeResourceIntTest {
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
+  private static final String DEFAULT_DBC = "1-AIIDHJ";
+  private static final String UPDATED_DBC = "NI-MOCK-DBC";
+  private static final String SEARCH_LOCAL_OFFICE_DBC = "1-AIIDHJ";
+
+  private static final Long DEFAULT_ENTITY = 1L;
+  private static final Long UPDATED_ENTITYID = 2L;
+  private static final Long SEARCH_LOCAL_OFFICE_ENTITYID = 1L;
+
   private static String[] localOfficeArray = new String[]{HENE_NAME, HENWL_NAME, HEKSS_NAME};
   LocalOffice searchLO = new LocalOffice()
       .abbreviation("SEARCHLO")
       .name("SEARCHLO")
+      .dbc("1-AIIDHJ")
+      .entityId(1L)
       .postAbbreviation("SEARCHLO");
   @Autowired
   private LocalOfficeRepository localOfficeRepository;
@@ -94,6 +104,8 @@ public class LocalOfficeResourceIntTest {
     LocalOffice localOffice = new LocalOffice()
         .abbreviation(DEFAULT_ABBREVIATION)
         .name(DEFAULT_NAME)
+        .dbc(DEFAULT_DBC)
+        .entityId(DEFAULT_ENTITY)
         .postAbbreviation(DEFAULT_POST_ABBREVIATION);
     return localOffice;
   }
@@ -134,6 +146,8 @@ public class LocalOfficeResourceIntTest {
     LocalOffice testLocalOffice = localOfficeList.get(localOfficeList.size() - 1);
     assertThat(testLocalOffice.getAbbreviation()).isEqualTo(DEFAULT_ABBREVIATION);
     assertThat(testLocalOffice.getName()).isEqualTo(DEFAULT_NAME);
+    assertThat(testLocalOffice.getDbc()).isEqualTo(DEFAULT_DBC);
+    assertThat(testLocalOffice.getEntityId()).isEqualTo(DEFAULT_ENTITY);
   }
 
   @Test
@@ -206,7 +220,9 @@ public class LocalOfficeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(localOffice.getId().intValue())))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
-        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+        .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+        .andExpect(jsonPath("$.[*].dbc").value(hasItem(DEFAULT_DBC.toString())))
+        .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY.intValue())));
   }
 
   @Test
@@ -216,6 +232,8 @@ public class LocalOfficeResourceIntTest {
     LocalOffice unencodedLocalOffice = new LocalOffice()
         .abbreviation(UNENCODED_ABBREVIATION)
         .name(UNENCODED_NAME)
+        .dbc(DEFAULT_DBC)
+        .entityId(DEFAULT_ENTITY)
         .postAbbreviation(UNENCODED_POST_ABBREVIATION);
     localOfficeRepository.saveAndFlush(unencodedLocalOffice);
 
@@ -225,7 +243,9 @@ public class LocalOfficeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
         .andExpect(jsonPath("$.[*].abbreviation").value(UNENCODED_ABBREVIATION))
-        .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME));
+        .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
+        .andExpect(jsonPath("$.[*].dbc").value(DEFAULT_DBC))
+        .andExpect(jsonPath("$.[*].entityId").value(DEFAULT_ENTITY.intValue()));
   }
 
   @Test
@@ -247,6 +267,8 @@ public class LocalOfficeResourceIntTest {
       LocalOffice localOfficeReal = new LocalOffice()
           .abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
           .name(lo)
+          .dbc("1-AIIDHJ")
+          .entityId(1L)
           .postAbbreviation(DEFAULT_POST_ABBREVIATION + count.toString());
       localOfficeRepository.saveAndFlush(localOfficeReal);
       count++;
@@ -295,7 +317,9 @@ public class LocalOfficeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(localOffice.getId().intValue()))
         .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION.toString()))
-        .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
+        .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+        .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC.toString()))
+        .andExpect(jsonPath("$.entityId").value(DEFAULT_ENTITY.intValue()));
   }
 
   @Test
@@ -317,7 +341,9 @@ public class LocalOfficeResourceIntTest {
     LocalOffice updatedLocalOffice = localOfficeRepository.findOne(localOffice.getId());
     updatedLocalOffice
         .abbreviation(UPDATED_ABBREVIATION)
-        .name(UPDATED_NAME);
+        .name(UPDATED_NAME)
+        .dbc(UPDATED_DBC)
+        .entityId(UPDATED_ENTITYID);
     LocalOfficeDTO localOfficeDTO = localOfficeMapper
         .localOfficeToLocalOfficeDTO(updatedLocalOffice);
 
@@ -332,6 +358,8 @@ public class LocalOfficeResourceIntTest {
     LocalOffice testLocalOffice = localOfficeList.get(localOfficeList.size() - 1);
     assertThat(testLocalOffice.getAbbreviation()).isEqualTo(UPDATED_ABBREVIATION);
     assertThat(testLocalOffice.getName()).isEqualTo(UPDATED_NAME);
+    assertThat(testLocalOffice.getDbc()).isEqualTo(UPDATED_DBC);
+    assertThat(testLocalOffice.getEntityId()).isEqualTo(UPDATED_ENTITYID);
   }
 
   @Test
@@ -387,6 +415,8 @@ public class LocalOfficeResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(SEARCH_LOCAL_OFFICE_ABBREVIATTION))
-        .andExpect(jsonPath("$.[*].name").value(SEARCH_LOCAL_OFFICE_NAME));
+        .andExpect(jsonPath("$.[*].name").value(SEARCH_LOCAL_OFFICE_NAME))
+        .andExpect(jsonPath("$.[*].dbc").value(SEARCH_LOCAL_OFFICE_DBC))
+        .andExpect(jsonPath("$.[*].entityId").value(SEARCH_LOCAL_OFFICE_ENTITYID.intValue()));
   }
 }
