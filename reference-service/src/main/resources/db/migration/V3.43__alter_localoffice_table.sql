@@ -1,5 +1,10 @@
 ALTER TABLE `LocalOffice`
-ADD COLUMN `entity` VARCHAR(45) NOT NULL AFTER `name`;
+ADD COLUMN `entityId` bigint(20) NOT NULL AFTER `name`;
 
 UPDATE `LocalOffice`
-SET entity = 'HEE';
+SET entityId = 1;
+
+INSERT INTO `LocalOffice`
+(`abbreviation`, `name`, `entityId`, `status`, `postAbbreviation`)
+VALUES
+('NIMDTA', 'Northern Ireland Medical and Dental Training Agency', 2, 'CURRENT', 'MDTA');

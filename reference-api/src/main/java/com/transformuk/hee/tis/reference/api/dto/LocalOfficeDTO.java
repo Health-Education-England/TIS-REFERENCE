@@ -20,6 +20,9 @@ public class LocalOfficeDTO implements Serializable {
   private String name;
 
   @NotNull
+  private Long entityId;
+
+  @NotNull
   private String postAbbreviation;
 
   private Status status;
@@ -46,6 +49,14 @@ public class LocalOfficeDTO implements Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Long getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(Long entityId) {
+    this.entityId = entityId;
   }
 
   public String getPostAbbreviation() {

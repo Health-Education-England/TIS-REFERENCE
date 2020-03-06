@@ -41,10 +41,6 @@ public class DBC implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  @NotNull
-  @Column(name = "entity", nullable = false)
-  private String entity;
-
   public Long getId() {
     return id;
   }
@@ -102,15 +98,6 @@ public class DBC implements Serializable {
 
   public DBC status(Status status) {
     this.status = status;
-    return this;
-  }
-
-  public String getEntity() { return entity; }
-
-  public void setEntity(String entity){ this.entity = entity; }
-
-  public DBC entity(String entity){
-    this.entity = entity;
     return this;
   }
 

@@ -34,6 +34,10 @@ public class LocalOffice implements Serializable {
   private String name;
 
   @NotNull
+  @Column(name = "entityId", nullable = false)
+  private Long entityId;
+
+  @NotNull
   @Column(name = "postAbbreviation", nullable = false)
   private String postAbbreviation;
 
@@ -72,6 +76,19 @@ public class LocalOffice implements Serializable {
 
   public LocalOffice name(String name) {
     this.name = name;
+    return this;
+  }
+
+  public Long getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(Long entityId) {
+    this.entityId = entityId;
+  }
+
+  public LocalOffice entityId(Long entityId) {
+    this.entityId = entityId;
     return this;
   }
 

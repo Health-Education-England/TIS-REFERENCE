@@ -62,8 +62,6 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
-  private static final String DEFAULT_ENTITY = "HEEENTITY";
-
   private static String[] dbcArray = new String[]{HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
@@ -101,8 +99,7 @@ public class DBCResourceIntTest {
     DBC dBC = new DBC()
         .dbc(DEFAULT_DBC)
         .name(DEFAULT_NAME)
-        .abbr(DEFAULT_ABBR)
-        .entity(DEFAULT_ENTITY);
+        .abbr(DEFAULT_ABBR);
     return dBC;
   }
 
@@ -136,7 +133,6 @@ public class DBCResourceIntTest {
     assertThat(testDBC.getDbc()).isEqualTo(DEFAULT_DBC);
     assertThat(testDBC.getName()).isEqualTo(DEFAULT_NAME);
     assertThat(testDBC.getAbbr()).isEqualTo(DEFAULT_ABBR);
-    assertThat(testDBC.getEntity()).isEqualTo(DEFAULT_ENTITY);
   }
 
   @Test
@@ -233,8 +229,7 @@ public class DBCResourceIntTest {
     DBC encDbc = new DBC()
         .dbc(UNENCODED_DBC)
         .name(UNENCODED_NAME)
-        .abbr(UNENCODED_ABBR)
-        .entity(DEFAULT_ENTITY);
+        .abbr(UNENCODED_ABBR);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
     dBCRepository.save(dbcs);
@@ -247,8 +242,7 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
         .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
-        .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR))
-        .andExpect(jsonPath("$.[*].entity").value(DEFAULT_ENTITY));
+        .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
   }
 
   @Test
@@ -353,8 +347,7 @@ public class DBCResourceIntTest {
       DBC dbcReal = new DBC()
           .dbc(dbc)
           .name(dbc)
-          .abbr("AAA" + count.toString())
-          .entity(DEFAULT_ENTITY);
+          .abbr("AAA" + count.toString());
       dBCRepository.saveAndFlush(dbcReal);
       count++;
     }
