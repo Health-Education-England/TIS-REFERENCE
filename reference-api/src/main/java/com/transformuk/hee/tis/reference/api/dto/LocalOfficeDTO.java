@@ -14,6 +14,9 @@ public class LocalOfficeDTO implements Serializable {
   private Long id;
 
   @NotNull
+  private String dbc;
+
+  @NotNull
   private String abbreviation;
 
   @NotNull
@@ -33,6 +36,14 @@ public class LocalOfficeDTO implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getDbc() {
+    return dbc;
+  }
+
+  public void setDbc(String dbc) {
+    this.dbc = dbc;
   }
 
   public String getAbbreviation() {
@@ -102,6 +113,7 @@ public class LocalOfficeDTO implements Serializable {
   public String toString() {
     return "LocalOfficeDTO{" +
         "id=" + id +
+        ", dbc='" + dbc + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
