@@ -34,6 +34,10 @@ public class DBC implements Serializable {
   private String name;
 
   @NotNull
+  @Column(name = "entityId", nullable = false)
+  private Long entityId;
+
+  @NotNull
   @Column(name = "abbr", nullable = false)
   private String abbr;
 
@@ -72,6 +76,19 @@ public class DBC implements Serializable {
 
   public DBC name(String name) {
     this.name = name;
+    return this;
+  }
+
+  public Long getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(Long entityId) {
+    this.entityId = entityId;
+  }
+
+  public DBC entityId(Long entityId) {
+    this.entityId = entityId;
     return this;
   }
 
@@ -127,6 +144,7 @@ public class DBC implements Serializable {
         "id=" + id +
         ", dbc='" + dbc + '\'' +
         ", name='" + name + '\'' +
+        ", entityId='" + entityId + '\'' +
         ", abbr='" + abbr + '\'' +
         ", status=" + status +
         '}';

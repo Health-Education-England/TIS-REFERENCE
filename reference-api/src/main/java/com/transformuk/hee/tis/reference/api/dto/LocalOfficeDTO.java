@@ -116,6 +116,7 @@ public class LocalOfficeDTO implements Serializable {
         ", dbc='" + dbc + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
+        ", entityId='" + entityId + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
         ", status=" + status +
         '}';
