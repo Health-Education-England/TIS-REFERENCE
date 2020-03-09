@@ -4,9 +4,10 @@ ADD COLUMN `dbc` varchar(255) NOT NULL AFTER `id`;
 ALTER TABLE `LocalOffice`
 ADD COLUMN `entityId` bigint(20) NOT NULL AFTER `name`;
 
-UPDATE `LocalOffice`, `DBC`
-SET `LocalOffice`.`dbc` = `DBC`.`dbc`
-WHERE `LocalOffice`.`abbreviation` = `DBC`.`abbr`;
+UPDATE `LocalOffice`
+INNER JOIN `DBC`
+ON `LocalOffice`.`abbreviation` = `DBC`.`abbr`
+SET `LocalOffice`.`dbc` = `DBC`.`dbc`;
 
 UPDATE `LocalOffice`
 SET entityId = 1;
