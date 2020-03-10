@@ -57,11 +57,11 @@ public class LocalOffice implements Serializable {
     this.id = id;
   }
 
-  public String getDBC() {
+  public String getDbc() {
     return dbc;
   }
 
-  public void setDBC(String dbc) {
+  public void setDbc(String dbc) {
     this.dbc = dbc;
   }
 
