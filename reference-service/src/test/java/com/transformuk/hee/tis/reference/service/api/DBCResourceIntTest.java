@@ -322,7 +322,7 @@ public class DBCResourceIntTest {
     assertThat(testDBC.getDbc()).isEqualTo(UPDATED_DBC);
     assertThat(testDBC.getName()).isEqualTo(UPDATED_NAME);
     assertThat(testDBC.getAbbr()).isEqualTo(UPDATED_ABBR);
-    assertThat(testDBC.g()).isEqualTo(UPDATED_ABBR);
+    assertThat(testDBC.getEntityId()).isEqualTo(UPDATED_ENTITYID);
   }
 
   @Test
