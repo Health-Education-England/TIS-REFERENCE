@@ -5,9 +5,9 @@ ALTER TABLE `LocalOffice`
 ADD COLUMN `entityId` bigint(20) NOT NULL AFTER `name`;
 
 UPDATE `LocalOffice`
-INNER JOIN `DBC`
-ON `LocalOffice`.`abbreviation` = `DBC`.`abbr`
-SET `LocalOffice`.`dbc` = `DBC`.`dbc`;
+SET `dbc` = (SELECT `dbc`
+              FROM `DBC`
+              WHERE `LocalOffice`.`abbreviation` = `DBC`.`abbr`);
 
 UPDATE `LocalOffice`
 SET entityId = 1;
