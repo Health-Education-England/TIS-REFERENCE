@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -19,6 +20,10 @@ public class SiteDTO implements Serializable {
   private Long id;
 
   private String siteCode;
+
+  private LocalDate startDate;
+
+  private LocalDate endDate;
 
   private String localOffice;
 
@@ -56,6 +61,22 @@ public class SiteDTO implements Serializable {
 
   public void setSiteCode(String siteCode) {
     this.siteCode = siteCode;
+  }
+
+  public LocalDate getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+  }
+
+  public LocalDate getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDate endDate) {
+    this.endDate = endDate;
   }
 
   public String getLocalOffice() {
@@ -174,6 +195,8 @@ public class SiteDTO implements Serializable {
     return "SiteDTO{" +
         "id=" + id +
         ", siteCode='" + siteCode + '\'' +
+        ", startDate='" + startDate + '\'' +
+        ", endDate='" + endDate + '\'' +
         ", localOffice='" + localOffice + '\'' +
         ", trustCode='" + trustCode + '\'' +
         ", trustId=" + trustId +

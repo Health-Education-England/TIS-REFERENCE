@@ -14,6 +14,7 @@ import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.api.util.UrlDecoderUtil;
+import com.transformuk.hee.tis.reference.service.api.validation.SiteValidator;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
@@ -71,15 +72,17 @@ public class SiteResource {
   private final SiteRepository siteRepository;
   private final SiteMapper siteMapper;
   private final SitesTrustsService sitesTrustsService;
+  private final SiteValidator siteValidator;
 
   private final int limit;
 
   public SiteResource(SiteRepository siteRepository, SiteMapper siteMapper,
-      SitesTrustsService sitesTrustsService,
+      SitesTrustsService sitesTrustsService, SiteValidator siteValidator,
       @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.siteMapper = siteMapper;
     this.sitesTrustsService = sitesTrustsService;
+    this.siteValidator = siteValidator;
     this.limit = limit;
   }
 
@@ -97,6 +100,7 @@ public class SiteResource {
   public ResponseEntity<SiteDTO> createSite(@Validated(Create.class) @RequestBody SiteDTO siteDTO)
       throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
+    siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
@@ -119,6 +123,7 @@ public class SiteResource {
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
+    siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);

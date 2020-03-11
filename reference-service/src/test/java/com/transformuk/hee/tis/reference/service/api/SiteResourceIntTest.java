@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.api.validation.SiteValidator;
+import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedException;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -21,12 +23,14 @@ import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.util.Maps;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -54,6 +58,11 @@ public class SiteResourceIntTest {
   private static final String UPDATED_SITE_CODE = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_CODE = "CCCCCCCCCC";
   private static final String UNENCODED_SITE_CODE1 = "RCC25";
+
+  private static final LocalDate DEFAULT_START_DATE = LocalDate.of(2000,12,01);
+  private static final LocalDate DEFAULT_END_DATE = LocalDate.of(2020,12 ,31);
+  private static final LocalDate UPDATED_START_DATE = LocalDate.of(2001,01 ,01);
+  private static final LocalDate UPDATED_END_DATE = LocalDate.of(2021, 01,01);
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
@@ -114,6 +123,9 @@ public class SiteResourceIntTest {
   private SitesTrustsService sitesTrustsService;
 
   @Autowired
+  private SiteValidator siteValidator;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -138,6 +150,8 @@ public class SiteResourceIntTest {
   public static Site createEntity(EntityManager em) {
     Site site = new Site()
         .siteCode(DEFAULT_SITE_CODE)
+        .startDate(DEFAULT_START_DATE)
+        .endDate(DEFAULT_END_DATE)
         .localOffice(DEFAULT_LOCAL_OFFICE)
         .trustCode(DEFAULT_TRUST_CODE)
         .siteName(DEFAULT_SITE_NAME)
@@ -153,7 +167,7 @@ public class SiteResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     SiteResource siteResource = new SiteResource(siteRepository, siteMapper, sitesTrustsService,
-        100);
+        siteValidator, 100);
     this.restSiteMockMvc = MockMvcBuilders.standaloneSetup(siteResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -182,6 +196,8 @@ public class SiteResourceIntTest {
     assertThat(siteList).hasSize(databaseSizeBeforeCreate + 1);
     Site testSite = siteList.get(siteList.size() - 1);
     assertThat(testSite.getSiteCode()).isEqualTo(DEFAULT_SITE_CODE);
+    assertThat(testSite.getStartDate()).isEqualTo(DEFAULT_START_DATE);
+    assertThat(testSite.getEndDate()).isEqualTo(DEFAULT_END_DATE);
     assertThat(testSite.getLocalOffice()).isEqualTo(DEFAULT_LOCAL_OFFICE);
     assertThat(testSite.getTrustCode()).isEqualTo(DEFAULT_TRUST_CODE);
     assertThat(testSite.getSiteName()).isEqualTo(DEFAULT_SITE_NAME);
@@ -224,6 +240,8 @@ public class SiteResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE)))
+        .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
+        .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
         .andExpect(jsonPath("$.[*].trustCode").value(hasItem(DEFAULT_TRUST_CODE)))
         .andExpect(jsonPath("$.[*].siteName").value(hasItem(DEFAULT_SITE_NAME)))
@@ -480,6 +498,8 @@ public class SiteResourceIntTest {
     Site updatedSite = siteRepository.findOne(site.getId());
     updatedSite
         .localOffice(UPDATED_LOCAL_OFFICE)
+        .startDate(UPDATED_START_DATE)
+        .endDate(UPDATED_END_DATE)
         .trustCode(UPDATED_TRUST_CODE)
         .siteName(UPDATED_SITE_NAME)
         .address(UPDATED_ADDRESS)
@@ -499,6 +519,8 @@ public class SiteResourceIntTest {
     assertThat(siteList).hasSize(databaseSizeBeforeUpdate);
     Site testSite = siteList.get(siteList.size() - 1);
     assertThat(testSite.getSiteCode()).isEqualTo(DEFAULT_SITE_CODE);
+    assertThat(testSite.getStartDate()).isEqualTo(UPDATED_START_DATE.toString());
+    assertThat(testSite.getEndDate()).isEqualTo(UPDATED_END_DATE.toString());
     assertThat(testSite.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
     assertThat(testSite.getTrustCode()).isEqualTo(UPDATED_TRUST_CODE);
     assertThat(testSite.getSiteName()).isEqualTo(UPDATED_SITE_NAME);
@@ -598,4 +620,20 @@ public class SiteResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
   }
+
+  @Test (expected = CustomParameterizedException.class)
+  public void startDateShouldBeBeforeEndDate() {
+
+    //Given
+    SiteDTO siteDTO = new SiteDTO();
+    siteDTO.setStartDate(LocalDate.of(2021,12,01));
+    siteDTO.setEndDate(LocalDate.of(2020,12,01 ));
+
+    //When
+    siteValidator.validate(siteDTO);
+
+    //Then
+    throw new CustomParameterizedException("Start Date needs to be before End Date");
+
+    }
 }

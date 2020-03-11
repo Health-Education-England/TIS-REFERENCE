@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.model;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,10 @@ public class Site implements Serializable {
   private Long id;
 
   private String siteCode;
+
+  private LocalDate startDate;
+
+  private LocalDate endDate;
 
   private String localOffice;
 
@@ -66,6 +71,32 @@ public class Site implements Serializable {
 
   public void setSiteCode(String siteCode) {
     this.siteCode = siteCode;
+  }
+
+  public LocalDate getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+  }
+
+  public Site startDate(LocalDate startDate) {
+    this.startDate = startDate;
+    return this;
+  }
+
+  public LocalDate getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDate endDate) {
+    this.endDate = endDate;
+  }
+
+  public Site endDate(LocalDate endDate) {
+    this.endDate = endDate;
+    return this;
   }
 
   public Site siteCode(String siteCode) {
@@ -241,6 +272,8 @@ public class Site implements Serializable {
     return "Site{" +
         "id=" + id +
         ", siteCode='" + siteCode + '\'' +
+        ", startDate='" + startDate + '\'' +
+        ", endDate='" + endDate + '\'' +
         ", localOffice='" + localOffice + '\'' +
         ", trustCode='" + trustCode + '\'' +
         ", siteName='" + siteName + '\'' +
