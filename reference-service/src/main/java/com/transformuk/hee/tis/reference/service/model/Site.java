@@ -271,10 +271,10 @@ public class Site implements Serializable {
   public String toString() {
     return "Site{" +
         "id=" + id +
-        ", siteCode='" + siteCode + '\'' +
-        ", startDate='" + startDate + '\'' +
-        ", endDate='" + endDate + '\'' +
-        ", localOffice='" + localOffice + '\'' +
+        ", siteCode='" + siteCode + '\''
+        + ", startDate='" + startDate + '\''
+        + ", endDate='" + endDate + '\''
+        + ", localOffice='" + localOffice + '\'' +
         ", trustCode='" + trustCode + '\'' +
         ", siteName='" + siteName + '\'' +
         ", address='" + address + '\'' +

@@ -193,10 +193,10 @@ public class SiteDTO implements Serializable {
   @Override
   public String toString() {
     return "SiteDTO{" +
-        "id=" + id +
-        ", siteCode='" + siteCode + '\'' +
-        ", startDate='" + startDate + '\'' +
-        ", endDate='" + endDate + '\'' +
+        "id=" + id
+        + ", siteCode='" + siteCode + '\''
+        + ", startDate='" + startDate + '\''
+        + ", endDate='" + endDate + '\'' +
         ", localOffice='" + localOffice + '\'' +
         ", trustCode='" + trustCode + '\'' +
         ", trustId=" + trustId +

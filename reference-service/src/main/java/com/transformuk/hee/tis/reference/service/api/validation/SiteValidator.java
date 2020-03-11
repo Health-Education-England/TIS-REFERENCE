@@ -10,17 +10,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SiteValidator {
-  private static final String START_DATE_LOWER_THAN_END_DATE = "Start Date needs to be before End Date";
+
+  private static final String START_DATE_BEFORE_END_DATE = "Start Date needs to be before End Date";
   private final Logger log = LoggerFactory.getLogger(SiteValidator.class);
 
   public void validate(SiteDTO siteDTO) {
 
-    LocalDate startDate = siteDTO.getStartDate(), endDate = siteDTO.getEndDate();
-    if (startDate!= null && endDate != null) {
+    LocalDate startDate = siteDTO.getStartDate();
+    LocalDate endDate = siteDTO.getEndDate();
+    if (startDate != null && endDate != null) {
       log.debug("VALIDATION of startDate and endDate");
       if (startDate.isAfter(endDate)) {
         throw new CustomParameterizedException(
-            START_DATE_LOWER_THAN_END_DATE, ErrorConstants.ERR_VALIDATION);
+            START_DATE_BEFORE_END_DATE, ErrorConstants.ERR_VALIDATION);
       }
     }
   }
