@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -13,12 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.Data;
 
 /**
  * A Site.
  */
 @Entity
 @Table(name = "Site")
+@Data
 public class Site implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -80,7 +81,6 @@ public class Site implements Serializable {
   public void setStartDate(LocalDate startDate) {
     this.startDate = startDate;
   }
-
   public Site startDate(LocalDate startDate) {
     this.startDate = startDate;
     return this;
@@ -93,7 +93,6 @@ public class Site implements Serializable {
   public void setEndDate(LocalDate endDate) {
     this.endDate = endDate;
   }
-
   public Site endDate(LocalDate endDate) {
     this.endDate = endDate;
     return this;
@@ -111,7 +110,6 @@ public class Site implements Serializable {
   public void setLocalOffice(String localOffice) {
     this.localOffice = localOffice;
   }
-
   public Site localOffice(String localOffice) {
     this.localOffice = localOffice;
     return this;
@@ -124,7 +122,6 @@ public class Site implements Serializable {
   public void setTrustCode(String trustCode) {
     this.trustCode = trustCode;
   }
-
   public Site trustCode(String trustCode) {
     this.trustCode = trustCode;
     return this;
@@ -137,7 +134,6 @@ public class Site implements Serializable {
   public void setTrustId(Long trustId) {
     this.trustId = trustId;
   }
-
   public Site trustId(Long trustId) {
     this.trustId = trustId;
     return this;
@@ -150,7 +146,6 @@ public class Site implements Serializable {
   public void setSiteName(String siteName) {
     this.siteName = siteName;
   }
-
   public Site siteName(String siteName) {
     this.siteName = siteName;
     return this;
@@ -163,7 +158,6 @@ public class Site implements Serializable {
   public void setAddress(String address) {
     this.address = address;
   }
-
   public Site address(String address) {
     this.address = address;
     return this;
@@ -176,7 +170,6 @@ public class Site implements Serializable {
   public void setPostCode(String postCode) {
     this.postCode = postCode;
   }
-
   public Site postCode(String postCode) {
     this.postCode = postCode;
     return this;
@@ -189,7 +182,6 @@ public class Site implements Serializable {
   public void setSiteKnownAs(String siteKnownAs) {
     this.siteKnownAs = siteKnownAs;
   }
-
   public Site siteKnownAs(String siteKnownAs) {
     this.siteKnownAs = siteKnownAs;
     return this;

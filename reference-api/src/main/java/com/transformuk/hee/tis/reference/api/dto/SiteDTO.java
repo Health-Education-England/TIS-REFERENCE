@@ -9,10 +9,12 @@ import java.time.LocalDate;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import lombok.Data;
 
 /**
  * A DTO for the Site entity.
  */
+@Data
 public class SiteDTO implements Serializable {
 
   @NotNull(groups = Update.class, message = "Id cannot be null during update")
@@ -46,126 +48,6 @@ public class SiteDTO implements Serializable {
   private Status status;
 
   private String intrepidId;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getSiteCode() {
-    return siteCode;
-  }
-
-  public void setSiteCode(String siteCode) {
-    this.siteCode = siteCode;
-  }
-
-  public LocalDate getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(LocalDate startDate) {
-    this.startDate = startDate;
-  }
-
-  public LocalDate getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(LocalDate endDate) {
-    this.endDate = endDate;
-  }
-
-  public String getLocalOffice() {
-    return localOffice;
-  }
-
-  public void setLocalOffice(String localOffice) {
-    this.localOffice = localOffice;
-  }
-
-  public String getTrustCode() {
-    return trustCode;
-  }
-
-  public void setTrustCode(String trustCode) {
-    this.trustCode = trustCode;
-  }
-
-  public Long getTrustId() {
-    return trustId;
-  }
-
-  public void setTrustId(Long trustId) {
-    this.trustId = trustId;
-  }
-
-  public String getSiteName() {
-    return siteName;
-  }
-
-  public void setSiteName(String siteName) {
-    this.siteName = siteName;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  public String getPostCode() {
-    return postCode;
-  }
-
-  public void setPostCode(String postCode) {
-    this.postCode = postCode;
-  }
-
-  public String getSiteKnownAs() {
-    return siteKnownAs;
-  }
-
-  public void setSiteKnownAs(String siteKnownAs) {
-    this.siteKnownAs = siteKnownAs;
-  }
-
-  public String getSiteNumber() {
-    return siteNumber;
-  }
-
-  public void setSiteNumber(String siteNumber) {
-    this.siteNumber = siteNumber;
-  }
-
-  public String getOrganisationalUnit() {
-    return organisationalUnit;
-  }
-
-  public void setOrganisationalUnit(String organisationalUnit) {
-    this.organisationalUnit = organisationalUnit;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public String getIntrepidId() {
-    return intrepidId;
-  }
-
-  public void setIntrepidId(String intrepidId) {
-    this.intrepidId = intrepidId;
-  }
 
   @Override
   public boolean equals(Object o) {
