@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,21 +13,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.api.validation.SiteValidator;
 import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedException;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Site;
-import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
-
 import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +79,8 @@ public class SiteResourceIntTest {
   private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
   private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
   private static final String UNENCODED_ADDRESS = "CCCCCCCCCC";
-  private static final String UNENCODED_ADDRESS1 = "Scarborough Hospital Woodlands Drive Scarborough North Yorkshire";
+  private static final String UNENCODED_ADDRESS1 =
+      "Scarborough Hospital Woodlands Drive Scarborough North Yorkshire";
 
   private static final String DEFAULT_POST_CODE = "AAAAAAAAAA";
   private static final String UPDATED_POST_CODE = "BBBBBBBBBB";
@@ -109,7 +109,8 @@ public class SiteResourceIntTest {
   private static final String SITE_CODE = "AAAA";
 
   private static final String ENCODED_SEARCH_STRING = "\"Scarborough%20General%20Hospital\"";
-  private static final String ENCODED_SITE_KNOWN_AS_STRING = "\"Scarborough%20General%20Hospital%20(RCBCA)\"";
+  private static final String ENCODED_SITE_KNOWN_AS_STRING =
+      "\"Scarborough%20General%20Hospital%20(RCBCA)\"";
 
   @Autowired
   private SiteRepository siteRepository;
@@ -576,7 +577,7 @@ public class SiteResourceIntTest {
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(site.getSiteCode())))
         .andExpect(jsonPath("$.[*].siteName").value(hasItem(site.getSiteName())))
-        .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())));
+        .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())))
         .andExpect(jsonPath("$.[*].siteCode").value(not(hasItem(anotherSite.getSiteCode()))))
         .andExpect(jsonPath("$.[*].siteName").value(not(hasItem(anotherSite.getSiteName()))))
         .andExpect(jsonPath("$.[*].address").value(not(hasItem(anotherSite.getAddress()))));
