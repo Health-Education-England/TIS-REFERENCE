@@ -74,8 +74,13 @@ node {
               env.IMAGE_NAME = imageName
           }
 
-          sh "ansible-playbook -i $env.DEVOPS_BASE/ansible/inventory/dev $env.DEVOPS_BASE/ansible/tasks/spring-boot-build.yml"
+          sh "mvn package -DskipTests"
+          sh "cp ./reference-service/target/reference-service-*.war ./reference-service/target/app.jar"
+          sh "docker build -t heetiscontainerregistry.azurecr.io/reference:$buildVersion -f ./reference-service/Dockerfile ./reference-service"
+          sh "docker push heetiscontainerregistry.azurecr.io/reference:$buildVersion"
 
+          sh "docker tag heetiscontainerregistry.azurecr.io/reference:$buildVersion heetiscontainerregistry.azurecr.io/reference:latest"
+          sh "docker push heetiscontainerregistry.azurecr.io/reference:latest"
           println "[Jenkinsfile INFO] Stage Dockerize completed..."
         }
 
