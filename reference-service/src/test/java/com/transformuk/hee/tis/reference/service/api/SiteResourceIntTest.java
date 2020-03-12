@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,7 +29,6 @@ import javax.persistence.EntityManager;
 
 import org.assertj.core.util.Maps;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -59,10 +57,10 @@ public class SiteResourceIntTest {
   private static final String UNENCODED_SITE_CODE = "CCCCCCCCCC";
   private static final String UNENCODED_SITE_CODE1 = "RCC25";
 
-  private static final LocalDate DEFAULT_START_DATE = LocalDate.of(2000,12,01);
-  private static final LocalDate DEFAULT_END_DATE = LocalDate.of(2020,12 ,31);
-  private static final LocalDate UPDATED_START_DATE = LocalDate.of(2001,01 ,01);
-  private static final LocalDate UPDATED_END_DATE = LocalDate.of(2021, 01,01);
+  private static final LocalDate DEFAULT_START_DATE = LocalDate.of(2000, 12, 01);
+  private static final LocalDate DEFAULT_END_DATE = LocalDate.of(2020, 12, 31);
+  private static final LocalDate UPDATED_START_DATE = LocalDate.of(2001, 01, 01);
+  private static final LocalDate UPDATED_END_DATE = LocalDate.of(2021, 01, 01);
 
   private static final String DEFAULT_LOCAL_OFFICE = "AAAAAAAAAA";
   private static final String UPDATED_LOCAL_OFFICE = "BBBBBBBBBB";
@@ -578,7 +576,7 @@ public class SiteResourceIntTest {
         .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(site.getSiteCode())))
         .andExpect(jsonPath("$.[*].siteName").value(hasItem(site.getSiteName())))
-        .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())))
+        .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())));
         .andExpect(jsonPath("$.[*].siteCode").value(not(hasItem(anotherSite.getSiteCode()))))
         .andExpect(jsonPath("$.[*].siteName").value(not(hasItem(anotherSite.getSiteName()))))
         .andExpect(jsonPath("$.[*].address").value(not(hasItem(anotherSite.getAddress()))));
@@ -621,13 +619,13 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
   }
 
-  @Test (expected = CustomParameterizedException.class)
+  @Test(expected = CustomParameterizedException.class)
   public void startDateShouldBeBeforeEndDate() {
 
     //Given
     SiteDTO siteDTO = new SiteDTO();
-    siteDTO.setStartDate(LocalDate.of(2021,12,01));
-    siteDTO.setEndDate(LocalDate.of(2020,12,01 ));
+    siteDTO.setStartDate(LocalDate.of(2021, 12, 01));
+    siteDTO.setEndDate(LocalDate.of(2020, 12, 01));
 
     //When
     siteValidator.validate(siteDTO);
@@ -635,5 +633,5 @@ public class SiteResourceIntTest {
     //Then
     throw new CustomParameterizedException("Start Date needs to be before End Date");
 
-    }
+  }
 }

@@ -65,7 +65,6 @@ public class WebConfigurer implements ServletContextInitializer,
     }
     log.info("Web application fully configured");
   }
-
   /**
    * Customize the Servlet engine: Mime types, the document root, the cache.
    */
@@ -79,7 +78,6 @@ public class WebConfigurer implements ServletContextInitializer,
     container.setMimeMappings(mappings);
     // When running in an IDE or with ./mvnw spring-boot:run, set location of the static web assets.
     setLocationForStaticAssets(container);
-
     /*
      * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288
      * HTTP/2 requires HTTPS, so HTTP requests will fallback to HTTP/1.1.
@@ -103,7 +101,6 @@ public class WebConfigurer implements ServletContextInitializer,
       container.setDocumentRoot(root);
     }
   }
-
   /**
    * Resolve path prefix to static resources.
    */
@@ -117,7 +114,6 @@ public class WebConfigurer implements ServletContextInitializer,
     }
     return extractedPath.substring(0, extractionEndIndex);
   }
-
   /**
    * Initializes the caching HTTP Headers Filter.
    */
@@ -132,7 +128,6 @@ public class WebConfigurer implements ServletContextInitializer,
     cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/app/*");
     cachingHttpHeadersFilter.setAsyncSupported(true);
   }
-
   /**
    * Initializes Metrics.
    */
