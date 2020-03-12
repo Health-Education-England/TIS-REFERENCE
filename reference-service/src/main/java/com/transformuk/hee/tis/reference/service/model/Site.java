@@ -58,41 +58,11 @@ public class Site implements Serializable {
 
   private String intrepidId;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getSiteCode() {
-    return siteCode;
-  }
-
-  public void setSiteCode(String siteCode) {
-    this.siteCode = siteCode;
-  }
-
-  public LocalDate getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(LocalDate startDate) {
-    this.startDate = startDate;
-  }
   public Site startDate(LocalDate startDate) {
     this.startDate = startDate;
     return this;
   }
 
-  public LocalDate getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(LocalDate endDate) {
-    this.endDate = endDate;
-  }
   public Site endDate(LocalDate endDate) {
     this.endDate = endDate;
     return this;
@@ -103,96 +73,39 @@ public class Site implements Serializable {
     return this;
   }
 
-  public String getLocalOffice() {
-    return localOffice;
-  }
-
-  public void setLocalOffice(String localOffice) {
-    this.localOffice = localOffice;
-  }
   public Site localOffice(String localOffice) {
     this.localOffice = localOffice;
     return this;
   }
 
-  public String getTrustCode() {
-    return trustCode;
-  }
-
-  public void setTrustCode(String trustCode) {
-    this.trustCode = trustCode;
-  }
   public Site trustCode(String trustCode) {
     this.trustCode = trustCode;
     return this;
   }
 
-  public Long getTrustId() {
-    return trustId;
-  }
-
-  public void setTrustId(Long trustId) {
-    this.trustId = trustId;
-  }
   public Site trustId(Long trustId) {
     this.trustId = trustId;
     return this;
   }
 
-  public String getSiteName() {
-    return siteName;
-  }
-
-  public void setSiteName(String siteName) {
-    this.siteName = siteName;
-  }
   public Site siteName(String siteName) {
     this.siteName = siteName;
     return this;
   }
 
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
   public Site address(String address) {
     this.address = address;
     return this;
   }
 
-  public String getPostCode() {
-    return postCode;
-  }
-
-  public void setPostCode(String postCode) {
-    this.postCode = postCode;
-  }
   public Site postCode(String postCode) {
     this.postCode = postCode;
     return this;
   }
 
-  public String getSiteKnownAs() {
-    return siteKnownAs;
-  }
-
-  public void setSiteKnownAs(String siteKnownAs) {
-    this.siteKnownAs = siteKnownAs;
-  }
   public Site siteKnownAs(String siteKnownAs) {
     this.siteKnownAs = siteKnownAs;
     return this;
-  }
-
-  public String getSiteNumber() {
-    return siteNumber;
-  }
-
-  public void setSiteNumber(String siteNumber) {
-    this.siteNumber = siteNumber;
   }
 
   public Site siteNumber(String siteNumber) {
@@ -200,38 +113,14 @@ public class Site implements Serializable {
     return this;
   }
 
-  public String getOrganisationalUnit() {
-    return organisationalUnit;
-  }
-
-  public void setOrganisationalUnit(String organisationalUnit) {
-    this.organisationalUnit = organisationalUnit;
-  }
-
   public Site organisationalUnit(String organisationalUnit) {
     this.organisationalUnit = organisationalUnit;
     return this;
   }
 
-  public String getIntrepidId() {
-    return intrepidId;
-  }
-
-  public void setIntrepidId(String intrepidId) {
-    this.intrepidId = intrepidId;
-  }
-
   public Site intrepidId(String intrepidId) {
     this.intrepidId = intrepidId;
     return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
   }
 
   public Site status(Status status) {
@@ -257,25 +146,5 @@ public class Site implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(siteCode);
-  }
-
-  @Override
-  public String toString() {
-    return "Site{" +
-        "id=" + id +
-        ", siteCode='" + siteCode + '\''
-        + ", startDate='" + startDate + '\''
-        + ", endDate='" + endDate + '\''
-        + ", localOffice='" + localOffice + '\'' +
-        ", trustCode='" + trustCode + '\'' +
-        ", siteName='" + siteName + '\'' +
-        ", address='" + address + '\'' +
-        ", postCode='" + postCode + '\'' +
-        ", siteKnownAs='" + siteKnownAs + '\'' +
-        ", siteNumber='" + siteNumber + '\'' +
-        ", organisationalUnit='" + organisationalUnit + '\'' +
-        ", status=" + status +
-        ", intrepidId='" + intrepidId + '\'' +
-        '}';
   }
 }

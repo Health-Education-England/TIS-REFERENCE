@@ -60,36 +60,11 @@ public class SiteDTO implements Serializable {
 
     SiteDTO siteDTO = (SiteDTO) o;
 
-    if (!Objects.equals(siteCode, siteDTO.siteCode)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(siteCode, siteDTO.siteCode);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(siteCode);
-  }
-
-  @Override
-  public String toString() {
-    return "SiteDTO{" +
-        "id=" + id
-        + ", siteCode='" + siteCode + '\''
-        + ", startDate='" + startDate + '\''
-        + ", endDate='" + endDate + '\'' +
-        ", localOffice='" + localOffice + '\'' +
-        ", trustCode='" + trustCode + '\'' +
-        ", trustId=" + trustId +
-        ", siteName='" + siteName + '\'' +
-        ", address='" + address + '\'' +
-        ", postCode='" + postCode + '\'' +
-        ", siteKnownAs='" + siteKnownAs + '\'' +
-        ", siteNumber='" + siteNumber + '\'' +
-        ", organisationalUnit='" + organisationalUnit + '\'' +
-        ", status=" + status +
-        ", intrepidId='" + intrepidId + '\'' +
-        '}';
   }
 }
