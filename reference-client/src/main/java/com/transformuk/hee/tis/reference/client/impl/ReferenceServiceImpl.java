@@ -125,7 +125,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       trustKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
-      e.printStackTrace();
+      LOG.error(e.getLocalizedMessage(), e);
     }
   }
 
