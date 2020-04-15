@@ -111,7 +111,7 @@ public class AssessmentTypeResource {
 
     AssessmentType result = assessmentTypeRepository.save(assessmentType);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, assessmentType.getCode()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getCode()))
         .body(result);
   }
 
