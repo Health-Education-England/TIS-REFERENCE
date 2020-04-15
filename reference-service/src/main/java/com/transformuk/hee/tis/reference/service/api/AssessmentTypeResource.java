@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -12,6 +13,7 @@ import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
+import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,7 +49,6 @@ import uk.nhs.tis.StringConverter;
  */
 @RestController
 @RequestMapping("/api")
-
 public class AssessmentTypeResource {
 
   private static final String ENTITY_NAME = "AssessmentType";
@@ -55,11 +56,13 @@ public class AssessmentTypeResource {
 
   private final AssessmentTypeRepository assessmentTypeRepository;
   private final AssessmentTypeServiceImpl assessmentTypeService;
+  private final AssessmentTypeMapper mapper;
 
   public AssessmentTypeResource(AssessmentTypeRepository assessmentTypeRepository,
-      AssessmentTypeServiceImpl assessmentTypeService) {
+      AssessmentTypeServiceImpl assessmentTypeService, AssessmentTypeMapper mapper) {
     this.assessmentTypeRepository = assessmentTypeRepository;
     this.assessmentTypeService = assessmentTypeService;
+    this.mapper = mapper;
   }
 
   /**
@@ -73,8 +76,8 @@ public class AssessmentTypeResource {
   @PostMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> createAssessmentType(
-      @Validated(Create.class) @RequestBody AssessmentType assessmentType)
+  public ResponseEntity<AssessmentTypeDto> createAssessmentType(
+      @Validated(Create.class) @RequestBody AssessmentTypeDto assessmentType)
       throws URISyntaxException {
     log.debug("REST request to save AssessmentType : {}", assessmentType);
     if (assessmentType.getCode() == null) {
@@ -82,10 +85,11 @@ public class AssessmentTypeResource {
           HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Assessment type must have an ID"))
           .body(null);
     }
-    AssessmentType newAssessmentType = assessmentTypeRepository.save(assessmentType);
+    AssessmentType newAssessmentType =
+        assessmentTypeRepository.save(mapper.toEntity(assessmentType));
     return ResponseEntity.created(new URI("/api/assessment-types/" + newAssessmentType.getCode()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, newAssessmentType.getCode()))
-        .body(newAssessmentType);
+        .body(mapper.toDto(newAssessmentType));
   }
 
   /**
@@ -100,8 +104,8 @@ public class AssessmentTypeResource {
   @PutMapping("/assessment-types")
   @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
-  public ResponseEntity<AssessmentType> updateAssessmentType(
-      @Validated(Update.class) @RequestBody AssessmentType assessmentType)
+  public ResponseEntity<AssessmentTypeDto> updateAssessmentType(
+      @Validated(Update.class) @RequestBody AssessmentTypeDto assessmentType)
       throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
 
@@ -109,10 +113,10 @@ public class AssessmentTypeResource {
       return createAssessmentType(assessmentType);
     }
 
-    AssessmentType result = assessmentTypeRepository.save(assessmentType);
+    AssessmentType result = assessmentTypeRepository.save(mapper.toEntity(assessmentType));
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getCode()))
-        .body(result);
+        .body(mapper.toDto(result));
   }
 
   /**
@@ -127,7 +131,7 @@ public class AssessmentTypeResource {
       @ApiResponse(code = 200, message = "assessment types list")})
   @GetMapping("/assessment-types")
   @Timed
-  public ResponseEntity<List<AssessmentType>> getAllAssessmentTypes(
+  public ResponseEntity<List<AssessmentTypeDto>> getAllAssessmentTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
@@ -148,7 +152,7 @@ public class AssessmentTypeResource {
     }
     HttpHeaders headers = PaginationUtil
         .generatePaginationHttpHeaders(page, "/api/assessment-type");
-    return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    return new ResponseEntity<>(mapper.toDtos(page.getContent()), headers, HttpStatus.OK);
   }
 
   /**
@@ -160,11 +164,11 @@ public class AssessmentTypeResource {
    */
   @GetMapping("/assessment-types/{code}")
   @Timed
-  public ResponseEntity<AssessmentType> getAssessmentTypeByCode(@PathVariable String code) {
+  public ResponseEntity<AssessmentTypeDto> getAssessmentTypeByCode(@PathVariable String code) {
     log.debug("REST request to get Assessment Type : {}", code);
-    AssessmentType result = assessmentTypeRepository.findOne(code);
-    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(result));
+    AssessmentType resultEntity = assessmentTypeRepository.findOne(code);
+    AssessmentTypeDto resultDto = mapper.toDto(resultEntity);
+
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(resultDto));
   }
-
-
 }

@@ -19,12 +19,14 @@ import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.AssessmentType;
 import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
+import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -101,8 +103,9 @@ public class AssessmentTypeResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
+    AssessmentTypeMapper mapper = Mappers.getMapper(AssessmentTypeMapper.class);
     AssessmentTypeResource testObj = new AssessmentTypeResource(assessmentTypeRepositoryMock,
-        assessmentTypeServiceMock);
+        assessmentTypeServiceMock, mapper);
     this.testObjMockMvc = MockMvcBuilders.standaloneSetup(testObj)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
