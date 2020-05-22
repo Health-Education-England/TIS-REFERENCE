@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
@@ -21,8 +23,11 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +78,7 @@ public class RoleResource {
    *
    * @param roleDTO the roleDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new roleDTO, or with
-   * status 400 (Bad Request) if the role has already an ID
+   *     status 400 (Bad Request) if the role has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/roles")
@@ -99,8 +105,8 @@ public class RoleResource {
    *
    * @param roleDTO the roleDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated roleDTO, or with
-   * status 400 (Bad Request) if the roleDTO is not valid, or with status 500 (Internal Server
-   * Error) if the roleDTO couldnt be updated
+   *     status 400 (Bad Request) if the roleDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the roleDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/roles")
@@ -196,7 +202,7 @@ public class RoleResource {
    *
    * @param id the id of the roleDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the roleDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/roles/{id}")
   @Timed
@@ -205,6 +211,38 @@ public class RoleResource {
     Role role = roleRepository.findOne(id);
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(roleDTO));
+  }
+
+  /**
+   * EXISTS /roles/exists/ : check if roles exist.
+   *
+   * @param codes            the codes of the RoleDTOs to check
+   * @param columnFilterJson The column filters to apply
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/roles/exists/")
+  @Timed
+  public ResponseEntity<Map<String, Boolean>> rolesExist(@RequestBody List<String> codes,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
+    log.debug("REST request to check Roles exist: {}", codes);
+    Specifications<Role> specs = Specifications.where(in("code", new ArrayList<>(codes)));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    List<Role> roles = roleRepository.findAll(specs);
+
+    Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
+    Map<String, Boolean> result =
+        codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   /**
@@ -229,7 +267,7 @@ public class RoleResource {
    *
    * @param roleDTOS List of the roleDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new roleDTOS, or with
-   * status 400 (Bad Request) if the RoleDTO has already an ID
+   *     status 400 (Bad Request) if the RoleDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-roles")
@@ -261,8 +299,8 @@ public class RoleResource {
    *
    * @param roleDTOS List of the roleDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated roleDTOS, or with
-   * status 400 (Bad Request) if the roleDTOS is not valid, or with status 500 (Internal Server
-   * Error) if the roleDTOS couldnt be updated
+   *     status 400 (Bad Request) if the roleDTOS is not valid, or with status 500 (Internal Server
+   *     Error) if the roleDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-roles")

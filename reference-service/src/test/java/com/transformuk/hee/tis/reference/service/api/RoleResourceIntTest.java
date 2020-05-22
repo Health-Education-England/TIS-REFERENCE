@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Role;
@@ -20,8 +21,12 @@ import com.transformuk.hee.tis.reference.service.repository.RoleCategoryReposito
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class RoleResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/roles/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -79,7 +86,7 @@ public class RoleResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restRoleMockMvc;
+  private MockMvc mockMvc;
 
   private Role role;
 
@@ -100,16 +107,12 @@ public class RoleResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     RoleResource roleResource = new RoleResource(roleRepository, roleMapper, roleService);
-    this.restRoleMockMvc = MockMvcBuilders.standaloneSetup(roleResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(roleResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
 
     roleCategory = roleCategoryRepository.findOne(3L);
-  }
-
-  @Before
-  public void initTest() {
     role = createEntity(em);
   }
 
@@ -120,7 +123,7 @@ public class RoleResourceIntTest {
 
     // Create the Role
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
-    restRoleMockMvc.perform(post("/api/roles")
+    mockMvc.perform(post("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isCreated());
@@ -143,7 +146,7 @@ public class RoleResourceIntTest {
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restRoleMockMvc.perform(post("/api/roles")
+    mockMvc.perform(post("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
@@ -163,7 +166,7 @@ public class RoleResourceIntTest {
     // Create the Role, which fails.
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
-    restRoleMockMvc.perform(post("/api/roles")
+    mockMvc.perform(post("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
@@ -182,7 +185,7 @@ public class RoleResourceIntTest {
     // Create the Role, which fails.
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
-    restRoleMockMvc.perform(post("/api/roles")
+    mockMvc.perform(post("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
@@ -198,7 +201,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(role);
 
     // Get all the roleList
-    restRoleMockMvc.perform(get("/api/roles?sort=id,desc"))
+    mockMvc.perform(get("/api/roles?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(role.getId().intValue())))
@@ -217,7 +220,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(unencodedRole);
 
     // Get the roleList
-    restRoleMockMvc.perform(get("/api/roles?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/roles?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedRole.getId().intValue()))
@@ -228,7 +231,7 @@ public class RoleResourceIntTest {
   @Test
   @Transactional
   public void getAllRolesCategory() throws Exception {
-    restRoleMockMvc.perform(get("/api/roles/categories/1"))
+    mockMvc.perform(get("/api/roles/categories/1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$", hasSize(10)))
@@ -251,7 +254,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(role);
 
     // Get the role
-    restRoleMockMvc.perform(get("/api/roles/{id}", role.getId()))
+    mockMvc.perform(get("/api/roles/{id}", role.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(role.getId().intValue()))
@@ -263,7 +266,7 @@ public class RoleResourceIntTest {
   @Transactional
   public void getNonExistingRole() throws Exception {
     // Get the role
-    restRoleMockMvc.perform(get("/api/roles/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/roles/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -281,7 +284,7 @@ public class RoleResourceIntTest {
         .label(UPDATED_LABEL);
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(updatedRole);
 
-    restRoleMockMvc.perform(put("/api/roles")
+    mockMvc.perform(put("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isOk());
@@ -303,7 +306,7 @@ public class RoleResourceIntTest {
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restRoleMockMvc.perform(put("/api/roles")
+    mockMvc.perform(put("/api/roles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isCreated());
@@ -321,7 +324,7 @@ public class RoleResourceIntTest {
     int databaseSizeBeforeDelete = roleRepository.findAll().size();
 
     // Get the role
-    restRoleMockMvc.perform(delete("/api/roles/{id}", role.getId())
+    mockMvc.perform(delete("/api/roles/{id}", role.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -334,5 +337,72 @@ public class RoleResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Role.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    roleRepository.saveAndFlush(role);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    role.setStatus(Status.INACTIVE);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    role.setStatus(Status.CURRENT);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
   }
 }
