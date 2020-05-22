@@ -117,6 +117,8 @@ public interface ReferenceService extends ClientService {
 
   Boolean isValueExists(Class dtoClass, String value);
 
+  Boolean isValueExists(Class dtoClass, String value, boolean currentOnly);
+
   List<LocalOfficeDTO> findAllLocalOffice();
 
   Collection<RoleDTO> getRolesByCategory(final Long categoryId);

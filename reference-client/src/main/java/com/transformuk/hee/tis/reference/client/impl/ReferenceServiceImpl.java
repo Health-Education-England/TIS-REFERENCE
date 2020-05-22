@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
-  private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT = "/api/local-offices?columnFilters=";
+  private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
+      "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
@@ -100,10 +102,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String NATIONALITY_STATUS_MAPPINGS_ENDPOINT = "/api/nationalities/exists/";
   private static final String ETHINIC_ORIGIN_MAPPINGS_ENDPOINT = "/api/ethnic-origins/exists/";
   private static final String MARITAL_STATUS_MAPPINGS_ENDPOINT = "/api/marital-statuses/exists/";
-  private static final String SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT = "/api/sexual-orientations/exists/";
+  private static final String SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT =
+      "/api/sexual-orientations/exists/";
   private static final String RELIGIOUS_BELIF_MAPPINGS_ENDPOINT = "/api/religious-beliefs/exists/";
-  private static final String QUALIFICATION_MAPPINGS_ENDPOINT = "/api/qualification-reference/exists/";
-  private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT = "/api/qualification-types/exists/";
+  private static final String QUALIFICATION_MAPPINGS_ENDPOINT =
+      "/api/qualification-reference/exists/";
+  private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT =
+      "/api/qualification-types/exists/";
   private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
 
   private static String gradesJsonQuerystringURLEncoded;
@@ -111,19 +116,21 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String localOfficesJsonQuerystringURLEncoded;
   private static String sitesKnownAsJsonQuerystringURLEncoded;
   private static String trustKnownAsJsonQuerystringURLEncoded;
+  private static String statusCurrentUrlEncoded;
 
   static {
     try {
-      gradesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
-          .encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
-      labelJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
-          .encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
-      localOfficesJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+      gradesJsonQuerystringURLEncoded =
+          new URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      labelJsonQuerystringURLEncoded =
+          new URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
+      localOfficesJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
-      sitesKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
-          .encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
-      trustKnownAsJsonQuerystringURLEncoded = new org.apache.commons.codec.net.URLCodec()
+      sitesKnownAsJsonQuerystringURLEncoded =
+          new URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      trustKnownAsJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
@@ -595,30 +602,40 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public Boolean isValueExists(Class dtoClass, String value) {
+    return isValueExists(dtoClass, value, false);
+  }
+
+  @Override
+  public Boolean isValueExists(Class dtoClass, String value, boolean currentOnly) {
     String url = serviceUrl;
     if (dtoClass.equals(TitleDTO.class)) {
-      url = url + TITLE_MAPPINGS_ENDPOINT;
+      url += TITLE_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(GmcStatusDTO.class)) {
-      url = url + GMC_STATUS_MAPPINGS_ENDPOINT;
+      url += GMC_STATUS_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(GdcStatusDTO.class)) {
-      url = url + GDC_STATUS_MAPPINGS_ENDPOINT;
+      url += GDC_STATUS_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(GenderDTO.class)) {
-      url = url + GENDER_MAPPINGS_ENDPOINT;
+      url += GENDER_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(NationalityDTO.class)) {
-      url = url + NATIONALITY_STATUS_MAPPINGS_ENDPOINT;
+      url += NATIONALITY_STATUS_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(EthnicOriginDTO.class)) {
-      url = url + ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
+      url += ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(MaritalStatusDTO.class)) {
-      url = url + MARITAL_STATUS_MAPPINGS_ENDPOINT;
+      url += MARITAL_STATUS_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(SexualOrientationDTO.class)) {
-      url = url + SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
+      url += SEXUAL_ORIENTATION_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(ReligiousBeliefDTO.class)) {
-      url = url + RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
+      url += RELIGIOUS_BELIF_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(QualificationReferenceDTO.class)) {
-      url = url + QUALIFICATION_MAPPINGS_ENDPOINT;
+      url += QUALIFICATION_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(QualificationTypeDTO.class)) {
-      url = url + QUALIFICATION_TYPE_MAPPINGS_ENDPOINT;
+      url += QUALIFICATION_TYPE_MAPPINGS_ENDPOINT;
     }
+
+    if (currentOnly) {
+      url += "?columnFilters=" + statusCurrentUrlEncoded;
+    }
+
     return codeExistsDto(url, value);
   }
 
