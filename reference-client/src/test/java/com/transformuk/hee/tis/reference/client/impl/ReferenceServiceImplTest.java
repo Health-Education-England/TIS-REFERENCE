@@ -29,7 +29,9 @@ import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1147,6 +1149,60 @@ public class ReferenceServiceImplTest {
     assertThat("Unexpected 'exists' result value.", exists, is(true));
     verify(referenceRestTemplate).exchange(REFERENCE_URL
             + "/api/titles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyRolesExistsWhenNotCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.rolesExist(codes, false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/roles/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentRolesExistsWhenCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.rolesExist(codes, true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate).exchange(
+        REFERENCE_URL + "/api/roles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
   }
 }

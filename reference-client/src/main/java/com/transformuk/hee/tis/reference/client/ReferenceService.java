@@ -95,6 +95,8 @@ public interface ReferenceService extends ClientService {
 
   Map<Long, Boolean> gradeIdsExists(List<Long> ids);
 
+  Map<String, Boolean> rolesExist(List<String> codes, boolean currentOnly);
+
   Map<String, Boolean> trustExists(List<String> Ids);
 
   Map<Long, Boolean> trustIdsExists(List<Long> ids);
