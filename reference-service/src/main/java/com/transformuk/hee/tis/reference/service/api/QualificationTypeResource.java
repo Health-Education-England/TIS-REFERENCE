@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,8 +76,8 @@ public class QualificationTypeResource {
    *
    * @param qualificationTypeDTO the qualificationTypeDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new
-   * qualificationTypeDTO, or with status 400 (Bad Request) if the qualificationType has already an
-   * ID
+   *     qualificationTypeDTO, or with status 400 (Bad Request) if the qualificationType has already
+   *     an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/qualification-types")
@@ -102,8 +106,8 @@ public class QualificationTypeResource {
    *
    * @param qualificationTypeDTO the qualificationTypeDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated qualificationTypeDTO,
-   * or with status 400 (Bad Request) if the qualificationTypeDTO is not valid, or with status 500
-   * (Internal Server Error) if the qualificationTypeDTO couldnt be updated
+   *     or with status 400 (Bad Request) if the qualificationTypeDTO is not valid, or with status
+   *     500 (Internal Server Error) if the qualificationTypeDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/qualification-types")
@@ -170,7 +174,7 @@ public class QualificationTypeResource {
    *
    * @param id the id of the qualificationTypeDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the qualificationTypeDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/qualification-types/{id}")
   @Timed
@@ -201,18 +205,28 @@ public class QualificationTypeResource {
   /**
    * EXISTS /qualification-types/exists/ : check is qualificationType exists
    *
-   * @param code the code of the qualificationTypeDTO to check
+   * @param code             the code of the qualificationTypeDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/qualification-types/exists/")
   @Timed
-  public ResponseEntity<Boolean> qualificationTypeExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> qualificationTypeExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check QualificationType exists : {}", code);
-    QualificationType qualificationType = qualificationTypeRepository.findFirstByCode(code);
-    if (qualificationType == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<QualificationType> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = qualificationTypeRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -220,8 +234,8 @@ public class QualificationTypeResource {
    *
    * @param qualificationTypeDTOs List of the qualificationTypeDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new
-   * qualificationTypeDTOS, or with status 400 (Bad Request) if the qualificationTypeDTO has already
-   * an ID
+   *     qualificationTypeDTOS, or with status 400 (Bad Request) if the qualificationTypeDTO has
+   *     already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-qualification-types")
@@ -256,9 +270,9 @@ public class QualificationTypeResource {
    *
    * @param qualificationTypeDTOS List of the qualificationTypeDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated
-   * qualificationTypeDTOS, or with status 400 (Bad Request) if the qualificationTypeDTOS is not
-   * valid, or with status 500 (Internal Server Error) if the qualificationTypeDTOS couldnt be
-   * updated
+   *     qualificationTypeDTOS, or with status 400 (Bad Request) if the qualificationTypeDTOS is not
+   *     valid, or with status 500 (Internal Server Error) if the qualificationTypeDTOS couldnt be
+   *     updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-qualification-types")

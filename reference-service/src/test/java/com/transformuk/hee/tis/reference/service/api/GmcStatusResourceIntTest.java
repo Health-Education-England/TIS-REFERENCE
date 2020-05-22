@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.GmcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GmcStatusRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.GmcStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GmcStatusMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class GmcStatusResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/gmc-statuses/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class GmcStatusResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restGmcStatusMockMvc;
+  private MockMvc mockMvc;
 
   private GmcStatus gmcStatus;
 
@@ -93,7 +99,7 @@ public class GmcStatusResourceIntTest {
     MockitoAnnotations.initMocks(this);
     GmcStatusResource gmcStatusResource = new GmcStatusResource(gmcStatusRepository,
         gmcStatusMapper, gmcStatusService);
-    this.restGmcStatusMockMvc = MockMvcBuilders.standaloneSetup(gmcStatusResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(gmcStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -111,7 +117,7 @@ public class GmcStatusResourceIntTest {
 
     // Create the GmcStatus
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
-    restGmcStatusMockMvc.perform(post("/api/gmc-statuses")
+    mockMvc.perform(post("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isCreated());
@@ -134,7 +140,7 @@ public class GmcStatusResourceIntTest {
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restGmcStatusMockMvc.perform(post("/api/gmc-statuses")
+    mockMvc.perform(post("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -154,7 +160,7 @@ public class GmcStatusResourceIntTest {
     // Create the GmcStatus, which fails.
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
 
-    restGmcStatusMockMvc.perform(post("/api/gmc-statuses")
+    mockMvc.perform(post("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -173,7 +179,7 @@ public class GmcStatusResourceIntTest {
     // Create the GmcStatus, which fails.
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
 
-    restGmcStatusMockMvc.perform(post("/api/gmc-statuses")
+    mockMvc.perform(post("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -189,7 +195,7 @@ public class GmcStatusResourceIntTest {
     gmcStatusRepository.saveAndFlush(gmcStatus);
 
     // Get all the gmcStatusList
-    restGmcStatusMockMvc.perform(get("/api/gmc-statuses?sort=id,desc"))
+    mockMvc.perform(get("/api/gmc-statuses?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(gmcStatus.getId().intValue())))
@@ -207,7 +213,7 @@ public class GmcStatusResourceIntTest {
     gmcStatusRepository.saveAndFlush(unencodedGmcStatus);
 
     // Get all the gmcStatusList
-    restGmcStatusMockMvc.perform(get("/api/gmc-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/gmc-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGmcStatus.getId().intValue()))
@@ -222,7 +228,7 @@ public class GmcStatusResourceIntTest {
     gmcStatusRepository.saveAndFlush(gmcStatus);
 
     // Get the gmcStatus
-    restGmcStatusMockMvc.perform(get("/api/gmc-statuses/{id}", gmcStatus.getId()))
+    mockMvc.perform(get("/api/gmc-statuses/{id}", gmcStatus.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(gmcStatus.getId().intValue()))
@@ -234,7 +240,7 @@ public class GmcStatusResourceIntTest {
   @Transactional
   public void getNonExistingGmcStatus() throws Exception {
     // Get the gmcStatus
-    restGmcStatusMockMvc.perform(get("/api/gmc-statuses/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/gmc-statuses/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -252,7 +258,7 @@ public class GmcStatusResourceIntTest {
         .label(UPDATED_LABEL);
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(updatedGmcStatus);
 
-    restGmcStatusMockMvc.perform(put("/api/gmc-statuses")
+    mockMvc.perform(put("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isOk());
@@ -274,7 +280,7 @@ public class GmcStatusResourceIntTest {
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restGmcStatusMockMvc.perform(put("/api/gmc-statuses")
+    mockMvc.perform(put("/api/gmc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gmcStatusDTO)))
         .andExpect(status().isCreated());
@@ -292,7 +298,7 @@ public class GmcStatusResourceIntTest {
     int databaseSizeBeforeDelete = gmcStatusRepository.findAll().size();
 
     // Get the gmcStatus
-    restGmcStatusMockMvc.perform(delete("/api/gmc-statuses/{id}", gmcStatus.getId())
+    mockMvc.perform(delete("/api/gmc-statuses/{id}", gmcStatus.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -305,5 +311,69 @@ public class GmcStatusResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(GmcStatus.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    gmcStatusRepository.saveAndFlush(gmcStatus);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    gmcStatus.setStatus(Status.INACTIVE);
+    gmcStatusRepository.saveAndFlush(gmcStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    gmcStatus.setStatus(Status.CURRENT);
+    gmcStatusRepository.saveAndFlush(gmcStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

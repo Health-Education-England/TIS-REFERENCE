@@ -1,6 +1,8 @@
 package com.transformuk.hee.tis.reference.client.impl;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -11,9 +13,20 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
+import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
+import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
+import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
+import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -325,6 +338,11 @@ public class ReferenceServiceImplTest {
     };
   }
 
+  private ParameterizedTypeReference<Boolean> getValueExistsReference() {
+    return new ParameterizedTypeReference<Boolean>() {
+    };
+  }
+
   @Test
   public void shouldGetSiteCodeExists() {
     // given
@@ -433,4 +451,702 @@ public class ReferenceServiceImplTest {
             requestEntity, responseType);
   }
 
+  @Test
+  public void shouldCheckAnyEthnicOriginExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(EthnicOriginDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/ethnic-origins/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyEthnicOriginExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(EthnicOriginDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/ethnic-origins/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentEthnicOriginExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(EthnicOriginDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/ethnic-origins/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGdcStatusExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GdcStatusDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/gdc-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGdcStatusExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GdcStatusDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/gdc-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentGdcStatusExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GdcStatusDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/gdc-statuses/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGenderExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GenderDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/genders/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGenderExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GenderDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/genders/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentGenderExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GenderDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/genders/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGmcStatusExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GmcStatusDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/gmc-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyGmcStatusExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GmcStatusDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/gmc-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentGmcStatusExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(GmcStatusDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/gmc-statuses/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyMaritalStatusExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(MaritalStatusDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/marital-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyMaritalStatusExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(MaritalStatusDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/marital-statuses/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentMaritalStatusExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(MaritalStatusDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/marital-statuses/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyNationalityExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(NationalityDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/nationalities/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyNationalityExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(NationalityDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/nationalities/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentNationalityExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(NationalityDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/nationalities/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyQualificationReferenceExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(QualificationReferenceDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/qualification-reference/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyQualificationReferenceExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(QualificationReferenceDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/qualification-reference/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentQualificationReferenceExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(QualificationReferenceDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/qualification-reference/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyQualificationTypeExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(QualificationTypeDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/qualification-types/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyQualificationTypeExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(QualificationTypeDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/qualification-types/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentQualificationTypeExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(QualificationTypeDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/qualification-types/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyReligiousBeliefExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(ReligiousBeliefDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/religious-beliefs/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyReligiousBeliefExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(ReligiousBeliefDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/religious-beliefs/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentReligiousBeliefExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(ReligiousBeliefDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/religious-beliefs/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnySexualOrientationExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(SexualOrientationDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/sexual-orientations/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnySexualOrientationExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(SexualOrientationDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/sexual-orientations/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentSexualOrientationExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists =
+        referenceServiceImpl.isValueExists(SexualOrientationDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/sexual-orientations/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyTitleExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(TitleDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/titles/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyTitleExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(TitleDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/titles/exists/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentTitleExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(TitleDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/titles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
 }

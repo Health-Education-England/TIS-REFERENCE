@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Gender;
 import com.transformuk.hee.tis.reference.service.repository.GenderRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.GenderServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GenderMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class GenderResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/genders/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class GenderResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restGenderMockMvc;
+  private MockMvc mockMvc;
 
   private Gender gender;
 
@@ -93,7 +99,7 @@ public class GenderResourceIntTest {
     MockitoAnnotations.initMocks(this);
     GenderResource genderResource = new GenderResource(genderRepository, genderMapper,
         genderService);
-    this.restGenderMockMvc = MockMvcBuilders.standaloneSetup(genderResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(genderResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -111,7 +117,7 @@ public class GenderResourceIntTest {
 
     // Create the Gender
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
-    restGenderMockMvc.perform(post("/api/genders")
+    mockMvc.perform(post("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isCreated());
@@ -134,7 +140,7 @@ public class GenderResourceIntTest {
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restGenderMockMvc.perform(post("/api/genders")
+    mockMvc.perform(post("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
@@ -154,7 +160,7 @@ public class GenderResourceIntTest {
     // Create the Gender, which fails.
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
-    restGenderMockMvc.perform(post("/api/genders")
+    mockMvc.perform(post("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
@@ -173,7 +179,7 @@ public class GenderResourceIntTest {
     // Create the Gender, which fails.
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
-    restGenderMockMvc.perform(post("/api/genders")
+    mockMvc.perform(post("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
@@ -189,7 +195,7 @@ public class GenderResourceIntTest {
     genderRepository.saveAndFlush(gender);
 
     // Get all the genderList
-    restGenderMockMvc.perform(get("/api/genders?sort=id,desc"))
+    mockMvc.perform(get("/api/genders?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(gender.getId().intValue())))
@@ -207,7 +213,7 @@ public class GenderResourceIntTest {
     genderRepository.saveAndFlush(unencodedGender);
 
     // Get all the genderList
-    restGenderMockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGender.getId().intValue()))
@@ -222,7 +228,7 @@ public class GenderResourceIntTest {
     genderRepository.saveAndFlush(gender);
 
     // Get the gender
-    restGenderMockMvc.perform(get("/api/genders/{id}", gender.getId()))
+    mockMvc.perform(get("/api/genders/{id}", gender.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(gender.getId().intValue()))
@@ -234,7 +240,7 @@ public class GenderResourceIntTest {
   @Transactional
   public void getNonExistingGender() throws Exception {
     // Get the gender
-    restGenderMockMvc.perform(get("/api/genders/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/genders/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -252,7 +258,7 @@ public class GenderResourceIntTest {
         .label(UPDATED_LABEL);
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(updatedGender);
 
-    restGenderMockMvc.perform(put("/api/genders")
+    mockMvc.perform(put("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isOk());
@@ -274,7 +280,7 @@ public class GenderResourceIntTest {
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restGenderMockMvc.perform(put("/api/genders")
+    mockMvc.perform(put("/api/genders")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isCreated());
@@ -292,7 +298,7 @@ public class GenderResourceIntTest {
     int databaseSizeBeforeDelete = genderRepository.findAll().size();
 
     // Get the gender
-    restGenderMockMvc.perform(delete("/api/genders/{id}", gender.getId())
+    mockMvc.perform(delete("/api/genders/{id}", gender.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -305,5 +311,69 @@ public class GenderResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Gender.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    genderRepository.saveAndFlush(gender);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    gender.setStatus(Status.INACTIVE);
+    genderRepository.saveAndFlush(gender);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    gender.setStatus(Status.CURRENT);
+    genderRepository.saveAndFlush(gender);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

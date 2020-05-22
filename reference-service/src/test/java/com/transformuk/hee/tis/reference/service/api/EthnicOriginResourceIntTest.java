@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.EthnicOrigin;
 import com.transformuk.hee.tis.reference.service.repository.EthnicOriginRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.EthnicOriginServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.EthnicOriginMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class EthnicOriginResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/ethnic-origins/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -67,7 +73,7 @@ public class EthnicOriginResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restEthnicOriginMockMvc;
+  private MockMvc mockMvc;
 
   private EthnicOrigin ethnicOrigin;
 
@@ -89,7 +95,7 @@ public class EthnicOriginResourceIntTest {
     EthnicOriginResource ethnicOriginResource = new EthnicOriginResource(ethnicOriginRepository,
         ethnicOriginMapper,
         ethnicOriginService);
-    this.restEthnicOriginMockMvc = MockMvcBuilders.standaloneSetup(ethnicOriginResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(ethnicOriginResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -108,7 +114,7 @@ public class EthnicOriginResourceIntTest {
     // Create the EthnicOrigin
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
         .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
-    restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
+    mockMvc.perform(post("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
         .andExpect(status().isCreated());
@@ -131,7 +137,7 @@ public class EthnicOriginResourceIntTest {
         .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
+    mockMvc.perform(post("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
         .andExpect(status().isBadRequest());
@@ -152,7 +158,7 @@ public class EthnicOriginResourceIntTest {
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
         .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
-    restEthnicOriginMockMvc.perform(post("/api/ethnic-origins")
+    mockMvc.perform(post("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
         .andExpect(status().isBadRequest());
@@ -168,7 +174,7 @@ public class EthnicOriginResourceIntTest {
     ethnicOriginRepository.saveAndFlush(ethnicOrigin);
 
     // Get all the ethnicOriginList
-    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?sort=id,desc"))
+    mockMvc.perform(get("/api/ethnic-origins?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(ethnicOrigin.getId().intValue())))
@@ -184,7 +190,7 @@ public class EthnicOriginResourceIntTest {
     ethnicOriginRepository.saveAndFlush(unencodedEthnicOrigin);
 
     // Get all the ethnicOriginList
-    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins?searchQuery=\"%24ome\"&sort=id,desc"))
+    mockMvc.perform(get("/api/ethnic-origins?searchQuery=\"%24ome\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedEthnicOrigin.getId().intValue()))
@@ -198,7 +204,7 @@ public class EthnicOriginResourceIntTest {
     ethnicOriginRepository.saveAndFlush(ethnicOrigin);
 
     // Get the ethnicOrigin
-    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins/{id}", ethnicOrigin.getId()))
+    mockMvc.perform(get("/api/ethnic-origins/{id}", ethnicOrigin.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(ethnicOrigin.getId().intValue()))
@@ -209,7 +215,7 @@ public class EthnicOriginResourceIntTest {
   @Transactional
   public void getNonExistingEthnicOrigin() throws Exception {
     // Get the ethnicOrigin
-    restEthnicOriginMockMvc.perform(get("/api/ethnic-origins/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/ethnic-origins/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -227,7 +233,7 @@ public class EthnicOriginResourceIntTest {
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
         .ethnicOriginToEthnicOriginDTO(updatedEthnicOrigin);
 
-    restEthnicOriginMockMvc.perform(put("/api/ethnic-origins")
+    mockMvc.perform(put("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
         .andExpect(status().isOk());
@@ -249,7 +255,7 @@ public class EthnicOriginResourceIntTest {
         .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restEthnicOriginMockMvc.perform(put("/api/ethnic-origins")
+    mockMvc.perform(put("/api/ethnic-origins")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(ethnicOriginDTO)))
         .andExpect(status().isCreated());
@@ -267,7 +273,7 @@ public class EthnicOriginResourceIntTest {
     int databaseSizeBeforeDelete = ethnicOriginRepository.findAll().size();
 
     // Get the ethnicOrigin
-    restEthnicOriginMockMvc.perform(delete("/api/ethnic-origins/{id}", ethnicOrigin.getId())
+    mockMvc.perform(delete("/api/ethnic-origins/{id}", ethnicOrigin.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -280,5 +286,69 @@ public class EthnicOriginResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(EthnicOrigin.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    ethnicOriginRepository.saveAndFlush(ethnicOrigin);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    ethnicOrigin.setStatus(Status.INACTIVE);
+    ethnicOriginRepository.saveAndFlush(ethnicOrigin);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    ethnicOrigin.setStatus(Status.CURRENT);
+    ethnicOriginRepository.saveAndFlush(ethnicOrigin);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.ReligiousBelief;
 import com.transformuk.hee.tis.reference.service.repository.ReligiousBeliefRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.ReligiousBeliefServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ReligiousBeliefMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class ReligiousBeliefResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/religious-beliefs/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -70,7 +76,7 @@ public class ReligiousBeliefResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restReligiousBeliefMockMvc;
+  private MockMvc mockMvc;
 
   private ReligiousBelief religiousBelief;
 
@@ -93,7 +99,7 @@ public class ReligiousBeliefResourceIntTest {
     ReligiousBeliefResource religiousBeliefResource = new ReligiousBeliefResource(
         religiousBeliefRepository,
         religiousBeliefMapper, religiousBeliefService);
-    this.restReligiousBeliefMockMvc = MockMvcBuilders.standaloneSetup(religiousBeliefResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(religiousBeliefResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -112,7 +118,7 @@ public class ReligiousBeliefResourceIntTest {
     // Create the ReligiousBelief
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
-    restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
+    mockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isCreated());
@@ -136,7 +142,7 @@ public class ReligiousBeliefResourceIntTest {
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
+    mockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isBadRequest());
@@ -157,7 +163,7 @@ public class ReligiousBeliefResourceIntTest {
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
-    restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
+    mockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isBadRequest());
@@ -177,7 +183,7 @@ public class ReligiousBeliefResourceIntTest {
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
-    restReligiousBeliefMockMvc.perform(post("/api/religious-beliefs")
+    mockMvc.perform(post("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isBadRequest());
@@ -193,7 +199,7 @@ public class ReligiousBeliefResourceIntTest {
     religiousBeliefRepository.saveAndFlush(religiousBelief);
 
     // Get all the religiousBeliefList
-    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs?sort=id,desc"))
+    mockMvc.perform(get("/api/religious-beliefs?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(religiousBelief.getId().intValue())))
@@ -211,7 +217,7 @@ public class ReligiousBeliefResourceIntTest {
     religiousBeliefRepository.saveAndFlush(unencodedReligiousBelief);
 
     // Get the religiousBeliefList
-    restReligiousBeliefMockMvc
+    mockMvc
         .perform(get("/api/religious-beliefs?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -227,7 +233,7 @@ public class ReligiousBeliefResourceIntTest {
     religiousBeliefRepository.saveAndFlush(religiousBelief);
 
     // Get the religiousBelief
-    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs/{id}", religiousBelief.getId()))
+    mockMvc.perform(get("/api/religious-beliefs/{id}", religiousBelief.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(religiousBelief.getId().intValue()))
@@ -239,7 +245,7 @@ public class ReligiousBeliefResourceIntTest {
   @Transactional
   public void getNonExistingReligiousBelief() throws Exception {
     // Get the religiousBelief
-    restReligiousBeliefMockMvc.perform(get("/api/religious-beliefs/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/religious-beliefs/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -259,7 +265,7 @@ public class ReligiousBeliefResourceIntTest {
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(updatedReligiousBelief);
 
-    restReligiousBeliefMockMvc.perform(put("/api/religious-beliefs")
+    mockMvc.perform(put("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isOk());
@@ -282,7 +288,7 @@ public class ReligiousBeliefResourceIntTest {
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restReligiousBeliefMockMvc.perform(put("/api/religious-beliefs")
+    mockMvc.perform(put("/api/religious-beliefs")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(religiousBeliefDTO)))
         .andExpect(status().isCreated());
@@ -300,7 +306,7 @@ public class ReligiousBeliefResourceIntTest {
     int databaseSizeBeforeDelete = religiousBeliefRepository.findAll().size();
 
     // Get the religiousBelief
-    restReligiousBeliefMockMvc
+    mockMvc
         .perform(delete("/api/religious-beliefs/{id}", religiousBelief.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
@@ -314,5 +320,69 @@ public class ReligiousBeliefResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(ReligiousBelief.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    religiousBeliefRepository.saveAndFlush(religiousBelief);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    religiousBelief.setStatus(Status.INACTIVE);
+    religiousBeliefRepository.saveAndFlush(religiousBelief);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    religiousBelief.setStatus(Status.CURRENT);
+    religiousBeliefRepository.saveAndFlush(religiousBelief);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

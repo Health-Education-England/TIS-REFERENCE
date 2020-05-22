@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +76,7 @@ public class EthnicOriginResource {
    *
    * @param ethnicOriginDTO the ethnicOriginDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new ethnicOriginDTO, or
-   * with status 400 (Bad Request) if the ethnicOrigin has already an ID
+   *     with status 400 (Bad Request) if the ethnicOrigin has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/ethnic-origins")
@@ -99,8 +103,8 @@ public class EthnicOriginResource {
    *
    * @param ethnicOriginDTO the ethnicOriginDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTO, or
-   * with status 400 (Bad Request) if the ethnicOriginDTO is not valid, or with status 500 (Internal
-   * Server Error) if the ethnicOriginDTO couldnt be updated
+   *     with status 400 (Bad Request) if the ethnicOriginDTO is not valid, or with status 500
+   *     (Internal Server Error) if the ethnicOriginDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/ethnic-origins")
@@ -163,7 +167,7 @@ public class EthnicOriginResource {
    *
    * @param id the id of the ethnicOriginDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the ethnicOriginDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/ethnic-origins/{id}")
   @Timed
@@ -178,18 +182,28 @@ public class EthnicOriginResource {
   /**
    * EXISTS /ethnic-origins/exists/ : check is ethnicOrigin exists
    *
-   * @param code the code of the ethnicOriginDTO to check
+   * @param code             the code of the ethnicOriginDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/ethnic-origins/exists/")
   @Timed
-  public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check EthnicOrigin exists : {}", code);
-    EthnicOrigin ethnicOrigin = ethnicOriginRepository.findFirstByCode(code);
-    if (ethnicOrigin == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<EthnicOrigin> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = ethnicOriginRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -213,7 +227,7 @@ public class EthnicOriginResource {
    *
    * @param ethnicOriginDTOS List of the ethnicOriginDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new ethnicOriginDTOS, or
-   * with status 400 (Bad Request) if the EthnicOriginDTO has already an ID
+   *     with status 400 (Bad Request) if the EthnicOriginDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-ethnic-origins")
@@ -247,8 +261,8 @@ public class EthnicOriginResource {
    *
    * @param ethnicOriginDTOS List of the ethnicOriginDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated ethnicOriginDTOS, or
-   * with status 400 (Bad Request) if the ethnicOriginDTOS is not valid, or with status 500
-   * (Internal Server Error) if the ethnicOriginDTOS couldnt be updated
+   *     with status 400 (Bad Request) if the ethnicOriginDTOS is not valid, or with status 500
+   *     (Internal Server Error) if the ethnicOriginDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-ethnic-origins")

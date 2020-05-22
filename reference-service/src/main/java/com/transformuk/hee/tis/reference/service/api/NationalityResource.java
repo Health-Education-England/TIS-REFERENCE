@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +76,7 @@ public class NationalityResource {
    *
    * @param nationalityDTO the nationalityDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new nationalityDTO, or
-   * with status 400 (Bad Request) if the nationality has already an ID
+   *     with status 400 (Bad Request) if the nationality has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/nationalities")
@@ -99,8 +103,8 @@ public class NationalityResource {
    *
    * @param nationalityDTO the nationalityDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTO, or
-   * with status 400 (Bad Request) if the nationalityDTO is not valid, or with status 500 (Internal
-   * Server Error) if the nationalityDTO couldnt be updated
+   *     with status 400 (Bad Request) if the nationalityDTO is not valid, or with status 500
+   *     (Internal Server Error) if the nationalityDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/nationalities")
@@ -162,7 +166,7 @@ public class NationalityResource {
    *
    * @param id the id of the nationalityDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the nationalityDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/nationalities/{id}")
   @Timed
@@ -176,18 +180,28 @@ public class NationalityResource {
   /**
    * EXISTS /nationalities/exists/ : check is nationalities exists
    *
-   * @param code the code of the nationalityDTO to check
+   * @param code             the code of the nationalityDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/nationalities/exists/")
   @Timed
-  public ResponseEntity<Boolean> nationalityExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> nationalityExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check Nationality exists : {}", code);
-    Nationality nationality = nationalityRepository.findFirstByCountryNumber(code);
-    if (nationality == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<Nationality> specs = Specifications.where(isEqual("countryNumber", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = nationalityRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -211,7 +225,7 @@ public class NationalityResource {
    *
    * @param nationalityDTOS List of the nationalityDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new nationalityDTOS, or
-   * with status 400 (Bad Request) if the NationalityDTO has already an ID
+   *     with status 400 (Bad Request) if the NationalityDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-nationalities")
@@ -244,8 +258,8 @@ public class NationalityResource {
    *
    * @param nationalityDTOS List of the nationalityDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated nationalityDTOS, or
-   * with status 400 (Bad Request) if the nationalityDTOS is not valid, or with status 500 (Internal
-   * Server Error) if the nationalityDTOS couldnt be updated
+   *     with status 400 (Bad Request) if the nationalityDTOS is not valid, or with status 500
+   *     (Internal Server Error) if the nationalityDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-nationalities")

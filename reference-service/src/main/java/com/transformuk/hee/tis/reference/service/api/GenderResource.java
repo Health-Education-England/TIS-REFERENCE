@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +75,7 @@ public class GenderResource {
    *
    * @param genderDTO the genderDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new genderDTO, or with
-   * status 400 (Bad Request) if the gender has already an ID
+   *     status 400 (Bad Request) if the gender has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/genders")
@@ -98,8 +102,8 @@ public class GenderResource {
    *
    * @param genderDTO the genderDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated genderDTO, or with
-   * status 400 (Bad Request) if the genderDTO is not valid, or with status 500 (Internal Server
-   * Error) if the genderDTO couldnt be updated
+   *     status 400 (Bad Request) if the genderDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the genderDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/genders")
@@ -160,7 +164,7 @@ public class GenderResource {
    *
    * @param id the id of the genderDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the genderDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/genders/{id}")
   @Timed
@@ -174,18 +178,28 @@ public class GenderResource {
   /**
    * EXISTS /genders/exists/ : check is genders exists
    *
-   * @param code the code of the genderDTO to check
+   * @param code             the code of the genderDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/genders/exists/")
   @Timed
-  public ResponseEntity<Boolean> genderExists(@RequestBody String code) {
-    log.debug("REST request to check Title exists : {}", code);
-    Gender gender = genderRepository.findFirstByCode(code);
-    if (gender == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+  public ResponseEntity<Boolean> genderExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
+    log.debug("REST request to check Gender exists : {}", code);
+    Specifications<Gender> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = genderRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -209,7 +223,7 @@ public class GenderResource {
    *
    * @param genderDTOS List of the genderDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new genderDTOS, or with
-   * status 400 (Bad Request) if the GenderDTO has already an ID
+   *     status 400 (Bad Request) if the GenderDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-genders")
@@ -241,8 +255,8 @@ public class GenderResource {
    *
    * @param genderDTOS List of the genderDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated genderDTOS, or with
-   * status 400 (Bad Request) if the genderDTOS is not valid, or with status 500 (Internal Server
-   * Error) if the genderDTOS couldnt be updated
+   *     status 400 (Bad Request) if the genderDTOS is not valid, or with status 500 (Internal
+   *     Server Error) if the genderDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-genders")

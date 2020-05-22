@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.SexualOrientation;
 import com.transformuk.hee.tis.reference.service.repository.SexualOrientationRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SexualOrientationServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.SexualOrientationMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class SexualOrientationResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/sexual-orientations/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -70,7 +76,7 @@ public class SexualOrientationResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restSexualOrientationMockMvc;
+  private MockMvc mockMvc;
 
   private SexualOrientation sexualOrientation;
 
@@ -93,7 +99,7 @@ public class SexualOrientationResourceIntTest {
     SexualOrientationResource sexualOrientationResource = new SexualOrientationResource(
         sexualOrientationRepository,
         sexualOrientationMapper, sexualOrientationService);
-    this.restSexualOrientationMockMvc = MockMvcBuilders.standaloneSetup(sexualOrientationResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(sexualOrientationResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -112,7 +118,7 @@ public class SexualOrientationResourceIntTest {
     // Create the SexualOrientation
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
-    restSexualOrientationMockMvc.perform(post("/api/sexual-orientations")
+    mockMvc.perform(post("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isCreated());
@@ -137,7 +143,7 @@ public class SexualOrientationResourceIntTest {
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restSexualOrientationMockMvc.perform(post("/api/sexual-orientations")
+    mockMvc.perform(post("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
@@ -158,7 +164,7 @@ public class SexualOrientationResourceIntTest {
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
-    restSexualOrientationMockMvc.perform(post("/api/sexual-orientations")
+    mockMvc.perform(post("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
@@ -178,7 +184,7 @@ public class SexualOrientationResourceIntTest {
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
-    restSexualOrientationMockMvc.perform(post("/api/sexual-orientations")
+    mockMvc.perform(post("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
@@ -194,7 +200,7 @@ public class SexualOrientationResourceIntTest {
     sexualOrientationRepository.saveAndFlush(sexualOrientation);
 
     // Get all the sexualOrientationList
-    restSexualOrientationMockMvc.perform(get("/api/sexual-orientations?sort=id,desc"))
+    mockMvc.perform(get("/api/sexual-orientations?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(sexualOrientation.getId().intValue())))
@@ -212,7 +218,7 @@ public class SexualOrientationResourceIntTest {
     sexualOrientationRepository.saveAndFlush(unencodedSexualOrientation);
 
     // Get the sexualOrientationList
-    restSexualOrientationMockMvc
+    mockMvc
         .perform(get("/api/sexual-orientations?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -228,7 +234,7 @@ public class SexualOrientationResourceIntTest {
     sexualOrientationRepository.saveAndFlush(sexualOrientation);
 
     // Get the sexualOrientation
-    restSexualOrientationMockMvc
+    mockMvc
         .perform(get("/api/sexual-orientations/{id}", sexualOrientation.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -241,7 +247,7 @@ public class SexualOrientationResourceIntTest {
   @Transactional
   public void getNonExistingSexualOrientation() throws Exception {
     // Get the sexualOrientation
-    restSexualOrientationMockMvc.perform(get("/api/sexual-orientations/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/sexual-orientations/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -261,7 +267,7 @@ public class SexualOrientationResourceIntTest {
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(updatedSexualOrientation);
 
-    restSexualOrientationMockMvc.perform(put("/api/sexual-orientations")
+    mockMvc.perform(put("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isOk());
@@ -285,7 +291,7 @@ public class SexualOrientationResourceIntTest {
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restSexualOrientationMockMvc.perform(put("/api/sexual-orientations")
+    mockMvc.perform(put("/api/sexual-orientations")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isCreated());
@@ -303,7 +309,7 @@ public class SexualOrientationResourceIntTest {
     int databaseSizeBeforeDelete = sexualOrientationRepository.findAll().size();
 
     // Get the sexualOrientation
-    restSexualOrientationMockMvc
+    mockMvc
         .perform(delete("/api/sexual-orientations/{id}", sexualOrientation.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
@@ -317,5 +323,69 @@ public class SexualOrientationResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(SexualOrientation.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    sexualOrientationRepository.saveAndFlush(sexualOrientation);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    sexualOrientation.setStatus(Status.INACTIVE);
+    sexualOrientationRepository.saveAndFlush(sexualOrientation);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    sexualOrientation.setStatus(Status.CURRENT);
+    sexualOrientationRepository.saveAndFlush(sexualOrientation);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

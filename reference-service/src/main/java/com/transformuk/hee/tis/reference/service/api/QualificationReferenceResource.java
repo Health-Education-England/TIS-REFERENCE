@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,8 +77,8 @@ public class QualificationReferenceResource {
    *
    * @param qualificationReferenceDTO the qualificationReferenceDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new
-   * qualificationReferenceDTO, or with status 400 (Bad Request) if the qualificationReference has
-   * already an ID
+   *     qualificationReferenceDTO, or with status 400 (Bad Request) if the qualificationReference
+   *     has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/qualification-reference")
@@ -104,9 +108,9 @@ public class QualificationReferenceResource {
    *
    * @param qualificationReferenceDTO the qualificationReferenceDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated
-   * qualificationReferenceDTO, or with status 400 (Bad Request) if the qualificationReferenceDTO is
-   * not valid, or with status 500 (Internal Server Error) if the qualificationReferenceDTO couldnt
-   * be updated
+   *     qualificationReferenceDTO, or with status 400 (Bad Request) if the
+   *     qualificationReferenceDTO is not valid, or with status 500 (Internal Server Error) if the
+   *     qualificationReferenceDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/qualification-reference")
@@ -173,7 +177,7 @@ public class QualificationReferenceResource {
    *
    * @param id the id of the qualificationReferenceDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the qualificationReferenceDTO, or
-   * with status 404 (Not Found)
+   *     with status 404 (Not Found)
    */
   @GetMapping("/qualification-reference/{id}")
   @Timed
@@ -205,19 +209,28 @@ public class QualificationReferenceResource {
   /**
    * EXISTS /qualification-reference/exists/ : check is qualificationReference exists
    *
-   * @param code the code of the qualificationReferenceDTO to check
+   * @param code             the code of the qualificationReferenceDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/qualification-reference/exists/")
   @Timed
-  public ResponseEntity<Boolean> qualificationReferenceExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> qualificationReferenceExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check QualificationReference exists : {}", code);
-    QualificationReference qualificationReference = qualificationReferenceRepository
-        .findFirstByCode(code);
-    if (qualificationReference == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<QualificationReference> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = qualificationReferenceRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -225,8 +238,8 @@ public class QualificationReferenceResource {
    *
    * @param qualificationReferenceDTOs List of the qualificationReferenceDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new
-   * qualificationReferenceDTOS, or with status 400 (Bad Request) if the qualificationReferenceDTO
-   * has already an ID
+   *     qualificationReferenceDTOS, or with status 400 (Bad Request) if the
+   *     qualificationReferenceDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-qualification-reference")
@@ -261,9 +274,9 @@ public class QualificationReferenceResource {
    *
    * @param qualificationReferenceDTOS List of the qualificationReferenceDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated
-   * qualificationReferenceDTOS, or with status 400 (Bad Request) if the qualificationReferenceDTOS
-   * is not valid, or with status 500 (Internal Server Error) if the qualificationReferenceDTOS
-   * couldnt be updated
+   *     qualificationReferenceDTOS, or with status 400 (Bad Request) if the
+   *     qualificationReferenceDTOS is not valid, or with status 500 (Internal Server Error) if the
+   *     qualificationReferenceDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-qualification-reference")

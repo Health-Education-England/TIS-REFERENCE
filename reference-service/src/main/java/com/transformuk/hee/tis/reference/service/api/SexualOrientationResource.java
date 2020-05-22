@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,8 +76,8 @@ public class SexualOrientationResource {
    *
    * @param sexualOrientationDTO the sexualOrientationDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new
-   * sexualOrientationDTO, or with status 400 (Bad Request) if the sexualOrientation has already an
-   * ID
+   *     sexualOrientationDTO, or with status 400 (Bad Request) if the sexualOrientation has already
+   *     an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/sexual-orientations")
@@ -102,8 +106,8 @@ public class SexualOrientationResource {
    *
    * @param sexualOrientationDTO the sexualOrientationDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated sexualOrientationDTO,
-   * or with status 400 (Bad Request) if the sexualOrientationDTO is not valid, or with status 500
-   * (Internal Server Error) if the sexualOrientationDTO couldnt be updated
+   *     or with status 400 (Bad Request) if the sexualOrientationDTO is not valid, or with status
+   *     500 (Internal Server Error) if the sexualOrientationDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/sexual-orientations")
@@ -169,7 +173,7 @@ public class SexualOrientationResource {
    *
    * @param id the id of the sexualOrientationDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the sexualOrientationDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/sexual-orientations/{id}")
   @Timed
@@ -184,18 +188,28 @@ public class SexualOrientationResource {
   /**
    * EXISTS /sexual-orientations/exists/ : check is sexualOrientation exists
    *
-   * @param code the code of the sexualOrientationDTO to check
+   * @param code             the code of the sexualOrientationDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/sexual-orientations/exists/")
   @Timed
-  public ResponseEntity<Boolean> maritalStatusExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> sexualOrientationExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check SexualOrientation exists : {}", code);
-    SexualOrientation sexualOrientation = sexualOrientationRepository.findFirstByCode(code);
-    if (sexualOrientation == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<SexualOrientation> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = sexualOrientationRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -220,8 +234,8 @@ public class SexualOrientationResource {
    *
    * @param sexualOrientationDTOS List of the sexualOrientationDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new
-   * sexualOrientationDTOS, or with status 400 (Bad Request) if the sexualOrientation has already an
-   * ID
+   *     sexualOrientationDTOS, or with status 400 (Bad Request) if the sexualOrientation has
+   *     already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-sexual-orientations")
@@ -256,9 +270,9 @@ public class SexualOrientationResource {
    *
    * @param sexualOrientationDTOS List of the sexualOrientationDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated
-   * sexualOrientationDTOS, or with status 400 (Bad Request) if the sexualOrientationDTOS is not
-   * valid, or with status 500 (Internal Server Error) if the sexualOrientationDTOS couldnt be
-   * updated
+   *     sexualOrientationDTOS, or with status 400 (Bad Request) if the sexualOrientationDTOS is not
+   *     valid, or with status 500 (Internal Server Error) if the sexualOrientationDTOS couldnt be
+   *     updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-sexual-orientations")
