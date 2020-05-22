@@ -87,6 +87,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
+  private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/exists/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
@@ -533,6 +534,17 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Map<Long, Boolean> gradeIdsExists(List<Long> ids) {
     String url = serviceUrl + GRADES_IDS_MAPPINGS_ENDPOINT;
     return idExists(url, ids);
+  }
+
+  @Override
+  public Map<String, Boolean> rolesExist(List<String> codes, boolean currentOnly) {
+    String url = serviceUrl + ROLES_MAPPINGS_ENDPOINT;
+
+    if (currentOnly) {
+      url += "?columnFilters=" + statusCurrentUrlEncoded;
+    }
+
+    return exists(url, codes);
   }
 
   @Override
