@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +74,7 @@ public class TitleResource {
    *
    * @param titleDTO the titleDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new titleDTO, or with
-   * status 400 (Bad Request) if the title has already an ID
+   *     status 400 (Bad Request) if the title has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/titles")
@@ -97,8 +101,8 @@ public class TitleResource {
    *
    * @param titleDTO the titleDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTO, or with
-   * status 400 (Bad Request) if the titleDTO is not valid, or with status 500 (Internal Server
-   * Error) if the titleDTO couldnt be updated
+   *     status 400 (Bad Request) if the titleDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the titleDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/titles")
@@ -160,7 +164,7 @@ public class TitleResource {
    *
    * @param id the id of the titleDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the titleDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/titles/{id}")
   @Timed
@@ -174,18 +178,28 @@ public class TitleResource {
   /**
    * EXISTS /titles/exists/ : check is titles exists
    *
-   * @param code the code of the titleDTO to check
+   * @param code             the code of the titleDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/titles/exists/")
   @Timed
-  public ResponseEntity<Boolean> titleExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> titleExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check Title exists : {}", code);
-    Title title = titleRepository.findFirstByCode(code);
-    if (title == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<Title> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = titleRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -210,7 +224,7 @@ public class TitleResource {
    *
    * @param titleDTOS List of the titleDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new titleDTOS, or with
-   * status 400 (Bad Request) if the TitleDto has already an ID
+   *     status 400 (Bad Request) if the TitleDto has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-titles")
@@ -242,8 +256,8 @@ public class TitleResource {
    *
    * @param titleDTOS List of the titleDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated titleDTOS, or with
-   * status 400 (Bad Request) if the titleDTOS is not valid, or with status 500 (Internal Server
-   * Error) if the titleDTOS couldnt be updated
+   *     status 400 (Bad Request) if the titleDTOS is not valid, or with status 500 (Internal Server
+   *     Error) if the titleDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-titles")

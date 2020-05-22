@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.QualificationType;
 import com.transformuk.hee.tis.reference.service.repository.QualificationTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.QualificationTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.QualificationTypeMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class QualificationTypeResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/qualification-types/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class QualificationTypeResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restQualificationTypeMockMvc;
+  private MockMvc mockMvc;
 
   private QualificationType qualificationType;
 
@@ -95,7 +101,7 @@ public class QualificationTypeResourceIntTest {
         qualificationTypeRepository,
         qualificationTypeMapper,
         qualificationTypeService);
-    this.restQualificationTypeMockMvc = MockMvcBuilders.standaloneSetup(qualificationTypeResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(qualificationTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -114,7 +120,7 @@ public class QualificationTypeResourceIntTest {
     // Create the QualificationType
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(qualificationType);
-    restQualificationTypeMockMvc.perform(post("/api/qualification-types")
+    mockMvc.perform(post("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isCreated());
@@ -139,7 +145,7 @@ public class QualificationTypeResourceIntTest {
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restQualificationTypeMockMvc.perform(post("/api/qualification-types")
+    mockMvc.perform(post("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
@@ -160,7 +166,7 @@ public class QualificationTypeResourceIntTest {
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
-    restQualificationTypeMockMvc.perform(post("/api/qualification-types")
+    mockMvc.perform(post("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
@@ -180,7 +186,7 @@ public class QualificationTypeResourceIntTest {
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
-    restQualificationTypeMockMvc.perform(post("/api/qualification-types")
+    mockMvc.perform(post("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
@@ -196,7 +202,7 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(qualificationType);
 
     // Get all the qualificationTypeList
-    restQualificationTypeMockMvc.perform(get("/api/qualification-types?sort=id,desc"))
+    mockMvc.perform(get("/api/qualification-types?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationType.getId().intValue())))
@@ -214,7 +220,7 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(unencodedQualificationType);
 
     // Get the qualificationTypeList
-    restQualificationTypeMockMvc
+    mockMvc
         .perform(get("/api/qualification-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -230,7 +236,7 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(qualificationType);
 
     // Get the qualificationType
-    restQualificationTypeMockMvc
+    mockMvc
         .perform(get("/api/qualification-types/{id}", qualificationType.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -243,7 +249,7 @@ public class QualificationTypeResourceIntTest {
   @Transactional
   public void getNonExistingQualificationType() throws Exception {
     // Get the qualificationType
-    restQualificationTypeMockMvc.perform(get("/api/qualification-types/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/qualification-types/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -263,7 +269,7 @@ public class QualificationTypeResourceIntTest {
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(updatedQualificationType);
 
-    restQualificationTypeMockMvc.perform(put("/api/qualification-types")
+    mockMvc.perform(put("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isOk());
@@ -287,7 +293,7 @@ public class QualificationTypeResourceIntTest {
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restQualificationTypeMockMvc.perform(put("/api/qualification-types")
+    mockMvc.perform(put("/api/qualification-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isCreated());
@@ -305,7 +311,7 @@ public class QualificationTypeResourceIntTest {
     int databaseSizeBeforeDelete = qualificationTypeRepository.findAll().size();
 
     // Get the QualificationType
-    restQualificationTypeMockMvc
+    mockMvc
         .perform(delete("/api/qualification-types/{id}", qualificationType.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
@@ -319,5 +325,69 @@ public class QualificationTypeResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(QualificationType.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    qualificationTypeRepository.saveAndFlush(qualificationType);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    qualificationType.setStatus(Status.INACTIVE);
+    qualificationTypeRepository.saveAndFlush(qualificationType);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    qualificationType.setStatus(Status.CURRENT);
+    qualificationTypeRepository.saveAndFlush(qualificationType);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

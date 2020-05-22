@@ -10,14 +10,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.GdcStatus;
 import com.transformuk.hee.tis.reference.service.repository.GdcStatusRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.GdcStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.GdcStatusMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class GdcStatusResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/gdc-statuses/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -69,7 +75,7 @@ public class GdcStatusResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restGdcStatusMockMvc;
+  private MockMvc mockMvc;
 
   private GdcStatus gdcStatus;
 
@@ -91,7 +97,7 @@ public class GdcStatusResourceIntTest {
     MockitoAnnotations.initMocks(this);
     GdcStatusResource gdcStatusResource = new GdcStatusResource(gdcStatusRepository,
         gdcStatusMapper, gdcStatusService);
-    this.restGdcStatusMockMvc = MockMvcBuilders.standaloneSetup(gdcStatusResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(gdcStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -109,7 +115,7 @@ public class GdcStatusResourceIntTest {
 
     // Create the GdcStatus
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
-    restGdcStatusMockMvc.perform(post("/api/gdc-statuses")
+    mockMvc.perform(post("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isCreated());
@@ -132,7 +138,7 @@ public class GdcStatusResourceIntTest {
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restGdcStatusMockMvc.perform(post("/api/gdc-statuses")
+    mockMvc.perform(post("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -152,7 +158,7 @@ public class GdcStatusResourceIntTest {
     // Create the GdcStatus, which fails.
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
-    restGdcStatusMockMvc.perform(post("/api/gdc-statuses")
+    mockMvc.perform(post("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -171,7 +177,7 @@ public class GdcStatusResourceIntTest {
     // Create the GdcStatus, which fails.
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
-    restGdcStatusMockMvc.perform(post("/api/gdc-statuses")
+    mockMvc.perform(post("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -190,7 +196,7 @@ public class GdcStatusResourceIntTest {
     gdcStatusRepository.saveAndFlush(unencodedGdcStatus);
 
     // Get all the gdcStatusList
-    restGdcStatusMockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te$t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te$t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGdcStatus.getId().intValue()))
@@ -205,7 +211,7 @@ public class GdcStatusResourceIntTest {
     gdcStatusRepository.saveAndFlush(gdcStatus);
 
     // Get the gdcStatus
-    restGdcStatusMockMvc.perform(get("/api/gdc-statuses/{id}", gdcStatus.getId()))
+    mockMvc.perform(get("/api/gdc-statuses/{id}", gdcStatus.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(gdcStatus.getId().intValue()))
@@ -217,7 +223,7 @@ public class GdcStatusResourceIntTest {
   @Transactional
   public void getNonExistingGdcStatus() throws Exception {
     // Get the gdcStatus
-    restGdcStatusMockMvc.perform(get("/api/gdc-statuses/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/gdc-statuses/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -235,7 +241,7 @@ public class GdcStatusResourceIntTest {
         .label(UPDATED_LABEL);
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(updatedGdcStatus);
 
-    restGdcStatusMockMvc.perform(put("/api/gdc-statuses")
+    mockMvc.perform(put("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isOk());
@@ -257,7 +263,7 @@ public class GdcStatusResourceIntTest {
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restGdcStatusMockMvc.perform(put("/api/gdc-statuses")
+    mockMvc.perform(put("/api/gdc-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isCreated());
@@ -275,7 +281,7 @@ public class GdcStatusResourceIntTest {
     int databaseSizeBeforeDelete = gdcStatusRepository.findAll().size();
 
     // Get the gdcStatus
-    restGdcStatusMockMvc.perform(delete("/api/gdc-statuses/{id}", gdcStatus.getId())
+    mockMvc.perform(delete("/api/gdc-statuses/{id}", gdcStatus.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -288,5 +294,69 @@ public class GdcStatusResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(GdcStatus.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    gdcStatusRepository.saveAndFlush(gdcStatus);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    gdcStatus.setStatus(Status.INACTIVE);
+    gdcStatusRepository.saveAndFlush(gdcStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    gdcStatus.setStatus(Status.CURRENT);
+    gdcStatusRepository.saveAndFlush(gdcStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

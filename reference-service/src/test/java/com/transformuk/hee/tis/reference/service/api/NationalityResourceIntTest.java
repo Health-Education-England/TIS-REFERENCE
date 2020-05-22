@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Nationality;
 import com.transformuk.hee.tis.reference.service.repository.NationalityRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.NationalityServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.NationalityMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class NationalityResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/nationalities/exists/";
 
   private static final String DEFAULT_COUNTRY_NUMBER = "AAAAAAAAAA";
   private static final String UPDATED_COUNTRY_NUMBER = "BBBBBBBBBB";
@@ -70,7 +76,7 @@ public class NationalityResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restNationalityMockMvc;
+  private MockMvc mockMvc;
 
   private Nationality nationality;
 
@@ -93,7 +99,7 @@ public class NationalityResourceIntTest {
     NationalityResource nationalityResource = new NationalityResource(nationalityRepository,
         nationalityMapper,
         nationalityService);
-    this.restNationalityMockMvc = MockMvcBuilders.standaloneSetup(nationalityResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(nationalityResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -111,7 +117,7 @@ public class NationalityResourceIntTest {
 
     // Create the Nationality
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
-    restNationalityMockMvc.perform(post("/api/nationalities")
+    mockMvc.perform(post("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isCreated());
@@ -134,7 +140,7 @@ public class NationalityResourceIntTest {
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restNationalityMockMvc.perform(post("/api/nationalities")
+    mockMvc.perform(post("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
@@ -154,7 +160,7 @@ public class NationalityResourceIntTest {
     // Create the Nationality, which fails.
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
-    restNationalityMockMvc.perform(post("/api/nationalities")
+    mockMvc.perform(post("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
@@ -173,7 +179,7 @@ public class NationalityResourceIntTest {
     // Create the Nationality, which fails.
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
-    restNationalityMockMvc.perform(post("/api/nationalities")
+    mockMvc.perform(post("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
@@ -189,7 +195,7 @@ public class NationalityResourceIntTest {
     nationalityRepository.saveAndFlush(nationality);
 
     // Get all the nationalityList
-    restNationalityMockMvc.perform(get("/api/nationalities?sort=id,desc"))
+    mockMvc.perform(get("/api/nationalities?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(nationality.getId().intValue())))
@@ -208,7 +214,7 @@ public class NationalityResourceIntTest {
     nationalityRepository.saveAndFlush(unencodedNationality);
 
     // Get all the nationalityList
-    restNationalityMockMvc.perform(get("/api/nationalities?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/nationalities?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))
@@ -223,7 +229,7 @@ public class NationalityResourceIntTest {
     nationalityRepository.saveAndFlush(nationality);
 
     // Get the nationality
-    restNationalityMockMvc.perform(get("/api/nationalities/{id}", nationality.getId()))
+    mockMvc.perform(get("/api/nationalities/{id}", nationality.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(nationality.getId().intValue()))
@@ -235,7 +241,7 @@ public class NationalityResourceIntTest {
   @Transactional
   public void getNonExistingNationality() throws Exception {
     // Get the nationality
-    restNationalityMockMvc.perform(get("/api/nationalities/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/nationalities/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -254,7 +260,7 @@ public class NationalityResourceIntTest {
     NationalityDTO nationalityDTO = nationalityMapper
         .nationalityToNationalityDTO(updatedNationality);
 
-    restNationalityMockMvc.perform(put("/api/nationalities")
+    mockMvc.perform(put("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isOk());
@@ -276,7 +282,7 @@ public class NationalityResourceIntTest {
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restNationalityMockMvc.perform(put("/api/nationalities")
+    mockMvc.perform(put("/api/nationalities")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isCreated());
@@ -294,7 +300,7 @@ public class NationalityResourceIntTest {
     int databaseSizeBeforeDelete = nationalityRepository.findAll().size();
 
     // Get the nationality
-    restNationalityMockMvc.perform(delete("/api/nationalities/{id}", nationality.getId())
+    mockMvc.perform(delete("/api/nationalities/{id}", nationality.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -307,5 +313,69 @@ public class NationalityResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Nationality.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    nationalityRepository.saveAndFlush(nationality);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    nationality.setStatus(Status.INACTIVE);
+    nationalityRepository.saveAndFlush(nationality);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    nationality.setStatus(Status.CURRENT);
+    nationalityRepository.saveAndFlush(nationality);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

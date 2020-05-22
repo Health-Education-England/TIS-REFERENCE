@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +76,7 @@ public class ReligiousBeliefResource {
    *
    * @param religiousBeliefDTO the religiousBeliefDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new religiousBeliefDTO,
-   * or with status 400 (Bad Request) if the religiousBelief has already an ID
+   *     or with status 400 (Bad Request) if the religiousBelief has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/religious-beliefs")
@@ -101,8 +105,8 @@ public class ReligiousBeliefResource {
    *
    * @param religiousBeliefDTO the religiousBeliefDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated religiousBeliefDTO,
-   * or with status 400 (Bad Request) if the religiousBeliefDTO is not valid, or with status 500
-   * (Internal Server Error) if the religiousBeliefDTO couldnt be updated
+   *     or with status 400 (Bad Request) if the religiousBeliefDTO is not valid, or with status 500
+   *     (Internal Server Error) if the religiousBeliefDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/religious-beliefs")
@@ -170,7 +174,7 @@ public class ReligiousBeliefResource {
    *
    * @param id the id of the religiousBeliefDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the religiousBeliefDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/religious-beliefs/{id}")
   @Timed
@@ -185,18 +189,28 @@ public class ReligiousBeliefResource {
   /**
    * EXISTS /religious-beliefs/exists/ : check is religiousBelief exists
    *
-   * @param code the code of the religiousBeliefDTO to check
+   * @param code             the code of the religiousBeliefDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/religious-beliefs/exists/")
   @Timed
-  public ResponseEntity<Boolean> religiousBeliefExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> religiousBeliefExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check ReligiousBelief exists : {}", code);
-    ReligiousBelief religiousBelief = religiousBeliefRepository.findFirstByCode(code);
-    if (religiousBelief == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<ReligiousBelief> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = religiousBeliefRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -221,7 +235,7 @@ public class ReligiousBeliefResource {
    *
    * @param religiousBeliefDTOS List of the religiousBeliefDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new religiousBeliefDTOS,
-   * or with status 400 (Bad Request) if the ReligiousBeliefDTO has already an ID
+   *     or with status 400 (Bad Request) if the ReligiousBeliefDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-religious-beliefs")
@@ -255,8 +269,8 @@ public class ReligiousBeliefResource {
    *
    * @param religiousBeliefDTOS List of the religiousBeliefDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated religiousBeliefDTOS,
-   * or with status 400 (Bad Request) if the religiousBeliefDTOS is not valid, or with status 500
-   * (Internal Server Error) if the religiousBeliefDTOS couldnt be updated
+   *     or with status 400 (Bad Request) if the religiousBeliefDTOS is not valid, or with status
+   *     500 (Internal Server Error) if the religiousBeliefDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-religious-beliefs")

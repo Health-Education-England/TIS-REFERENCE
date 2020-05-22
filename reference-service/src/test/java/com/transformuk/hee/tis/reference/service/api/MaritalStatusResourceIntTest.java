@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.MaritalStatus;
 import com.transformuk.hee.tis.reference.service.repository.MaritalStatusRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.MaritalStatusServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.MaritalStatusMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class MaritalStatusResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/marital-statuses/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class MaritalStatusResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restMaritalStatusMockMvc;
+  private MockMvc mockMvc;
 
   private MaritalStatus maritalStatus;
 
@@ -94,7 +100,7 @@ public class MaritalStatusResourceIntTest {
     MaritalStatusResource maritalStatusResource = new MaritalStatusResource(maritalStatusRepository,
         maritalStatusMapper,
         maritalStatusService);
-    this.restMaritalStatusMockMvc = MockMvcBuilders.standaloneSetup(maritalStatusResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(maritalStatusResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -113,7 +119,7 @@ public class MaritalStatusResourceIntTest {
     // Create the MaritalStatus
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(maritalStatus);
-    restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
+    mockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isCreated());
@@ -137,7 +143,7 @@ public class MaritalStatusResourceIntTest {
         .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
+    mockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -158,7 +164,7 @@ public class MaritalStatusResourceIntTest {
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(maritalStatus);
 
-    restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
+    mockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -178,7 +184,7 @@ public class MaritalStatusResourceIntTest {
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(maritalStatus);
 
-    restMaritalStatusMockMvc.perform(post("/api/marital-statuses")
+    mockMvc.perform(post("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -194,7 +200,7 @@ public class MaritalStatusResourceIntTest {
     maritalStatusRepository.saveAndFlush(maritalStatus);
 
     // Get all the maritalStatusList
-    restMaritalStatusMockMvc.perform(get("/api/marital-statuses?sort=id,desc"))
+    mockMvc.perform(get("/api/marital-statuses?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(maritalStatus.getId().intValue())))
@@ -212,7 +218,7 @@ public class MaritalStatusResourceIntTest {
     maritalStatusRepository.saveAndFlush(unencodedMaritalStatus);
 
     // Get all the maritalStatusList
-    restMaritalStatusMockMvc
+    mockMvc
         .perform(get("/api/marital-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -228,7 +234,7 @@ public class MaritalStatusResourceIntTest {
     maritalStatusRepository.saveAndFlush(maritalStatus);
 
     // Get the maritalStatus
-    restMaritalStatusMockMvc.perform(get("/api/marital-statuses/{id}", maritalStatus.getId()))
+    mockMvc.perform(get("/api/marital-statuses/{id}", maritalStatus.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(maritalStatus.getId().intValue()))
@@ -240,7 +246,7 @@ public class MaritalStatusResourceIntTest {
   @Transactional
   public void getNonExistingMaritalStatus() throws Exception {
     // Get the maritalStatus
-    restMaritalStatusMockMvc.perform(get("/api/marital-statuses/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/marital-statuses/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -259,7 +265,7 @@ public class MaritalStatusResourceIntTest {
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(updatedMaritalStatus);
 
-    restMaritalStatusMockMvc.perform(put("/api/marital-statuses")
+    mockMvc.perform(put("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isOk());
@@ -282,7 +288,7 @@ public class MaritalStatusResourceIntTest {
         .maritalStatusToMaritalStatusDTO(maritalStatus);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restMaritalStatusMockMvc.perform(put("/api/marital-statuses")
+    mockMvc.perform(put("/api/marital-statuses")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isCreated());
@@ -300,7 +306,7 @@ public class MaritalStatusResourceIntTest {
     int databaseSizeBeforeDelete = maritalStatusRepository.findAll().size();
 
     // Get the maritalStatus
-    restMaritalStatusMockMvc.perform(delete("/api/marital-statuses/{id}", maritalStatus.getId())
+    mockMvc.perform(delete("/api/marital-statuses/{id}", maritalStatus.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -313,5 +319,69 @@ public class MaritalStatusResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(MaritalStatus.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    maritalStatusRepository.saveAndFlush(maritalStatus);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    maritalStatus.setStatus(Status.INACTIVE);
+    maritalStatusRepository.saveAndFlush(maritalStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    maritalStatus.setStatus(Status.CURRENT);
+    maritalStatusRepository.saveAndFlush(maritalStatus);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

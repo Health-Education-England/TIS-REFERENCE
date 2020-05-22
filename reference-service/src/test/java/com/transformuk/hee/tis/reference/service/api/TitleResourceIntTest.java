@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Title;
 import com.transformuk.hee.tis.reference.service.repository.TitleRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.TitleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.TitleMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class TitleResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/titles/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class TitleResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restTitleMockMvc;
+  private MockMvc mockMvc;
 
   private Title title;
 
@@ -92,7 +98,7 @@ public class TitleResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     TitleResource titleResource = new TitleResource(titleRepository, titleMapper, titleService);
-    this.restTitleMockMvc = MockMvcBuilders.standaloneSetup(titleResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(titleResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -110,7 +116,7 @@ public class TitleResourceIntTest {
 
     // Create the Title
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
-    restTitleMockMvc.perform(post("/api/titles")
+    mockMvc.perform(post("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isCreated());
@@ -133,7 +139,7 @@ public class TitleResourceIntTest {
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restTitleMockMvc.perform(post("/api/titles")
+    mockMvc.perform(post("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
@@ -153,7 +159,7 @@ public class TitleResourceIntTest {
     // Create the Title, which fails.
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
-    restTitleMockMvc.perform(post("/api/titles")
+    mockMvc.perform(post("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
@@ -172,7 +178,7 @@ public class TitleResourceIntTest {
     // Create the Title, which fails.
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
-    restTitleMockMvc.perform(post("/api/titles")
+    mockMvc.perform(post("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
@@ -188,7 +194,7 @@ public class TitleResourceIntTest {
     titleRepository.saveAndFlush(title);
 
     // Get all the titleList
-    restTitleMockMvc.perform(get("/api/titles?sort=id,desc"))
+    mockMvc.perform(get("/api/titles?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(title.getId().intValue())))
@@ -206,7 +212,7 @@ public class TitleResourceIntTest {
     titleRepository.saveAndFlush(unencodedTitle);
 
     // Get all the titleList
-    restTitleMockMvc.perform(get("/api/titles?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/titles?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedTitle.getId().intValue()))
@@ -221,7 +227,7 @@ public class TitleResourceIntTest {
     titleRepository.saveAndFlush(title);
 
     // Get the title
-    restTitleMockMvc.perform(get("/api/titles/{id}", title.getId()))
+    mockMvc.perform(get("/api/titles/{id}", title.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(title.getId().intValue()))
@@ -233,7 +239,7 @@ public class TitleResourceIntTest {
   @Transactional
   public void getNonExistingTitle() throws Exception {
     // Get the title
-    restTitleMockMvc.perform(get("/api/titles/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/titles/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -251,7 +257,7 @@ public class TitleResourceIntTest {
         .label(UPDATED_LABEL);
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(updatedTitle);
 
-    restTitleMockMvc.perform(put("/api/titles")
+    mockMvc.perform(put("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isOk());
@@ -273,7 +279,7 @@ public class TitleResourceIntTest {
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restTitleMockMvc.perform(put("/api/titles")
+    mockMvc.perform(put("/api/titles")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isCreated());
@@ -291,7 +297,7 @@ public class TitleResourceIntTest {
     int databaseSizeBeforeDelete = titleRepository.findAll().size();
 
     // Get the title
-    restTitleMockMvc.perform(delete("/api/titles/{id}", title.getId())
+    mockMvc.perform(delete("/api/titles/{id}", title.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -304,5 +310,69 @@ public class TitleResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(Title.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    titleRepository.saveAndFlush(title);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    title.setStatus(Status.INACTIVE);
+    titleRepository.saveAndFlush(title);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    title.setStatus(Status.CURRENT);
+    titleRepository.saveAndFlush(title);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }

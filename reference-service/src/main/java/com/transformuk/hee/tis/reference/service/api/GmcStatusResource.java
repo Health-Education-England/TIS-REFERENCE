@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +75,7 @@ public class GmcStatusResource {
    *
    * @param gmcStatusDTO the gmcStatusDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new gmcStatusDTO, or
-   * with status 400 (Bad Request) if the gmcStatus has already an ID
+   *     with status 400 (Bad Request) if the gmcStatus has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/gmc-statuses")
@@ -98,8 +102,8 @@ public class GmcStatusResource {
    *
    * @param gmcStatusDTO the gmcStatusDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTO, or with
-   * status 400 (Bad Request) if the gmcStatusDTO is not valid, or with status 500 (Internal Server
-   * Error) if the gmcStatusDTO couldnt be updated
+   *     status 400 (Bad Request) if the gmcStatusDTO is not valid, or with status 500 (Internal
+   *     Server Error) if the gmcStatusDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/gmc-statuses")
@@ -161,7 +165,7 @@ public class GmcStatusResource {
    *
    * @param id the id of the gmcStatusDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the gmcStatusDTO, or with status
-   * 404 (Not Found)
+   *     404 (Not Found)
    */
   @GetMapping("/gmc-statuses/{id}")
   @Timed
@@ -175,18 +179,28 @@ public class GmcStatusResource {
   /**
    * EXISTS /gmc-statuses/exists/ : check is gmcStatus exists
    *
-   * @param code the code of the GmcStatusDTO to check
+   * @param code             the code of the GmcStatusDTO to check
+   * @param columnFilterJson The column filters to apply
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/gmc-statuses/exists/")
   @Timed
-  public ResponseEntity<Boolean> gmcStatusExists(@RequestBody String code) {
+  public ResponseEntity<Boolean> gmcStatusExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
     log.debug("REST request to check GmcStatus exists : {}", code);
-    GmcStatus gmcStatus = gmcStatusRepository.findFirstByCode(code);
-    if (gmcStatus == null) {
-      return new ResponseEntity<>(false, HttpStatus.OK);
+    Specifications<GmcStatus> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    return new ResponseEntity<>(true, HttpStatus.OK);
+
+    boolean exists = gmcStatusRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
   /**
@@ -210,7 +224,7 @@ public class GmcStatusResource {
    *
    * @param gmcStatusDTOS List of the gmcStatusDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new gmcStatusDTOS, or
-   * with status 400 (Bad Request) if the GmcStatusDTO has already an ID
+   *     with status 400 (Bad Request) if the GmcStatusDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-gmc-statuses")
@@ -242,8 +256,8 @@ public class GmcStatusResource {
    *
    * @param gmcStatusDTOS List of the gmcStatusDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated gmcStatusDTOS, or
-   * with status 400 (Bad Request) if the gmcStatusDTOS is not valid, or with status 500 (Internal
-   * Server Error) if the gmcStatusDTOS couldnt be updated
+   *     with status 400 (Bad Request) if the gmcStatusDTOS is not valid, or with status 500
+   *     (Internal Server Error) if the gmcStatusDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-gmc-statuses")
