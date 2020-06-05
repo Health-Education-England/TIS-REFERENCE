@@ -24,6 +24,7 @@ import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
+import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
@@ -1204,5 +1205,24 @@ public class ReferenceServiceImplTest {
     verify(referenceRestTemplate).exchange(
         REFERENCE_URL + "/api/roles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldFindRolesIn() {
+    // given
+    String codes = "code1,code2";
+    List<RoleDTO> roleDtos = new ArrayList<>();
+    ResponseEntity<List<SiteDTO>> responseEntity = new ResponseEntity(roleDtos, HttpStatus.OK);
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), isNull(RequestEntity.class),
+            any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+
+    // when
+    List<RoleDTO> respList = referenceServiceImpl.findRolesIn(codes);
+
+    //then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/roles/in/" + codes),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(roleDtos, respList);
   }
 }

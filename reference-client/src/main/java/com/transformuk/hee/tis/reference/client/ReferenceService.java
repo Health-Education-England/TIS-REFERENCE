@@ -53,6 +53,14 @@ public interface ReferenceService extends ClientService {
    */
   List<GradeDTO> findGradesIn(Set<String> codes);
 
+  /**
+   * Find the roles given the codes. This does one API call and one SQL call to retrieve all the
+   * roles.
+   *
+   * @param codes the role codes to look for
+   * @return the found roles or an empty list
+   */
+  List<RoleDTO> findRolesIn(String codes);
 
   /**
    * Find the grades given the Ids. This does one API call and one SQL call to retrieve all the
