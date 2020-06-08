@@ -333,6 +333,13 @@ public class RoleResource {
         .body(results);
   }
 
+  /**
+   * GET /roles/in/:codes : get roles given to codes.
+   *
+   * @param codes the codes to search by, using a ',' separator
+   * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
+   *     list
+   */
   @GetMapping("/roles/in/{codes}")
   @Timed
   public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {
