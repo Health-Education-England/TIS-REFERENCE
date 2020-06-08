@@ -258,8 +258,8 @@ public class RoleResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(role.getId().intValue()))
-        .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
-        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+        .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
   }
 
   @Test
@@ -404,5 +404,25 @@ public class RoleResourceIntTest {
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnAllRolesInCodes() throws Exception {
+    roleRepository.saveAndFlush(role);
+    Role role2 = new Role()
+        .code(UPDATED_CODE)
+        .label(UPDATED_LABEL)
+        .roleCategory(roleCategory);
+    roleRepository.saveAndFlush(role);
+    roleRepository.saveAndFlush(role2);
+
+    String codes = String.join(",", role.getCode(), role2.getCode());
+    mockMvc.perform(get("/api/roles/in/{codes}", codes))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(UPDATED_CODE)));
   }
 }

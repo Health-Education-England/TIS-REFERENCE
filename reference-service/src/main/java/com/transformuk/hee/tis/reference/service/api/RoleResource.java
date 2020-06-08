@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -331,4 +333,30 @@ public class RoleResource {
         .body(results);
   }
 
+  /**
+   * GET /roles/in/:codes : get roles given to codes.
+   *
+   * @param codes the codes to search by, using a ',' separator
+   * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
+   *     list
+   */
+  @GetMapping("/roles/in/{codes}")
+  @Timed
+  public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {
+    log.debug("REST request to find several roles");
+    List<RoleDTO> resp = new ArrayList<>();
+    Set<String> codeSet = new HashSet<>();
+
+    if (codes == null || codes.isEmpty()) {
+      return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    codeSet.addAll(Arrays.asList(codes.split(",")));
+
+    if (!codeSet.isEmpty()) {
+      List<Role> roles = roleRepository.findByCodeIn(codeSet);
+      resp = roleMapper.rolesToRoleDTOs(roles);
+    }
+    return new ResponseEntity<>(resp, HttpStatus.OK);
+  }
 }
