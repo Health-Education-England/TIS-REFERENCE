@@ -414,7 +414,6 @@ public class RoleResourceIntTest {
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL)
         .roleCategory(roleCategory);
-    roleRepository.saveAndFlush(role);
     roleRepository.saveAndFlush(role2);
 
     String codes = String.join(",", role.getCode(), role2.getCode());
@@ -424,5 +423,22 @@ public class RoleResourceIntTest {
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(UPDATED_CODE)));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnAllRolesInCodesWhenDotExistsInRole() throws Exception {
+    String code2 = "code2.code2";
+    Role role2 = new Role()
+        .code("code2.code2")
+        .label(UPDATED_LABEL)
+        .roleCategory(roleCategory);
+    roleRepository.saveAndFlush(role2);
+
+    mockMvc.perform(get("/api/roles/in/{codes}", role2.getCode()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
   }
 }
