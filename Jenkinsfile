@@ -81,6 +81,10 @@ node {
 
           sh "docker tag heetiscontainerregistry.azurecr.io/reference:$buildVersion heetiscontainerregistry.azurecr.io/reference:latest"
           sh "docker push heetiscontainerregistry.azurecr.io/reference:latest"
+
+          sh "docker rmi heetiscontainerregistry.azurecr.io/reference:$buildVersion"
+          sh "docker rmi heetiscontainerregistry.azurecr.io/reference:latest"
+
           println "[Jenkinsfile INFO] Stage Dockerize completed..."
         }
 
