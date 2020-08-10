@@ -5,6 +5,7 @@ def utils = new hee.tis.utils()
 node {
 
     def service = "reference"
+    def containerRegistryLocaltion = "430723991443.dkr.ecr.eu-west-2.amazonaws.com"
 
     deleteDir()
 
@@ -62,6 +63,7 @@ node {
         milestone 2
 
         stage('Dockerise') {
+          sh "aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 430723991443.dkr.ecr.eu-west-2.amazonaws.com"
           env.VERSION = utils.getMvnToPom(workspace, 'version')
           env.GROUP_ID = utils.getMvnToPom(workspace, 'groupId')
           env.ARTIFACT_ID = utils.getMvnToPom(workspace, 'artifactId')
@@ -76,14 +78,14 @@ node {
 
           sh "mvn package -DskipTests"
           sh "cp ./reference-service/target/reference-service-*.war ./reference-service/target/app.jar"
-          sh "docker build -t heetiscontainerregistry.azurecr.io/reference:$buildVersion -f ./reference-service/Dockerfile ./reference-service"
-          sh "docker push heetiscontainerregistry.azurecr.io/reference:$buildVersion"
+          sh "docker build -t ${containerRegistryLocaltion}/${service}:$buildVersion -f ./reference-service/Dockerfile ./reference-service"
+          sh "docker push ${containerRegistryLocaltion}/${service}:$buildVersion"
 
-          sh "docker tag heetiscontainerregistry.azurecr.io/reference:$buildVersion heetiscontainerregistry.azurecr.io/reference:latest"
-          sh "docker push heetiscontainerregistry.azurecr.io/reference:latest"
+          sh "docker tag ${containerRegistryLocaltion}/${service}:$buildVersion heetiscontainerregistry.azurecr.io/reference:latest"
+          sh "docker push ${containerRegistryLocaltion}/${service}:latest"
 
-          sh "docker rmi heetiscontainerregistry.azurecr.io/reference:$buildVersion"
-          sh "docker rmi heetiscontainerregistry.azurecr.io/reference:latest"
+          sh "docker rmi ${containerRegistryLocaltion}/${service}:$buildVersion"
+          sh "docker rmi ${containerRegistryLocaltion}/${service}:latest"
 
           println "[Jenkinsfile INFO] Stage Dockerize completed..."
         }
