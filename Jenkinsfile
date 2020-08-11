@@ -81,7 +81,7 @@ node {
           sh "docker build -t ${containerRegistryLocaltion}/${service}:$buildVersion -f ./reference-service/Dockerfile ./reference-service"
           sh "docker push ${containerRegistryLocaltion}/${service}:$buildVersion"
 
-          sh "docker tag ${containerRegistryLocaltion}/${service}:$buildVersion heetiscontainerregistry.azurecr.io/reference:latest"
+          sh "docker tag ${containerRegistryLocaltion}/${service}:$buildVersion ${containerRegistryLocaltion}/reference:latest"
           sh "docker push ${containerRegistryLocaltion}/${service}:latest"
 
           sh "docker rmi ${containerRegistryLocaltion}/${service}:$buildVersion"
