@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static org.springframework.util.StringUtils.isEmpty;
+
+import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -12,8 +14,12 @@ import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
+import com.transformuk.hee.tis.security.model.UserProfile;
+import com.transformuk.hee.tis.security.util.TisSecurityHelper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +28,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +44,34 @@ public class SitesTrustsService {
   private SiteRepository siteRepository;
   private TrustRepository trustRepository;
   private LocalOfficeRepository localOfficeRepository;
+  private AclSupportService aclService;
+  private PermissionService permissionService;
 
   @Autowired
   public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
-      LocalOfficeRepository localOfficeRepository, @Value("${search.result.limit:100}") int limit) {
+      LocalOfficeRepository localOfficeRepository, @Value("${search.result.limit:100}") int limit, AclSupportService aclService, PermissionService permissionService) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
     this.localOfficeRepository = localOfficeRepository;
     this.limit = limit;
+    this.aclService = aclService;
+    this.permissionService = permissionService;
+  }
+
+  @Transactional
+  public Site create(Site site) {
+    Set<String> principals = permissionService.getUserEntities();
+
+    Site savedSite = siteRepository.save(site);
+    aclService.grantPermissionsToUser(Site.class.getName(), savedSite.getId(), principals,
+        Sets.newHashSet(BasePermission.READ, BasePermission.WRITE));
+    return savedSite;
+  }
+
+  @PreAuthorize("hasPermission(#site, 'WRITE')")
+  public Site update(Site site) {
+    Site updatedSite = siteRepository.save(site);
+    return updatedSite;
   }
 
   /**
