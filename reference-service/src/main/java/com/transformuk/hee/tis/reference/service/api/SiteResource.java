@@ -102,7 +102,7 @@ public class SiteResource {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = siteRepository.save(site);
+    site = sitesTrustsService.create(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.created(new URI("/api/sites/" + result.getId()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -125,7 +125,7 @@ public class SiteResource {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = siteRepository.save(site);
+    site = sitesTrustsService.update(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getId().toString()))
@@ -268,6 +268,7 @@ public class SiteResource {
    * (Not Found)
    */
   @GetMapping("/sites/{id}")
+//  @PreAuthorize("hasPermission(#id, 'com.transformuk.hee.tis.reference.service.model.Site', 'read')")
   @Timed
   public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
     log.debug("REST request to get Site : {}", id);
