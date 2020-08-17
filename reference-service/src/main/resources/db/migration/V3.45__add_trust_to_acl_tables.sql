@@ -1,5 +1,5 @@
 INSERT INTO `acl_class` (`class`)
-VALUES ('com.transformuk.hee.tis.reference.service.model.Site');
+VALUES ('com.transformuk.hee.tis.reference.service.model.Trust');
 
 INSERT IGNORE INTO `acl_sid` (`principal`, `sid`)
 VALUES (0, 'HEE');
@@ -9,7 +9,7 @@ INSERT INTO `acl_object_identity` (`object_id_class`, `object_id_identity`, `own
 SELECT (
            SELECT `id`
            FROM `acl_class`
-           WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Site'
+           WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Trust'
        ),
        `id`,
        (
@@ -18,7 +18,7 @@ SELECT (
            WHERE `sid` = 'HEE'
        ),
        1
-FROM `Site`;
+FROM `Trust`;
 
 -- Add read permissions
 INSERT INTO `acl_entry` (`acl_object_identity`, `ace_order`, `sid`, `mask`, `granting`,
@@ -39,7 +39,7 @@ WHERE `object_id_class` =
       (
           SELECT `id`
           FROM `acl_class`
-          WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Site'
+          WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Trust'
       );
 
 -- Add write permissions
@@ -61,5 +61,5 @@ WHERE `object_id_class` =
       (
           SELECT `id`
           FROM `acl_class`
-          WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Site'
+          WHERE `class` = 'com.transformuk.hee.tis.reference.service.model.Trust'
       );
