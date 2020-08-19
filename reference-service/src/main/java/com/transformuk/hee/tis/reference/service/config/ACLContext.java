@@ -7,9 +7,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.support.NoOpCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.acls.AclPermissionCacheOptimizer;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclAuthorizationStrategyImpl;
@@ -60,20 +58,14 @@ public class ACLContext {
   }
 
   @Bean
-  public MutableAclService mutableAclService() {
-    JdbcMutableAclService jdbcMutableAclService = new JdbcMutableAclService(dataSource,
-        lookupStrategy(), aclCache());
-    jdbcMutableAclService.setClassIdentityQuery("SELECT @@IDENTITY");
-    jdbcMutableAclService.setSidIdentityQuery("SELECT @@IDENTITY");
-    return jdbcMutableAclService;
+  public PermissionEvaluator permissionEvaluator(MutableAclService mutableAclService) {
+    return new AclPermissionEvaluator(mutableAclService);
   }
 
   @Bean
-  public MethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler() {
-    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-    AclPermissionEvaluator permissionEvaluator = new AclPermissionEvaluator(mutableAclService());
-    expressionHandler.setPermissionEvaluator(permissionEvaluator);
-    expressionHandler.setPermissionCacheOptimizer(new AclPermissionCacheOptimizer(mutableAclService()));
-    return expressionHandler;
+  public MutableAclService mutableAclService() {
+    JdbcMutableAclService jdbcMutableAclService = new JdbcMutableAclService(dataSource,
+        lookupStrategy(), aclCache());
+    return jdbcMutableAclService;
   }
 }
