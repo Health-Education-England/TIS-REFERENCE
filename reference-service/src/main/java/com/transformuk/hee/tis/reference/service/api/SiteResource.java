@@ -221,13 +221,14 @@ public class SiteResource {
   }
 
   /**
-   * POST /sites/ids/in/query: post a query to fetch sites.
-   * Currently this is a fix for a large amount of sites requests(exceeding the requestParam length limit).
+   * POST /sites/ids/in/query: post a query to fetch sites. Currently this is a fix for a large
+   * amount of sites requests(exceeding the requestParam length limit).
+   *
    * @param idMap the siteIds to search by. Frontend sends a json.
    * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
    */
   @ApiOperation(value = "get a collection of sites by id")
-  @PostMapping(path="/sites/ids/in/query")
+  @PostMapping(path = "/sites/ids/in/query")
   @Timed
   public ResponseEntity<List<SiteDTO>> getSitesInByIds(@RequestBody Map<String, List<Long>> idMap) {
     return getSitesInById(idMap.get("ids"));
@@ -268,7 +269,7 @@ public class SiteResource {
    * (Not Found)
    */
   @GetMapping("/sites/{id}")
-//  @PreAuthorize("hasPermission(#id, 'com.transformuk.hee.tis.reference.service.model.Site', 'read')")
+  @PreAuthorize("hasPermission(#id, 'com.transformuk.hee.tis.reference.service.model.Site', 'read')")
   @Timed
   public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
     log.debug("REST request to get Site : {}", id);
@@ -330,11 +331,7 @@ public class SiteResource {
       List<Site> foundSites = siteRepository.findAll(ids);
       Set<Long> dbIds = foundSites.stream().map(Site::getId).collect(Collectors.toSet());
       ids.forEach(siteCode -> {
-        if (dbIds.contains(siteCode)) {
-          siteExistsMap.put(siteCode, true);
-        } else {
-          siteExistsMap.put(siteCode, false);
-        }
+        siteExistsMap.put(siteCode, dbIds.contains(siteCode));
       });
     }
 

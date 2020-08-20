@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.AuditableAcl;
@@ -24,6 +25,7 @@ public class AclSupportService {
     this.aclService = aclService;
   }
 
+  @Secured("ROLE_RUN_AS_Machine User")
   public AuditableAcl grantPermissionsToUser(String type, Long id, Set<String> principals,
       Set<Permission> permissions) {
     Set<Sid> sids = principals.stream().map(p -> new GrantedAuthoritySid(p))
@@ -40,14 +42,14 @@ public class AclSupportService {
       for (Sid sid : sids) {
         int index = acl.getEntries().size();
         boolean granting = true;
-        acl.setOwner(sid);
+        acl.setOwner(sid);// needs Administration permission
         acl.insertAce(index, permission, sid, granting);
         indices.add(index);
       }
     }
 
     for (Integer index : indices) {
-      acl.updateAuditing(index, true, true);
+      acl.updateAuditing(index, true, true);// needs Administration permission
     }
 
     acl = (AuditableAcl) aclService.updateAcl(acl);
@@ -64,8 +66,13 @@ public class AclSupportService {
   }
 
   private AuditableAcl create(String type, Long id) {
-    AuditableAcl acl = (AuditableAcl) aclService.createAcl(new ObjectIdentityImpl(type, id));
-    return acl;
+    try {
+      AuditableAcl acl = (AuditableAcl) aclService.createAcl(new ObjectIdentityImpl(type, id));
+      return acl;
+    } catch(Exception e) {
+      e.getMessage();
+      return null;
+    }
   }
 
   private AuditableAcl get(String type, Serializable id) {

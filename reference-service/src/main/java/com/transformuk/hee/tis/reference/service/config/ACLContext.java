@@ -36,7 +36,7 @@ public class ACLContext {
 
   @Bean
   public AclAuthorizationStrategy aclAuthorizationStrategy() {
-    return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("Machine User"));
+    return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_RUN_AS_Machine User"));
   }
 
   @Bean
