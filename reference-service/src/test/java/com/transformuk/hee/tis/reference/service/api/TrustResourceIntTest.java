@@ -2,22 +2,28 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.PermissionService;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +31,20 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -88,6 +104,12 @@ public class TrustResourceIntTest {
   @Autowired
   private TrustMapper trustMapper;
 
+  @MockBean
+  private PermissionService permissionServiceMock;
+
+  @Autowired
+  private MutableAclService mutableAclService;
+
   @Autowired
   private SitesTrustsService sitesTrustsService;
 
@@ -137,8 +159,11 @@ public class TrustResourceIntTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"HEE", "NI"})
   @Transactional
   public void createTrust() throws Exception {
+    when(permissionServiceMock.getUserEntities()).thenReturn(Sets.newHashSet("HEE", "NI"));
+
     int databaseSizeBeforeCreate = trustRepository.findAll().size();
 
     // Create the Trust
@@ -158,6 +183,12 @@ public class TrustResourceIntTest {
     assertThat(testTrust.getTrustNumber()).isEqualTo(DEFAULT_TRUST_NUMBER);
     assertThat(testTrust.getAddress()).isEqualTo(DEFAULT_ADDRESS);
     assertThat(testTrust.getPostCode()).isEqualTo(DEFAULT_POST_CODE);
+
+    Acl acl = mutableAclService.readAclById(new ObjectIdentityImpl(Trust.class.getName(), testTrust.getId()));
+    List<AccessControlEntry> aclEntires = acl.getEntries();
+    assertThat(aclEntires.size()).isEqualTo(4);
+    Set<Sid> sids = aclEntires.stream().map(e -> e.getSid()).collect(Collectors.toSet());
+    assertThat(sids).contains(new GrantedAuthoritySid("HEE"), new GrantedAuthoritySid("NI"));
   }
 
   @Test
@@ -302,11 +333,19 @@ public class TrustResourceIntTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"HEE", "ROLE_RUN_AS_Machine User"})
   @Transactional
   public void updateTrust() throws Exception {
     // Initialize the database
     trust = trustRepository.saveAndFlush(trust);
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
+
+    ObjectIdentityImpl siteIdentity = new ObjectIdentityImpl(trust);
+    MutableAcl acl = mutableAclService.createAcl(siteIdentity);
+    GrantedAuthoritySid heeSid = new GrantedAuthoritySid("HEE");
+    acl.setOwner(heeSid);
+    acl.insertAce(0, BasePermission.WRITE, heeSid, true);
+    mutableAclService.updateAcl(acl);
 
     // Update the trust
     Trust updatedTrust = trustRepository.findOne(trust.getId());
@@ -333,6 +372,7 @@ public class TrustResourceIntTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"HEE"})
   @Transactional
   public void updateNonExistingTrust() throws Exception {
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();

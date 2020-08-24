@@ -38,16 +38,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class SitesTrustsService {
 
   private final int limit;
-  private final SiteRepository siteRepository;
-  private final TrustRepository trustRepository;
-  private final LocalOfficeRepository localOfficeRepository;
-  private final AclSupportService aclService;
-  private final PermissionService permissionService;
+  private SiteRepository siteRepository;
+  private TrustRepository trustRepository;
+  private LocalOfficeRepository localOfficeRepository;
+  private AclSupportService aclService;
+  private PermissionService permissionService;
 
   @Autowired
   public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
-      LocalOfficeRepository localOfficeRepository, @Value("${search.result.limit:100}") int limit,
-      AclSupportService aclService, PermissionService permissionService) {
+      LocalOfficeRepository localOfficeRepository, AclSupportService aclService,
+      PermissionService permissionService, @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
     this.localOfficeRepository = localOfficeRepository;
@@ -58,7 +58,7 @@ public class SitesTrustsService {
 
   @Secured({"HEE", "NI", "RUN_AS_Machine User"})
   @Transactional
-  public Site create(Site site) {
+  public Site createSite(Site site) {
     Set<String> principals = permissionService.getUserEntities();
 
     Site savedSite = siteRepository.save(site);
@@ -68,7 +68,7 @@ public class SitesTrustsService {
   }
 
   @PreAuthorize("hasPermission(#site, 'WRITE')")
-  public Site update(Site site) {
+  public Site updateSite(Site site) {
     Site updatedSite = siteRepository.save(site);
     return updatedSite;
   }
@@ -122,6 +122,23 @@ public class SitesTrustsService {
     } else {
       return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
     }
+  }
+
+  @Secured({"HEE", "NI", "RUN_AS_Machine User"})
+  @Transactional
+  public Trust createTrust(Trust trust) {
+    Set<String> principals = permissionService.getUserEntities();
+
+    Trust savedTrust = trustRepository.save(trust);
+    aclService.grantPermissionsToUser(Trust.class.getName(), savedTrust.getId(), principals,
+        Sets.newHashSet(BasePermission.READ, BasePermission.WRITE));
+    return savedTrust;
+  }
+
+  @PreAuthorize("hasPermission(#trust, 'WRITE')")
+  public Trust updateTrust(Trust trust) {
+    Trust updatedTrust = trustRepository.save(trust);
+    return updatedTrust;
   }
 
   /**

@@ -102,7 +102,7 @@ public class SiteResource {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = sitesTrustsService.create(site);
+    site = sitesTrustsService.createSite(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.created(new URI("/api/sites/" + result.getId()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -125,7 +125,7 @@ public class SiteResource {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = sitesTrustsService.update(site);
+    site = sitesTrustsService.updateSite(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getId().toString()))

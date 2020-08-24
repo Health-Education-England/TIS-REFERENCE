@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,16 +41,16 @@ public class SitesTrustsServiceTest {
   @Mock
   private LocalOfficeRepository localOfficeRepository;
 
-  @Autowired
+  @Mock
   private AclSupportService aclService;
 
-  @Autowired
+  @Mock
   private PermissionService permissionService;
 
   @InjectMocks
   private SitesTrustsService service =
-      new SitesTrustsService(siteRepository, trustRepository, localOfficeRepository, 100,
-          aclService, permissionService);
+      new SitesTrustsService(siteRepository, trustRepository, localOfficeRepository, aclService,
+          permissionService, 100);
 
   @Test
   public void shouldSearchSites() {
