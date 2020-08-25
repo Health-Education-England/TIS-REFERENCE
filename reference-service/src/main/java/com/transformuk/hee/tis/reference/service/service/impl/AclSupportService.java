@@ -19,8 +19,6 @@ public class AclSupportService {
 
   private final MutableAclService aclService;
 
-//  private ConsoleAuditLogger aclAuditLogger = new ConsoleAuditLogger();
-
   public AclSupportService(MutableAclService aclService) {
     this.aclService = aclService;
   }
@@ -36,7 +34,6 @@ public class AclSupportService {
   private AuditableAcl grantPermissions(String type, Long id, Set<Sid> sids,
       Set<Permission> permissions) {
     AuditableAcl acl = getOrCreate(type, id);
-//    acl.setOwner(new GrantedAuthoritySid("Machine User"));
     Set<Integer> indices = new HashSet<>();
     for (Permission permission : permissions) {
       for (Sid sid : sids) {

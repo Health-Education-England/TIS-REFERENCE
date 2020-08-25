@@ -63,9 +63,12 @@ public class ACLContext {
   }
 
   @Bean
-  public MutableAclService mutableAclService() {
+  public JdbcMutableAclService mutableAclService() {
     JdbcMutableAclService jdbcMutableAclService = new JdbcMutableAclService(dataSource,
         lookupStrategy(), aclCache());
+    // set dialect for MySQL
+    jdbcMutableAclService.setClassIdentityQuery("SELECT @@IDENTITY");
+    jdbcMutableAclService.setSidIdentityQuery("SELECT @@IDENTITY");
     return jdbcMutableAclService;
   }
 }

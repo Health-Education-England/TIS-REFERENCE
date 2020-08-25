@@ -46,10 +46,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -137,7 +137,7 @@ public class SiteResourceIntTest {
   private PermissionService permissionServiceMock;
 
   @Autowired
-  private MutableAclService mutableAclService;
+  private JdbcMutableAclService mutableAclService;
 
   @Autowired
   private SitesTrustsService sitesTrustsService;
@@ -192,6 +192,9 @@ public class SiteResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
+    // Set dialect for H2 database
+    this.mutableAclService.setClassIdentityQuery("call identity()");
+    this.mutableAclService.setSidIdentityQuery("call identity()");
   }
 
   @Before
