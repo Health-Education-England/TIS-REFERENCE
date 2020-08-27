@@ -41,9 +41,16 @@ public class SitesTrustsServiceTest {
   @Mock
   private LocalOfficeRepository localOfficeRepository;
 
+  @Mock
+  private AclSupportService aclService;
+
+  @Mock
+  private PermissionService permissionService;
+
   @InjectMocks
   private SitesTrustsService service =
-      new SitesTrustsService(siteRepository, trustRepository, localOfficeRepository, 100);
+      new SitesTrustsService(siteRepository, trustRepository, localOfficeRepository, aclService,
+          permissionService, 100);
 
   @Test
   public void shouldSearchSites() {

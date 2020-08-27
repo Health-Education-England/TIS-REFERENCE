@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Set;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.springframework.http.MediaType;
@@ -34,6 +35,18 @@ public class TestUtil {
     UserProfile userProfile = new UserProfile();
     userProfile.setUserName(userName);
     userProfile.setDesignatedBodyCodes(newSet(designatedBodyCodes));
+    AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToken", userProfile,
+        null);
+    UsernamePasswordAuthenticationToken authenticationToken = new
+        UsernamePasswordAuthenticationToken(authenticatedUser, null);
+
+    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+  }
+
+  public static void mockUserProfileWithRole(String userName, Set<String> roles) {
+    UserProfile userProfile = new UserProfile();
+    userProfile.setUserName(userName);
+    userProfile.setRoles(roles);
     AuthenticatedUser authenticatedUser = new AuthenticatedUser(userName, "dummyToken", userProfile,
         null);
     UsernamePasswordAuthenticationToken authenticationToken = new

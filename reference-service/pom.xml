@@ -12,7 +12,7 @@
 
   <groupId>com.transformuk.hee.tis</groupId>
   <artifactId>reference-service</artifactId>
-  <version>3.14.0</version>
+  <version>3.15.0</version>
   <packaging>war</packaging>
 
   <prerequisites>
@@ -147,7 +147,7 @@
     <dependency>
       <groupId>com.transformuk.hee</groupId>
       <artifactId>profile-client</artifactId>
-      <version>2.4.0</version>
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>com.transformuk.hee</groupId>
@@ -359,6 +359,14 @@
       <scope>test</scope>
     </dependency>
     <!-- security -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-acl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-data</artifactId>

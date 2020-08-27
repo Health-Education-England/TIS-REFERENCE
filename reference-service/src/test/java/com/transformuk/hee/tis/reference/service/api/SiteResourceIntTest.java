@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -20,11 +22,14 @@ import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedEx
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.PermissionService;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.assertj.core.util.Maps;
 import org.junit.Before;
@@ -33,10 +38,20 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.jdbc.JdbcMutableAclService;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -118,6 +133,12 @@ public class SiteResourceIntTest {
   @Autowired
   private SiteMapper siteMapper;
 
+  @MockBean
+  private PermissionService permissionServiceMock;
+
+  @Autowired
+  private JdbcMutableAclService mutableAclService;
+
   @Autowired
   private SitesTrustsService sitesTrustsService;
 
@@ -171,6 +192,9 @@ public class SiteResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
+    // Set dialect for H2 database
+    this.mutableAclService.setClassIdentityQuery("call identity()");
+    this.mutableAclService.setSidIdentityQuery("call identity()");
   }
 
   @Before
@@ -179,8 +203,11 @@ public class SiteResourceIntTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"HEE", "NI"})
   @Transactional
   public void createSite() throws Exception {
+    when(permissionServiceMock.getUserEntities()).thenReturn(Sets.newHashSet("HEE", "NI"));
+
     int databaseSizeBeforeCreate = siteRepository.findAll().size();
 
     // Create the Site
@@ -205,6 +232,12 @@ public class SiteResourceIntTest {
     assertThat(testSite.getSiteKnownAs()).isEqualTo(DEFAULT_SITE_KNOWN_AS);
     assertThat(testSite.getSiteNumber()).isEqualTo(DEFAULT_SITE_NUMBER);
     assertThat(testSite.getOrganisationalUnit()).isEqualTo(DEFAULT_ORGANISATIONAL_UNIT);
+
+    Acl acl = mutableAclService.readAclById(new ObjectIdentityImpl(Site.class.getName(), testSite.getId()));
+    List<AccessControlEntry> aclEntires = acl.getEntries();
+    assertThat(aclEntires.size()).isEqualTo(4);
+    Set<Sid> sids = aclEntires.stream().map(e -> e.getSid()).collect(Collectors.toSet());
+    assertThat(sids).contains(new GrantedAuthoritySid("HEE"), new GrantedAuthoritySid("NI"));
   }
 
   @Test
@@ -487,11 +520,19 @@ public class SiteResourceIntTest {
   }
 
   @Test
+  @WithMockUser(authorities = {"HEE", "ROLE_RUN_AS_Machine User"})
   @Transactional
   public void updateSite() throws Exception {
     // Initialize the database
     site = siteRepository.saveAndFlush(site);
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
+
+    ObjectIdentityImpl siteIdentity = new ObjectIdentityImpl(site);
+    MutableAcl acl = mutableAclService.createAcl(siteIdentity);
+    GrantedAuthoritySid heeSid = new GrantedAuthoritySid("HEE");
+    acl.setOwner(heeSid);
+    acl.insertAce(0, BasePermission.WRITE, heeSid, true);
+    mutableAclService.updateAcl(acl);
 
     // Update the site
     Site updatedSite = siteRepository.findOne(site.getId());
