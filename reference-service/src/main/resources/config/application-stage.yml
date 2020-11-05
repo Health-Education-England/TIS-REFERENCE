@@ -3,10 +3,9 @@ spring:
     url: jdbc:mysql://${DBHOST}:${DBPORT}/${DBNAME}?useUnicode=true&characterEncoding=utf8&useSSL=${USE_SSL}
     username: ${DBUSER}
     password: ${DBPASSWORD}
-
-flyway:
-  password: ${DBPASSWORD}
-  schemas: ${DBNAME}
+  flyway:
+    password: ${DBPASSWORD}
+    schemas: ${DBNAME}
 
 logging:
   file: ${LOG_DIR}/reference.log

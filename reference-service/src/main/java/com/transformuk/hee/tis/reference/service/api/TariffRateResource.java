@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TariffRateDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -76,7 +75,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TariffRateDTO> createTariffRate(
       @Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
@@ -104,7 +102,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TariffRateDTO> updateTariffRate(
       @Valid @RequestBody TariffRateDTO tariffRateDTO) throws URISyntaxException {
@@ -131,7 +128,6 @@ public class TariffRateResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "tariff rates list")})
   @GetMapping("/tariff-rates")
-  @Timed
   public ResponseEntity<List<TariffRateDTO>> getAllTariffRates(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -164,10 +160,9 @@ public class TariffRateResource {
    * 404 (Not Found)
    */
   @GetMapping("/tariff-rates/{id}")
-  @Timed
   public ResponseEntity<TariffRateDTO> getTariffRate(@PathVariable Long id) {
     log.debug("REST request to get TariffRate : {}", id);
-    TariffRate tariffRate = tariffRateRepository.findOne(id);
+    TariffRate tariffRate = tariffRateRepository.findById(id).orElse(null);
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(tariffRate);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(tariffRateDTO));
   }
@@ -179,11 +174,10 @@ public class TariffRateResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/tariff-rates/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteTariffRate(@PathVariable Long id) {
     log.debug("REST request to delete TariffRate : {}", id);
-    tariffRateRepository.delete(id);
+    tariffRateRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -198,7 +192,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TariffRateDTO>> bulkCreateTariffRate(
       @Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
@@ -215,7 +208,7 @@ public class TariffRateResource {
       }
     }
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
-    tariffRates = tariffRateRepository.save(tariffRates);
+    tariffRates = tariffRateRepository.saveAll(tariffRates);
     List<TariffRateDTO> result = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
     return ResponseEntity.ok()
         .body(result);
@@ -231,7 +224,6 @@ public class TariffRateResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-tariff-rates")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TariffRateDTO>> bulkUpdateTariffRate(
       @Valid @RequestBody List<TariffRateDTO> tariffRateDTOS) throws URISyntaxException {
@@ -252,7 +244,7 @@ public class TariffRateResource {
       }
     }
     List<TariffRate> tariffRates = tariffRateMapper.tariffRateDTOsToTariffRates(tariffRateDTOS);
-    tariffRates = tariffRateRepository.save(tariffRates);
+    tariffRates = tariffRateRepository.saveAll(tariffRates);
     List<TariffRateDTO> results = tariffRateMapper.tariffRatesToTariffRateDTOs(tariffRates);
     return ResponseEntity.ok()
         .body(results);

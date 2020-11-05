@@ -118,7 +118,7 @@ public class NationalityResourceIntTest {
     // Create the Nationality
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
     mockMvc.perform(post("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isCreated());
 
@@ -141,7 +141,7 @@ public class NationalityResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
 
@@ -161,7 +161,7 @@ public class NationalityResourceIntTest {
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
     mockMvc.perform(post("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
 
@@ -180,7 +180,7 @@ public class NationalityResourceIntTest {
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
 
     mockMvc.perform(post("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isBadRequest());
 
@@ -197,7 +197,7 @@ public class NationalityResourceIntTest {
     // Get all the nationalityList
     mockMvc.perform(get("/api/nationalities?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(nationality.getId().intValue())))
         .andExpect(
             jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
@@ -216,7 +216,7 @@ public class NationalityResourceIntTest {
     // Get all the nationalityList
     mockMvc.perform(get("/api/nationalities?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedNationality.getId().intValue()))
         .andExpect(jsonPath("$.[*].countryNumber").value(UNENCODED_COUNTRY_NUMBER))
         .andExpect(jsonPath("$.[*].nationality").value(UNENCODED_NATIONALITY));
@@ -231,7 +231,7 @@ public class NationalityResourceIntTest {
     // Get the nationality
     mockMvc.perform(get("/api/nationalities/{id}", nationality.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(nationality.getId().intValue()))
         .andExpect(jsonPath("$.countryNumber").value(DEFAULT_COUNTRY_NUMBER.toString()))
         .andExpect(jsonPath("$.nationality").value(DEFAULT_NATIONALITY.toString()));
@@ -253,7 +253,7 @@ public class NationalityResourceIntTest {
     int databaseSizeBeforeUpdate = nationalityRepository.findAll().size();
 
     // Update the nationality
-    Nationality updatedNationality = nationalityRepository.findOne(nationality.getId());
+    Nationality updatedNationality = nationalityRepository.findById(nationality.getId()).get();
     updatedNationality
         .countryNumber(UPDATED_COUNTRY_NUMBER)
         .nationality(UPDATED_NATIONALITY);
@@ -261,7 +261,7 @@ public class NationalityResourceIntTest {
         .nationalityToNationalityDTO(updatedNationality);
 
     mockMvc.perform(put("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isOk());
 
@@ -283,7 +283,7 @@ public class NationalityResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/nationalities")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalityDTO)))
         .andExpect(status().isCreated());
 
@@ -301,7 +301,7 @@ public class NationalityResourceIntTest {
 
     // Get the nationality
     mockMvc.perform(delete("/api/nationalities/{id}", nationality.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -319,7 +319,7 @@ public class NationalityResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -331,7 +331,7 @@ public class NationalityResourceIntTest {
     nationalityRepository.saveAndFlush(nationality);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -343,7 +343,7 @@ public class NationalityResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -358,7 +358,7 @@ public class NationalityResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -373,7 +373,7 @@ public class NationalityResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

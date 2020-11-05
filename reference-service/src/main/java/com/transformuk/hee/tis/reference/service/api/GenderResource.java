@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +78,6 @@ public class GenderResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/genders")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GenderDTO> createGender(@Valid @RequestBody GenderDTO genderDTO)
       throws URISyntaxException {
@@ -107,7 +105,6 @@ public class GenderResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/genders")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GenderDTO> updateGender(@Valid @RequestBody GenderDTO genderDTO)
       throws URISyntaxException {
@@ -134,7 +131,6 @@ public class GenderResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/genders")
-  @Timed
   public ResponseEntity<List<GenderDTO>> getAllGenders(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -167,10 +163,9 @@ public class GenderResource {
    *     (Not Found)
    */
   @GetMapping("/genders/{id}")
-  @Timed
   public ResponseEntity<GenderDTO> getGender(@PathVariable Long id) {
     log.debug("REST request to get Gender : {}", id);
-    Gender gender = genderRepository.findOne(id);
+    Gender gender = genderRepository.findById(id).orElse(null);
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(genderDTO));
   }
@@ -183,12 +178,11 @@ public class GenderResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/genders/exists/")
-  @Timed
   public ResponseEntity<Boolean> genderExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check Gender exists : {}", code);
-    Specifications<Gender> specs = Specifications.where(isEqual("code", code));
+    Specification<Gender> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -198,7 +192,7 @@ public class GenderResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = genderRepository.findOne(specs) != null;
+    boolean exists = genderRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -209,11 +203,10 @@ public class GenderResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/genders/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteGender(@PathVariable Long id) {
     log.debug("REST request to delete Gender : {}", id);
-    genderRepository.delete(id);
+    genderRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -227,7 +220,6 @@ public class GenderResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-genders")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GenderDTO>> bulkCreateGender(
       @Valid @RequestBody List<GenderDTO> genderDTOS) throws URISyntaxException {
@@ -244,7 +236,7 @@ public class GenderResource {
       }
     }
     List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
-    genders = genderRepository.save(genders);
+    genders = genderRepository.saveAll(genders);
     List<GenderDTO> result = genderMapper.gendersToGenderDTOs(genders);
     return ResponseEntity.ok()
         .body(result);
@@ -260,7 +252,6 @@ public class GenderResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-genders")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GenderDTO>> bulkUpdateGender(
       @Valid @RequestBody List<GenderDTO> genderDTOS) throws URISyntaxException {
@@ -281,7 +272,7 @@ public class GenderResource {
       }
     }
     List<Gender> genders = genderMapper.genderDTOsToGenders(genderDTOS);
-    genders = genderRepository.save(genders);
+    genders = genderRepository.saveAll(genders);
     List<GenderDTO> results = genderMapper.gendersToGenderDTOs(genders);
     return ResponseEntity.ok()
         .body(results);

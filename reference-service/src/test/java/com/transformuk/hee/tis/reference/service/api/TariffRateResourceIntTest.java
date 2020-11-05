@@ -126,7 +126,7 @@ public class TariffRateResourceIntTest {
     // Create the TariffRate
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(tariffRate);
     restTariffRateMockMvc.perform(post("/api/tariff-rates")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(tariffRateDTO)))
         .andExpect(status().isCreated());
 
@@ -152,7 +152,7 @@ public class TariffRateResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restTariffRateMockMvc.perform(post("/api/tariff-rates")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(tariffRateDTO)))
         .andExpect(status().isBadRequest());
 
@@ -172,7 +172,7 @@ public class TariffRateResourceIntTest {
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(tariffRate);
 
     restTariffRateMockMvc.perform(post("/api/tariff-rates")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(tariffRateDTO)))
         .andExpect(status().isBadRequest());
 
@@ -189,7 +189,7 @@ public class TariffRateResourceIntTest {
     // Get all the tariffRateList
     restTariffRateMockMvc.perform(get("/api/tariff-rates?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(tariffRate.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].gradeAbbreviation")
@@ -216,7 +216,7 @@ public class TariffRateResourceIntTest {
     // Get all the tariffRateList
     restTariffRateMockMvc.perform(get("/api/tariff-rates?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedTariffRate.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].gradeAbbreviation").value(UNENCODED_GRADE_ABBREVIATION))
@@ -234,7 +234,7 @@ public class TariffRateResourceIntTest {
     // Get the tariffRate
     restTariffRateMockMvc.perform(get("/api/tariff-rates/{id}", tariffRate.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(tariffRate.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.gradeAbbreviation").value(DEFAULT_GRADE_ABBREVIATION.toString()))
@@ -259,7 +259,7 @@ public class TariffRateResourceIntTest {
     int databaseSizeBeforeUpdate = tariffRateRepository.findAll().size();
 
     // Update the tariffRate
-    TariffRate updatedTariffRate = tariffRateRepository.findOne(tariffRate.getId());
+    TariffRate updatedTariffRate = tariffRateRepository.findById(tariffRate.getId()).get();
     updatedTariffRate
         .code(UPDATED_CODE)
         .gradeAbbreviation(UPDATED_GRADE_ABBREVIATION)
@@ -269,7 +269,7 @@ public class TariffRateResourceIntTest {
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(updatedTariffRate);
 
     restTariffRateMockMvc.perform(put("/api/tariff-rates")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(tariffRateDTO)))
         .andExpect(status().isOk());
 
@@ -294,7 +294,7 @@ public class TariffRateResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restTariffRateMockMvc.perform(put("/api/tariff-rates")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(tariffRateDTO)))
         .andExpect(status().isCreated());
 
@@ -312,7 +312,7 @@ public class TariffRateResourceIntTest {
 
     // Get the tariffRate
     restTariffRateMockMvc.perform(delete("/api/tariff-rates/{id}", tariffRate.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

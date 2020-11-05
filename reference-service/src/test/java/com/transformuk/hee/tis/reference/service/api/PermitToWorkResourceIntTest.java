@@ -120,7 +120,7 @@ public class PermitToWorkResourceIntTest {
     PermitToWorkDTO permitToWorkDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(permitToWork);
     mockMvc.perform(post("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(permitToWorkDTO)))
         .andExpect(status().isCreated());
 
@@ -144,7 +144,7 @@ public class PermitToWorkResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -165,7 +165,7 @@ public class PermitToWorkResourceIntTest {
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
     mockMvc.perform(post("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -185,7 +185,7 @@ public class PermitToWorkResourceIntTest {
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
     mockMvc.perform(post("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -202,7 +202,7 @@ public class PermitToWorkResourceIntTest {
     // Get all the permitToWorkList
     mockMvc.perform(get("/api/permit-to-works?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(permitToWork.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -220,7 +220,7 @@ public class PermitToWorkResourceIntTest {
     // Get the permitToWorkList
     mockMvc.perform(get("/api/permit-to-works?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -235,7 +235,7 @@ public class PermitToWorkResourceIntTest {
     // Get the maritalStatus
     mockMvc.perform(get("/api/permit-to-works/{id}", permitToWork.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(permitToWork.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -257,7 +257,7 @@ public class PermitToWorkResourceIntTest {
     int databaseSizeBeforeUpdate = permitToWorkRepository.findAll().size();
 
     // Update the maritalStatus
-    PermitToWork updatedPermitToWork = permitToWorkRepository.findOne(permitToWork.getId());
+    PermitToWork updatedPermitToWork = permitToWorkRepository.findById(permitToWork.getId()).get();
     updatedPermitToWork
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -265,7 +265,7 @@ public class PermitToWorkResourceIntTest {
         .permitToWorkToPermitToWorkDTO(updatedPermitToWork);
 
     mockMvc.perform(put("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isOk());
 
@@ -288,7 +288,7 @@ public class PermitToWorkResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/permit-to-works")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isCreated());
 
@@ -306,7 +306,7 @@ public class PermitToWorkResourceIntTest {
 
     // Get the permitToWork
     mockMvc.perform(delete("/api/permit-to-works/{id}", permitToWork.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -324,7 +324,7 @@ public class PermitToWorkResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -336,7 +336,7 @@ public class PermitToWorkResourceIntTest {
     permitToWorkRepository.saveAndFlush(permitToWork);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -348,7 +348,7 @@ public class PermitToWorkResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -363,7 +363,7 @@ public class PermitToWorkResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -378,7 +378,7 @@ public class PermitToWorkResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

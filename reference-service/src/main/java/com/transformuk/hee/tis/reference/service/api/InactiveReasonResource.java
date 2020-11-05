@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.InactiveReasonDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -76,7 +75,6 @@ public class InactiveReasonResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/inactive-reasons")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<InactiveReasonDTO> createInactiveReason(
       @Valid @RequestBody InactiveReasonDTO inactiveReasonDTO) throws URISyntaxException {
@@ -106,7 +104,6 @@ public class InactiveReasonResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/inactive-reasons")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<InactiveReasonDTO> updateInactiveReason(
       @Valid @RequestBody InactiveReasonDTO inactiveReasonDTO) throws URISyntaxException {
@@ -137,7 +134,6 @@ public class InactiveReasonResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/inactive-reasons")
-  @Timed
   public ResponseEntity<List<InactiveReasonDTO>> getAllInactiveReasons(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -173,10 +169,9 @@ public class InactiveReasonResource {
    * status 404 (Not Found)
    */
   @GetMapping("/inactive-reasons/{id}")
-  @Timed
   public ResponseEntity<InactiveReasonDTO> getInactiveReason(@PathVariable Long id) {
     log.debug("REST request to get InactiveReason : {}", id);
-    InactiveReason inactiveReason = inactiveReasonRepository.findOne(id);
+    InactiveReason inactiveReason = inactiveReasonRepository.findById(id).orElse(null);
     InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
         .inactiveReasonToInactiveReasonDTO(inactiveReason);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(inactiveReasonDTO));
@@ -189,11 +184,10 @@ public class InactiveReasonResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/inactive-reasons/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteInactiveReason(@PathVariable Long id) {
     log.debug("REST request to delete InactiveReason : {}", id);
-    inactiveReasonRepository.delete(id);
+    inactiveReasonRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -207,7 +201,6 @@ public class InactiveReasonResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-inactive-reasons")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<InactiveReasonDTO>> bulkCreateInactiveReason(
       @Valid @RequestBody List<InactiveReasonDTO> inactiveReasonDTOS) throws URISyntaxException {
@@ -225,7 +218,7 @@ public class InactiveReasonResource {
     }
     List<InactiveReason> inactiveReasons = inactiveReasonMapper
         .inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
-    inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
+    inactiveReasons = inactiveReasonRepository.saveAll(inactiveReasons);
     List<InactiveReasonDTO> result = inactiveReasonMapper
         .inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
     return ResponseEntity.ok()
@@ -242,7 +235,6 @@ public class InactiveReasonResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-inactive-reasons")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<InactiveReasonDTO>> bulkUpdateInactiveReason(
       @Valid @RequestBody List<InactiveReasonDTO> inactiveReasonDTOS) throws URISyntaxException {
@@ -265,7 +257,7 @@ public class InactiveReasonResource {
     }
     List<InactiveReason> inactiveReasons = inactiveReasonMapper
         .inactiveReasonDTOsToInactiveReasons(inactiveReasonDTOS);
-    inactiveReasons = inactiveReasonRepository.save(inactiveReasons);
+    inactiveReasons = inactiveReasonRepository.saveAll(inactiveReasons);
     List<InactiveReasonDTO> results = inactiveReasonMapper
         .inactiveReasonsToInactiveReasonDTOs(inactiveReasons);
     return ResponseEntity.ok()

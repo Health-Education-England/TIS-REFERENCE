@@ -23,13 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class TestUtil {
 
-  /**
-   * MediaType for JSON UTF8
-   */
-  public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
-      MediaType.APPLICATION_JSON.getType(),
-      MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
-
   public static void mockUserProfile(String userName, String... designatedBodyCodes) {
     UserProfile userProfile = new UserProfile();
     userProfile.setUserName(userName);

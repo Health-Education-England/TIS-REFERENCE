@@ -32,7 +32,6 @@ spring:
   profiles:
     active: local
     include:
-    - prometheus
     - swagger
   jackson:
     serialization.write_dates_as_timestamps: false
@@ -77,47 +76,36 @@ spring:
     port: 25
     username:
     password:
-
-flyway:
-  baseline-description: #
-  baseline-version: 1 # version to start migration
-  baseline-on-migrate: true
-  check-location: false # Check that migration scripts location exists.
-  clean-on-validation-error: false
-  flyway.enabled: true # Enable flyway.
-  encoding: #
-  ignore-failed-future-migration: #
-  init-sqls: # SQL statements to execute to initialize a connection immediately after obtaining it.
-  locations: classpath:db/migration/common,classpath:db/migration/tenant/hee #hee should be used by default
-  out-of-order: true
-  password: ${DBPASSWORD:}
-  placeholder-prefix:
-  placeholder-replacement:
-  placeholder-suffix:
-  placeholders.*:
-  schemas: ${DBNAME:reference}
-  sql-migration-prefix: V
-  sql-migration-separator:
-  sql-migration-suffix: .sql
-  table:  #
-  url: ${spring.datasource.url}
-  user: ${spring.datasource.username}
-  validate-on-migrate:  #
-  initOnMigrate: true
-
-security:
-  basic:
-    enabled: false
-  user:
-    name: admin
-    password: admin
+  flyway:
+    baseline-version: 1 # version to start migration
+    baseline-on-migrate: true
+    check-location: false # Check that migration scripts location exists.
+    clean-on-validation-error: false
+    ignore-future-migrations: true
+    init-sqls: # SQL statements to execute to initialize a connection immediately after obtaining it.
+    locations: classpath:db/migration/common,classpath:db/migration/tenant/hee #hee should be used by default
+    out-of-order: true
+    password: ${DBPASSWORD:}
+    schemas: ${DBNAME:tcs}
+    sql-migration-prefix: V
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    enabled: true
+    table: schema_version
+  security:
+    basic:
+      enabled: false
+    user:
+      name: admin
+      password: admin
 
 server:
   port: 8088
-  session:
-    cookie:
-      http-only: true
-  context-path: /reference
+  servlet:
+    session:
+      cookie:
+        http-only: true
+    context-path: /reference
 
 info:
   project:
@@ -153,19 +141,6 @@ jhipster:
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
-  metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-    jmx.enabled: true
-    graphite: # Use the "graphite" Maven profile to have the Graphite dependencies
-      enabled: false
-      host: localhost
-      port: 2003
-      prefix: reference
-    prometheus: # Use the "prometheus" Maven profile to have the Prometheus dependencies
-      enabled: false
-      endpoint: /prometheusMetrics
-    logs: # Reports Dropwizard metrics in the logs
-      enabled: false
-      reportFrequency: 60 # in seconds
   logging:
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false

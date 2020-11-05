@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +80,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationTypeDTO> createQualificationType(
       @Valid @RequestBody QualificationTypeDTO qualificationTypeDTO) throws URISyntaxException {
@@ -111,7 +109,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<QualificationTypeDTO> updateQualificationType(
       @Valid @RequestBody QualificationTypeDTO qualificationTypeDTO) throws URISyntaxException {
@@ -142,7 +139,6 @@ public class QualificationTypeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Qualification Type list")})
   @GetMapping("/qualification-types")
-  @Timed
   public ResponseEntity<List<QualificationTypeDTO>> getAllQualificationTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -177,10 +173,9 @@ public class QualificationTypeResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/qualification-types/{id}")
-  @Timed
   public ResponseEntity<QualificationTypeDTO> getQualificationType(@PathVariable Long id) {
     log.debug("REST request to get qualificationType : {}", id);
-    QualificationType qualificationType = qualificationTypeRepository.findOne(id);
+    QualificationType qualificationType = qualificationTypeRepository.findById(id).orElse(null);
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(qualificationType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(qualificationTypeDTO));
@@ -193,11 +188,10 @@ public class QualificationTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/qualification-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteQualificationType(@PathVariable Long id) {
     log.debug("REST request to delete qualificationType : {}", id);
-    qualificationTypeRepository.delete(id);
+    qualificationTypeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -210,12 +204,11 @@ public class QualificationTypeResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/qualification-types/exists/")
-  @Timed
   public ResponseEntity<Boolean> qualificationTypeExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check QualificationType exists : {}", code);
-    Specifications<QualificationType> specs = Specifications.where(isEqual("code", code));
+    Specification<QualificationType> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -225,7 +218,7 @@ public class QualificationTypeResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = qualificationTypeRepository.findOne(specs) != null;
+    boolean exists = qualificationTypeRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -239,7 +232,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationTypeDTO>> bulkCreateQualificationType(
       @Valid @RequestBody List<QualificationTypeDTO> qualificationTypeDTOs)
@@ -258,7 +250,7 @@ public class QualificationTypeResource {
     }
     List<QualificationType> qualificationTypes = qualificationTypeMapper
         .qualificationTypeDTOsToQualificationTypes(qualificationTypeDTOs);
-    qualificationTypes = qualificationTypeRepository.save(qualificationTypes);
+    qualificationTypes = qualificationTypeRepository.saveAll(qualificationTypes);
     List<QualificationTypeDTO> result = qualificationTypeMapper
         .qualificationTypesToQualificationTypeDTOs(qualificationTypes);
     return ResponseEntity.ok()
@@ -276,7 +268,6 @@ public class QualificationTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-qualification-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<QualificationTypeDTO>> bulkUpdateQualificationType(
       @Valid @RequestBody List<QualificationTypeDTO> qualificationTypeDTOS)
@@ -300,7 +291,7 @@ public class QualificationTypeResource {
     }
     List<QualificationType> qualificationTypes = qualificationTypeMapper
         .qualificationTypeDTOsToQualificationTypes(qualificationTypeDTOS);
-    qualificationTypes = qualificationTypeRepository.save(qualificationTypes);
+    qualificationTypes = qualificationTypeRepository.saveAll(qualificationTypes);
     List<QualificationTypeDTO> results = qualificationTypeMapper
         .qualificationTypesToQualificationTypeDTOs(qualificationTypes);
     return ResponseEntity.ok()

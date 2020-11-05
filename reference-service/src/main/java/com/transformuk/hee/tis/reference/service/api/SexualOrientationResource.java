@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +80,6 @@ public class SexualOrientationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/sexual-orientations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SexualOrientationDTO> createSexualOrientation(
       @Valid @RequestBody SexualOrientationDTO sexualOrientationDTO) throws URISyntaxException {
@@ -111,7 +109,6 @@ public class SexualOrientationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/sexual-orientations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SexualOrientationDTO> updateSexualOrientation(
       @Valid @RequestBody SexualOrientationDTO sexualOrientationDTO) throws URISyntaxException {
@@ -141,7 +138,6 @@ public class SexualOrientationResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "sexual orientations list")})
   @GetMapping("/sexual-orientations")
-  @Timed
   public ResponseEntity<List<SexualOrientationDTO>> getAllSexualOrientations(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -176,10 +172,9 @@ public class SexualOrientationResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/sexual-orientations/{id}")
-  @Timed
   public ResponseEntity<SexualOrientationDTO> getSexualOrientation(@PathVariable Long id) {
     log.debug("REST request to get SexualOrientation : {}", id);
-    SexualOrientation sexualOrientation = sexualOrientationRepository.findOne(id);
+    SexualOrientation sexualOrientation = sexualOrientationRepository.findById(id).orElse(null);
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sexualOrientationDTO));
@@ -193,12 +188,11 @@ public class SexualOrientationResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/sexual-orientations/exists/")
-  @Timed
   public ResponseEntity<Boolean> sexualOrientationExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check SexualOrientation exists : {}", code);
-    Specifications<SexualOrientation> specs = Specifications.where(isEqual("code", code));
+    Specification<SexualOrientation> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -208,7 +202,7 @@ public class SexualOrientationResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = sexualOrientationRepository.findOne(specs) != null;
+    boolean exists = sexualOrientationRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -219,11 +213,10 @@ public class SexualOrientationResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/sexual-orientations/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteSexualOrientation(@PathVariable Long id) {
     log.debug("REST request to delete SexualOrientation : {}", id);
-    sexualOrientationRepository.delete(id);
+    sexualOrientationRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -239,7 +232,6 @@ public class SexualOrientationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-sexual-orientations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SexualOrientationDTO>> bulkCreateSexualOrientation(
       @Valid @RequestBody List<SexualOrientationDTO> sexualOrientationDTOS)
@@ -258,7 +250,7 @@ public class SexualOrientationResource {
     }
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper
         .sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
-    sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
+    sexualOrientations = sexualOrientationRepository.saveAll(sexualOrientations);
     List<SexualOrientationDTO> result = sexualOrientationMapper
         .sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
     return ResponseEntity.ok()
@@ -276,7 +268,6 @@ public class SexualOrientationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-sexual-orientations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SexualOrientationDTO>> bulkUpdateSexualOrientation(
       @Valid @RequestBody List<SexualOrientationDTO> sexualOrientationDTOS)
@@ -299,7 +290,7 @@ public class SexualOrientationResource {
     }
     List<SexualOrientation> sexualOrientations = sexualOrientationMapper
         .sexualOrientationDTOsToSexualOrientations(sexualOrientationDTOS);
-    sexualOrientations = sexualOrientationRepository.save(sexualOrientations);
+    sexualOrientations = sexualOrientationRepository.saveAll(sexualOrientations);
     List<SexualOrientationDTO> results = sexualOrientationMapper
         .sexualOrientationsToSexualOrientationDTOs(sexualOrientations);
     return ResponseEntity.ok()

@@ -112,7 +112,7 @@ public class RecordTypeResourceIntTest {
     // Create the RecordType
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(recordType);
     restRecordTypeMockMvc.perform(post("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -135,7 +135,7 @@ public class RecordTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restRecordTypeMockMvc.perform(post("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -155,7 +155,7 @@ public class RecordTypeResourceIntTest {
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(recordType);
 
     restRecordTypeMockMvc.perform(post("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -174,7 +174,7 @@ public class RecordTypeResourceIntTest {
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(recordType);
 
     restRecordTypeMockMvc.perform(post("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -191,7 +191,7 @@ public class RecordTypeResourceIntTest {
     // Get all the recordTypeList
     restRecordTypeMockMvc.perform(get("/api/record-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(recordType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -209,7 +209,7 @@ public class RecordTypeResourceIntTest {
     // Get all the recordTypeList
     restRecordTypeMockMvc.perform(get("/api/record-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedRecordType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -224,7 +224,7 @@ public class RecordTypeResourceIntTest {
     // Get the recordType
     restRecordTypeMockMvc.perform(get("/api/record-types/{id}", recordType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(recordType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -246,14 +246,14 @@ public class RecordTypeResourceIntTest {
     int databaseSizeBeforeUpdate = recordTypeRepository.findAll().size();
 
     // Update the recordType
-    RecordType updatedRecordType = recordTypeRepository.findOne(recordType.getId());
+    RecordType updatedRecordType = recordTypeRepository.findById(recordType.getId()).get();
     updatedRecordType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(updatedRecordType);
 
     restRecordTypeMockMvc.perform(put("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isOk());
 
@@ -275,7 +275,7 @@ public class RecordTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restRecordTypeMockMvc.perform(put("/api/record-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(recordTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -293,7 +293,7 @@ public class RecordTypeResourceIntTest {
 
     // Get the recordType
     restRecordTypeMockMvc.perform(delete("/api/record-types/{id}", recordType.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

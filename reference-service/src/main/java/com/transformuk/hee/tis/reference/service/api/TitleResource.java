@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +77,6 @@ public class TitleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/titles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TitleDTO> createTitle(@Valid @RequestBody TitleDTO titleDTO)
       throws URISyntaxException {
@@ -106,7 +104,6 @@ public class TitleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/titles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<TitleDTO> updateTitle(@Valid @RequestBody TitleDTO titleDTO)
       throws URISyntaxException {
@@ -133,7 +130,6 @@ public class TitleResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "titles list")})
   @GetMapping("/titles")
-  @Timed
   public ResponseEntity<List<TitleDTO>> getAllTitles(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -167,10 +163,9 @@ public class TitleResource {
    *     (Not Found)
    */
   @GetMapping("/titles/{id}")
-  @Timed
   public ResponseEntity<TitleDTO> getTitle(@PathVariable Long id) {
     log.debug("REST request to get Title : {}", id);
-    Title title = titleRepository.findOne(id);
+    Title title = titleRepository.findById(id).orElse(null);
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(titleDTO));
   }
@@ -183,12 +178,11 @@ public class TitleResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/titles/exists/")
-  @Timed
   public ResponseEntity<Boolean> titleExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check Title exists : {}", code);
-    Specifications<Title> specs = Specifications.where(isEqual("code", code));
+    Specification<Title> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -198,7 +192,7 @@ public class TitleResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = titleRepository.findOne(specs) != null;
+    boolean exists = titleRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -209,11 +203,10 @@ public class TitleResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/titles/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteTitle(@PathVariable Long id) {
     log.debug("REST request to delete Title : {}", id);
-    titleRepository.delete(id);
+    titleRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -228,7 +221,6 @@ public class TitleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-titles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TitleDTO>> bulkCreateTitle(
       @Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
@@ -245,7 +237,7 @@ public class TitleResource {
       }
     }
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);
-    titles = titleRepository.save(titles);
+    titles = titleRepository.saveAll(titles);
     List<TitleDTO> result = titleMapper.titlesToTitleDTOs(titles);
     return ResponseEntity.ok()
         .body(result);
@@ -261,7 +253,6 @@ public class TitleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-titles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<TitleDTO>> bulkUpdateTitle(
       @Valid @RequestBody List<TitleDTO> titleDTOS) throws URISyntaxException {
@@ -282,7 +273,7 @@ public class TitleResource {
       }
     }
     List<Title> titles = titleMapper.titleDTOsToTitles(titleDTOS);
-    titles = titleRepository.save(titles);
+    titles = titleRepository.saveAll(titles);
     List<TitleDTO> results = titleMapper.titlesToTitleDTOs(titles);
     return ResponseEntity.ok()
         .body(results);

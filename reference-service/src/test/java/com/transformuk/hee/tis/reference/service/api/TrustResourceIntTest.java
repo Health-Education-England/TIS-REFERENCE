@@ -143,7 +143,7 @@ public class TrustResourceIntTest {
 
     // Create the Trust
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
-    restTrustMockMvc.perform(post("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    restTrustMockMvc.perform(post("/api/trusts").contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isCreated());
 
     // Validate the Trust in the database
@@ -172,7 +172,7 @@ public class TrustResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restTrustMockMvc
-        .perform(post("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .perform(post("/api/trusts").contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
         .andExpect(status().isBadRequest());
 
@@ -190,7 +190,7 @@ public class TrustResourceIntTest {
 
     // Get all the trustList
     restTrustMockMvc.perform(get("/api/trusts?sort=code,asc")).andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
         .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
@@ -210,7 +210,7 @@ public class TrustResourceIntTest {
     // Get all the trustList
     restTrustMockMvc.perform(get("/api/trusts/in/invalid," + DEFAULT_CODE))
         .andExpect(status().isFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
         .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
@@ -229,7 +229,7 @@ public class TrustResourceIntTest {
 
     // Get all the trustList
     restTrustMockMvc.perform(get("/api/trusts/search/?searchString=R1A")).andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.list[0].code").value("R1A"))
         .andExpect(
             jsonPath("$.list[0].trustName").value("Worcestershire Health and Care NHS Trust"));
@@ -243,7 +243,7 @@ public class TrustResourceIntTest {
 
     // Get all the trustList
     restTrustMockMvc.perform(get("/api/trusts/{id}", trust.getId())).andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME));
@@ -261,7 +261,7 @@ public class TrustResourceIntTest {
 
     // when and then
     restTrustMockMvc
-        .perform(post("/api/trusts/codeexists/").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .perform(post("/api/trusts/codeexists/").contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJson(trustCode)))
         .andExpect(status().isFound());
   }
@@ -277,7 +277,7 @@ public class TrustResourceIntTest {
 
     // when and then
     restTrustMockMvc
-        .perform(post("/api/trusts/codeexists/").contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .perform(post("/api/trusts/codeexists/").contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJson(trustCode)))
         .andExpect(status().isNoContent());
   }
@@ -309,13 +309,13 @@ public class TrustResourceIntTest {
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
 
     // Update the trust
-    Trust updatedTrust = trustRepository.findOne(trust.getId());
+    Trust updatedTrust = trustRepository.findById(trust.getId()).get();
     updatedTrust.localOffice(UPDATED_LOCAL_OFFICE).status(UPDATED_STATUS)
         .trustKnownAs(UPDATED_TRUST_KNOWN_AS).trustName(UPDATED_TRUST_NAME)
         .trustNumber(UPDATED_TRUST_NUMBER).address(UPDATED_ADDRESS).postCode(UPDATED_POST_CODE);
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(updatedTrust);
 
-    restTrustMockMvc.perform(put("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    restTrustMockMvc.perform(put("/api/trusts").contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isOk());
 
     // Validate the Trust in the database
@@ -341,7 +341,7 @@ public class TrustResourceIntTest {
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(trust);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restTrustMockMvc.perform(put("/api/trusts").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    restTrustMockMvc.perform(put("/api/trusts").contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isCreated());
 
     // Validate the Trust in the database
@@ -371,7 +371,7 @@ public class TrustResourceIntTest {
         .perform(get("/api/trusts").param("page", "0").param("size", "200").param("sort", "id,asc")
             .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].localOffice").value(DEFAULT_LOCAL_OFFICE))
         .andExpect(jsonPath("$.[*].status").value(DEFAULT_STATUS.toString()))
@@ -400,7 +400,7 @@ public class TrustResourceIntTest {
             .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         // Verify field values
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
 
 
@@ -411,7 +411,7 @@ public class TrustResourceIntTest {
             .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         // Verify field values
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
   }
 
@@ -432,7 +432,7 @@ public class TrustResourceIntTest {
             .param("page", "0").param("size", "200").param("sort", "trustKnownAs,asc"))
         // Verify field values
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
   }
 }

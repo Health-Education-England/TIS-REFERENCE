@@ -111,7 +111,7 @@ public class FundingTypeResourceIntTest {
     // Create the FundingType
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
     restFundingTypeMockMvc.perform(post("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -134,7 +134,7 @@ public class FundingTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restFundingTypeMockMvc.perform(post("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -154,7 +154,7 @@ public class FundingTypeResourceIntTest {
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
 
     restFundingTypeMockMvc.perform(post("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -173,7 +173,7 @@ public class FundingTypeResourceIntTest {
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
 
     restFundingTypeMockMvc.perform(post("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -190,7 +190,7 @@ public class FundingTypeResourceIntTest {
     // Get all the fundingTypeList
     restFundingTypeMockMvc.perform(get("/api/funding-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(fundingType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -208,7 +208,7 @@ public class FundingTypeResourceIntTest {
     // Get all the fundingTypeList
     restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedFundingType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -223,7 +223,7 @@ public class FundingTypeResourceIntTest {
     // Get the fundingType
     restFundingTypeMockMvc.perform(get("/api/funding-types/{id}", fundingType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(fundingType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -245,7 +245,7 @@ public class FundingTypeResourceIntTest {
     int databaseSizeBeforeUpdate = fundingTypeRepository.findAll().size();
 
     // Update the fundingType
-    FundingType updatedFundingType = fundingTypeRepository.findOne(fundingType.getId());
+    FundingType updatedFundingType = fundingTypeRepository.findById(fundingType.getId()).get();
     updatedFundingType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -253,7 +253,7 @@ public class FundingTypeResourceIntTest {
         .fundingTypeToFundingTypeDTO(updatedFundingType);
 
     restFundingTypeMockMvc.perform(put("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isOk());
 
@@ -275,7 +275,7 @@ public class FundingTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restFundingTypeMockMvc.perform(put("/api/funding-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -293,7 +293,7 @@ public class FundingTypeResourceIntTest {
 
     // Get the fundingType
     restFundingTypeMockMvc.perform(delete("/api/funding-types/{id}", fundingType.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

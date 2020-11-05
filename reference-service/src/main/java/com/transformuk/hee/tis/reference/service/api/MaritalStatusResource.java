@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,6 @@ public class MaritalStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/marital-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MaritalStatusDTO> createMaritalStatus(
       @Valid @RequestBody MaritalStatusDTO maritalStatusDTO) throws URISyntaxException {
@@ -109,7 +107,6 @@ public class MaritalStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/marital-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MaritalStatusDTO> updateMaritalStatus(
       @Valid @RequestBody MaritalStatusDTO maritalStatusDTO) throws URISyntaxException {
@@ -139,7 +136,6 @@ public class MaritalStatusResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "marital statuses list")})
   @GetMapping("/marital-statuses")
-  @Timed
   public ResponseEntity<List<MaritalStatusDTO>> getAllMaritalStatuses(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -173,10 +169,9 @@ public class MaritalStatusResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/marital-statuses/{id}")
-  @Timed
   public ResponseEntity<MaritalStatusDTO> getMaritalStatus(@PathVariable Long id) {
     log.debug("REST request to get MaritalStatus : {}", id);
-    MaritalStatus maritalStatus = maritalStatusRepository.findOne(id);
+    MaritalStatus maritalStatus = maritalStatusRepository.findById(id).orElse(null);
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(maritalStatus);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(maritalStatusDTO));
@@ -190,12 +185,11 @@ public class MaritalStatusResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/marital-statuses/exists/")
-  @Timed
   public ResponseEntity<Boolean> maritalStatusExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check MaritalStatus exists : {}", code);
-    Specifications<MaritalStatus> specs = Specifications.where(isEqual("code", code));
+    Specification<MaritalStatus> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -205,7 +199,7 @@ public class MaritalStatusResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = maritalStatusRepository.findOne(specs) != null;
+    boolean exists = maritalStatusRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -216,11 +210,10 @@ public class MaritalStatusResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/marital-statuses/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteMaritalStatus(@PathVariable Long id) {
     log.debug("REST request to delete MaritalStatus : {}", id);
-    maritalStatusRepository.delete(id);
+    maritalStatusRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -234,7 +227,6 @@ public class MaritalStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-marital-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MaritalStatusDTO>> bulkCreateMaritalStatus(
       @Valid @RequestBody List<MaritalStatusDTO> maritalStatusDTOS) throws URISyntaxException {
@@ -252,7 +244,7 @@ public class MaritalStatusResource {
     }
     List<MaritalStatus> maritalStatuses = maritalStatusMapper
         .maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
-    maritalStatuses = maritalStatusRepository.save(maritalStatuses);
+    maritalStatuses = maritalStatusRepository.saveAll(maritalStatuses);
     List<MaritalStatusDTO> result = maritalStatusMapper
         .maritalStatusesToMaritalStatusDTOs(maritalStatuses);
     return ResponseEntity.ok()
@@ -269,7 +261,6 @@ public class MaritalStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-marital-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MaritalStatusDTO>> bulkUpdateMaritalStatus(
       @Valid @RequestBody List<MaritalStatusDTO> maritalStatusDTOS) throws URISyntaxException {
@@ -292,7 +283,7 @@ public class MaritalStatusResource {
     }
     List<MaritalStatus> maritalStatuses = maritalStatusMapper
         .maritalStatusDTOsToMaritalStatuses(maritalStatusDTOS);
-    maritalStatuses = maritalStatusRepository.save(maritalStatuses);
+    maritalStatuses = maritalStatusRepository.saveAll(maritalStatuses);
     List<MaritalStatusDTO> results = maritalStatusMapper
         .maritalStatusesToMaritalStatusDTOs(maritalStatuses);
     return ResponseEntity.ok()

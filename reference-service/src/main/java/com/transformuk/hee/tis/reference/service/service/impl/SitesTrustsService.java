@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static org.springframework.util.StringUtils.isEmpty;
+
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +64,7 @@ public class SitesTrustsService {
    */
   public List<Site> searchSites(String searchString) {
     if (!isEmpty(searchString)) {
-      Page<Site> sites = searchSites(searchString, new PageRequest(0, limit));
+      Page<Site> sites = searchSites(searchString, PageRequest.of(0, limit));
       return sites.getContent();
     } else {
       return siteRepository.findAll();
@@ -90,9 +90,9 @@ public class SitesTrustsService {
   public List<Site> searchSitesWithinTrust(String trustCode, String searchString) {
     if (!isEmpty(searchString)) {
       return siteRepository.findBySearchStringAndTrustCode(trustCode, searchString,
-          new PageRequest(0, limit));
+          PageRequest.of(0, limit));
     } else {
-      return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
+      return siteRepository.findByTrustCode(trustCode, PageRequest.of(0, limit));
     }
   }
 
@@ -115,7 +115,7 @@ public class SitesTrustsService {
    */
   public List<Trust> searchTrusts(String searchString) {
     if (!isEmpty(searchString)) {
-      return trustRepository.findBySearchString(searchString, new PageRequest(0, limit))
+      return trustRepository.findBySearchString(searchString, PageRequest.of(0, limit))
           .getContent();
     } else {
       return trustRepository.findAll();
@@ -163,7 +163,7 @@ public class SitesTrustsService {
     List<Specification<Site>> specs = new ArrayList<>();
     // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("siteCode", searchString))
+      specs.add(Specification.where(containsLike("siteCode", searchString))
           .or(containsLike("trustCode", searchString)).or(containsLike("siteName", searchString))
           .or(containsLike("postCode", searchString)).or(containsLike("address", searchString))
           .or(containsLike("siteKnownAs", searchString)));
@@ -175,7 +175,7 @@ public class SitesTrustsService {
 
     Page<Site> result;
     if (!specs.isEmpty()) {
-      Specifications<Site> fullSpec = Specifications.where(specs.get(0));
+      Specification<Site> fullSpec = Specification.where(specs.get(0));
       // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
@@ -195,7 +195,7 @@ public class SitesTrustsService {
     List<Specification<Trust>> specs = new ArrayList<>();
     // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("trustName", searchString))
+      specs.add(Specification.where(containsLike("trustName", searchString))
           .or(containsLike("trustKnownAs", searchString)).or(containsLike("code", searchString))
           .or(containsLike("postCode", searchString)).or(containsLike("address", searchString)));
     }
@@ -206,7 +206,7 @@ public class SitesTrustsService {
 
     Page<Trust> result;
     if (!specs.isEmpty()) {
-      Specifications<Trust> fullSpec = Specifications.where(specs.get(0));
+      Specification<Trust> fullSpec = Specification.where(specs.get(0));
       // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
@@ -225,7 +225,7 @@ public class SitesTrustsService {
     List<Specification<LocalOffice>> specs = new ArrayList<>();
     // add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("abbreviation", searchString))
+      specs.add(Specification.where(containsLike("abbreviation", searchString))
           .or(containsLike("name", searchString)));
     }
     // add the column filters criteria
@@ -235,7 +235,7 @@ public class SitesTrustsService {
 
     Page<LocalOffice> result;
     if (!specs.isEmpty()) {
-      Specifications<LocalOffice> fullSpec = Specifications.where(specs.get(0));
+      Specification<LocalOffice> fullSpec = Specification.where(specs.get(0));
       // add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));
@@ -268,7 +268,7 @@ public class SitesTrustsService {
    */
   public List<LocalOffice> searchLocalOffices(String searchString) {
     if (!isEmpty(searchString)) {
-      return localOfficeRepository.findBySearchString(searchString, new PageRequest(0, limit))
+      return localOfficeRepository.findBySearchString(searchString, PageRequest.of(0, limit))
           .getContent();
     } else {
       return localOfficeRepository.findAll();

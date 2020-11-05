@@ -3,5 +3,6 @@
 #
 # This file contains overrides for NIMDTA specific values,
 # ===================================================================
-flyway:
-  locations: classpath:db/migration/common,classpath:db/migration/tenant/nimdta
+spring:
+  flyway:
+    locations: classpath:db/migration/common,classpath:db/migration/tenant/nimdta

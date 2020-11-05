@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,7 @@ public class CountryServiceImpl {
     List<Specification<Country>> specs = new ArrayList<>();
     //add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("countryNumber", searchString)).
+      specs.add(Specification.where(containsLike("countryNumber", searchString)).
           or(containsLike("nationality", searchString)));
     }
     //add the column filters criteria
@@ -40,7 +39,7 @@ public class CountryServiceImpl {
 
     Page<Country> result;
     if (!specs.isEmpty()) {
-      Specifications<Country> fullSpec = Specifications.where(specs.get(0));
+      Specification<Country> fullSpec = Specification.where(specs.get(0));
       //add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));

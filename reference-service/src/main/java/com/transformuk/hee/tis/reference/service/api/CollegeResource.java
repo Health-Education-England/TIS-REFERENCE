@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -79,7 +78,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CollegeDTO> createCollege(@Valid @RequestBody CollegeDTO collegeDTO)
       throws URISyntaxException {
@@ -107,7 +105,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CollegeDTO> updateCollege(@Valid @RequestBody CollegeDTO collegeDTO)
       throws URISyntaxException {
@@ -135,7 +132,6 @@ public class CollegeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "college list")})
   @GetMapping("/colleges")
-  @Timed
   public ResponseEntity<List<CollegeDTO>> getAllColleges(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -168,10 +164,9 @@ public class CollegeResource {
    * 404 (Not Found)
    */
   @GetMapping("/colleges/{id}")
-  @Timed
   public ResponseEntity<CollegeDTO> getCollege(@PathVariable Long id) {
     log.debug("REST request to get College : {}", id);
-    College college = collegeRepository.findOne(id);
+    College college = collegeRepository.findById(id).orElse(null);
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(college);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(collegeDTO));
   }
@@ -183,11 +178,10 @@ public class CollegeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/colleges/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteCollege(@PathVariable Long id) {
     log.debug("REST request to delete College : {}", id);
-    collegeRepository.delete(id);
+    collegeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -201,7 +195,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CollegeDTO>> bulkCreateCollege(
       @Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
@@ -218,7 +211,7 @@ public class CollegeResource {
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
-    colleges = collegeRepository.save(colleges);
+    colleges = collegeRepository.saveAll(colleges);
     List<CollegeDTO> result = collegeMapper.collegesToCollegeDTOs(colleges);
     return ResponseEntity.ok()
         .body(result);
@@ -234,7 +227,6 @@ public class CollegeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-colleges")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CollegeDTO>> bulkUpdateCollege(
       @Valid @RequestBody List<CollegeDTO> collegeDTOS) throws URISyntaxException {
@@ -255,7 +247,7 @@ public class CollegeResource {
       }
     }
     List<College> colleges = collegeMapper.collegeDTOsToColleges(collegeDTOS);
-    colleges = collegeRepository.save(colleges);
+    colleges = collegeRepository.saveAll(colleges);
     List<CollegeDTO> results = collegeMapper.collegesToCollegeDTOs(colleges);
     return ResponseEntity.ok()
         .body(results);

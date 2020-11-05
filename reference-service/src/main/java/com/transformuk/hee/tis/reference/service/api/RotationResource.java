@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
@@ -78,7 +77,6 @@ public class RotationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/rotations")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Create')")
   public ResponseEntity<RotationDTO> createRotation(
       @RequestBody @Validated(Create.class) RotationDTO rotationDTO) throws URISyntaxException {
@@ -104,7 +102,6 @@ public class RotationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/rotations")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Update')")
   public ResponseEntity<RotationDTO> updateRotation(
       @RequestBody @Validated(Update.class) RotationDTO rotationDTO) throws URISyntaxException {
@@ -130,7 +127,6 @@ public class RotationResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "rotations list")})
   @GetMapping("/rotations")
-  @Timed
   public ResponseEntity<List<RotationDTO>> getAllRotations(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -163,7 +159,6 @@ public class RotationResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/rotations/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> rotationsExists(@RequestBody List<String> values) {
     Map<String, Boolean> rotationExistsMap = Maps.newHashMap();
     log.debug("REST request to check Rotations exists : {}", values);
@@ -186,7 +181,6 @@ public class RotationResource {
    * 404 (Not Found)
    */
   @GetMapping("/rotations/{id}")
-  @Timed
   public ResponseEntity<RotationDTO> getRotation(@PathVariable Long id) {
     log.debug("REST request to get Rotation : {}", id);
     RotationDTO rotationDTO = rotationService.findOne(id);
@@ -200,7 +194,6 @@ public class RotationResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/rotations/{id}")
-  @Timed
   @PreAuthorize("hasPermission('tis:references::reference:', 'Delete')")
   public ResponseEntity<Void> deleteRotation(@PathVariable Long id) {
     log.debug("REST request to delete Rotation : {}", id);

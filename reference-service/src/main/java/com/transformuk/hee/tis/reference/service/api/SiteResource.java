@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.LimitedListResponse;
@@ -95,7 +94,6 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/sites")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> createSite(@Validated(Create.class) @RequestBody SiteDTO siteDTO)
       throws URISyntaxException {
@@ -119,7 +117,6 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/sites")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
@@ -140,7 +137,6 @@ public class SiteResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/sites")
-  @Timed
   public ResponseEntity<List<SiteDTO>> getAllSites(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -176,7 +172,6 @@ public class SiteResource {
    * list
    */
   @GetMapping("/sites/in/{codes}")
-  @Timed
   public ResponseEntity<List<SiteDTO>> getSitesIn(@PathVariable String codes) {
     log.debug("REST request to find several  Sites");
     List<SiteDTO> resp = new ArrayList<>();
@@ -206,14 +201,13 @@ public class SiteResource {
    */
   @ApiOperation(value = "get a collection of sites by id")
   @GetMapping("/sites/ids/in")
-  @Timed
   public ResponseEntity<List<SiteDTO>> getSitesInById(@RequestParam List<Long> ids) {
     log.debug("REST request to find several Sites by ids {}", ids);
     List<SiteDTO> resp = new ArrayList<>();
     if (CollectionUtils.isEmpty(ids)) {
       return new ResponseEntity<>(resp, HttpStatus.OK);
     } else {
-      List<Site> sites = siteRepository.findAll(ids);
+      List<Site> sites = siteRepository.findAllById(ids);
       resp = siteMapper.sitesToSiteDTOs(sites);
       return new ResponseEntity<>(resp,
           CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
@@ -228,7 +222,6 @@ public class SiteResource {
    */
   @ApiOperation(value = "get a collection of sites by id")
   @PostMapping(path="/sites/ids/in/query")
-  @Timed
   public ResponseEntity<List<SiteDTO>> getSitesInByIds(@RequestBody Map<String, List<Long>> idMap) {
     return getSitesInById(idMap.get("ids"));
   }
@@ -268,10 +261,9 @@ public class SiteResource {
    * (Not Found)
    */
   @GetMapping("/sites/{id}")
-  @Timed
   public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
     log.debug("REST request to get Site : {}", id);
-    Site site = siteRepository.findOne(id);
+    Site site = siteRepository.findById(id).orElse(null);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(siteDTO));
   }
@@ -284,7 +276,6 @@ public class SiteResource {
    * (Not Found)
    */
   @GetMapping("/sites/code/{code}")
-  @Timed
   public ResponseEntity<SiteDTO> getSiteByCode(@PathVariable String code) {
     log.debug("REST request to get Site by code : {}", code);
     Site site = siteRepository.findBySiteCode(code);
@@ -299,7 +290,6 @@ public class SiteResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/sites/exists")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> siteExists(@RequestBody List<String> siteCodes) {
     Map<String, Boolean> siteExistsMap = Maps.newHashMap();
     log.debug("REST request to check Site exists : {}", siteCodes);
@@ -321,12 +311,11 @@ public class SiteResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/sites/ids/exists")
-  @Timed
   public ResponseEntity<Map<Long, Boolean>> siteIdsExists(@RequestBody List<Long> ids) {
     Map<Long, Boolean> siteExistsMap = Maps.newHashMap();
     log.debug("REST request to check Site exists : {}", ids);
     if (!CollectionUtils.isEmpty(ids)) {
-      List<Site> foundSites = siteRepository.findAll(ids);
+      List<Site> foundSites = siteRepository.findAllById(ids);
       Set<Long> dbIds = foundSites.stream().map(Site::getId).collect(Collectors.toSet());
       ids.forEach(siteCode -> {
         if (dbIds.contains(siteCode)) {
@@ -347,7 +336,6 @@ public class SiteResource {
    * @return HttpStatus FOUND if exists or NOT_FOUND if doesn't exist
    */
   @PostMapping("/sites/codeexists/")
-  @Timed
   public ResponseEntity siteCodeExists(@RequestBody String code) {
     log.debug("REST request to check Site exists : {}", code);
     HttpStatus siteFound = HttpStatus.NO_CONTENT;
@@ -368,7 +356,6 @@ public class SiteResource {
    * @Param trustCode the code of the trust to check
    */
   @PostMapping("/sites/trustmatch/{trustCode}")
-  @Timed
   public ResponseEntity siteTrustMatch(@RequestBody String siteCode,
       @PathVariable String trustCode) {
     log.debug("REST request to check Site exists : {} {}", siteCode, trustCode);
@@ -392,14 +379,13 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-sites")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SiteDTO>> bulkCreateSite(@Valid @RequestBody List<SiteDTO> siteDTOs)
       throws URISyntaxException {
     log.debug("REST request to bulk save Site : {}", siteDTOs);
 
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
-    sites = siteRepository.save(sites);
+    sites = siteRepository.saveAll(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
     return ResponseEntity.ok()
         .body(results);
@@ -415,7 +401,6 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-sites")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SiteDTO>> bulkUpdateSite(@Valid @RequestBody List<SiteDTO> siteDTOs)
       throws URISyntaxException {
@@ -437,7 +422,7 @@ public class SiteResource {
     }
 
     List<Site> sites = siteMapper.siteDTOsToSites(siteDTOs);
-    sites = siteRepository.save(sites);
+    sites = siteRepository.saveAll(sites);
     List<SiteDTO> results = siteMapper.sitesToSiteDTOs(sites);
     return ResponseEntity.ok()
         .body(results);

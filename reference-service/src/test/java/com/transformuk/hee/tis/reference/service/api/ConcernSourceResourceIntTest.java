@@ -71,7 +71,7 @@ public class ConcernSourceResourceIntTest {
 
     restConcernSourceMockMvc.perform(get("/api/sources"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(concernSource.getId().intValue())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_SOURCE_NAME)));
   }

@@ -112,7 +112,7 @@ public class SettledResourceIntTest {
     // Create the Settled
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(settled);
     restSettledMockMvc.perform(post("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isCreated());
 
@@ -135,7 +135,7 @@ public class SettledResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restSettledMockMvc.perform(post("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isBadRequest());
 
@@ -155,7 +155,7 @@ public class SettledResourceIntTest {
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(settled);
 
     restSettledMockMvc.perform(post("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isBadRequest());
 
@@ -174,7 +174,7 @@ public class SettledResourceIntTest {
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(settled);
 
     restSettledMockMvc.perform(post("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isBadRequest());
 
@@ -191,7 +191,7 @@ public class SettledResourceIntTest {
     // Get all the settledList
     restSettledMockMvc.perform(get("/api/settleds?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(settled.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -209,7 +209,7 @@ public class SettledResourceIntTest {
     // Get all the settledList
     restSettledMockMvc.perform(get("/api/settleds?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedSettled.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -224,7 +224,7 @@ public class SettledResourceIntTest {
     // Get the settled
     restSettledMockMvc.perform(get("/api/settleds/{id}", settled.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(settled.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -246,14 +246,14 @@ public class SettledResourceIntTest {
     int databaseSizeBeforeUpdate = settledRepository.findAll().size();
 
     // Update the settled
-    Settled updatedSettled = settledRepository.findOne(settled.getId());
+    Settled updatedSettled = settledRepository.findById(settled.getId()).get();
     updatedSettled
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(updatedSettled);
 
     restSettledMockMvc.perform(put("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isOk());
 
@@ -275,7 +275,7 @@ public class SettledResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restSettledMockMvc.perform(put("/api/settleds")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(settledDTO)))
         .andExpect(status().isCreated());
 
@@ -293,7 +293,7 @@ public class SettledResourceIntTest {
 
     // Get the settled
     restSettledMockMvc.perform(delete("/api/settleds/{id}", settled.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

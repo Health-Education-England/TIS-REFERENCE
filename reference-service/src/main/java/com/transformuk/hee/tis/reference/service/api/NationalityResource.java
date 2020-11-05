@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<NationalityDTO> createNationality(
       @Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
@@ -108,7 +106,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<NationalityDTO> updateNationality(
       @Valid @RequestBody NationalityDTO nationalityDTO) throws URISyntaxException {
@@ -136,7 +133,6 @@ public class NationalityResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/nationalities")
-  @Timed
   public ResponseEntity<List<NationalityDTO>> getAllNationalities(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -169,10 +165,9 @@ public class NationalityResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/nationalities/{id}")
-  @Timed
   public ResponseEntity<NationalityDTO> getNationality(@PathVariable Long id) {
     log.debug("REST request to get Nationality : {}", id);
-    Nationality nationality = nationalityRepository.findOne(id);
+    Nationality nationality = nationalityRepository.findById(id).orElse(null);
     NationalityDTO nationalityDTO = nationalityMapper.nationalityToNationalityDTO(nationality);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(nationalityDTO));
   }
@@ -185,12 +180,11 @@ public class NationalityResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/nationalities/exists/")
-  @Timed
   public ResponseEntity<Boolean> nationalityExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check Nationality exists : {}", code);
-    Specifications<Nationality> specs = Specifications.where(isEqual("countryNumber", code));
+    Specification<Nationality> specs = Specification.where(isEqual("countryNumber", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -200,7 +194,7 @@ public class NationalityResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = nationalityRepository.findOne(specs) != null;
+    boolean exists = nationalityRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -211,11 +205,10 @@ public class NationalityResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/nationalities/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteNationality(@PathVariable Long id) {
     log.debug("REST request to delete Nationality : {}", id);
-    nationalityRepository.delete(id);
+    nationalityRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -229,7 +222,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<NationalityDTO>> bulkCreateNationality(
       @Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
@@ -247,7 +239,7 @@ public class NationalityResource {
     }
     List<Nationality> nationalities = nationalityMapper
         .nationalityDTOsToNationalities(nationalityDTOS);
-    nationalities = nationalityRepository.save(nationalities);
+    nationalities = nationalityRepository.saveAll(nationalities);
     List<NationalityDTO> result = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()
         .body(result);
@@ -263,7 +255,6 @@ public class NationalityResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-nationalities")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<NationalityDTO>> bulkUpdateNationality(
       @Valid @RequestBody List<NationalityDTO> nationalityDTOS) throws URISyntaxException {
@@ -285,7 +276,7 @@ public class NationalityResource {
     }
     List<Nationality> nationalities = nationalityMapper
         .nationalityDTOsToNationalities(nationalityDTOS);
-    nationalities = nationalityRepository.save(nationalities);
+    nationalities = nationalityRepository.saveAll(nationalities);
     List<NationalityDTO> results = nationalityMapper.nationalitiesToNationalityDTOs(nationalities);
     return ResponseEntity.ok()
         .body(results);

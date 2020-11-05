@@ -115,7 +115,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
         .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -141,7 +141,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -163,7 +163,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -184,7 +184,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .programmeMembershipTypeToProgrammeMembershipTypeDTO(programmeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(post("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -202,7 +202,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     // Get all the programmeMembershipTypeList
     restProgrammeMembershipTypeMockMvc.perform(get("/api/programme-membership-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(programmeMembershipType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -221,7 +221,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     restProgrammeMembershipTypeMockMvc
         .perform(get("/api/programme-membership-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedProgrammeMembershipType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -237,7 +237,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     restProgrammeMembershipTypeMockMvc
         .perform(get("/api/programme-membership-types/{id}", programmeMembershipType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(programmeMembershipType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -261,7 +261,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
 
     // Update the programmeMembershipType
     ProgrammeMembershipType updatedProgrammeMembershipType = programmeMembershipTypeRepository
-        .findOne(programmeMembershipType.getId());
+        .findById(programmeMembershipType.getId()).get();
     updatedProgrammeMembershipType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -269,7 +269,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
         .programmeMembershipTypeToProgrammeMembershipTypeDTO(updatedProgrammeMembershipType);
 
     restProgrammeMembershipTypeMockMvc.perform(put("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isOk());
 
@@ -294,7 +294,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restProgrammeMembershipTypeMockMvc.perform(put("/api/programme-membership-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(programmeMembershipTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -314,7 +314,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
     // Get the programmeMembershipType
     restProgrammeMembershipTypeMockMvc
         .perform(delete("/api/programme-membership-types/{id}", programmeMembershipType.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

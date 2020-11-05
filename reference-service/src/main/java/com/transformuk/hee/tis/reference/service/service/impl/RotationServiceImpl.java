@@ -19,7 +19,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,7 +107,7 @@ public class RotationServiceImpl implements RotationService {
   @Transactional(readOnly = true)
   public RotationDTO findOne(Long id) {
     log.debug("Request to get Rotation : {}", id);
-    Rotation rotation = rotationRepository.findOne(id);
+    Rotation rotation = rotationRepository.findById(id).orElse(null);
     return rotationMapper.toDto(rotation);
   }
 
@@ -120,7 +119,7 @@ public class RotationServiceImpl implements RotationService {
   @Override
   public void delete(Long id) {
     log.debug("Request to delete Rotation : {}", id);
-    rotationRepository.delete(id);
+    rotationRepository.deleteById(id);
   }
 
   @Transactional(readOnly = true)
@@ -130,7 +129,7 @@ public class RotationServiceImpl implements RotationService {
     List<Specification<Rotation>> specs = new ArrayList<>();
     //add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("code", searchString)).
+      specs.add(Specification.where(containsLike("code", searchString)).
           or(containsLike("label", searchString)));
     }
     //add the column filters criteria
@@ -140,7 +139,7 @@ public class RotationServiceImpl implements RotationService {
 
     Page<Rotation> result;
     if (!specs.isEmpty()) {
-      Specifications<Rotation> fullSpec = Specifications.where(specs.get(0));
+      Specification<Rotation> fullSpec = Specification.where(specs.get(0));
       //add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +36,7 @@ public class RoleServiceImpl {
     List<Specification<Role>> specs = new ArrayList<>();
     //add the text search criteria
     if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specifications.where(containsLike("code", searchString)).
+      specs.add(Specification.where(containsLike("code", searchString)).
           or(containsLike("label", searchString)));
     }
     //add the column filters criteria
@@ -47,7 +46,7 @@ public class RoleServiceImpl {
 
     Page<Role> result;
     if (!specs.isEmpty()) {
-      Specifications<Role> fullSpec = Specifications.where(specs.get(0));
+      Specification<Role> fullSpec = Specification.where(specs.get(0));
       //add the rest of the specs that made it in
       for (int i = 1; i < specs.size(); i++) {
         fullSpec = fullSpec.and(specs.get(i));

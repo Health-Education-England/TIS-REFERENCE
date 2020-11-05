@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.LeavingDestinationDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -77,7 +76,6 @@ public class LeavingDestinationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/leaving-destinations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LeavingDestinationDTO> createLeavingDestination(
       @Valid @RequestBody LeavingDestinationDTO leavingDestinationDTO) throws URISyntaxException {
@@ -108,7 +106,6 @@ public class LeavingDestinationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/leaving-destinations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LeavingDestinationDTO> updateLeavingDestination(
       @Valid @RequestBody LeavingDestinationDTO leavingDestinationDTO) throws URISyntaxException {
@@ -138,7 +135,6 @@ public class LeavingDestinationResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/leaving-destinations")
-  @Timed
   public ResponseEntity<List<LeavingDestinationDTO>> getAllLeavingDestinations(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -174,10 +170,9 @@ public class LeavingDestinationResource {
    * with status 404 (Not Found)
    */
   @GetMapping("/leaving-destinations/{id}")
-  @Timed
   public ResponseEntity<LeavingDestinationDTO> getLeavingDestination(@PathVariable Long id) {
     log.debug("REST request to get LeavingDestination : {}", id);
-    LeavingDestination leavingDestination = leavingDestinationRepository.findOne(id);
+    LeavingDestination leavingDestination = leavingDestinationRepository.findById(id).orElse(null);
     LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
         .leavingDestinationToLeavingDestinationDTO(leavingDestination);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(leavingDestinationDTO));
@@ -190,11 +185,10 @@ public class LeavingDestinationResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/leaving-destinations/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteLeavingDestination(@PathVariable Long id) {
     log.debug("REST request to delete LeavingDestination : {}", id);
-    leavingDestinationRepository.delete(id);
+    leavingDestinationRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -209,7 +203,6 @@ public class LeavingDestinationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-leaving-destinations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<LeavingDestinationDTO>> bulkCreateLeavingDestination(
       @Valid @RequestBody List<LeavingDestinationDTO> leavingDestinationDTOS)
@@ -228,7 +221,7 @@ public class LeavingDestinationResource {
     }
     List<LeavingDestination> leavingDestinations = leavingDestinationMapper
         .leavingDestinationDTOsToLeavingDestinations(leavingDestinationDTOS);
-    leavingDestinations = leavingDestinationRepository.save(leavingDestinations);
+    leavingDestinations = leavingDestinationRepository.saveAll(leavingDestinations);
     List<LeavingDestinationDTO> result = leavingDestinationMapper
         .leavingDestinationsToLeavingDestinationDTOs(leavingDestinations);
     return ResponseEntity.ok()
@@ -246,7 +239,6 @@ public class LeavingDestinationResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-leaving-destinations")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<LeavingDestinationDTO>> bulkUpdateLeavingDestination(
       @Valid @RequestBody List<LeavingDestinationDTO> leavingDestinationDTOS)
@@ -270,7 +262,7 @@ public class LeavingDestinationResource {
     }
     List<LeavingDestination> leavingDestinations = leavingDestinationMapper
         .leavingDestinationDTOsToLeavingDestinations(leavingDestinationDTOS);
-    leavingDestinations = leavingDestinationRepository.save(leavingDestinations);
+    leavingDestinations = leavingDestinationRepository.saveAll(leavingDestinations);
     List<LeavingDestinationDTO> results = leavingDestinationMapper
         .leavingDestinationsToLeavingDestinationDTOs(leavingDestinations);
     return ResponseEntity.ok()

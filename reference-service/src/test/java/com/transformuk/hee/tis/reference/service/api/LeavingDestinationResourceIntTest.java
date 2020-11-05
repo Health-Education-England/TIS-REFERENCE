@@ -113,7 +113,7 @@ public class LeavingDestinationResourceIntTest {
     LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
         .leavingDestinationToLeavingDestinationDTO(leavingDestination);
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isCreated());
 
@@ -138,7 +138,7 @@ public class LeavingDestinationResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -159,7 +159,7 @@ public class LeavingDestinationResourceIntTest {
         .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -179,7 +179,7 @@ public class LeavingDestinationResourceIntTest {
         .leavingDestinationToLeavingDestinationDTO(leavingDestination);
 
     restLeavingDestinationMockMvc.perform(post("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -196,7 +196,7 @@ public class LeavingDestinationResourceIntTest {
     // Get all the leavingDestinationList
     restLeavingDestinationMockMvc.perform(get("/api/leaving-destinations?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(leavingDestination.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -215,7 +215,7 @@ public class LeavingDestinationResourceIntTest {
     restLeavingDestinationMockMvc
         .perform(get("/api/leaving-destinations?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedLeavingDestination.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -231,7 +231,7 @@ public class LeavingDestinationResourceIntTest {
     restLeavingDestinationMockMvc
         .perform(get("/api/leaving-destinations/{id}", leavingDestination.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(leavingDestination.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -254,7 +254,7 @@ public class LeavingDestinationResourceIntTest {
 
     // Update the leavingDestination
     LeavingDestination updatedLeavingDestination = leavingDestinationRepository
-        .findOne(leavingDestination.getId());
+        .findById(leavingDestination.getId()).get();
     updatedLeavingDestination
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -262,7 +262,7 @@ public class LeavingDestinationResourceIntTest {
         .leavingDestinationToLeavingDestinationDTO(updatedLeavingDestination);
 
     restLeavingDestinationMockMvc.perform(put("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isOk());
 
@@ -286,7 +286,7 @@ public class LeavingDestinationResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restLeavingDestinationMockMvc.perform(put("/api/leaving-destinations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingDestinationDTO)))
         .andExpect(status().isCreated());
 
@@ -305,7 +305,7 @@ public class LeavingDestinationResourceIntTest {
     // Get the leavingDestination
     restLeavingDestinationMockMvc
         .perform(delete("/api/leaving-destinations/{id}", leavingDestination.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

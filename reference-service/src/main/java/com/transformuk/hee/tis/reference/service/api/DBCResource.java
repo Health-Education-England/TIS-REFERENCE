@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -78,7 +77,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<DBCDTO> createDBC(@Valid @RequestBody DBCDTO dBCDTO)
       throws URISyntaxException {
@@ -105,7 +103,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<DBCDTO> updateDBC(@Valid @RequestBody DBCDTO dBCDTO)
       throws URISyntaxException {
@@ -131,7 +128,6 @@ public class DBCResource {
       notes = "Returns a list of countries with support for pagination, sorting, smart search and column filters \n")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "dbcs list")})
   @GetMapping("/dbcs")
-  @Timed
   public ResponseEntity<List<DBCDTO>> getAllDbcs(@ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched") @RequestParam(value = "searchQuery",
           required = false) String searchQuery,
@@ -164,10 +160,9 @@ public class DBCResource {
    * (Not Found)
    */
   @GetMapping("/dbcs/{id}")
-  @Timed
   public ResponseEntity<DBCDTO> getDBC(@PathVariable Long id) {
     log.debug("REST request to get DBC : {}", id);
-    DBC dBC = dBCRepository.findOne(id);
+    DBC dBC = dBCRepository.findById(id).orElse(null);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(dBCDTO));
   }
@@ -179,7 +174,6 @@ public class DBCResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/dbcs/user")
-  @Timed
   public ResponseEntity<List<DBCDTO>> getUserDbcs() {
     log.debug("REST request to get page of DBCs for current user");
     UserProfile userProfile = getProfileFromContext();
@@ -197,7 +191,6 @@ public class DBCResource {
    * (Not Found)
    */
   @GetMapping("/dbcs/code/{code}")
-  @Timed
   public ResponseEntity<DBCDTO> getDBCByCode(@PathVariable String code) {
     log.debug("REST request to get DBC by code: {}", code);
     DBC dBC = dBCRepository.findByDbc(code);
@@ -212,11 +205,10 @@ public class DBCResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/dbcs/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteDBC(@PathVariable Long id) {
     log.debug("REST request to delete DBC : {}", id);
-    dBCRepository.delete(id);
+    dBCRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -230,7 +222,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<DBCDTO>> bulkCreateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos)
       throws URISyntaxException {
@@ -246,7 +237,7 @@ public class DBCResource {
       }
     }
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
-    dbcs = dBCRepository.save(dbcs);
+    dbcs = dBCRepository.saveAll(dbcs);
     List<DBCDTO> result = dBCMapper.dBCSToDBCDTOs(dbcs);
     return ResponseEntity.ok().body(result);
   }
@@ -261,7 +252,6 @@ public class DBCResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-dbcs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<DBCDTO>> bulkUpdateDBC(@Valid @RequestBody List<DBCDTO> dbcdtos)
       throws URISyntaxException {
@@ -278,7 +268,7 @@ public class DBCResource {
           .body(null);
     }
     List<DBC> dbcs = dBCMapper.dBCDTOsToDBCS(dbcdtos);
-    dbcs = dBCRepository.save(dbcs);
+    dbcs = dBCRepository.saveAll(dbcs);
     List<DBCDTO> results = dBCMapper.dBCSToDBCDTOs(dbcs);
     return ResponseEntity.ok().body(results);
   }

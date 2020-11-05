@@ -3,7 +3,8 @@ package com.transformuk.hee.tis.reference.service.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -186,7 +187,7 @@ public class SiteResourceIntTest {
     // Create the Site
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
     restSiteMockMvc.perform(post("/api/sites")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
         .andExpect(status().isCreated());
 
@@ -218,7 +219,7 @@ public class SiteResourceIntTest {
 
     // An entity with an existing siteCode cannot be created, so this API call must fail
     restSiteMockMvc.perform(post("/api/sites")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
         .andExpect(status().isBadRequest());
 
@@ -237,7 +238,7 @@ public class SiteResourceIntTest {
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites?sort=siteCode,asc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE)))
         .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
         .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
@@ -271,7 +272,7 @@ public class SiteResourceIntTest {
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites?searchQuery=\"Te%24t\"&sort=siteCode,asc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
         .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE))
         .andExpect(jsonPath("$.[*].trustCode").value(UNENCODED_TRUST_CODE))
@@ -292,7 +293,7 @@ public class SiteResourceIntTest {
     // Get the sites given codes
     restSiteMockMvc.perform(get("/api/sites/in/invalid," + DEFAULT_SITE_CODE))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(DEFAULT_SITE_CODE)))
         .andExpect(jsonPath("$.[*].localOffice").value(hasItem(DEFAULT_LOCAL_OFFICE)))
         .andExpect(jsonPath("$.[*].trustCode").value(hasItem(DEFAULT_TRUST_CODE)))
@@ -314,7 +315,7 @@ public class SiteResourceIntTest {
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites/search?searchString=R1AAA"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.total").value(1))
         .andExpect(jsonPath("$.list[0].siteCode").value("R1AAA"))
         .andExpect(jsonPath("$.list[0].trustCode").value("R1A"))
@@ -332,7 +333,7 @@ public class SiteResourceIntTest {
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites/search-by-trust/R1A?searchString=R1AAA"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.total").value(1))
         .andExpect(jsonPath("$.list[0].siteCode").value("R1AAA"))
         .andExpect(jsonPath("$.list[0].trustCode").value("R1A"))
@@ -350,7 +351,7 @@ public class SiteResourceIntTest {
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites/code/{code}", DEFAULT_SITE_CODE))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(site.getId().intValue()))
         .andExpect(jsonPath("$.siteCode").value(DEFAULT_SITE_CODE))
         .andExpect(jsonPath("$.trustCode").value(DEFAULT_TRUST_CODE))
@@ -368,7 +369,7 @@ public class SiteResourceIntTest {
     // Get the site
     restSiteMockMvc.perform(get("/api/sites/{id}", this.site.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.siteCode").value(DEFAULT_SITE_CODE))
         .andExpect(jsonPath("$.localOffice").value(DEFAULT_LOCAL_OFFICE))
         .andExpect(jsonPath("$.trustCode").value(DEFAULT_TRUST_CODE))
@@ -388,10 +389,10 @@ public class SiteResourceIntTest {
     Map<String, Boolean> expectedMap = Maps.newHashMap(site.getSiteCode(), true);
     restSiteMockMvc.perform(
         post("/api/sites/exists")
-            .contentType(APPLICATION_JSON_UTF8_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .content(TestUtil.convertObjectToJsonBytes(Lists.newArrayList(site.getSiteCode()))))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
@@ -406,7 +407,7 @@ public class SiteResourceIntTest {
 
     // when and then
     restSiteMockMvc.perform(post("/api/sites/codeexists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJson(siteCode)))
         .andExpect(status().isFound());
   }
@@ -422,7 +423,7 @@ public class SiteResourceIntTest {
 
     // when and then
     restSiteMockMvc.perform(post("/api/sites/codeexists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJson(siteCode)))
         .andExpect(status().isNoContent());
   }
@@ -439,7 +440,7 @@ public class SiteResourceIntTest {
 
     // when and then
     restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJson(siteCode)))
         .andExpect(status().isFound());
   }
@@ -456,7 +457,7 @@ public class SiteResourceIntTest {
 
     // when and then
     restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJson(siteCode)))
         .andExpect(status().isNoContent());
   }
@@ -473,7 +474,7 @@ public class SiteResourceIntTest {
 
     // when and then
     restSiteMockMvc.perform(post("/api/sites/trustmatch/" + trustCode)
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJson(siteCode)))
         .andExpect(status().isNoContent());
   }
@@ -494,7 +495,7 @@ public class SiteResourceIntTest {
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Update the site
-    Site updatedSite = siteRepository.findOne(site.getId());
+    Site updatedSite = siteRepository.findById(site.getId()).get();
     updatedSite
         .localOffice(UPDATED_LOCAL_OFFICE)
         .startDate(UPDATED_START_DATE)
@@ -509,7 +510,7 @@ public class SiteResourceIntTest {
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
 
     restSiteMockMvc.perform(put("/api/sites")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
         .andExpect(status().isOk());
 
@@ -540,7 +541,7 @@ public class SiteResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restSiteMockMvc.perform(put("/api/sites")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
         .andExpect(status().isBadRequest());
 
@@ -574,7 +575,7 @@ public class SiteResourceIntTest {
 
     restSiteMockMvc.perform(get("/api/sites?searchQuery=\"AAA\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteCode").value(hasItem(site.getSiteCode())))
         .andExpect(jsonPath("$.[*].siteName").value(hasItem(site.getSiteName())))
         .andExpect(jsonPath("$.[*].address").value(hasItem(site.getAddress())))
@@ -605,7 +606,7 @@ public class SiteResourceIntTest {
             .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         //Verify field values
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
 
     //When Then //Search using 'siteKnownAs'
@@ -616,7 +617,7 @@ public class SiteResourceIntTest {
             .param("columnFilters", "{\"status\":[\"CURRENT\"]}"))
         // Verify field values
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME1));
   }
 

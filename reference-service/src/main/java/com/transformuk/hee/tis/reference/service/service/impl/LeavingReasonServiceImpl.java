@@ -12,7 +12,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,7 +41,7 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   @Override
   public LeavingReasonDto find(Long id) {
     LOGGER.debug("Request to find leaving reason with id {}.", id);
-    return mapper.leavingReasonToLeavingReasonDto(repository.findOne(id));
+    return mapper.leavingReasonToLeavingReasonDto(repository.findById(id).orElse(null));
   }
 
   @Override
@@ -53,7 +52,7 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
 
   @Override
   public List<LeavingReasonDto> findAll(List<ColumnFilter> columnFilters) {
-    Specifications<LeavingReason> whereSpec = null;
+    Specification<LeavingReason> whereSpec = null;
     List<LeavingReason> result;
 
     if (columnFilters != null) {
@@ -63,7 +62,7 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
         Specification<LeavingReason> inSpec = in(columnFilter.getName(), columnFilter.getValues());
 
         if (i == 0) {
-          whereSpec = Specifications.where(inSpec);
+          whereSpec = Specification.where(inSpec);
         } else {
           whereSpec.and(inSpec);
         }
@@ -82,6 +81,6 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   @Override
   public void delete(Long id) {
     LOGGER.debug("Request to delete leaving reason with id {}.", id);
-    repository.delete(id);
+    repository.deleteById(id);
   }
 }
