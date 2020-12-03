@@ -21,7 +21,7 @@ public class FlywayConfig {
   private String user;
 
   @Value("${flyway.locations}")
-  private String migrationFilesLocations;
+  private String[] migrationFilesLocations;
 
   @Value("${flyway.schemas}")
   private String schemas;
