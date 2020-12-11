@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.client.impl;
 
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.client.impl.AbstractClientService;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.CollegeDTO;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
 import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
@@ -140,6 +141,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   static {
     classToParamTypeRefMap = Maps.newHashMap();
+    classToParamTypeRefMap
+        .put(AssessmentTypeDto.class, new ParameterizedTypeReference<List<AssessmentTypeDto>>() {
+        });
     classToParamTypeRefMap
         .put(CollegeDTO.class, new ParameterizedTypeReference<List<CollegeDTO>>() {
         });
