@@ -15,6 +15,7 @@ import com.transformuk.hee.tis.reference.service.repository.AssessmentTypeReposi
 import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -24,6 +25,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +73,7 @@ public class AssessmentTypeResource {
    *
    * @param assessmentType the Assessment type to create
    * @return the ResponseEntity with status 201 (Created) and with body the new AssessmentType, or
-   * with status 400 (Bad Request) if the AssessmentType has already an ID
+   *     with status 400 (Bad Request) if the AssessmentType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/assessment-types")
@@ -80,7 +83,7 @@ public class AssessmentTypeResource {
       @Validated(Create.class) @RequestBody AssessmentTypeDto assessmentType)
       throws URISyntaxException {
     log.debug("REST request to save AssessmentType : {}", assessmentType);
-    if (assessmentType.getCode() == null) {
+    if (assessmentType.getId() != null) {
       return ResponseEntity.badRequest().headers(
           HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "Assessment type must have an ID"))
           .body(null);
@@ -97,8 +100,8 @@ public class AssessmentTypeResource {
    *
    * @param assessmentType the assessmentType to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated assessmentType, or
-   * with status 400 (Bad Request) if the assessmentType is not valid, or with status 500 (Internal
-   * Server Error) if the assessmentType couldnt be updated
+   *     with status 400 (Bad Request) if the assessmentType is not valid, or with status 500
+   *     (Internal Server Error) if the assessmentType couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/assessment-types")
@@ -109,7 +112,7 @@ public class AssessmentTypeResource {
       throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
 
-    if (assessmentTypeRepository.findOne(assessmentType.getCode()) == null) {
+    if (assessmentTypeRepository.findOne(assessmentType.getId()) == null) {
       return createAssessmentType(assessmentType);
     }
 
@@ -160,15 +163,45 @@ public class AssessmentTypeResource {
    *
    * @param code the code of the AssessmentType to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the AssessmentType, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/assessment-types/{code}")
   @Timed
   public ResponseEntity<AssessmentTypeDto> getAssessmentTypeByCode(@PathVariable String code) {
     log.debug("REST request to get Assessment Type : {}", code);
-    AssessmentType resultEntity = assessmentTypeRepository.findOne(code);
+    AssessmentType resultEntity = assessmentTypeRepository.findOneByCode(code);
     AssessmentTypeDto resultDto = mapper.toDto(resultEntity);
 
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(resultDto));
+  }
+
+  /**
+   * POST  /bulk-assessment-types : Bulk create new assessment-types.
+   *
+   * @param assessmentTypeDtos List of the assessmentTypeDtos to create
+   * @return the ResponseEntity with status 200 (Created) and with body the new assessmentTypeDtos,
+   *     or with status 400 (Bad Request) if the assessmentTypeDto already has an ID.
+   */
+  @PostMapping("/bulk-assessment-types")
+  @Timed
+  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  public ResponseEntity<List<AssessmentTypeDto>> bulkCreateAssessmentTypes(
+      @Valid @RequestBody List<AssessmentTypeDto> assessmentTypeDtos) {
+    log.debug("REST request to bulk save AssessmentTypeDTOs : {}", assessmentTypeDtos);
+    if (!Collections.isEmpty(assessmentTypeDtos)) {
+      List<Long> entityIds = assessmentTypeDtos.stream()
+          .filter(assessmentTypeDto -> assessmentTypeDto.getId() != null)
+          .map(AssessmentTypeDto::getId)
+          .collect(Collectors.toList());
+      if (!Collections.isEmpty(entityIds)) {
+        return ResponseEntity.badRequest().headers(HeaderUtil
+            .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
+                "A new assessmentTypes cannot already have an ID")).body(null);
+      }
+    }
+    List<AssessmentType> assessmentTypes = mapper.toEntities(assessmentTypeDtos);
+    assessmentTypes = assessmentTypeRepository.save(assessmentTypes);
+    List<AssessmentTypeDto> result = mapper.toDtos(assessmentTypes);
+    return ResponseEntity.ok(result);
   }
 }
