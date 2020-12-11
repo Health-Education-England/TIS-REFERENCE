@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Spring Data JPA repository for the Assessment type entity.
  */
 @SuppressWarnings("unused")
-public interface AssessmentTypeRepository extends JpaRepository<AssessmentType, String>,
+public interface AssessmentTypeRepository extends JpaRepository<AssessmentType, Long>,
     JpaSpecificationExecutor {
 
+  AssessmentType findOneByCode(String code);
 }

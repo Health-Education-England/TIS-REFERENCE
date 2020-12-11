@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class AssessmentTypeDto implements Serializable {
 
+  private Long id;
+
   @NotNull(groups = {Update.class,
       Create.class}, message = "code is needed for both create and update")
   private String code;
