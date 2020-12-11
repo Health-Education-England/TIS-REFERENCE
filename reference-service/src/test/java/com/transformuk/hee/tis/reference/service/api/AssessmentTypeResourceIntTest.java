@@ -142,7 +142,7 @@ public class AssessmentTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void createAssessmentTypeWithIdShouldShouldReturnBadRequest() throws Exception {
+  public void createAssessmentTypeWithIdShouldReturnBadRequest() throws Exception {
     testObjMockMvc.perform(post("/api/assessment-types")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
@@ -182,7 +182,7 @@ public class AssessmentTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void bulkCreateAssessmentTypesWithIdShouldShouldReturnBadRequest() throws Exception {
+  public void bulkCreateAssessmentTypesWithIdShouldReturnBadRequest() throws Exception {
     List<AssessmentType> assessmentTypes = Arrays.asList(assessmentType, createEntity());
 
     testObjMockMvc.perform(post("/api/bulk-assessment-types")
@@ -231,7 +231,7 @@ public class AssessmentTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void updateAssessmentTypeWithNoCodeShouldShouldReturnBadRequest() throws Exception {
+  public void updateAssessmentTypeWithNoCodeShouldReturnBadRequest() throws Exception {
     assessmentType.setCode(null);
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
