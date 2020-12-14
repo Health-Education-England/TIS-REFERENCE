@@ -17,6 +17,9 @@ public class CollegeDTO implements Serializable {
   private UUID uuid;
 
   @NotNull
+  private UUID uuid;
+
+  @NotNull
   private String abbreviation;
 
   private String name;
@@ -30,6 +33,10 @@ public class CollegeDTO implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -82,6 +89,7 @@ public class CollegeDTO implements Serializable {
   public String toString() {
     return "CollegeDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", status=" + status +
