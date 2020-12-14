@@ -75,6 +75,10 @@ public class Grade implements Serializable {
     return this;
   }
 
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
+
   public String getAbbreviation() {
     return abbreviation;
   }
@@ -203,6 +207,7 @@ public class Grade implements Serializable {
   public String toString() {
     return "Grade{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", label='" + label + '\'' +
