@@ -30,6 +30,10 @@ public class LocalOffice implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "abbreviation", nullable = false)
   private String abbreviation;
 
@@ -133,6 +137,7 @@ public class LocalOffice implements Serializable {
   public String toString() {
     return "LocalOffice{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +

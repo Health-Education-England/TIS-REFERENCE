@@ -30,6 +30,10 @@ public class CurriculumSubType implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 
@@ -116,6 +120,7 @@ public class CurriculumSubType implements Serializable {
   public String toString() {
     return "CurriculumSubType{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

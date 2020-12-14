@@ -30,6 +30,10 @@ public class EthnicOrigin implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 
@@ -99,6 +103,7 @@ public class EthnicOrigin implements Serializable {
   public String toString() {
     return "EthnicOrigin{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", status=" + status +
         '}';

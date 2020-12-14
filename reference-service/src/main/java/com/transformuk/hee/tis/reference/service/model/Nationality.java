@@ -30,6 +30,10 @@ public class Nationality implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "countryNumber", nullable = false)
   private String countryNumber;
 
@@ -116,6 +120,7 @@ public class Nationality implements Serializable {
   public String toString() {
     return "Nationality{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", countryNumber='" + countryNumber + '\'' +
         ", nationality='" + nationality + '\'' +
         ", status=" + status +
