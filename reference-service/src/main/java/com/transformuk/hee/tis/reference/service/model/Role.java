@@ -28,6 +28,10 @@ public class Role implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 

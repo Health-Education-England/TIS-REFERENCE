@@ -30,6 +30,10 @@ public class LocalOffice implements Serializable {
   private UUID uuid;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "abbreviation", nullable = false)
   private String abbreviation;
 
