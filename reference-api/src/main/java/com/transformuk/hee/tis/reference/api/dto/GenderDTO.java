@@ -32,6 +32,10 @@ public class GenderDTO implements Serializable {
     this.id = id;
   }
 
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
+
   public String getCode() {
     return code;
   }
@@ -83,6 +87,7 @@ public class GenderDTO implements Serializable {
   public String toString() {
     return "GenderDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

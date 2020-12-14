@@ -45,6 +45,10 @@ public class GradeDTO implements Serializable {
     this.id = id;
   }
 
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
+
   public String getAbbreviation() {
     return abbreviation;
   }
@@ -140,6 +144,7 @@ public class GradeDTO implements Serializable {
   public String toString() {
     return "GradeDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", label='" + label + '\'' +
