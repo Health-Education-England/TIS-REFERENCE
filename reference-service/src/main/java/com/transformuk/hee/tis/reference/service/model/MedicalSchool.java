@@ -116,6 +116,7 @@ public class MedicalSchool implements Serializable {
   public String toString() {
     return "MedicalSchool{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

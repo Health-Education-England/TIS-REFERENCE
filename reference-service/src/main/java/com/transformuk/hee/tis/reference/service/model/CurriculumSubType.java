@@ -116,6 +116,7 @@ public class CurriculumSubType implements Serializable {
   public String toString() {
     return "CurriculumSubType{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

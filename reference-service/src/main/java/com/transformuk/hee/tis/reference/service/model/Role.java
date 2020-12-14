@@ -131,6 +131,7 @@ public class Role implements Serializable {
   public String toString() {
     return "Role{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +
