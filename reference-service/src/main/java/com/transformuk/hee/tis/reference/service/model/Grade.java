@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,6 +25,10 @@ public class Grade implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
 
   @Column(name = "abbreviation")
   private String abbreviation;
@@ -66,6 +71,10 @@ public class Grade implements Serializable {
     this.id = id;
     return this;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -195,6 +204,7 @@ public class Grade implements Serializable {
   public String toString() {
     return "Grade{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", label='" + label + '\'' +

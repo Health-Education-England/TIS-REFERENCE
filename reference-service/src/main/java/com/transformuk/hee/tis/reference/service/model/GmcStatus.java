@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -26,6 +27,10 @@ public class GmcStatus implements Serializable {
   private Long id;
 
   @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
+
+  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 
@@ -44,6 +49,10 @@ public class GmcStatus implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getCode() {
     return code;
@@ -103,6 +112,7 @@ public class GmcStatus implements Serializable {
   public String toString() {
     return "GmcStatus{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

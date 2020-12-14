@@ -6,6 +6,7 @@ import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
@@ -17,6 +18,9 @@ public class GradeDTO implements Serializable {
   @NotNull(groups = Update.class, message = "id must not be null during update")
   @Null(groups = Create.class, message = "id must be null during create")
   private Long id;
+
+  @NotNull
+  private UUID uuid;
 
   private String abbreviation;
 
@@ -41,6 +45,10 @@ public class GradeDTO implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -137,6 +145,7 @@ public class GradeDTO implements Serializable {
   public String toString() {
     return "GradeDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", label='" + label + '\'' +

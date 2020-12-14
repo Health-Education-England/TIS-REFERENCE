@@ -5,6 +5,7 @@ import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -27,6 +28,10 @@ public class AssessmentType implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @NotNull
+  @Column(name = "uuid", nullable = false)
+  private UUID uuid;
 
   @NotNull(groups = {Update.class,
       Create.class}, message = "code is needed for both create and update")

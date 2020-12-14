@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -12,6 +13,9 @@ import javax.validation.constraints.NotNull;
 public class PermitToWorkDTO implements Serializable {
 
   private Long id;
+
+  @NotNull
+  private UUID uuid;
 
   @NotNull
   private String code;
@@ -28,6 +32,10 @@ public class PermitToWorkDTO implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getCode() {
     return code;
@@ -80,6 +88,7 @@ public class PermitToWorkDTO implements Serializable {
   public String toString() {
     return "MaritalStatusDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

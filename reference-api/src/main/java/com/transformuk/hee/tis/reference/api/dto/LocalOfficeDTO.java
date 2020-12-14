@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -12,6 +13,9 @@ import javax.validation.constraints.NotNull;
 public class LocalOfficeDTO implements Serializable {
 
   private Long id;
+
+  @NotNull
+  private UUID uuid;
 
   @NotNull
   private String abbreviation;
@@ -31,6 +35,10 @@ public class LocalOfficeDTO implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getAbbreviation() {
     return abbreviation;
@@ -91,6 +99,7 @@ public class LocalOfficeDTO implements Serializable {
   public String toString() {
     return "LocalOfficeDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
