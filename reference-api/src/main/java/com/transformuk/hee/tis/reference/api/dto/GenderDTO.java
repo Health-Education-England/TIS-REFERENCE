@@ -14,7 +14,6 @@ public class GenderDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

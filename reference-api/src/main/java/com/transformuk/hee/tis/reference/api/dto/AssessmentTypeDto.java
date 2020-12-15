@@ -13,7 +13,6 @@ public class AssessmentTypeDto implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull(groups = {Update.class,

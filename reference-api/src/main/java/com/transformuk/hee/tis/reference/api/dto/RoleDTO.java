@@ -13,7 +13,6 @@ public class RoleDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

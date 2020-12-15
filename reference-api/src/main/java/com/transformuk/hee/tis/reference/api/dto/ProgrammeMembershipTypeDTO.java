@@ -14,7 +14,6 @@ public class ProgrammeMembershipTypeDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

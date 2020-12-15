@@ -14,7 +14,6 @@ public class SexualOrientationDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

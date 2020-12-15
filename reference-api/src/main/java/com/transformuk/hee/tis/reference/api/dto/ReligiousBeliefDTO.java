@@ -14,7 +14,6 @@ public class ReligiousBeliefDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

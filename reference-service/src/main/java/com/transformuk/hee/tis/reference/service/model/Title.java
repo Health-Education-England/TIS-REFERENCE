@@ -26,8 +26,7 @@ public class Title implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull
-  @Column(name = "uuid", nullable = false)
+  @Column(name = "uuid")
   private UUID uuid;
 
   @NotNull

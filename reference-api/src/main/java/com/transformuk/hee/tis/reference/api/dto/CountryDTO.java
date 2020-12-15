@@ -14,7 +14,6 @@ public class CountryDTO implements Serializable {
 
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   @NotNull

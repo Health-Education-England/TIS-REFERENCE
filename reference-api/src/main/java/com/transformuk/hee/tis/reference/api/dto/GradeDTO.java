@@ -19,7 +19,6 @@ public class GradeDTO implements Serializable {
   @Null(groups = Create.class, message = "id must be null during create")
   private Long id;
 
-  @NotNull
   private UUID uuid;
 
   private String abbreviation;
