@@ -1,3 +1,14 @@
+ALTER TABLE `AssessmentType`
+ADD COLUMN uuid varchar(36);
+
+UPDATE `AssessmentType` SET uuid =(SELECT uuid());
+CREATE TRIGGER before_insert_AssessmentType
+BEFORE INSERT ON `AssessmentType`
+FOR EACH ROW
+SET new.uuid = uuid();
+
+CREATE UNIQUE index idx_uuid_unique on `AssessmentType` (uuid);
+
 ALTER TABLE `College`
 ADD COLUMN uuid varchar(36);
 
