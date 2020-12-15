@@ -57,10 +57,6 @@ public class LocalOffice implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getAbbreviation() {
     return abbreviation;
   }
@@ -137,7 +133,6 @@ public class LocalOffice implements Serializable {
   public String toString() {
     return "LocalOffice{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +
