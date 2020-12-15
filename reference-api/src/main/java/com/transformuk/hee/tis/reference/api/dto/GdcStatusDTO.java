@@ -33,10 +33,6 @@ public class GdcStatusDTO implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getCode() {
     return code;
   }
@@ -88,7 +84,6 @@ public class GdcStatusDTO implements Serializable {
   public String toString() {
     return "GdcStatusDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

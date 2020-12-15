@@ -46,10 +46,6 @@ public class EthnicOrigin implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getCode() {
     return code;
   }
@@ -100,7 +96,6 @@ public class EthnicOrigin implements Serializable {
   public String toString() {
     return "EthnicOrigin{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", status=" + status +
         '}';
