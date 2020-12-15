@@ -17,9 +17,6 @@ public class CollegeDTO implements Serializable {
   private UUID uuid;
 
   @NotNull
-  private UUID uuid;
-
-  @NotNull
   private String abbreviation;
 
   private String name;
