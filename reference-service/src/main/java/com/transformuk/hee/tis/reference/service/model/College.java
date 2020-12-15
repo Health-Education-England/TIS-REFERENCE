@@ -55,10 +55,6 @@ public class College implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getAbbreviation() {
     return abbreviation;
   }
@@ -122,7 +118,6 @@ public class College implements Serializable {
   public String toString() {
     return "College{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", status=" + status +

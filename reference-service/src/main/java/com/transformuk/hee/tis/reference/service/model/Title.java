@@ -57,10 +57,6 @@ public class Title implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getCode() {
     return code;
   }
@@ -125,7 +121,6 @@ public class Title implements Serializable {
   public String toString() {
     return "Title{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

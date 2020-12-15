@@ -57,10 +57,6 @@ public class Nationality implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getCountryNumber() {
     return countryNumber;
   }
@@ -124,7 +120,6 @@ public class Nationality implements Serializable {
   public String toString() {
     return "Nationality{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", countryNumber='" + countryNumber + '\'' +
         ", nationality='" + nationality + '\'' +
         ", status=" + status +

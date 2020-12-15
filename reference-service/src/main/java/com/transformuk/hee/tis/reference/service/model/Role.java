@@ -59,10 +59,6 @@ public class Role implements Serializable {
     this.id = id;
   }
 
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
   public String getCode() {
     return code;
   }
@@ -139,7 +135,6 @@ public class Role implements Serializable {
   public String toString() {
     return "Role{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +
