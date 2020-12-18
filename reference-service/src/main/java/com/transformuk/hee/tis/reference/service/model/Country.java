@@ -30,10 +30,6 @@ public class Country implements Serializable {
   private UUID uuid;
 
   @NotNull
-  @Column(name = "uuid", nullable = false)
-  private UUID uuid;
-
-  @NotNull
   @Column(name = "countryNumber", nullable = false)
   private String countryNumber;
 
@@ -52,6 +48,10 @@ public class Country implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getCountryNumber() {
     return countryNumber;

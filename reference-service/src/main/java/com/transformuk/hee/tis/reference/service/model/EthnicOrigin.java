@@ -30,10 +30,6 @@ public class EthnicOrigin implements Serializable {
   private UUID uuid;
 
   @NotNull
-  @Column(name = "uuid", nullable = false)
-  private UUID uuid;
-
-  @NotNull
   @Column(name = "code", nullable = false)
   private String code;
 
@@ -48,6 +44,10 @@ public class EthnicOrigin implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getCode() {
     return code;
