@@ -38,7 +38,9 @@ public class PlacementTypeDTO implements Serializable {
 
   public void setUuid(UUID uuid) {
     this.uuid = uuid;
-  }public String getCode() {
+  }
+
+  public String getCode() {
     return code;
   }
 
