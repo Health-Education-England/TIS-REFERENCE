@@ -22,6 +22,7 @@ import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
@@ -191,6 +192,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         });
     classToParamTypeRefMap
         .put(NationalityDTO.class, new ParameterizedTypeReference<List<NationalityDTO>>() {
+        });
+    classToParamTypeRefMap
+        .put(PermitToWorkDTO.class, new ParameterizedTypeReference<List<PermitToWorkDTO>>() {
         });
     classToParamTypeRefMap
         .put(PlacementTypeDTO.class, new ParameterizedTypeReference<List<PlacementTypeDTO>>() {
