@@ -66,6 +66,10 @@ public class Grade implements Serializable {
     this.id = id;
   }
 
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
+
   public Grade id(Long id) {
     this.id = id;
     return this;

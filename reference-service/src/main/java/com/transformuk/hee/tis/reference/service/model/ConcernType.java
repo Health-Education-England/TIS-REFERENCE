@@ -23,4 +23,32 @@ public class ConcernType implements Serializable {
 
   @NotNull
   private String label;
+
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
 }
