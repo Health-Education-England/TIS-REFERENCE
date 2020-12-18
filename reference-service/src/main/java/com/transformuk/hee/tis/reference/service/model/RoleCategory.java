@@ -12,7 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 @Entity
 public class RoleCategory implements Serializable {
 
@@ -29,35 +31,13 @@ public class RoleCategory implements Serializable {
   @OneToMany(mappedBy = "roleCategory", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Role> roles = new HashSet<>();
 
+  private String uuid;
+
   public RoleCategory() {
   }
 
   public RoleCategory(String name) {
     this.name = name;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Set<Role> getRoles() {
-    return roles;
-  }
-
-  public void setRoles(Set<Role> roles) {
-    this.roles = roles;
   }
 
   @Override

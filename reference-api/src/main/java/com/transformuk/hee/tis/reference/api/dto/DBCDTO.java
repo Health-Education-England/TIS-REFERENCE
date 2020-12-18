@@ -5,10 +5,14 @@ import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * A DTO for the DBC entity.
  */
+@Data
+@NoArgsConstructor
 public class DBCDTO implements Serializable {
 
   private Long id;
@@ -24,45 +28,7 @@ public class DBCDTO implements Serializable {
 
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getDbc() {
-    return dbc;
-  }
-
-  public void setDbc(String dbc) {
-    this.dbc = dbc;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getAbbr() {
-    return abbr;
-  }
-
-  public void setAbbr(String abbr) {
-    this.abbr = abbr;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
+  private String uuid;
 
   @Override
   public boolean equals(Object o) {
@@ -75,11 +41,7 @@ public class DBCDTO implements Serializable {
 
     DBCDTO dBCDTO = (DBCDTO) o;
 
-    if (!Objects.equals(id, dBCDTO.id)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(id, dBCDTO.id);
   }
 
   @Override
@@ -87,14 +49,4 @@ public class DBCDTO implements Serializable {
     return Objects.hashCode(id);
   }
 
-  @Override
-  public String toString() {
-    return "DBCDTO{" +
-        "id=" + id +
-        ", dbc='" + dbc + '\'' +
-        ", name='" + name + '\'' +
-        ", abbr='" + abbr + '\'' +
-        ", status=" + status +
-        '}';
-  }
 }
