@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class RoleCategoryDTO implements Serializable {
   @NotNull
   private String name;
 
-  private String uuid;
+  private UUID uuid;
 
   @Override
   public boolean equals(Object o) {
@@ -43,6 +44,7 @@ public class RoleCategoryDTO implements Serializable {
   public String toString() {
     return "RoleCategoryDTO{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", name='" + name + '\'' +
         '}';
   }
