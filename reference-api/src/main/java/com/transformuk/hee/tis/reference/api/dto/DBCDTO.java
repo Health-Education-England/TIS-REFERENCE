@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 /**
  * A DTO for the DBC entity.
  */
-@Data
 @NoArgsConstructor
 public class DBCDTO implements Serializable {
 
@@ -30,6 +29,54 @@ public class DBCDTO implements Serializable {
   private String abbr;
 
   private Status status;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
+  }
+
+  public String getDbc() {
+    return dbc;
+  }
+
+  public void setDbc(String dbc) {
+    this.dbc = dbc;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAbbr() {
+    return abbr;
+  }
+
+  public void setAbbr(String abbr) {
+    this.abbr = abbr;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
 
   @Override
   public boolean equals(Object o) {

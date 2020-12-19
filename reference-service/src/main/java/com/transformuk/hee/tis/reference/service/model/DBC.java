@@ -45,9 +45,6 @@ public class DBC implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  @Column(name = "uuid")
-  private String uuid;
-
   public Long getId() {
     return id;
   }
@@ -112,15 +109,7 @@ public class DBC implements Serializable {
     return this;
   }
 
-  public String getUuid() {
-    return uuid;
-  }
-
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
-  }
-
-  public DBC uuid(String uuid) {
+  public DBC uuid(UUID uuid) {
     this.uuid = uuid;
     return this;
   }
