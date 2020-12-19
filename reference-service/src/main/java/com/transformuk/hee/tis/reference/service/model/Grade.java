@@ -203,6 +203,7 @@ public class Grade implements Serializable {
   public String toString() {
     return "Grade{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", label='" + label + '\'' +

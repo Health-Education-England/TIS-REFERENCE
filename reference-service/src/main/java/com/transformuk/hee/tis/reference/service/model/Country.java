@@ -116,6 +116,7 @@ public class Country implements Serializable {
   public String toString() {
     return "Country{" +
         "id=" + id +
+        ", uuid='" + uuid.toString() + '\'' +
         ", countryNumber='" + countryNumber + '\'' +
         ", nationality='" + nationality + '\'' +
         ", status=" + status +
