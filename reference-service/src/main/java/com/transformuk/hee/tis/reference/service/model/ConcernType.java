@@ -23,5 +23,4 @@ public class ConcernType implements Serializable {
 
   @NotNull
   private String label;
-
 }
