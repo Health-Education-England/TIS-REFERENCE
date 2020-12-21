@@ -90,7 +90,7 @@ public class CollegeDTO implements Serializable {
   public String toString() {
     return "CollegeDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", status=" + status +

@@ -116,7 +116,7 @@ public class Settled implements Serializable {
   public String toString() {
     return "Settled{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

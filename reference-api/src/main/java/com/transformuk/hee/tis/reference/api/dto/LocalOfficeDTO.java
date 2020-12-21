@@ -102,7 +102,7 @@ public class LocalOfficeDTO implements Serializable {
   public String toString() {
     return "LocalOfficeDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +

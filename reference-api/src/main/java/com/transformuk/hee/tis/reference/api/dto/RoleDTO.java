@@ -97,7 +97,7 @@ public class RoleDTO implements Serializable {
   public String toString() {
     return "RoleDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

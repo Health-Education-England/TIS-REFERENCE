@@ -116,7 +116,7 @@ public class MaritalStatus implements Serializable {
   public String toString() {
     return "MaritalStatus{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

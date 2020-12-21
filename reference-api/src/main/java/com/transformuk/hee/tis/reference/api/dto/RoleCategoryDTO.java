@@ -44,7 +44,7 @@ public class RoleCategoryDTO implements Serializable {
   public String toString() {
     return "RoleCategoryDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", name='" + name + '\'' +
         '}';
   }

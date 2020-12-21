@@ -116,7 +116,7 @@ public class PlacementType implements Serializable {
   public String toString() {
     return "PlacementType{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

@@ -91,7 +91,7 @@ public class GmcStatusDTO implements Serializable {
   public String toString() {
     return "GmcStatusDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

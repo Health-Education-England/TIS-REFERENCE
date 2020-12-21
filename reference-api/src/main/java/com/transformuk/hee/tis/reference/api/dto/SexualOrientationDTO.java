@@ -91,7 +91,7 @@ public class SexualOrientationDTO implements Serializable {
   public String toString() {
     return "SexualOrientationDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

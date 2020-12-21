@@ -91,7 +91,7 @@ public class GdcStatusDTO implements Serializable {
   public String toString() {
     return "GdcStatusDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

@@ -91,7 +91,7 @@ public class CurriculumSubTypeDTO implements Serializable {
   public String toString() {
     return "CurriculumSubTypeDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

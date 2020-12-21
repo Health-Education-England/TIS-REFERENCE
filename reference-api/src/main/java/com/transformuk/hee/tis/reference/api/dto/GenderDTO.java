@@ -91,7 +91,7 @@ public class GenderDTO implements Serializable {
   public String toString() {
     return "GenderDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

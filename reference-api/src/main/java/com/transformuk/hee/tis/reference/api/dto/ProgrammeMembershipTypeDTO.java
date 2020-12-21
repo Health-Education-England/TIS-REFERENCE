@@ -91,7 +91,7 @@ public class ProgrammeMembershipTypeDTO implements Serializable {
   public String toString() {
     return "ProgrammeMembershipTypeDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

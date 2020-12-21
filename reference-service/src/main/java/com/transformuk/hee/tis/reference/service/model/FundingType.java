@@ -116,7 +116,7 @@ public class FundingType implements Serializable {
   public String toString() {
     return "FundingType{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

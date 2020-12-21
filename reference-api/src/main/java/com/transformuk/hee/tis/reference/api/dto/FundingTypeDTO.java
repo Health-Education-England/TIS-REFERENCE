@@ -91,7 +91,7 @@ public class FundingTypeDTO implements Serializable {
   public String toString() {
     return "FundingTypeDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

@@ -80,7 +80,7 @@ public class EthnicOriginDTO implements Serializable {
   public String toString() {
     return "EthnicOriginDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", status=" + status +
         '}';

@@ -91,7 +91,7 @@ public class NationalityDTO implements Serializable {
   public String toString() {
     return "NationalityDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", countryNumber='" + countryNumber + '\'' +
         ", nationality='" + nationality + '\'' +
         ", status=" + status +

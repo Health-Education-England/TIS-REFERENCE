@@ -133,7 +133,7 @@ public class LocalOffice implements Serializable {
   public String toString() {
     return "LocalOffice{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", abbreviation='" + abbreviation + '\'' +
         ", name='" + name + '\'' +
         ", postAbbreviation='" + postAbbreviation + '\'' +

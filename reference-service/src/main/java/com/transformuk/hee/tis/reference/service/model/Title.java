@@ -117,7 +117,7 @@ public class Title implements Serializable {
   public String toString() {
     return "Title{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

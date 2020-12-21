@@ -99,7 +99,7 @@ public class EthnicOrigin implements Serializable {
   public String toString() {
     return "EthnicOrigin{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", status=" + status +
         '}';

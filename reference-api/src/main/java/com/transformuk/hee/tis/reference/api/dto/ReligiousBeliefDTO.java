@@ -91,7 +91,7 @@ public class ReligiousBeliefDTO implements Serializable {
   public String toString() {
     return "ReligiousBeliefDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

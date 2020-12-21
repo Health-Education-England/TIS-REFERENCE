@@ -116,7 +116,7 @@ public class ReligiousBelief implements Serializable {
   public String toString() {
     return "ReligiousBelief{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

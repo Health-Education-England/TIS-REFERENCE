@@ -138,7 +138,7 @@ public class DBC implements Serializable {
   public String toString() {
     return "DBC{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", dbc='" + dbc + '\'' +
         ", name='" + name + '\'' +
         ", abbr='" + abbr + '\'' +

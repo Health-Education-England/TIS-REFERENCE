@@ -111,7 +111,7 @@ public class GmcStatus implements Serializable {
   public String toString() {
     return "GmcStatus{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

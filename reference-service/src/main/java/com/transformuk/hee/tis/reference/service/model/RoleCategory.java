@@ -65,7 +65,7 @@ public class RoleCategory implements Serializable {
   public String toString() {
     return "RoleCategory{" +
         "id=" + id +
-         ", uuid='" + uuid.toString() + '\'' +
+         ", uuid='" + uuid + '\'' +
         ", name='" + name + '\'' +
         '}';
   }

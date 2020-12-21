@@ -91,7 +91,7 @@ public class PermitToWorkDTO implements Serializable {
   public String toString() {
     return "MaritalStatusDTO{" +
         "id=" + id +
-        ", uuid='" + uuid.toString() + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +
