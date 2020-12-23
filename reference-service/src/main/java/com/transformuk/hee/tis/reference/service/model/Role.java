@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -22,6 +23,9 @@ public class Role implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(name = "uuid")
+  private UUID uuid;
 
   @NotNull
   @Column(name = "code", nullable = false)
@@ -46,6 +50,10 @@ public class Role implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getCode() {
     return code;
@@ -123,6 +131,7 @@ public class Role implements Serializable {
   public String toString() {
     return "Role{" +
         "id=" + id +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

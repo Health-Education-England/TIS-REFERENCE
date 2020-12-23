@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -12,6 +13,8 @@ import javax.validation.constraints.NotNull;
 public class EthnicOriginDTO implements Serializable {
 
   private Long id;
+
+  private UUID uuid;
 
   @NotNull
   private String code;
@@ -24,6 +27,14 @@ public class EthnicOriginDTO implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
   }
 
   public String getCode() {
@@ -69,6 +80,7 @@ public class EthnicOriginDTO implements Serializable {
   public String toString() {
     return "EthnicOriginDTO{" +
         "id=" + id +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", status=" + status +
         '}';

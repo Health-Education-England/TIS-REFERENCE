@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +32,7 @@ public class RoleCategory implements Serializable {
   @OneToMany(mappedBy = "roleCategory", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Role> roles = new HashSet<>();
 
-  private String uuid;
+  private UUID uuid;
 
   public RoleCategory() {
   }
@@ -64,6 +65,7 @@ public class RoleCategory implements Serializable {
   public String toString() {
     return "RoleCategory{" +
         "id=" + id +
+         ", uuid='" + uuid + '\'' +
         ", name='" + name + '\'' +
         '}';
   }

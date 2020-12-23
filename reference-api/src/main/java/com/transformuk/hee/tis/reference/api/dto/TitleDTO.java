@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.api.dto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -12,6 +13,8 @@ import javax.validation.constraints.NotNull;
 public class TitleDTO implements Serializable {
 
   private Long id;
+
+  private UUID uuid;
 
   @NotNull
   private String code;
@@ -27,6 +30,14 @@ public class TitleDTO implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
   }
 
   public String getCode() {
@@ -80,6 +91,7 @@ public class TitleDTO implements Serializable {
   public String toString() {
     return "TitleDTO{" +
         "id=" + id +
+        ", uuid='" + uuid + '\'' +
         ", code='" + code + '\'' +
         ", label='" + label + '\'' +
         ", status=" + status +

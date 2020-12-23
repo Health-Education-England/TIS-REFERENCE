@@ -4,6 +4,7 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,6 +26,9 @@ public class DBC implements Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "uuid")
+  private UUID uuid;
+
   @NotNull
   @Column(name = "dbc", nullable = false)
   private String dbc;
@@ -41,9 +45,6 @@ public class DBC implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  @Column(name = "uuid")
-  private String uuid;
-
   public Long getId() {
     return id;
   }
@@ -51,6 +52,10 @@ public class DBC implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UUID getUuid() { return uuid; }
+
+  public void setUuid(UUID uuid) { this.uuid = uuid; }
 
   public String getDbc() {
     return dbc;
@@ -104,15 +109,7 @@ public class DBC implements Serializable {
     return this;
   }
 
-  public String getUuid() {
-    return uuid;
-  }
-
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
-  }
-
-  public DBC uuid(String uuid) {
+  public DBC uuid(UUID uuid) {
     this.uuid = uuid;
     return this;
   }
@@ -141,6 +138,7 @@ public class DBC implements Serializable {
   public String toString() {
     return "DBC{" +
         "id=" + id +
+        ", uuid='" + uuid + '\'' +
         ", dbc='" + dbc + '\'' +
         ", name='" + name + '\'' +
         ", abbr='" + abbr + '\'' +
