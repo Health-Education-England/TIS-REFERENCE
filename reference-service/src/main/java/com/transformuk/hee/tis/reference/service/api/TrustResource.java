@@ -101,7 +101,7 @@ public class TrustResource {
           .body(null);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
-    trust = sitesTrustsService.createTrust(trust);
+    trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
     return ResponseEntity.created(new URI("/api/trusts/" + result.getId()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -127,7 +127,7 @@ public class TrustResource {
       return createTrust(trustDTO);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
-    trust = sitesTrustsService.updateTrust(trust);
+    trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, trustDTO.getId().toString()))
@@ -271,7 +271,6 @@ public class TrustResource {
    * (Not Found)
    */
   @GetMapping("/trusts/{id}")
-  @PreAuthorize("hasPermission(#id, 'com.transformuk.hee.tis.reference.service.model.Trust', 'read')")
   @Timed
   public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
     log.debug("REST request to get Trust by id: {}", id);

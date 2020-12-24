@@ -102,7 +102,7 @@ public class SiteResource {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = sitesTrustsService.createSite(site);
+    site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.created(new URI("/api/sites/" + result.getId()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -125,7 +125,7 @@ public class SiteResource {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
     Site site = siteMapper.siteDTOToSite(siteDTO);
-    site = sitesTrustsService.updateSite(site);
+    site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, siteDTO.getId().toString()))
@@ -221,14 +221,13 @@ public class SiteResource {
   }
 
   /**
-   * POST /sites/ids/in/query: post a query to fetch sites. Currently this is a fix for a large
-   * amount of sites requests(exceeding the requestParam length limit).
-   *
+   * POST /sites/ids/in/query: post a query to fetch sites.
+   * Currently this is a fix for a large amount of sites requests(exceeding the requestParam length limit).
    * @param idMap the siteIds to search by. Frontend sends a json.
    * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
    */
   @ApiOperation(value = "get a collection of sites by id")
-  @PostMapping(path = "/sites/ids/in/query")
+  @PostMapping(path="/sites/ids/in/query")
   @Timed
   public ResponseEntity<List<SiteDTO>> getSitesInByIds(@RequestBody Map<String, List<Long>> idMap) {
     return getSitesInById(idMap.get("ids"));
@@ -269,7 +268,6 @@ public class SiteResource {
    * (Not Found)
    */
   @GetMapping("/sites/{id}")
-  @PreAuthorize("hasPermission(#id, 'com.transformuk.hee.tis.reference.service.model.Site', 'read')")
   @Timed
   public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
     log.debug("REST request to get Site : {}", id);
@@ -331,7 +329,11 @@ public class SiteResource {
       List<Site> foundSites = siteRepository.findAll(ids);
       Set<Long> dbIds = foundSites.stream().map(Site::getId).collect(Collectors.toSet());
       ids.forEach(siteCode -> {
-        siteExistsMap.put(siteCode, dbIds.contains(siteCode));
+        if (dbIds.contains(siteCode)) {
+          siteExistsMap.put(siteCode, true);
+        } else {
+          siteExistsMap.put(siteCode, false);
+        }
       });
     }
 
