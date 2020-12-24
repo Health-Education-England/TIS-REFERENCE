@@ -4,8 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static org.springframework.util.StringUtils.isEmpty;
-
-import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -16,7 +14,6 @@ import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,43 +35,21 @@ public class SitesTrustsService {
   private SiteRepository siteRepository;
   private TrustRepository trustRepository;
   private LocalOfficeRepository localOfficeRepository;
-  private AclSupportService aclService;
-  private PermissionService permissionService;
 
   @Autowired
   public SitesTrustsService(SiteRepository siteRepository, TrustRepository trustRepository,
-      LocalOfficeRepository localOfficeRepository, AclSupportService aclService,
-      PermissionService permissionService, @Value("${search.result.limit:100}") int limit) {
+      LocalOfficeRepository localOfficeRepository, @Value("${search.result.limit:100}") int limit) {
     this.siteRepository = siteRepository;
     this.trustRepository = trustRepository;
     this.localOfficeRepository = localOfficeRepository;
     this.limit = limit;
-    this.aclService = aclService;
-    this.permissionService = permissionService;
-  }
-
-  @Secured({"HEE", "NI", "RUN_AS_Machine User"})
-  @Transactional
-  public Site createSite(Site site) {
-    Set<String> principals = permissionService.getUserEntities();
-
-    Site savedSite = siteRepository.save(site);
-    aclService.grantPermissionsToUser(Site.class.getName(), savedSite.getId(), principals,
-        Sets.newHashSet(BasePermission.READ, BasePermission.WRITE));
-    return savedSite;
-  }
-
-  @PreAuthorize("hasPermission(#site, 'WRITE')")
-  public Site updateSite(Site site) {
-    Site updatedSite = siteRepository.save(site);
-    return updatedSite;
   }
 
   /**
    * Searches all sites who have data containing given searchString
    *
    * @param searchString search string to be searched for site data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return List of {@link Site} matching searchString
    */
   public Page<Site> searchSites(String searchString, Pageable pageable) {
@@ -111,7 +83,7 @@ public class SitesTrustsService {
   }
 
   /**
-   * @param trustCode    Trust code for a trust inside which the sites have to be searched
+   * @param trustCode Trust code for a trust inside which the sites have to be searched
    * @param searchString search string to be searched for site data
    * @return List of {@link Site} matching searchString for given trustCode
    */
@@ -122,23 +94,6 @@ public class SitesTrustsService {
     } else {
       return siteRepository.findByTrustCode(trustCode, new PageRequest(0, limit));
     }
-  }
-
-  @Secured({"HEE", "NI", "RUN_AS_Machine User"})
-  @Transactional
-  public Trust createTrust(Trust trust) {
-    Set<String> principals = permissionService.getUserEntities();
-
-    Trust savedTrust = trustRepository.save(trust);
-    aclService.grantPermissionsToUser(Trust.class.getName(), savedTrust.getId(), principals,
-        Sets.newHashSet(BasePermission.READ, BasePermission.WRITE));
-    return savedTrust;
-  }
-
-  @PreAuthorize("hasPermission(#trust, 'WRITE')")
-  public Trust updateTrust(Trust trust) {
-    Trust updatedTrust = trustRepository.save(trust);
-    return updatedTrust;
   }
 
   /**
@@ -171,7 +126,7 @@ public class SitesTrustsService {
    * Searches all trusts who have data containing given searchString
    *
    * @param searchString search string to be searched for trust data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link Trust} matching searchString
    */
   public Page<Trust> searchTrusts(String searchString, Pageable pageable) {
@@ -182,7 +137,7 @@ public class SitesTrustsService {
    * Searches all current trusts who have data containing given searchString
    *
    * @param searchString search string to be searched for trust data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link Trust} matching searchString
    */
   public Page<Trust> searchCurrentTrusts(String searchString, Pageable pageable) {
@@ -297,7 +252,7 @@ public class SitesTrustsService {
    * Searches current localOffices who have data containing given searchString
    *
    * @param searchString search string to be searched for localOffice data
-   * @param pageable     pageable defining the page and size
+   * @param pageable pageable defining the page and size
    * @return Page of {@link LocalOffice} matching searchString
    */
   public Page<LocalOffice> searchCurrentLocalOffices(String searchString, Pageable pageable) {
