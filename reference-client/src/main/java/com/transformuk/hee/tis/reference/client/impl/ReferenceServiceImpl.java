@@ -82,6 +82,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/in/";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
+  private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
@@ -120,6 +121,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String localOfficesJsonQuerystringURLEncoded;
   private static String sitesKnownAsJsonQuerystringURLEncoded;
   private static String trustKnownAsJsonQuerystringURLEncoded;
+  private static String trustIdJsonQuerystringURLEncoded;
   private static String statusCurrentUrlEncoded;
 
   static {
@@ -134,6 +136,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
           new URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustKnownAsJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      trustIdJsonQuerystringURLEncoded = new URLCodec().encode("{\"id\":[\"PARAMETER_ID\"],"
+              + "\"status\":[\"CURRENT\"]}");
       statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -512,6 +516,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .replace("PARAMETER_TRUSTKNOWNAS", urlEncode(trustKnownAs));
     return referenceRestTemplate
         .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {
+        })
+        .getBody();
+  }
+
+  @Override
+  public TrustDTO findTrustById(Long id) {
+    LOG.debug("calling findTrustById with id {}", id);
+    String url =
+            serviceUrl + FIND_TRUST_BY_ID_ENDPOINT + trustIdJsonQuerystringURLEncoded.replace(
+                    "PARAMETER_ID", urlEncode(String.valueOf(id)));
+    return referenceRestTemplate
+        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<TrustDTO>() {
         })
         .getBody();
   }

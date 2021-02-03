@@ -89,6 +89,13 @@ public interface ReferenceService extends ClientService {
    */
   List<TrustDTO> findTrustByTrustKnownAs(String trustKnownAs);
 
+  /**
+   * Find the trust given the id.
+   * @param id The id of the requested trust.
+   * @return   The found trust.
+   */
+  TrustDTO findTrustById(Long id);
+
   List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
 
   List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs);

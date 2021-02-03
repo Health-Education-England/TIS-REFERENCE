@@ -210,6 +210,30 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldFindTrustById() {
+    //given
+    Long id = 10L;
+    TrustDTO trustDTO = new TrustDTO();
+    trustDTO.setId(id);
+
+    ResponseEntity<TrustDTO> responseEntity = new ResponseEntity(trustDTO, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<TrustDTO>>any()))
+        .willReturn(responseEntity);
+
+    //when
+    TrustDTO response = referenceServiceImpl.findTrustById(id);
+
+    //then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/trusts/"
+                + "%7B%22id%22%3A%5B%2210%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+            eq(HttpMethod.GET), isNull(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<SiteDTO>>any());
+    assertEquals(trustDTO, response);
+  }
+
+  @Test
   public void shouldFindLocalOfficesByName() {
     // given
     String localOfficeNameWithSpecialCharacters = "localOfficeNameWithSpecialCharacters@!£&£$%@/\\";
