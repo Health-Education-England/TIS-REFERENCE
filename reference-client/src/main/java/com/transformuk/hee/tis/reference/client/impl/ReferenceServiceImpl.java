@@ -82,6 +82,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/in/";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
+  private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
@@ -514,6 +515,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<TrustDTO>>() {
         })
         .getBody();
+  }
+
+  @Override
+  public TrustDTO findTrustById(Long id) {
+    LOG.debug("calling findTrustById with id {}", id);
+    String url = serviceUrl + FIND_TRUST_BY_ID_ENDPOINT + id;
+    return referenceRestTemplate.getForEntity(url, TrustDTO.class).getBody();
   }
 
   @Override

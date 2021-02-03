@@ -50,6 +50,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -74,7 +76,7 @@ public class ReferenceServiceImplTest {
   private ReferenceServiceImpl referenceServiceImpl;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     referenceServiceImpl = new ReferenceServiceImpl(STANDARD_RATE_LIMIT, BULK_RATE_LIMIT);
     referenceServiceImpl.setServiceUrl(REFERENCE_URL);
     MockitoAnnotations.initMocks(this);
@@ -207,6 +209,40 @@ public class ReferenceServiceImplTest {
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(trusts, respList);
+  }
+
+  @Test
+  public void shouldFindTrustById() {
+    //given
+    Long id = 10L;
+    TrustDTO trustDTO = new TrustDTO();
+    trustDTO.setId(id);
+
+    ResponseEntity<TrustDTO> responseEntity = new ResponseEntity(trustDTO, HttpStatus.OK);
+    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
+        .willReturn(responseEntity);
+
+    //when
+    TrustDTO response = referenceServiceImpl.findTrustById(id);
+
+    //then
+    verify(referenceRestTemplate).getForEntity(REFERENCE_URL + "/api/trusts/" + id,
+        TrustDTO.class);
+    assertEquals(trustDTO, response);
+  }
+
+  @Test(expected = RestClientException.class)
+  public void shouldErrorWhenNotFound() {
+    //given
+    Long id = 10L;
+    TrustDTO trustDTO = new TrustDTO();
+    trustDTO.setId(id);
+
+    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
+        .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+    //when
+    TrustDTO response = referenceServiceImpl.findTrustById(id);
   }
 
   @Test
