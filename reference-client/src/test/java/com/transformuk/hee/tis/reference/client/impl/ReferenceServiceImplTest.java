@@ -226,8 +226,8 @@ public class ReferenceServiceImplTest {
     TrustDTO response = referenceServiceImpl.findTrustById(id);
 
     //then
-    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/trusts/" + id),
-        eq(TrustDTO.class));
+    verify(referenceRestTemplate).getForEntity(REFERENCE_URL + "/api/trusts/" + id,
+        TrustDTO.class);
     assertEquals(trustDTO, response);
   }
 
