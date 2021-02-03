@@ -121,7 +121,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String localOfficesJsonQuerystringURLEncoded;
   private static String sitesKnownAsJsonQuerystringURLEncoded;
   private static String trustKnownAsJsonQuerystringURLEncoded;
-  private static String trustIdJsonQuerystringURLEncoded;
   private static String statusCurrentUrlEncoded;
 
   static {
@@ -136,8 +135,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
           new URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustKnownAsJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
-      trustIdJsonQuerystringURLEncoded = new URLCodec().encode("{\"id\":[\"PARAMETER_ID\"],"
-              + "\"status\":[\"CURRENT\"]}");
       statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -523,13 +520,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public TrustDTO findTrustById(Long id) {
     LOG.debug("calling findTrustById with id {}", id);
-    String url =
-            serviceUrl + FIND_TRUST_BY_ID_ENDPOINT + trustIdJsonQuerystringURLEncoded.replace(
-                    "PARAMETER_ID", urlEncode(String.valueOf(id)));
-    return referenceRestTemplate
-        .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<TrustDTO>() {
-        })
-        .getBody();
+    String url = serviceUrl + FIND_TRUST_BY_ID_ENDPOINT + id;
+    return referenceRestTemplate.getForEntity(url, TrustDTO.class).getBody();
   }
 
   @Override

@@ -50,6 +50,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -74,7 +76,7 @@ public class ReferenceServiceImplTest {
   private ReferenceServiceImpl referenceServiceImpl;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     referenceServiceImpl = new ReferenceServiceImpl(STANDARD_RATE_LIMIT, BULK_RATE_LIMIT);
     referenceServiceImpl.setServiceUrl(REFERENCE_URL);
     MockitoAnnotations.initMocks(this);
@@ -217,20 +219,30 @@ public class ReferenceServiceImplTest {
     trustDTO.setId(id);
 
     ResponseEntity<TrustDTO> responseEntity = new ResponseEntity(trustDTO, HttpStatus.OK);
-    given(referenceRestTemplate.exchange(anyString(),
-        any(HttpMethod.class), isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<TrustDTO>>any()))
+    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
         .willReturn(responseEntity);
 
     //when
     TrustDTO response = referenceServiceImpl.findTrustById(id);
 
     //then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/trusts/"
-                + "%7B%22id%22%3A%5B%2210%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
-            eq(HttpMethod.GET), isNull(RequestEntity.class),
-            Matchers.<ParameterizedTypeReference<SiteDTO>>any());
+    verify(referenceRestTemplate).getForEntity(eq(REFERENCE_URL + "/api/trusts/" + id),
+        eq(TrustDTO.class));
     assertEquals(trustDTO, response);
+  }
+
+  @Test(expected = RestClientException.class)
+  public void shouldErrorWhenNotFound() {
+    //given
+    Long id = 10L;
+    TrustDTO trustDTO = new TrustDTO();
+    trustDTO.setId(id);
+
+    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
+        .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+    //when
+    TrustDTO response = referenceServiceImpl.findTrustById(id);
   }
 
   @Test
