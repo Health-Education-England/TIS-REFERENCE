@@ -27,6 +27,7 @@ public class DbcToLocalOfficeMapper {
       .put("1-AIIDMQ", Lists.newArrayList("Health Education England South West"))
       .put("1-AIIDHJ", Lists.newArrayList("Health Education England Wessex"))
       .put("1-AIIDNQ", Lists.newArrayList("Health Education England North West"))
+      .put("1-25U-830", Lists.newArrayList("Northern Ireland Medical and Dental Training Agency"))
       .build();
 
   /**

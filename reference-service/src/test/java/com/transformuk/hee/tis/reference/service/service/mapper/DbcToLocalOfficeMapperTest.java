@@ -1,16 +1,15 @@
 package com.transformuk.hee.tis.reference.service.service.mapper;
 
-/**
- * Tests the Designated Body Code to Local Office Mapper class
- */
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.Set;
 import org.junit.Test;
 
-
+/**
+ * Tests the Designated Body Code to Local Office Mapper class
+ */
 public class DbcToLocalOfficeMapperTest {
 
   @Test
@@ -23,6 +22,14 @@ public class DbcToLocalOfficeMapperTest {
     assertThat(mapResult).hasSize(3);
     assertThat(mapResult).contains("Health Education England North West London",
         "Health Education England Kent, Surrey and Sussex", "Health Education England North East");
+  }
+
+  @Test
+  public void shouldMapNimdtaLocalOffice() {
+    Set<String> map = DbcToLocalOfficeMapper.map(Collections.singleton("1-25U-830"));
+
+    assertThat(map).hasSize(1);
+    assertThat(map).contains("Northern Ireland Medical and Dental Training Agency");
   }
 
   @Test
