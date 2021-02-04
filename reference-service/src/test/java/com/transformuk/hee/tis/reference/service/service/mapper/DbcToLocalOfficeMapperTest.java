@@ -19,17 +19,20 @@ public class DbcToLocalOfficeMapperTest {
     //When
     Set<String> mapResult = DbcToLocalOfficeMapper.map(dbcs);
     //Then
-    assertThat(mapResult).hasSize(3);
-    assertThat(mapResult).contains("Health Education England North West London",
-        "Health Education England Kent, Surrey and Sussex", "Health Education England North East");
+    assertThat(mapResult)
+        .hasSize(3)
+        .contains("Health Education England North West London",
+            "Health Education England Kent, Surrey and Sussex",
+            "Health Education England North East");
   }
 
   @Test
   public void shouldMapNimdtaLocalOffice() {
     Set<String> map = DbcToLocalOfficeMapper.map(Collections.singleton("1-25U-830"));
 
-    assertThat(map).hasSize(1);
-    assertThat(map).contains("Northern Ireland Medical and Dental Training Agency");
+    assertThat(map)
+        .hasSize(1)
+        .contains("Northern Ireland Medical and Dental Training Agency");
   }
 
   @Test
