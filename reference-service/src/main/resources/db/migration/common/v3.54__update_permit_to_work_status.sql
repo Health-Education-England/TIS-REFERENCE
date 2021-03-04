@@ -1,0 +1,30 @@
+UPDATE `PermitToWork`
+SET `status` = 'INACTIVE'
+WHERE `code` IN (
+  'British National Overseas',
+  'Dependent - other immigration category',
+  'Dependent - partner holds Tier 2 visa which you are a dependent on',
+  'Dependent with endorsement - You are the partner/civil partner/spouse of a UK/EEA national and have an endorsement regarding ''no employment as a doctor or dentist in training''',
+  'Dependent without endorsement - You are the partner/civil partner/spouse of a UK/EEA national and do not have an endorsement regarding ''employment as a doctor or dentist in training''',
+  'Discretionary Leave to Remain',
+  'Highly Skilled Migrant Programme (with start and end dates of endorsement stamp in passport)',
+  'I am a fiancé of a UK national',
+  'My immigration status is not listed as an option',
+  'No current immigration status in the UK',
+  'Other immigration categories i.e. overseas government employees, innovators etc.',
+  'Short-term study visa (not over 11 months)',
+  'Tier 1 - points based system - no endoresment regarding ''employment as a doctor or dentist in training''',
+  'Tier 1 - points based system - with endorsement ''no employment as a doctor or dentist in training''',
+  'Tier 2 - points based system',
+  'Tier 3',
+  'Tier 4 (Adult Student) graduate of UK medical school completed foundation',
+  'Tier 4 (General) student',
+  'Tier 4 - currently a student at a UK university/medical school',
+  'Tier 4 - graduate of UK medical/dental school currently in Foundation Programme',
+  'Tier 4 - studying for a Masters/PhD',
+  'Turkish Businessperson',
+  'Turkish Worker',
+  'Visitor visa / PLAB visa / Business Visitor visa',
+  'Visitor visa/ PLAB visa/ Business Visitor visa',
+  'You are the partner/civil partner/spouse of a UK/EEA national'
+);

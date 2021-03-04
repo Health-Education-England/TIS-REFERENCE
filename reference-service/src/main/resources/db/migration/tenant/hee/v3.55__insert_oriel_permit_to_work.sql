@@ -1,0 +1,20 @@
+INSERT INTO `PermitToWork`(`code`, `label`, `status`)
+VALUES
+  ('UK/Irish National', 'UK/Irish National', 'CURRENT'),
+  ('Dependant/Spouse visa', 'Dependant/Spouse visa', 'CURRENT'),
+  ('EU EEA National (started prior to June 2021)', 'EU EEA National (started prior to June 2021)', 'CURRENT'),
+  ('Spouse of EEA National (started prior to June 2021)', 'Spouse of EEA National (started prior to June 2021)', 'CURRENT'),
+  ('EU settlement scheme', 'EU settlement scheme', 'CURRENT'),
+  ('EU pre-settled status', 'EU pre-settled status', 'CURRENT'),
+  ('Student visa', 'Student visa', 'CURRENT'),
+  ('Skilled worker', 'Skilled worker', 'CURRENT'),
+  ('Post graduate visa', 'Post graduate visa', 'CURRENT'),
+  ('Limited LTR', 'Limited LTR', 'INACTIVE'),
+  ('Other', 'Other', 'INACTIVE'),
+  ('Evidence of entitlement', 'Evidence of entitlement', 'INACTIVE'),
+  ('HSMP', 'HSMP', 'INACTIVE'),
+  ('Permit-free', 'Permit-free', 'INACTIVE'),
+  ('Resident permit', 'Resident permit', 'INACTIVE'),
+  ('TWES MTI', 'TWES MTI', 'INACTIVE'),
+  ('Unspecified', 'Unspecified', 'INACTIVE'),
+  ('Yes', 'Yes', 'INACTIVE');
