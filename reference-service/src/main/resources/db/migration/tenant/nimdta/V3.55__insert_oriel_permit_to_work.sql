@@ -9,13 +9,10 @@ VALUES
   ('Student visa', 'Student visa', 'CURRENT', 'c2aa0a44-7dc5-11eb-9f9a-0638a616fc76'),
   ('Skilled worker', 'Skilled worker', 'CURRENT', 'c2aa0b20-7dc5-11eb-9f9a-0638a616fc76'),
   ('Post graduate visa', 'Post graduate visa', 'CURRENT', 'c2aa0c07-7dc5-11eb-9f9a-0638a616fc76'),
-  ('Limited LTR', 'Limited LTR', 'INACTIVE', 'c2aa0cd0-7dc5-11eb-9f9a-0638a616fc76'),
   ('Other', 'Other', 'INACTIVE', 'c2aa0da1-7dc5-11eb-9f9a-0638a616fc76'),
   ('Evidence of entitlement', 'Evidence of entitlement', 'INACTIVE', 'c2aa0e65-7dc5-11eb-9f9a-0638a616fc76'),
-  ('HSMP', 'HSMP', 'INACTIVE', 'c2aa0f28-7dc5-11eb-9f9a-0638a616fc76'),
   ('Permit-free', 'Permit-free', 'INACTIVE', 'c2aa0feb-7dc5-11eb-9f9a-0638a616fc76'),
   ('Resident permit', 'Resident permit', 'INACTIVE', 'c2aa10ac-7dc5-11eb-9f9a-0638a616fc76'),
   ('TWES MTI', 'TWES MTI', 'INACTIVE', 'c2aa1188-7dc5-11eb-9f9a-0638a616fc76'),
   ('Unspecified', 'Unspecified', 'INACTIVE', 'c2aa124b-7dc5-11eb-9f9a-0638a616fc76'),
-  ('Yes', 'Yes', 'INACTIVE', 'c2aa1383-7dc5-11eb-9f9a-0638a616fc76'),
-  ('Work permit', 'Work permit', 'INACTIVE', 'fee77181-80d0-11eb-9f9a-0638a616fc76');
+  ('Yes', 'Yes', 'INACTIVE', 'c2aa1383-7dc5-11eb-9f9a-0638a616fc76');
