@@ -17,4 +17,5 @@ VALUES
   ('Resident permit', 'Resident permit', 'INACTIVE', 'c2aa10ac-7dc5-11eb-9f9a-0638a616fc76'),
   ('TWES MTI', 'TWES MTI', 'INACTIVE', 'c2aa1188-7dc5-11eb-9f9a-0638a616fc76'),
   ('Unspecified', 'Unspecified', 'INACTIVE', 'c2aa124b-7dc5-11eb-9f9a-0638a616fc76'),
-  ('Yes', 'Yes', 'INACTIVE', 'c2aa1383-7dc5-11eb-9f9a-0638a616fc76');
+  ('Yes', 'Yes', 'INACTIVE', 'c2aa1383-7dc5-11eb-9f9a-0638a616fc76'),
+  ('Work permit', 'Work permit', 'INACTIVE', 'fee77181-80d0-11eb-9f9a-0638a616fc76');
