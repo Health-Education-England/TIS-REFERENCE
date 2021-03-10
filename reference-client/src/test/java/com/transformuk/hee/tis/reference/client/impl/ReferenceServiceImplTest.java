@@ -21,6 +21,7 @@ import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.NationalityDTO;
+import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
 import com.transformuk.hee.tis.reference.api.dto.QualificationReferenceDTO;
 import com.transformuk.hee.tis.reference.api.dto.QualificationTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
@@ -219,7 +220,7 @@ public class ReferenceServiceImplTest {
     trustDTO.setId(id);
 
     ResponseEntity<TrustDTO> responseEntity = new ResponseEntity(trustDTO, HttpStatus.OK);
-    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
+    given(referenceRestTemplate.getForEntity(anyString(), eq(TrustDTO.class)))
         .willReturn(responseEntity);
 
     //when
@@ -238,7 +239,7 @@ public class ReferenceServiceImplTest {
     TrustDTO trustDTO = new TrustDTO();
     trustDTO.setId(id);
 
-    given(referenceRestTemplate.getForEntity(anyString(),eq(TrustDTO.class)))
+    given(referenceRestTemplate.getForEntity(anyString(), eq(TrustDTO.class)))
         .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
     //when
@@ -865,6 +866,69 @@ public class ReferenceServiceImplTest {
     assertThat("Unexpected 'exists' result value.", exists, is(true));
     verify(referenceRestTemplate).exchange(REFERENCE_URL
             + "/api/nationalities/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyPermitToWorkExists() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(PermitToWorkDTO.class, "code123");
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/permit-to-works/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyPermitToWorkExistsWhenNotCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(PermitToWorkDTO.class, "code123", false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/permit-to-works/exists/", HttpMethod.POST,
+            requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentPermitToWorkExistsWhenCurrentOnly() {
+    // Given.
+    HttpEntity<String> requestEntity = new HttpEntity<>("code123");
+    ParameterizedTypeReference<Boolean> responseType = getValueExistsReference();
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Boolean>>any()))
+        .willReturn(ResponseEntity.ok(true));
+
+    // When.
+    Boolean exists = referenceServiceImpl.isValueExists(PermitToWorkDTO.class, "code123", true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists, is(true));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/permit-to-works/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
   }
 
