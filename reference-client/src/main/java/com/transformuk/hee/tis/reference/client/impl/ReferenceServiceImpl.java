@@ -99,6 +99,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String MEDICAL_SCHOOLS_MAPPINGS_ENDPOINT = "/api/medical-schools/exists/";
   private static final String COUNTRIES_MAPPINGS_ENDPOINT = "/api/countries/exists/";
   private static final String ROTATIONS_MAPPINGS_ENDPOINT = "/api/rotations/exists/";
+  private static final String PERMIT_TO_WORK_MAPPINGS_ENDPOINT = "/api/permit-to-works/exists/";
   private static final String PLACEMENT_TYPES_MAPPINGS_ENDPOINT = "/api/placement-types/exists/";
   private static final String TITLE_MAPPINGS_ENDPOINT = "/api/titles/exists/";
   private static final String GMC_STATUS_MAPPINGS_ENDPOINT = "/api/gmc-statuses/exists/";
@@ -656,6 +657,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       url += GENDER_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(NationalityDTO.class)) {
       url += NATIONALITY_STATUS_MAPPINGS_ENDPOINT;
+    } else if (dtoClass.equals(PermitToWorkDTO.class)) {
+      url += PERMIT_TO_WORK_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(EthnicOriginDTO.class)) {
       url += ETHINIC_ORIGIN_MAPPINGS_ENDPOINT;
     } else if (dtoClass.equals(MaritalStatusDTO.class)) {

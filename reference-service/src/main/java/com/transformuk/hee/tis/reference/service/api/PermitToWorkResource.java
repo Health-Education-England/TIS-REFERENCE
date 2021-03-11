@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +76,7 @@ public class PermitToWorkResource {
    *
    * @param permitToWorkDTO the permitToWorkDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new permitToWorkDTO, or
-   * with status 400 (Bad Request) if the permitToWork has already an ID
+   *     with status 400 (Bad Request) if the permitToWork has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/permit-to-works")
@@ -99,8 +103,8 @@ public class PermitToWorkResource {
    *
    * @param permitToWorkDTO the permitToWorkDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated permitToWorkDTO, or
-   * with status 400 (Bad Request) if the permitToWorkDTO is not valid, or with status 500 (Internal
-   * Server Error) if the permitToWorkDTO couldnt be updated
+   *     with status 400 (Bad Request) if the permitToWorkDTO is not valid, or with status 500
+   *     (Internal Server Error) if the permitToWorkDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/permit-to-works")
@@ -164,7 +168,7 @@ public class PermitToWorkResource {
    *
    * @param id the id of the permitToWorkDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the permitToWorkDTO, or with
-   * status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/permit-to-works/{id}")
   @Timed
@@ -197,7 +201,7 @@ public class PermitToWorkResource {
    *
    * @param permitToWorkDTOS List of the permitToWorkDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new permitToWorkDTOS, or
-   * with status 400 (Bad Request) if the PermitToWorkDTO has already an ID
+   *     with status 400 (Bad Request) if the PermitToWorkDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-permit-to-works")
@@ -231,8 +235,8 @@ public class PermitToWorkResource {
    *
    * @param permitToWorkDTOS List of the permitToWorkDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated permitToWorkDTOS, or
-   * with status 400 (Bad Request) if the permitToWorkDTOS is not valid, or with status 500
-   * (Internal Server Error) if the permitToWorkDTOS couldnt be updated
+   *     with status 400 (Bad Request) if the permitToWorkDTOS is not valid, or with status 500
+   *     (Internal Server Error) if the permitToWorkDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-permit-to-works")
@@ -265,4 +269,30 @@ public class PermitToWorkResource {
         .body(results);
   }
 
+  /**
+   * EXISTS /permit-to-works/exists/ : check is permit to works exists
+   *
+   * @param code             the code of the permit to work to check
+   * @param columnFilterJson The column filters to apply
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/permit-to-works/exists")
+  @Timed
+  public ResponseEntity<Boolean> permitToWorkExists(@RequestBody String code,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
+    log.debug("REST request to check PermitToWork exists : {}", code);
+    Specifications<PermitToWork> specs = Specifications.where(isEqual("code", code));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    boolean exists = permitToWorkRepository.findOne(specs) != null;
+    return new ResponseEntity<>(exists, HttpStatus.OK);
+  }
 }

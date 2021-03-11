@@ -11,14 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.PermitToWork;
 import com.transformuk.hee.tis.reference.service.repository.PermitToWorkRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.PermitToWorkServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.PermitToWorkMapper;
+import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class PermitToWorkResourceIntTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/permit-to-works/exists/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -71,7 +77,7 @@ public class PermitToWorkResourceIntTest {
   @Autowired
   private EntityManager em;
 
-  private MockMvc restPermitToWorkMockMvc;
+  private MockMvc mockMvc;
 
   private PermitToWork permitToWork;
 
@@ -81,7 +87,7 @@ public class PermitToWorkResourceIntTest {
    * This is a static method, as tests for other entities might also need it, if they test an entity
    * which requires the current entity.
    */
-  public static PermitToWork createEntity(EntityManager em) {
+  public static PermitToWork createEntity() {
     PermitToWork permitToWork = new PermitToWork()
         .code(DEFAULT_CODE)
         .label(DEFAULT_LABEL);
@@ -94,7 +100,7 @@ public class PermitToWorkResourceIntTest {
     PermitToWorkResource permitToWorkResource = new PermitToWorkResource(permitToWorkRepository,
         permitToWorkMapper,
         permitToWorkService);
-    this.restPermitToWorkMockMvc = MockMvcBuilders.standaloneSetup(permitToWorkResource)
+    this.mockMvc = MockMvcBuilders.standaloneSetup(permitToWorkResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
@@ -102,7 +108,7 @@ public class PermitToWorkResourceIntTest {
 
   @Before
   public void initTest() {
-    permitToWork = createEntity(em);
+    permitToWork = createEntity();
   }
 
   @Test
@@ -113,7 +119,7 @@ public class PermitToWorkResourceIntTest {
     // Create the PermitToWork
     PermitToWorkDTO permitToWorkDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(permitToWork);
-    restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
+    mockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(permitToWorkDTO)))
         .andExpect(status().isCreated());
@@ -137,7 +143,7 @@ public class PermitToWorkResourceIntTest {
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
     // An entity with an existing ID cannot be created, so this API call must fail
-    restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
+    mockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -158,7 +164,7 @@ public class PermitToWorkResourceIntTest {
     PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
-    restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
+    mockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -178,7 +184,7 @@ public class PermitToWorkResourceIntTest {
     PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
-    restPermitToWorkMockMvc.perform(post("/api/permit-to-works")
+    mockMvc.perform(post("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isBadRequest());
@@ -194,7 +200,7 @@ public class PermitToWorkResourceIntTest {
     permitToWorkRepository.saveAndFlush(permitToWork);
 
     // Get all the permitToWorkList
-    restPermitToWorkMockMvc.perform(get("/api/permit-to-works?sort=id,desc"))
+    mockMvc.perform(get("/api/permit-to-works?sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(permitToWork.getId().intValue())))
@@ -212,7 +218,7 @@ public class PermitToWorkResourceIntTest {
     permitToWorkRepository.saveAndFlush(unencodedPermitToWork);
 
     // Get the permitToWorkList
-    restPermitToWorkMockMvc.perform(get("/api/permit-to-works?searchQuery=\"Te%24t\"&sort=id,desc"))
+    mockMvc.perform(get("/api/permit-to-works?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedPermitToWork.getId().intValue()))
@@ -227,7 +233,7 @@ public class PermitToWorkResourceIntTest {
     permitToWorkRepository.saveAndFlush(permitToWork);
 
     // Get the maritalStatus
-    restPermitToWorkMockMvc.perform(get("/api/permit-to-works/{id}", permitToWork.getId()))
+    mockMvc.perform(get("/api/permit-to-works/{id}", permitToWork.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id").value(permitToWork.getId().intValue()))
@@ -239,7 +245,7 @@ public class PermitToWorkResourceIntTest {
   @Transactional
   public void getNonExistingPermitToWork() throws Exception {
     // Get the maritalStatus
-    restPermitToWorkMockMvc.perform(get("/api/permit-to-works/{id}", Long.MAX_VALUE))
+    mockMvc.perform(get("/api/permit-to-works/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
   }
 
@@ -258,7 +264,7 @@ public class PermitToWorkResourceIntTest {
     PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(updatedPermitToWork);
 
-    restPermitToWorkMockMvc.perform(put("/api/permit-to-works")
+    mockMvc.perform(put("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isOk());
@@ -281,7 +287,7 @@ public class PermitToWorkResourceIntTest {
         .permitToWorkToPermitToWorkDTO(permitToWork);
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
-    restPermitToWorkMockMvc.perform(put("/api/permit-to-works")
+    mockMvc.perform(put("/api/permit-to-works")
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
         .content(TestUtil.convertObjectToJsonBytes(maritalStatusDTO)))
         .andExpect(status().isCreated());
@@ -299,7 +305,7 @@ public class PermitToWorkResourceIntTest {
     int databaseSizeBeforeDelete = permitToWorkRepository.findAll().size();
 
     // Get the permitToWork
-    restPermitToWorkMockMvc.perform(delete("/api/permit-to-works/{id}", permitToWork.getId())
+    mockMvc.perform(delete("/api/permit-to-works/{id}", permitToWork.getId())
         .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
 
@@ -312,5 +318,69 @@ public class PermitToWorkResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(PermitToWork.class);
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    permitToWorkRepository.saveAndFlush(permitToWork);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    permitToWork.setStatus(Status.INACTIVE);
+    permitToWorkRepository.saveAndFlush(permitToWork);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    permitToWork.setStatus(Status.CURRENT);
+    permitToWorkRepository.saveAndFlush(permitToWork);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"));
   }
 }
