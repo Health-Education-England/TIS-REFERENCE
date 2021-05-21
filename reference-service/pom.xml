@@ -12,7 +12,7 @@
 
   <groupId>com.transformuk.hee.tis</groupId>
   <artifactId>reference-service</artifactId>
-  <version>3.19.1</version>
+  <version>3.19.2</version>
   <packaging>war</packaging>
 
   <prerequisites>
@@ -147,7 +147,7 @@
     <dependency>
       <groupId>com.transformuk.hee</groupId>
       <artifactId>profile-client</artifactId>
-      <version>3.0.1</version>
+      <version>3.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.transformuk.hee</groupId>
