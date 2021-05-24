@@ -1,54 +1,35 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.PermitToWork;
 import com.transformuk.hee.tis.reference.service.repository.PermitToWorkRepository;
-import java.util.ArrayList;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class PermitToWorkServiceImpl {
+public class PermitToWorkServiceImpl extends AbstractReferenceService<PermitToWork> {
 
-  @Autowired
-  private PermitToWorkRepository permitToWorkRepository;
+  private PermitToWorkRepository repository;
 
-  @Transactional(readOnly = true)
-  public Page<PermitToWork> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
-      Pageable pageable) {
+  PermitToWorkServiceImpl(PermitToWorkRepository repository) {
+    this.repository = repository;
+  }
 
-    List<Specification<PermitToWork>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString)).
-          or(containsLike("label", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("code", "label");
+  }
 
-    Page<PermitToWork> result;
-    if (!specs.isEmpty()) {
-      Specification<PermitToWork> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = permitToWorkRepository.findAll(fullSpec, pageable);
-    } else {
-      result = permitToWorkRepository.findAll(pageable);
-    }
+  @Override
+  protected JpaRepository<PermitToWork, Long> getRepository() {
+    return repository;
+  }
 
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<PermitToWork> getSpecificationExecutor() {
+    return repository;
   }
 }
