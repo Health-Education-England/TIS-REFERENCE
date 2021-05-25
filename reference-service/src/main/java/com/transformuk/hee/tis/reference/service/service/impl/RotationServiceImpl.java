@@ -61,7 +61,7 @@ public class RotationServiceImpl extends AbstractReferenceService<Rotation> impl
    */
   @Override
   @Transactional(readOnly = true)
-  public Page<RotationDTO> findAll(Pageable pageable) {
+  public Page<RotationDTO> findAllDtos(Pageable pageable) {
     log.debug("Request to get all Rotations");
     return repository.findAll(pageable)
         .map(mapper::toDto);

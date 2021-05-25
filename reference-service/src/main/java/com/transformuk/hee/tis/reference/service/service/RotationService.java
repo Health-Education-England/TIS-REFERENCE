@@ -26,7 +26,7 @@ public interface RotationService {
    * @param pageable the pagination information
    * @return the list of entities
    */
-  Page<RotationDTO> findAll(Pageable pageable);
+  Page<RotationDTO> findAllDtos(Pageable pageable);
 
   /**
    * Get all the current rotations.
