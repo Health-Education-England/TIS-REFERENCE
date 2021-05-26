@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RecordTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -76,7 +75,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RecordTypeDTO> createRecordType(
       @Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
@@ -104,7 +102,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RecordTypeDTO> updateRecordType(
       @Valid @RequestBody RecordTypeDTO recordTypeDTO) throws URISyntaxException {
@@ -131,7 +128,6 @@ public class RecordTypeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "record types list")})
   @GetMapping("/record-types")
-  @Timed
   public ResponseEntity<List<RecordTypeDTO>> getAllRecordTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -164,10 +160,9 @@ public class RecordTypeResource {
    * 404 (Not Found)
    */
   @GetMapping("/record-types/{id}")
-  @Timed
   public ResponseEntity<RecordTypeDTO> getRecordType(@PathVariable Long id) {
     log.debug("REST request to get RecordType : {}", id);
-    RecordType recordType = recordTypeRepository.findOne(id);
+    RecordType recordType = recordTypeRepository.findById(id).orElse(null);
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(recordType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(recordTypeDTO));
   }
@@ -179,11 +174,10 @@ public class RecordTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/record-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteRecordType(@PathVariable Long id) {
     log.debug("REST request to delete RecordType : {}", id);
-    recordTypeRepository.delete(id);
+    recordTypeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -198,7 +192,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RecordTypeDTO>> bulkCreateRecordType(
       @Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
@@ -215,7 +208,7 @@ public class RecordTypeResource {
       }
     }
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
-    recordTypes = recordTypeRepository.save(recordTypes);
+    recordTypes = recordTypeRepository.saveAll(recordTypes);
     List<RecordTypeDTO> result = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -231,7 +224,6 @@ public class RecordTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-record-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RecordTypeDTO>> bulkUpdateRecordType(
       @Valid @RequestBody List<RecordTypeDTO> recordTypeDTOS) throws URISyntaxException {
@@ -252,7 +244,7 @@ public class RecordTypeResource {
       }
     }
     List<RecordType> recordTypes = recordTypeMapper.recordTypeDTOsToRecordTypes(recordTypeDTOS);
-    recordTypes = recordTypeRepository.save(recordTypes);
+    recordTypes = recordTypeRepository.saveAll(recordTypes);
     List<RecordTypeDTO> results = recordTypeMapper.recordTypesToRecordTypeDTOs(recordTypes);
     return ResponseEntity.ok()
         .body(results);

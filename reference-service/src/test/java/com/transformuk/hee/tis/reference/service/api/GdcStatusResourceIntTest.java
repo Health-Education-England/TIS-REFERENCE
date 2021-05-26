@@ -116,7 +116,7 @@ public class GdcStatusResourceIntTest {
     // Create the GdcStatus
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
     mockMvc.perform(post("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isCreated());
 
@@ -139,7 +139,7 @@ public class GdcStatusResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -159,7 +159,7 @@ public class GdcStatusResourceIntTest {
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
     mockMvc.perform(post("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -178,7 +178,7 @@ public class GdcStatusResourceIntTest {
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
 
     mockMvc.perform(post("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -198,7 +198,7 @@ public class GdcStatusResourceIntTest {
     // Get all the gdcStatusList
     mockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te$t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGdcStatus.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -213,7 +213,7 @@ public class GdcStatusResourceIntTest {
     // Get the gdcStatus
     mockMvc.perform(get("/api/gdc-statuses/{id}", gdcStatus.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(gdcStatus.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -235,14 +235,14 @@ public class GdcStatusResourceIntTest {
     int databaseSizeBeforeUpdate = gdcStatusRepository.findAll().size();
 
     // Update the gdcStatus
-    GdcStatus updatedGdcStatus = gdcStatusRepository.findOne(gdcStatus.getId());
+    GdcStatus updatedGdcStatus = gdcStatusRepository.findById(gdcStatus.getId()).get();
     updatedGdcStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(updatedGdcStatus);
 
     mockMvc.perform(put("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isOk());
 
@@ -264,7 +264,7 @@ public class GdcStatusResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/gdc-statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gdcStatusDTO)))
         .andExpect(status().isCreated());
 
@@ -282,7 +282,7 @@ public class GdcStatusResourceIntTest {
 
     // Get the gdcStatus
     mockMvc.perform(delete("/api/gdc-statuses/{id}", gdcStatus.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -300,7 +300,7 @@ public class GdcStatusResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -312,7 +312,7 @@ public class GdcStatusResourceIntTest {
     gdcStatusRepository.saveAndFlush(gdcStatus);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -324,7 +324,7 @@ public class GdcStatusResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -339,7 +339,7 @@ public class GdcStatusResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -354,7 +354,7 @@ public class GdcStatusResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

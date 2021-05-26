@@ -11,8 +11,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.metrics.orm.jpa.HibernateMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,8 +22,7 @@ import org.springframework.core.env.Environment;
  * Main application class from which the app starts
  */
 @ComponentScan
-@EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class,
-    MetricRepositoryAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {HibernateMetricsAutoConfiguration.class})
 @EnableConfigurationProperties({ApplicationProperties.class})
 @PropertySource({"classpath:/config/application.yml",
     "classpath:/config/profileclientapplication.properties"})

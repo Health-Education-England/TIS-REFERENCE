@@ -115,7 +115,7 @@ public class CurriculumSubTypeResourceIntTest {
     CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
         .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -140,7 +140,7 @@ public class CurriculumSubTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -161,7 +161,7 @@ public class CurriculumSubTypeResourceIntTest {
         .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -181,7 +181,7 @@ public class CurriculumSubTypeResourceIntTest {
         .curriculumSubTypeToCurriculumSubTypeDTO(curriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(post("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -198,7 +198,7 @@ public class CurriculumSubTypeResourceIntTest {
     // Get all the curriculumSubTypeList
     restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(curriculumSubType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -214,7 +214,7 @@ public class CurriculumSubTypeResourceIntTest {
     restCurriculumSubTypeMockMvc
         .perform(get("/api/curriculum-sub-types/{id}", curriculumSubType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -230,7 +230,7 @@ public class CurriculumSubTypeResourceIntTest {
     restCurriculumSubTypeMockMvc
         .perform(get("/api/curriculum-sub-types/code/{code}", curriculumSubType.getCode()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(curriculumSubType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -251,13 +251,13 @@ public class CurriculumSubTypeResourceIntTest {
 
     List<CurriculumSubType> curriculumSubTypes = Lists
         .newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
-    curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypeRepository.saveAll(curriculumSubTypes);
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
     restCurriculumSubTypeMockMvc.perform(get("/api/curriculum-sub-types?searchQuery=\"med\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].code")
             .value(hasItems(medicalCurriculum.getCode(), medicalSPR.getCode())))
         .andExpect(jsonPath("$.[*].label")
@@ -278,14 +278,14 @@ public class CurriculumSubTypeResourceIntTest {
 
     List<CurriculumSubType> curriculumSubTypes = Lists
         .newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
-    curriculumSubTypeRepository.save(curriculumSubTypes);
+    curriculumSubTypeRepository.saveAll(curriculumSubTypes);
     curriculumSubTypeRepository.flush();
 
     // Get the curriculumSubType
     restCurriculumSubTypeMockMvc
         .perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t%2FVal\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
@@ -307,7 +307,7 @@ public class CurriculumSubTypeResourceIntTest {
 
     // Update the curriculumSubType
     CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository
-        .findOne(curriculumSubType.getId());
+        .findById(curriculumSubType.getId()).get();
     updatedCurriculumSubType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -315,7 +315,7 @@ public class CurriculumSubTypeResourceIntTest {
         .curriculumSubTypeToCurriculumSubTypeDTO(updatedCurriculumSubType);
 
     restCurriculumSubTypeMockMvc.perform(put("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isOk());
 
@@ -339,7 +339,7 @@ public class CurriculumSubTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restCurriculumSubTypeMockMvc.perform(put("/api/curriculum-sub-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(curriculumSubTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -358,7 +358,7 @@ public class CurriculumSubTypeResourceIntTest {
     // Get the curriculumSubType
     restCurriculumSubTypeMockMvc
         .perform(delete("/api/curriculum-sub-types/{id}", curriculumSubType.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

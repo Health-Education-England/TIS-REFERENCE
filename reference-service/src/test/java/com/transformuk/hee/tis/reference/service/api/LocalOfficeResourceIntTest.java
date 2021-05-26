@@ -124,7 +124,7 @@ public class LocalOfficeResourceIntTest {
     // Create the LocalOffice
     LocalOfficeDTO localOfficeDTO = localOfficeMapper.localOfficeToLocalOfficeDTO(localOffice);
     restLocalOfficeMockMvc.perform(post("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isCreated());
 
@@ -147,7 +147,7 @@ public class LocalOfficeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restLocalOfficeMockMvc.perform(post("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -167,7 +167,7 @@ public class LocalOfficeResourceIntTest {
     LocalOfficeDTO localOfficeDTO = localOfficeMapper.localOfficeToLocalOfficeDTO(localOffice);
 
     restLocalOfficeMockMvc.perform(post("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -186,7 +186,7 @@ public class LocalOfficeResourceIntTest {
     LocalOfficeDTO localOfficeDTO = localOfficeMapper.localOfficeToLocalOfficeDTO(localOffice);
 
     restLocalOfficeMockMvc.perform(post("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -203,7 +203,7 @@ public class LocalOfficeResourceIntTest {
     // Get all the localOfficeList
     restLocalOfficeMockMvc.perform(get("/api/local-offices?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(localOffice.getId().intValue())))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
@@ -222,7 +222,7 @@ public class LocalOfficeResourceIntTest {
     // Get all the localOfficeList
     restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedLocalOffice.getId().intValue()))
         .andExpect(jsonPath("$.[*].abbreviation").value(UNENCODED_ABBREVIATION))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME));
@@ -272,7 +272,7 @@ public class LocalOfficeResourceIntTest {
     // Get the local offices
     ResultActions resultActions = restLocalOfficeMockMvc.perform(get("/api/local-offices/user"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA3")))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem("AAAAAAAA2")))
@@ -292,7 +292,7 @@ public class LocalOfficeResourceIntTest {
     // Get the localOffice
     restLocalOfficeMockMvc.perform(get("/api/local-offices/{id}", localOffice.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(localOffice.getId().intValue()))
         .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION.toString()))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
@@ -314,7 +314,7 @@ public class LocalOfficeResourceIntTest {
     int databaseSizeBeforeUpdate = localOfficeRepository.findAll().size();
 
     // Update the localOffice
-    LocalOffice updatedLocalOffice = localOfficeRepository.findOne(localOffice.getId());
+    LocalOffice updatedLocalOffice = localOfficeRepository.findById(localOffice.getId()).get();
     updatedLocalOffice
         .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME);
@@ -322,7 +322,7 @@ public class LocalOfficeResourceIntTest {
         .localOfficeToLocalOfficeDTO(updatedLocalOffice);
 
     restLocalOfficeMockMvc.perform(put("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isOk());
 
@@ -344,7 +344,7 @@ public class LocalOfficeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restLocalOfficeMockMvc.perform(put("/api/local-offices")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(localOfficeDTO)))
         .andExpect(status().isCreated());
 
@@ -362,7 +362,7 @@ public class LocalOfficeResourceIntTest {
 
     // Get the localOffice
     restLocalOfficeMockMvc.perform(delete("/api/local-offices/{id}", localOffice.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -385,7 +385,7 @@ public class LocalOfficeResourceIntTest {
     // Get all the trustList
     restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"CHLO\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(SEARCH_LOCAL_OFFICE_ABBREVIATTION))
         .andExpect(jsonPath("$.[*].name").value(SEARCH_LOCAL_OFFICE_NAME));
   }

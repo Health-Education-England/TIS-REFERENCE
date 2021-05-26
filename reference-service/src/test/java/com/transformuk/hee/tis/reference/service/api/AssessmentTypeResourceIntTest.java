@@ -23,6 +23,7 @@ import com.transformuk.hee.tis.reference.service.service.impl.AssessmentTypeServ
 import com.transformuk.hee.tis.reference.service.service.mapper.AssessmentTypeMapper;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
@@ -129,7 +130,7 @@ public class AssessmentTypeResourceIntTest {
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(createEntity());
 
     testObjMockMvc.perform(post("/api/assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value(DEFAULT_ID))
@@ -144,11 +145,11 @@ public class AssessmentTypeResourceIntTest {
   @Transactional
   public void createAssessmentTypeWithIdShouldReturnBadRequest() throws Exception {
     testObjMockMvc.perform(post("/api/assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isBadRequest());
 
-    verify(assessmentTypeRepositoryMock, never()).save(anyCollectionOf(AssessmentType.class));
+    verify(assessmentTypeRepositoryMock, never()).saveAll(anyCollectionOf(AssessmentType.class));
   }
 
   @Test
@@ -162,22 +163,22 @@ public class AssessmentTypeResourceIntTest {
     assessmentType2.setLabel("ABC_123");
     List<AssessmentType> assessmentTypes = Arrays.asList(assessmentType, assessmentType2);
 
-    when(assessmentTypeRepositoryMock.save(assessmentTypes)).thenAnswer(invocation -> {
-      List<AssessmentType> argument = invocation.getArgumentAt(0, List.class);
+    when(assessmentTypeRepositoryMock.saveAll(assessmentTypes)).thenAnswer(invocation -> {
+      List<AssessmentType> argument = invocation.getArgument(0, List.class);
       argument.get(0).setId(DEFAULT_ID);
       argument.get(1).setId(2L);
       return argument;
     });
 
     testObjMockMvc.perform(post("/api/bulk-assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentTypes)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.[*].id").value(hasItems(DEFAULT_ID.intValue(), 2)))
         .andExpect(jsonPath("$.[*].code").value(hasItems(DEFAULT_CODE, "ABC")))
         .andExpect(jsonPath("$.[*].label").value(hasItems(DEFAULT_LABEL, "ABC_123")));
 
-    verify(assessmentTypeRepositoryMock).save(any(Iterable.class));
+    verify(assessmentTypeRepositoryMock).saveAll(any(Iterable.class));
   }
 
   @Test
@@ -186,7 +187,7 @@ public class AssessmentTypeResourceIntTest {
     List<AssessmentType> assessmentTypes = Arrays.asList(assessmentType, createEntity());
 
     testObjMockMvc.perform(post("/api/bulk-assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentTypes)))
         .andExpect(status().isBadRequest());
 
@@ -196,11 +197,12 @@ public class AssessmentTypeResourceIntTest {
   @Test
   @Transactional
   public void updateAssessmentTypeShouldReturnUpdateAssessmentType() throws Exception {
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getId())).thenReturn(assessmentType);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getId()))
+        .thenReturn(Optional.of(assessmentType));
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(assessmentType);
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(DEFAULT_ID))
@@ -215,11 +217,12 @@ public class AssessmentTypeResourceIntTest {
   public void updateAssessmentTypeShouldReturnCreateAssessmentTypeWhenItDoesntExist()
       throws Exception {
     assessmentType.setId(null);
-    when(assessmentTypeRepositoryMock.findOne(assessmentType.getId())).thenReturn(null);
+    when(assessmentTypeRepositoryMock.findById(assessmentType.getId()))
+        .thenReturn(Optional.empty());
     when(assessmentTypeRepositoryMock.save(assessmentType)).thenReturn(createEntity());
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value(DEFAULT_ID))
@@ -235,7 +238,7 @@ public class AssessmentTypeResourceIntTest {
     assessmentType.setCode(null);
 
     testObjMockMvc.perform(MockMvcRequestBuilders.put("/api/assessment-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(assessmentType)))
         .andExpect(status().isBadRequest());
 
@@ -258,13 +261,13 @@ public class AssessmentTypeResourceIntTest {
 
     testObjMockMvc.perform(get("/api/assessment-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItems(DEFAULT_ID.intValue(), 2)))
         .andExpect(jsonPath("$.[*].code").value(hasItems(DEFAULT_CODE, "ABC")))
         .andExpect(jsonPath("$.[*].label").value(hasItems(DEFAULT_LABEL, "ABC_123")));
 
     Pageable captorValue = pageableArgumentCaptor.getValue();
-    Sort expectedSort = new Sort(new Sort.Order(Sort.Direction.DESC, "id"));
+    Sort expectedSort = Sort.by(new Sort.Order(Sort.Direction.DESC, "id"));
     Assert.assertEquals(expectedSort, captorValue.getSort());
   }
 
@@ -284,7 +287,7 @@ public class AssessmentTypeResourceIntTest {
     testObjMockMvc
         .perform(get("/api/assessment-types?searchQuery=\"Te%24t%20Assessment\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(DEFAULT_ID.intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -298,7 +301,7 @@ public class AssessmentTypeResourceIntTest {
 
     testObjMockMvc.perform(get("/api/assessment-types/{code}", assessmentType.getCode()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(DEFAULT_ID))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));

@@ -65,7 +65,7 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(post("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isBadRequest())
         .andExpect(header().string("X-referenceApp-error", "error.idexists"))
@@ -83,7 +83,7 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(post("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isBadRequest());
   }
@@ -98,7 +98,7 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(post("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isBadRequest());
   }
@@ -114,18 +114,18 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     MvcResult result = mockMvc.perform(post("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isCreated())
         .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.created"))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
             .exists())
         .andReturn();
 
     String headerParam = result.getResponse().getHeader("X-referenceApp-params");
-    LeavingReason createdEntity = repository.findOne(Long.parseLong(headerParam));
+    LeavingReason createdEntity = repository.findById(Long.parseLong(headerParam)).orElse(null);
     assertThat("The created entity was not found.", createdEntity, notNullValue());
     assertThat("The created entity's code did not match the expected value.",
         createdEntity.getCode(), is("code one"));
@@ -145,7 +145,7 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(put("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isBadRequest());
   }
@@ -160,7 +160,7 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(put("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isBadRequest());
   }
@@ -179,17 +179,17 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     MvcResult result = mockMvc.perform(put("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isCreated())
         .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.created"))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
             .exists())
         .andReturn();
 
-    LeavingReason originalEntity = repository.findOne(leavingReason.getId());
+    LeavingReason originalEntity = repository.findById(leavingReason.getId()).orElse(null);
     assertThat("The created entity was not found.", originalEntity, notNullValue());
     assertThat("The created entity's code did not match the expected value.",
         originalEntity.getCode(), is("code one"));
@@ -199,7 +199,7 @@ public class LeavingReasonResourceIntegrationTest {
         originalEntity.getStatus(), is(Status.CURRENT));
 
     String headerParam = result.getResponse().getHeader("X-referenceApp-params");
-    LeavingReason createdEntity = repository.findOne(Long.parseLong(headerParam));
+    LeavingReason createdEntity = repository.findById(Long.parseLong(headerParam)).orElse(null);
     assertThat("The created entity was not found.", createdEntity, notNullValue());
     assertThat("The created entity's code did not match the expected value.",
         createdEntity.getCode(), is("code two"));
@@ -225,17 +225,17 @@ public class LeavingReasonResourceIntegrationTest {
 
     // Call the code under test and perform assertions.
     mockMvc.perform(put("/api/leaving-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(leavingReasonDto)))
         .andExpect(status().isOk())
         .andExpect(header().string("X-referenceApp-alert", "referenceApp.LeavingReason.updated"))
         .andExpect(header().string("X-referenceApp-params", leavingReason.getId().toString()))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
             .exists());
 
-    LeavingReason createdEntity = repository.findOne(leavingReason.getId());
+    LeavingReason createdEntity = repository.findById(leavingReason.getId()).orElse(null);
     assertThat("The created entity was not found.", createdEntity, notNullValue());
     assertThat("The created entity's code did not match the expected value.",
         createdEntity.getCode(), is("code two"));
@@ -271,7 +271,7 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons/" + leavingReason.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().json(TestUtil.convertObjectToJson(leavingReason)));
   }
 
@@ -286,7 +286,7 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().json("[]"));
   }
 
@@ -305,7 +305,7 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(leavingReasonCount + 2))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
@@ -330,7 +330,7 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(leavingReasonCount + 2))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"INACTIVE\")]")
@@ -355,7 +355,7 @@ public class LeavingReasonResourceIntegrationTest {
     // Call the code under test and perform assertions.
     mockMvc.perform(get("/api/leaving-reasons"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(leavingReasonCount + 2))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
@@ -381,7 +381,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().json("[]"));
   }
 
@@ -401,7 +401,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"INACTIVE\")]")
@@ -427,7 +427,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"INACTIVE\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(1))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code two\" && @.label == \"label two\" && @.status == \"INACTIVE\")]")
@@ -451,7 +451,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
@@ -477,7 +477,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().json("[]"));
   }
 
@@ -497,7 +497,7 @@ public class LeavingReasonResourceIntegrationTest {
     mockMvc.perform(get("/api/leaving-reasons")
         .param("columnFilters", "{ \"status\" : [\"CURRENT\"] }"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.length()").value(1))
         .andExpect(jsonPath(
             "$.[?(@.code == \"code one\" && @.label == \"label one\" && @.status == \"CURRENT\")]")
@@ -541,7 +541,7 @@ public class LeavingReasonResourceIntegrationTest {
     assertThat("The number of leaving reasons did not match the expected value.", postDeleteCount,
         is(preDeleteCount - 1));
 
-    leavingReason = repository.findOne(id);
+    leavingReason = repository.findById(id).orElse(null);
     assertThat("The leaving reason did not match the expected value.", leavingReason, nullValue());
   }
 

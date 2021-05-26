@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<EthnicOriginDTO> createEthnicOrigin(
       @Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
@@ -108,7 +106,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<EthnicOriginDTO> updateEthnicOrigin(
       @Valid @RequestBody EthnicOriginDTO ethnicOriginDTO) throws URISyntaxException {
@@ -137,7 +134,6 @@ public class EthnicOriginResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "ethnic origins list")})
   @GetMapping("/ethnic-origins")
-  @Timed
   public ResponseEntity<List<EthnicOriginDTO>> getAllEthnicOrigins(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -170,10 +166,9 @@ public class EthnicOriginResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/ethnic-origins/{id}")
-  @Timed
   public ResponseEntity<EthnicOriginDTO> getEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to get EthnicOrigin : {}", id);
-    EthnicOrigin ethnicOrigin = ethnicOriginRepository.findOne(id);
+    EthnicOrigin ethnicOrigin = ethnicOriginRepository.findById(id).orElse(null);
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
         .ethnicOriginToEthnicOriginDTO(ethnicOrigin);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(ethnicOriginDTO));
@@ -187,12 +182,11 @@ public class EthnicOriginResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/ethnic-origins/exists/")
-  @Timed
   public ResponseEntity<Boolean> ethnicOriginExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check EthnicOrigin exists : {}", code);
-    Specifications<EthnicOrigin> specs = Specifications.where(isEqual("code", code));
+    Specification<EthnicOrigin> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -202,7 +196,7 @@ public class EthnicOriginResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = ethnicOriginRepository.findOne(specs) != null;
+    boolean exists = ethnicOriginRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -213,11 +207,10 @@ public class EthnicOriginResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/ethnic-origins/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteEthnicOrigin(@PathVariable Long id) {
     log.debug("REST request to delete EthnicOrigin : {}", id);
-    ethnicOriginRepository.delete(id);
+    ethnicOriginRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -231,7 +224,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<EthnicOriginDTO>> bulkCreateEthnicOrigin(
       @Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
@@ -249,7 +241,7 @@ public class EthnicOriginResource {
     }
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper
         .ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
-    ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
+    ethnicOrigins = ethnicOriginRepository.saveAll(ethnicOrigins);
     List<EthnicOriginDTO> result = ethnicOriginMapper
         .ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()
@@ -266,7 +258,6 @@ public class EthnicOriginResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-ethnic-origins")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<EthnicOriginDTO>> bulkUpdateEthnicOrigin(
       @Valid @RequestBody List<EthnicOriginDTO> ethnicOriginDTOS) throws URISyntaxException {
@@ -288,7 +279,7 @@ public class EthnicOriginResource {
     }
     List<EthnicOrigin> ethnicOrigins = ethnicOriginMapper
         .ethnicOriginDTOsToEthnicOrigins(ethnicOriginDTOS);
-    ethnicOrigins = ethnicOriginRepository.save(ethnicOrigins);
+    ethnicOrigins = ethnicOriginRepository.saveAll(ethnicOrigins);
     List<EthnicOriginDTO> results = ethnicOriginMapper
         .ethnicOriginsToEthnicOriginDTOs(ethnicOrigins);
     return ResponseEntity.ok()

@@ -111,7 +111,7 @@ public class CollegeResourceIntTest {
     // Create the College
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(college);
     restCollegeMockMvc.perform(post("/api/colleges")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(collegeDTO)))
         .andExpect(status().isCreated());
 
@@ -134,7 +134,7 @@ public class CollegeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restCollegeMockMvc.perform(post("/api/colleges")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(collegeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -154,7 +154,7 @@ public class CollegeResourceIntTest {
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(college);
 
     restCollegeMockMvc.perform(post("/api/colleges")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(collegeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -171,7 +171,7 @@ public class CollegeResourceIntTest {
     // Get all the collegeList
     restCollegeMockMvc.perform(get("/api/colleges?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(college.getId().intValue())))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
@@ -189,7 +189,7 @@ public class CollegeResourceIntTest {
     // Get all the collegeList
     restCollegeMockMvc.perform(get("/api/colleges?searchQuery=\"Te%24ting%20%26%20\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedCollege.getId().intValue())))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(UNENCODED_NAME.toString())));
@@ -204,7 +204,7 @@ public class CollegeResourceIntTest {
     // Get the college
     restCollegeMockMvc.perform(get("/api/colleges/{id}", college.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(college.getId().intValue()))
         .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION.toString()))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
@@ -226,14 +226,14 @@ public class CollegeResourceIntTest {
     int databaseSizeBeforeUpdate = collegeRepository.findAll().size();
 
     // Update the college
-    College updatedCollege = collegeRepository.findOne(college.getId());
+    College updatedCollege = collegeRepository.findById(college.getId()).get();
     updatedCollege
         .abbreviation(UPDATED_ABBREVIATION)
         .name(UPDATED_NAME);
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(updatedCollege);
 
     restCollegeMockMvc.perform(put("/api/colleges")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(collegeDTO)))
         .andExpect(status().isOk());
 
@@ -255,7 +255,7 @@ public class CollegeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restCollegeMockMvc.perform(put("/api/colleges")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(collegeDTO)))
         .andExpect(status().isCreated());
 
@@ -273,7 +273,7 @@ public class CollegeResourceIntTest {
 
     // Get the college
     restCollegeMockMvc.perform(delete("/api/colleges/{id}", college.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

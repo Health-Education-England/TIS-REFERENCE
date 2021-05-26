@@ -31,7 +31,6 @@ public class ConcernTypeResourceIntTest {
   private static final String DEFAULT_TYPE_CODE = "DEFAULT_TYPE_CODE";
   private static final String DEFAULT_TYPE_LABEL = "DEFAULT_TYPE_LABEL";
 
-
   @Autowired
   private ConcernTypeRepository concernTypeRepository;
 
@@ -75,7 +74,7 @@ public class ConcernTypeResourceIntTest {
 
     restConcernTypeMockMvc.perform(get("/api/concern-types"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(concernType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_TYPE_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_TYPE_LABEL.toString())));

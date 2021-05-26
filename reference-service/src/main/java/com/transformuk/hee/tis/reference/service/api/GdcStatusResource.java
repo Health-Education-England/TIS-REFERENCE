@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +78,6 @@ public class GdcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/gdc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GdcStatusDTO> createGdcStatus(@Valid @RequestBody GdcStatusDTO gdcStatusDTO)
       throws URISyntaxException {
@@ -107,7 +105,6 @@ public class GdcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/gdc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GdcStatusDTO> updateGdcStatus(@Valid @RequestBody GdcStatusDTO gdcStatusDTO)
       throws URISyntaxException {
@@ -134,7 +131,6 @@ public class GdcStatusResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "gdc statuses list")})
   @GetMapping("/gdc-statuses")
-  @Timed
   public ResponseEntity<List<GdcStatusDTO>> getAllGdcStatuses(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -167,10 +163,9 @@ public class GdcStatusResource {
    *     404 (Not Found)
    */
   @GetMapping("/gdc-statuses/{id}")
-  @Timed
   public ResponseEntity<GdcStatusDTO> getGdcStatus(@PathVariable Long id) {
     log.debug("REST request to get GdcStatus : {}", id);
-    GdcStatus gdcStatus = gdcStatusRepository.findOne(id);
+    GdcStatus gdcStatus = gdcStatusRepository.findById(id).orElse(null);
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(gdcStatus);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gdcStatusDTO));
   }
@@ -183,12 +178,11 @@ public class GdcStatusResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/gdc-statuses/exists/")
-  @Timed
   public ResponseEntity<Boolean> gdcStatusExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check GdcStatus exists : {}", code);
-    Specifications<GdcStatus> specs = Specifications.where(isEqual("code", code));
+    Specification<GdcStatus> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -198,7 +192,7 @@ public class GdcStatusResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = gdcStatusRepository.findOne(specs) != null;
+    boolean exists = gdcStatusRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -209,11 +203,10 @@ public class GdcStatusResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/gdc-statuses/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteGdcStatus(@PathVariable Long id) {
     log.debug("REST request to delete GdcStatus : {}", id);
-    gdcStatusRepository.delete(id);
+    gdcStatusRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -227,7 +220,6 @@ public class GdcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-gdc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GdcStatusDTO>> bulkCreateGdcStatus(
       @Valid @RequestBody List<GdcStatusDTO> gdcStatusDTOS) throws URISyntaxException {
@@ -244,7 +236,7 @@ public class GdcStatusResource {
       }
     }
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
-    gdcStatuses = gdcStatusRepository.save(gdcStatuses);
+    gdcStatuses = gdcStatusRepository.saveAll(gdcStatuses);
     List<GdcStatusDTO> result = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
     return ResponseEntity.ok()
         .body(result);
@@ -260,7 +252,6 @@ public class GdcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-gdc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GdcStatusDTO>> bulkUpdateGdcStatus(
       @Valid @RequestBody List<GdcStatusDTO> gdcStatusDTOS) throws URISyntaxException {
@@ -281,7 +272,7 @@ public class GdcStatusResource {
       }
     }
     List<GdcStatus> gdcStatuses = gdcStatusMapper.gdcStatusDTOsToGdcStatuses(gdcStatusDTOS);
-    gdcStatuses = gdcStatusRepository.save(gdcStatuses);
+    gdcStatuses = gdcStatusRepository.saveAll(gdcStatuses);
     List<GdcStatusDTO> results = gdcStatusMapper.gdcStatusesToGdcStatusDTOs(gdcStatuses);
     return ResponseEntity.ok()
         .body(results);

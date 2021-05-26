@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.PermitToWorkDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PermitToWorkDTO> createPermitToWork(
       @Valid @RequestBody PermitToWorkDTO permitToWorkDTO) throws URISyntaxException {
@@ -108,7 +106,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PermitToWorkDTO> updatePermitToWork(
       @Valid @RequestBody PermitToWorkDTO permitToWorkDTO) throws URISyntaxException {
@@ -137,7 +134,6 @@ public class PermitToWorkResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "permit to work list")})
   @GetMapping("/permit-to-works")
-  @Timed
   public ResponseEntity<List<PermitToWorkDTO>> getAllPermitToWorks(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -171,10 +167,9 @@ public class PermitToWorkResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/permit-to-works/{id}")
-  @Timed
   public ResponseEntity<PermitToWorkDTO> getPermitToWork(@PathVariable Long id) {
     log.debug("REST request to get PermitToWork : {}", id);
-    PermitToWork permitToWork = permitToWorkRepository.findOne(id);
+    PermitToWork permitToWork = permitToWorkRepository.findById(id).orElse(null);
     PermitToWorkDTO permitToWorkDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(permitToWork);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(permitToWorkDTO));
@@ -187,11 +182,10 @@ public class PermitToWorkResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/permit-to-works/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deletePermitToWork(@PathVariable Long id) {
     log.debug("REST request to delete PermitToWork : {}", id);
-    permitToWorkRepository.delete(id);
+    permitToWorkRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -205,7 +199,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PermitToWorkDTO>> bulkCreatePermitToWork(
       @Valid @RequestBody List<PermitToWorkDTO> permitToWorkDTOS) throws URISyntaxException {
@@ -223,7 +216,7 @@ public class PermitToWorkResource {
     }
     List<PermitToWork> permitToWorks = permitToWorkMapper
         .permitToWorkDTOsToPermitToWorks(permitToWorkDTOS);
-    permitToWorks = permitToWorkRepository.save(permitToWorks);
+    permitToWorks = permitToWorkRepository.saveAll(permitToWorks);
     List<PermitToWorkDTO> result = permitToWorkMapper
         .permitToWorksToPermitToWorkDTOs(permitToWorks);
     return ResponseEntity.ok()
@@ -240,7 +233,6 @@ public class PermitToWorkResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-permit-to-works")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PermitToWorkDTO>> bulkUpdatePermitToWork(
       @Valid @RequestBody List<PermitToWorkDTO> permitToWorkDTOS) throws URISyntaxException {
@@ -262,7 +254,7 @@ public class PermitToWorkResource {
     }
     List<PermitToWork> permitToWorks = permitToWorkMapper
         .permitToWorkDTOsToPermitToWorks(permitToWorkDTOS);
-    permitToWorks = permitToWorkRepository.save(permitToWorks);
+    permitToWorks = permitToWorkRepository.saveAll(permitToWorks);
     List<PermitToWorkDTO> results = permitToWorkMapper
         .permitToWorksToPermitToWorkDTOs(permitToWorks);
     return ResponseEntity.ok()
@@ -277,14 +269,12 @@ public class PermitToWorkResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/permit-to-works/exists")
-  @Timed
   public ResponseEntity<Boolean> permitToWorkExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
-    String codeToLog = null;
-    if (code != null) codeToLog = code.replaceAll("[\n\r\t]", "_");
+    String codeToLog = code != null ? code.replaceAll("[\n\r\t]", "_") : null;
     log.debug("REST request to check PermitToWork exists : {}", codeToLog);
-    Specifications<PermitToWork> specs = Specifications.where(isEqual("code", code));
+    Specification<PermitToWork> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -294,7 +284,7 @@ public class PermitToWorkResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = permitToWorkRepository.findOne(specs) != null;
+    boolean exists = permitToWorkRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 }

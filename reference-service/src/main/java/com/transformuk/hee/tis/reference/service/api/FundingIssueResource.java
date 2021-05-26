@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -76,7 +75,6 @@ public class FundingIssueResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/funding-issues")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingIssueDTO> createFundingIssue(
       @Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
@@ -104,7 +102,6 @@ public class FundingIssueResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/funding-issues")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingIssueDTO> updateFundingIssue(
       @Valid @RequestBody FundingIssueDTO fundingIssueDTO) throws URISyntaxException {
@@ -132,7 +129,6 @@ public class FundingIssueResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "funding issues list")})
   @GetMapping("/funding-issues")
-  @Timed
   public ResponseEntity<List<FundingIssueDTO>> getAllFundingIssues(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -165,10 +161,9 @@ public class FundingIssueResource {
    * status 404 (Not Found)
    */
   @GetMapping("/funding-issues/{id}")
-  @Timed
   public ResponseEntity<FundingIssueDTO> getFundingIssue(@PathVariable Long id) {
     log.debug("REST request to get FundingIssue : {}", id);
-    FundingIssue fundingIssue = fundingIssueRepository.findOne(id);
+    FundingIssue fundingIssue = fundingIssueRepository.findById(id).orElse(null);
     FundingIssueDTO fundingIssueDTO = fundingIssueMapper
         .fundingIssueToFundingIssueDTO(fundingIssue);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingIssueDTO));
@@ -181,11 +176,10 @@ public class FundingIssueResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/funding-issues/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteFundingIssue(@PathVariable Long id) {
     log.debug("REST request to delete FundingIssue : {}", id);
-    fundingIssueRepository.delete(id);
+    fundingIssueRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -199,7 +193,6 @@ public class FundingIssueResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-funding-issues")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingIssueDTO>> bulkCreateFundingIssue(
       @Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
@@ -217,7 +210,7 @@ public class FundingIssueResource {
     }
     List<FundingIssue> fundingIssues = fundingIssueMapper
         .fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
-    fundingIssues = fundingIssueRepository.save(fundingIssues);
+    fundingIssues = fundingIssueRepository.saveAll(fundingIssues);
     List<FundingIssueDTO> result = fundingIssueMapper
         .fundingIssuesToFundingIssueDTOs(fundingIssues);
     return ResponseEntity.ok()
@@ -234,7 +227,6 @@ public class FundingIssueResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-funding-issues")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingIssueDTO>> bulkUpdateFundingIssue(
       @Valid @RequestBody List<FundingIssueDTO> fundingIssueDTOS) throws URISyntaxException {
@@ -256,7 +248,7 @@ public class FundingIssueResource {
     }
     List<FundingIssue> fundingIssues = fundingIssueMapper
         .fundingIssueDTOsToFundingIssues(fundingIssueDTOS);
-    fundingIssues = fundingIssueRepository.save(fundingIssues);
+    fundingIssues = fundingIssueRepository.saveAll(fundingIssues);
     List<FundingIssueDTO> results = fundingIssueMapper
         .fundingIssuesToFundingIssueDTOs(fundingIssues);
     return ResponseEntity.ok()

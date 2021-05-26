@@ -117,7 +117,7 @@ public class TitleResourceIntTest {
     // Create the Title
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
     mockMvc.perform(post("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isCreated());
 
@@ -140,7 +140,7 @@ public class TitleResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -160,7 +160,7 @@ public class TitleResourceIntTest {
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
     mockMvc.perform(post("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -179,7 +179,7 @@ public class TitleResourceIntTest {
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(title);
 
     mockMvc.perform(post("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -196,7 +196,7 @@ public class TitleResourceIntTest {
     // Get all the titleList
     mockMvc.perform(get("/api/titles?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(title.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -214,7 +214,7 @@ public class TitleResourceIntTest {
     // Get all the titleList
     mockMvc.perform(get("/api/titles?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedTitle.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -229,7 +229,7 @@ public class TitleResourceIntTest {
     // Get the title
     mockMvc.perform(get("/api/titles/{id}", title.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(title.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -251,14 +251,14 @@ public class TitleResourceIntTest {
     int databaseSizeBeforeUpdate = titleRepository.findAll().size();
 
     // Update the title
-    Title updatedTitle = titleRepository.findOne(title.getId());
+    Title updatedTitle = titleRepository.findById(title.getId()).get();
     updatedTitle
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(updatedTitle);
 
     mockMvc.perform(put("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isOk());
 
@@ -280,7 +280,7 @@ public class TitleResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/titles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(titleDTO)))
         .andExpect(status().isCreated());
 
@@ -298,7 +298,7 @@ public class TitleResourceIntTest {
 
     // Get the title
     mockMvc.perform(delete("/api/titles/{id}", title.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -316,7 +316,7 @@ public class TitleResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -328,7 +328,7 @@ public class TitleResourceIntTest {
     titleRepository.saveAndFlush(title);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -340,7 +340,7 @@ public class TitleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -355,7 +355,7 @@ public class TitleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -370,7 +370,7 @@ public class TitleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

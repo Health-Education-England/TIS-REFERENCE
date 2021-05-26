@@ -114,7 +114,7 @@ public class TrainingNumberTypeResourceIntTest {
     TrainingNumberTypeDTO trainingNumberTypeDTO = trainingNumberTypeMapper
         .trainingNumberTypeToTrainingNumberTypeDTO(trainingNumberType);
     restTrainingNumberTypeMockMvc.perform(post("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -139,7 +139,7 @@ public class TrainingNumberTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restTrainingNumberTypeMockMvc.perform(post("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -160,7 +160,7 @@ public class TrainingNumberTypeResourceIntTest {
         .trainingNumberTypeToTrainingNumberTypeDTO(trainingNumberType);
 
     restTrainingNumberTypeMockMvc.perform(post("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -180,7 +180,7 @@ public class TrainingNumberTypeResourceIntTest {
         .trainingNumberTypeToTrainingNumberTypeDTO(trainingNumberType);
 
     restTrainingNumberTypeMockMvc.perform(post("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -197,7 +197,7 @@ public class TrainingNumberTypeResourceIntTest {
     // Get all the trainingNumberTypeList
     restTrainingNumberTypeMockMvc.perform(get("/api/training-number-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(trainingNumberType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -216,7 +216,7 @@ public class TrainingNumberTypeResourceIntTest {
     restTrainingNumberTypeMockMvc
         .perform(get("/api/training-number-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedTrainingNumberType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -232,7 +232,7 @@ public class TrainingNumberTypeResourceIntTest {
     restTrainingNumberTypeMockMvc
         .perform(get("/api/training-number-types/{id}", trainingNumberType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(trainingNumberType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -255,7 +255,7 @@ public class TrainingNumberTypeResourceIntTest {
 
     // Update the trainingNumberType
     TrainingNumberType updatedTrainingNumberType = trainingNumberTypeRepository
-        .findOne(trainingNumberType.getId());
+        .findById(trainingNumberType.getId()).get();
     updatedTrainingNumberType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -263,7 +263,7 @@ public class TrainingNumberTypeResourceIntTest {
         .trainingNumberTypeToTrainingNumberTypeDTO(updatedTrainingNumberType);
 
     restTrainingNumberTypeMockMvc.perform(put("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isOk());
 
@@ -287,7 +287,7 @@ public class TrainingNumberTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restTrainingNumberTypeMockMvc.perform(put("/api/training-number-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(trainingNumberTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -306,7 +306,7 @@ public class TrainingNumberTypeResourceIntTest {
     // Get the trainingNumberType
     restTrainingNumberTypeMockMvc
         .perform(delete("/api/training-number-types/{id}", trainingNumberType.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

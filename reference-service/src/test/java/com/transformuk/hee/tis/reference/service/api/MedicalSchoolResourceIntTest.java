@@ -112,7 +112,7 @@ public class MedicalSchoolResourceIntTest {
     MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
         .medicalSchoolToMedicalSchoolDTO(medicalSchool);
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isCreated());
 
@@ -136,7 +136,7 @@ public class MedicalSchoolResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isBadRequest());
 
@@ -157,7 +157,7 @@ public class MedicalSchoolResourceIntTest {
         .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isBadRequest());
 
@@ -177,7 +177,7 @@ public class MedicalSchoolResourceIntTest {
         .medicalSchoolToMedicalSchoolDTO(medicalSchool);
 
     restMedicalSchoolMockMvc.perform(post("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isBadRequest());
 
@@ -198,7 +198,7 @@ public class MedicalSchoolResourceIntTest {
     restMedicalSchoolMockMvc
         .perform(get("/api/medical-schools?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedMedicalSchool.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -213,7 +213,7 @@ public class MedicalSchoolResourceIntTest {
     // Get the medicalSchool
     restMedicalSchoolMockMvc.perform(get("/api/medical-schools/{id}", medicalSchool.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(medicalSchool.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -235,7 +235,7 @@ public class MedicalSchoolResourceIntTest {
     int databaseSizeBeforeUpdate = medicalSchoolRepository.findAll().size();
 
     // Update the medicalSchool
-    MedicalSchool updatedMedicalSchool = medicalSchoolRepository.findOne(medicalSchool.getId());
+    MedicalSchool updatedMedicalSchool = medicalSchoolRepository.findById(medicalSchool.getId()).get();
     updatedMedicalSchool
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -243,7 +243,7 @@ public class MedicalSchoolResourceIntTest {
         .medicalSchoolToMedicalSchoolDTO(updatedMedicalSchool);
 
     restMedicalSchoolMockMvc.perform(put("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isOk());
 
@@ -266,7 +266,7 @@ public class MedicalSchoolResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restMedicalSchoolMockMvc.perform(put("/api/medical-schools")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(medicalSchoolDTO)))
         .andExpect(status().isCreated());
 
@@ -284,7 +284,7 @@ public class MedicalSchoolResourceIntTest {
 
     // Get the medicalSchool
     restMedicalSchoolMockMvc.perform(delete("/api/medical-schools/{id}", medicalSchool.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

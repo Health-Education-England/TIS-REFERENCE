@@ -115,7 +115,7 @@ public class CountryResourceIntTest {
     // Create the Country
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
     restCountryMockMvc.perform(post("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isCreated());
 
@@ -138,7 +138,7 @@ public class CountryResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restCountryMockMvc.perform(post("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isBadRequest());
 
@@ -158,7 +158,7 @@ public class CountryResourceIntTest {
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
 
     restCountryMockMvc.perform(post("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isBadRequest());
 
@@ -177,7 +177,7 @@ public class CountryResourceIntTest {
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
 
     restCountryMockMvc.perform(post("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isBadRequest());
 
@@ -194,7 +194,7 @@ public class CountryResourceIntTest {
     // Get all the countryList
     restCountryMockMvc.perform(get("/api/countries?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
         .andExpect(
             jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
@@ -210,7 +210,7 @@ public class CountryResourceIntTest {
     // Get all the countryList
     restCountryMockMvc.perform(get("/api/countries?searchQuery=\"AAAAA\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
         .andExpect(
             jsonPath("$.[*].countryNumber").value(hasItem(DEFAULT_COUNTRY_NUMBER.toString())))
@@ -229,7 +229,7 @@ public class CountryResourceIntTest {
     // Get all the countryList
     restCountryMockMvc.perform(get("/api/countries?searchQuery=\"Check%21%20\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(unencodedCountry.getId().intValue())))
         .andExpect(
             jsonPath("$.[*].countryNumber").value(hasItem(UNENCODED_COUNTRY_NUMBER.toString())))
@@ -245,7 +245,7 @@ public class CountryResourceIntTest {
     // Get the country
     restCountryMockMvc.perform(get("/api/countries/{id}", country.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(country.getId().intValue()))
         .andExpect(jsonPath("$.countryNumber").value(DEFAULT_COUNTRY_NUMBER.toString()))
         .andExpect(jsonPath("$.nationality").value(DEFAULT_NATIONALITY.toString()));
@@ -260,10 +260,10 @@ public class CountryResourceIntTest {
     expectedMap.put("XYZ", false);
     List<String> nationalities = Lists.newArrayList(country.getNationality(), "XYZ");
     restCountryMockMvc.perform(post("/api/countries/exists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(nationalities)))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
@@ -283,14 +283,14 @@ public class CountryResourceIntTest {
     int databaseSizeBeforeUpdate = countryRepository.findAll().size();
 
     // Update the country
-    Country updatedCountry = countryRepository.findOne(country.getId());
+    Country updatedCountry = countryRepository.findById(country.getId()).get();
     updatedCountry
         .countryNumber(UPDATED_COUNTRY_NUMBER)
         .nationality(UPDATED_NATIONALITY);
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(updatedCountry);
 
     restCountryMockMvc.perform(put("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isOk());
 
@@ -312,7 +312,7 @@ public class CountryResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restCountryMockMvc.perform(put("/api/countries")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
         .andExpect(status().isCreated());
 
@@ -330,7 +330,7 @@ public class CountryResourceIntTest {
 
     // Get the country
     restCountryMockMvc.perform(delete("/api/countries/{id}", country.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

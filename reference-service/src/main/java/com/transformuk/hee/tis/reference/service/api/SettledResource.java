@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.SettledDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -75,7 +74,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SettledDTO> createSettled(@Valid @RequestBody SettledDTO settledDTO)
       throws URISyntaxException {
@@ -103,7 +101,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<SettledDTO> updateSettled(@Valid @RequestBody SettledDTO settledDTO)
       throws URISyntaxException {
@@ -131,7 +128,6 @@ public class SettledResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "settled list")})
   @GetMapping("/settleds")
-  @Timed
   public ResponseEntity<List<SettledDTO>> getAllSettleds(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -164,10 +160,9 @@ public class SettledResource {
    * 404 (Not Found)
    */
   @GetMapping("/settleds/{id}")
-  @Timed
   public ResponseEntity<SettledDTO> getSettled(@PathVariable Long id) {
     log.debug("REST request to get Settled : {}", id);
-    Settled settled = settledRepository.findOne(id);
+    Settled settled = settledRepository.findById(id).orElse(null);
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(settled);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(settledDTO));
   }
@@ -179,11 +174,10 @@ public class SettledResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/settleds/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteSettled(@PathVariable Long id) {
     log.debug("REST request to delete Settled : {}", id);
-    settledRepository.delete(id);
+    settledRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -198,7 +192,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SettledDTO>> bulkCreateSettled(
       @Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
@@ -215,7 +208,7 @@ public class SettledResource {
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
-    settledList = settledRepository.save(settledList);
+    settledList = settledRepository.saveAll(settledList);
     List<SettledDTO> result = settledMapper.settledsToSettledDTOs(settledList);
     return ResponseEntity.ok()
         .body(result);
@@ -231,7 +224,6 @@ public class SettledResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-settleds")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<SettledDTO>> bulkUpdateSettled(
       @Valid @RequestBody List<SettledDTO> settledDTOS) throws URISyntaxException {
@@ -252,7 +244,7 @@ public class SettledResource {
       }
     }
     List<Settled> settledList = settledMapper.settledDTOsToSettleds(settledDTOS);
-    settledList = settledRepository.save(settledList);
+    settledList = settledRepository.saveAll(settledList);
     List<SettledDTO> results = settledMapper.settledsToSettledDTOs(settledList);
     return ResponseEntity.ok()
         .body(results);

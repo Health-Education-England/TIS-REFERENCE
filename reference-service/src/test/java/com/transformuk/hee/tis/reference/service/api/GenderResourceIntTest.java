@@ -118,7 +118,7 @@ public class GenderResourceIntTest {
     // Create the Gender
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
     mockMvc.perform(post("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isCreated());
 
@@ -141,7 +141,7 @@ public class GenderResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
 
@@ -161,7 +161,7 @@ public class GenderResourceIntTest {
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
     mockMvc.perform(post("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
 
@@ -180,7 +180,7 @@ public class GenderResourceIntTest {
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(gender);
 
     mockMvc.perform(post("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isBadRequest());
 
@@ -197,7 +197,7 @@ public class GenderResourceIntTest {
     // Get all the genderList
     mockMvc.perform(get("/api/genders?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(gender.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -215,7 +215,7 @@ public class GenderResourceIntTest {
     // Get all the genderList
     mockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedGender.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -230,7 +230,7 @@ public class GenderResourceIntTest {
     // Get the gender
     mockMvc.perform(get("/api/genders/{id}", gender.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(gender.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -252,14 +252,14 @@ public class GenderResourceIntTest {
     int databaseSizeBeforeUpdate = genderRepository.findAll().size();
 
     // Update the gender
-    Gender updatedGender = genderRepository.findOne(gender.getId());
+    Gender updatedGender = genderRepository.findById(gender.getId()).get();
     updatedGender
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(updatedGender);
 
     mockMvc.perform(put("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isOk());
 
@@ -281,7 +281,7 @@ public class GenderResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/genders")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(genderDTO)))
         .andExpect(status().isCreated());
 
@@ -299,7 +299,7 @@ public class GenderResourceIntTest {
 
     // Get the gender
     mockMvc.perform(delete("/api/genders/{id}", gender.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -317,7 +317,7 @@ public class GenderResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -329,7 +329,7 @@ public class GenderResourceIntTest {
     genderRepository.saveAndFlush(gender);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -341,7 +341,7 @@ public class GenderResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -356,7 +356,7 @@ public class GenderResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -371,7 +371,7 @@ public class GenderResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

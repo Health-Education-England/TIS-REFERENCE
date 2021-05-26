@@ -2,6 +2,8 @@ package com.transformuk.hee.tis.reference.service.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.Site;
@@ -25,7 +27,7 @@ import org.springframework.data.domain.Pageable;
 public class SitesTrustsServiceTest {
 
   public static final String SEARCH_STRING = "search me";
-  public static final Pageable LIMIT = new PageRequest(0, 100);
+  public static final Pageable LIMIT = PageRequest.of(0, 100);
   public static final List<Site> EMPTY_SITE_LIST = new ArrayList<>();
   public static final List<Trust> EMPTY_TRUST_LIST = new ArrayList<>();
   public static final String TRUST_CODE = "trust code";
@@ -73,7 +75,7 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrust() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode(SEARCH_STRING, TRUST_CODE, LIMIT))
+    given(siteRepository.findBySearchStringAndTrustCode(TRUST_CODE, SEARCH_STRING, LIMIT))
         .willReturn(EMPTY_SITE_LIST);
 
     // when
@@ -86,8 +88,7 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode("", TRUST_CODE, LIMIT))
-        .willReturn(EMPTY_SITE_LIST);
+    given(siteRepository.findByTrustCode(TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
@@ -124,15 +125,12 @@ public class SitesTrustsServiceTest {
 
   @Test
   public void shouldReturnAllTrustsIfSearchStringIsNullOrEmpty() {
-    // given
-    Page<Trust> emptyPage = new PageImpl<>(EMPTY_TRUST_LIST);
-    given(trustRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
-
     // when
     List<Trust> trusts = service.searchTrusts("");
 
     // then
     assertEquals(EMPTY_SITE_LIST, trusts);
+    verify(trustRepository).findAll();
   }
 
   @Test
@@ -164,14 +162,11 @@ public class SitesTrustsServiceTest {
 
   @Test
   public void shouldReturnAllLocalOfficesIfSearchStringIsNullOrEmpty() {
-    // given
-    Page<LocalOffice> emptyPage = new PageImpl<>(EMPTY_LO_LIST);
-    given(localOfficeRepository.findBySearchString("", LIMIT)).willReturn(emptyPage);
-
     // when
     List<LocalOffice> localOffices = service.searchLocalOffices("");
 
     // then
     assertEquals(EMPTY_LO_LIST, localOffices);
+    verify(localOfficeRepository).findAll();
   }
 }

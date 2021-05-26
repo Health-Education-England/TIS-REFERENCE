@@ -119,7 +119,7 @@ public class SexualOrientationResourceIntTest {
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
     mockMvc.perform(post("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isCreated());
 
@@ -144,7 +144,7 @@ public class SexualOrientationResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -165,7 +165,7 @@ public class SexualOrientationResourceIntTest {
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
     mockMvc.perform(post("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -185,7 +185,7 @@ public class SexualOrientationResourceIntTest {
         .sexualOrientationToSexualOrientationDTO(sexualOrientation);
 
     mockMvc.perform(post("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isBadRequest());
 
@@ -202,7 +202,7 @@ public class SexualOrientationResourceIntTest {
     // Get all the sexualOrientationList
     mockMvc.perform(get("/api/sexual-orientations?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(sexualOrientation.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -221,7 +221,7 @@ public class SexualOrientationResourceIntTest {
     mockMvc
         .perform(get("/api/sexual-orientations?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedSexualOrientation.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -237,7 +237,7 @@ public class SexualOrientationResourceIntTest {
     mockMvc
         .perform(get("/api/sexual-orientations/{id}", sexualOrientation.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(sexualOrientation.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -260,7 +260,7 @@ public class SexualOrientationResourceIntTest {
 
     // Update the sexualOrientation
     SexualOrientation updatedSexualOrientation = sexualOrientationRepository
-        .findOne(sexualOrientation.getId());
+        .findById(sexualOrientation.getId()).get();
     updatedSexualOrientation
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -268,7 +268,7 @@ public class SexualOrientationResourceIntTest {
         .sexualOrientationToSexualOrientationDTO(updatedSexualOrientation);
 
     mockMvc.perform(put("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isOk());
 
@@ -292,7 +292,7 @@ public class SexualOrientationResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/sexual-orientations")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(sexualOrientationDTO)))
         .andExpect(status().isCreated());
 
@@ -311,7 +311,7 @@ public class SexualOrientationResourceIntTest {
     // Get the sexualOrientation
     mockMvc
         .perform(delete("/api/sexual-orientations/{id}", sexualOrientation.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -329,7 +329,7 @@ public class SexualOrientationResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -341,7 +341,7 @@ public class SexualOrientationResourceIntTest {
     sexualOrientationRepository.saveAndFlush(sexualOrientation);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -353,7 +353,7 @@ public class SexualOrientationResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -368,7 +368,7 @@ public class SexualOrientationResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -383,7 +383,7 @@ public class SexualOrientationResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

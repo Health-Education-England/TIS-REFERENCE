@@ -105,7 +105,7 @@ public class StatusResourceIntTest {
     // Create the Status
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(status);
     restStatusMockMvc.perform(post("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isCreated());
 
@@ -128,7 +128,7 @@ public class StatusResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restStatusMockMvc.perform(post("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -148,7 +148,7 @@ public class StatusResourceIntTest {
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(status);
 
     restStatusMockMvc.perform(post("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -167,7 +167,7 @@ public class StatusResourceIntTest {
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(status);
 
     restStatusMockMvc.perform(post("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isBadRequest());
 
@@ -184,7 +184,7 @@ public class StatusResourceIntTest {
     // Get all the statusList
     restStatusMockMvc.perform(get("/api/statuses?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(status.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -199,7 +199,7 @@ public class StatusResourceIntTest {
     // Get the status
     restStatusMockMvc.perform(get("/api/statuses/{id}", status.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(status.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -221,14 +221,14 @@ public class StatusResourceIntTest {
     int databaseSizeBeforeUpdate = statusRepository.findAll().size();
 
     // Update the status
-    Status updatedStatus = statusRepository.findOne(status.getId());
+    Status updatedStatus = statusRepository.findById(status.getId()).get();
     updatedStatus
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(updatedStatus);
 
     restStatusMockMvc.perform(put("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isOk());
 
@@ -250,7 +250,7 @@ public class StatusResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restStatusMockMvc.perform(put("/api/statuses")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(statusDTO)))
         .andExpect(status().isCreated());
 
@@ -268,7 +268,7 @@ public class StatusResourceIntTest {
 
     // Get the status
     restStatusMockMvc.perform(delete("/api/statuses/{id}", status.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ReligiousBeliefDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ReligiousBeliefDTO> createReligiousBelief(
       @Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
@@ -110,7 +108,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<ReligiousBeliefDTO> updateReligiousBelief(
       @Valid @RequestBody ReligiousBeliefDTO religiousBeliefDTO) throws URISyntaxException {
@@ -141,7 +138,6 @@ public class ReligiousBeliefResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "religious beliefs list")})
   @GetMapping("/religious-beliefs")
-  @Timed
   public ResponseEntity<List<ReligiousBeliefDTO>> getAllReligiousBeliefs(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -177,10 +173,9 @@ public class ReligiousBeliefResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/religious-beliefs/{id}")
-  @Timed
   public ResponseEntity<ReligiousBeliefDTO> getReligiousBelief(@PathVariable Long id) {
     log.debug("REST request to get ReligiousBelief : {}", id);
-    ReligiousBelief religiousBelief = religiousBeliefRepository.findOne(id);
+    ReligiousBelief religiousBelief = religiousBeliefRepository.findById(id).orElse(null);
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(religiousBelief);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(religiousBeliefDTO));
@@ -194,12 +189,11 @@ public class ReligiousBeliefResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/religious-beliefs/exists/")
-  @Timed
   public ResponseEntity<Boolean> religiousBeliefExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check ReligiousBelief exists : {}", code);
-    Specifications<ReligiousBelief> specs = Specifications.where(isEqual("code", code));
+    Specification<ReligiousBelief> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -209,7 +203,7 @@ public class ReligiousBeliefResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = religiousBeliefRepository.findOne(specs) != null;
+    boolean exists = religiousBeliefRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -220,11 +214,10 @@ public class ReligiousBeliefResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/religious-beliefs/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteReligiousBelief(@PathVariable Long id) {
     log.debug("REST request to delete ReligiousBelief : {}", id);
-    religiousBeliefRepository.delete(id);
+    religiousBeliefRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -239,7 +232,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ReligiousBeliefDTO>> bulkCreateReligiousBelief(
       @Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
@@ -257,7 +249,7 @@ public class ReligiousBeliefResource {
     }
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper
         .religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
-    religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+    religiousBeliefs = religiousBeliefRepository.saveAll(religiousBeliefs);
     List<ReligiousBeliefDTO> result = religiousBeliefMapper
         .religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
     return ResponseEntity.ok()
@@ -274,7 +266,6 @@ public class ReligiousBeliefResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-religious-beliefs")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<ReligiousBeliefDTO>> bulkUpdateReligiousBelief(
       @Valid @RequestBody List<ReligiousBeliefDTO> religiousBeliefDTOS) throws URISyntaxException {
@@ -296,7 +287,7 @@ public class ReligiousBeliefResource {
     }
     List<ReligiousBelief> religiousBeliefs = religiousBeliefMapper
         .religiousBeliefDTOsToReligiousBeliefs(religiousBeliefDTOS);
-    religiousBeliefs = religiousBeliefRepository.save(religiousBeliefs);
+    religiousBeliefs = religiousBeliefRepository.saveAll(religiousBeliefs);
     List<ReligiousBeliefDTO> results = religiousBeliefMapper
         .religiousBeliefsToReligiousBeliefDTOs(religiousBeliefs);
     return ResponseEntity.ok()

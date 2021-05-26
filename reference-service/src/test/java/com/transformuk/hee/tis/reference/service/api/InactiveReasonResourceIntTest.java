@@ -114,7 +114,7 @@ public class InactiveReasonResourceIntTest {
     InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
         .inactiveReasonToInactiveReasonDTO(inactiveReason);
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isCreated());
 
@@ -138,7 +138,7 @@ public class InactiveReasonResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isBadRequest());
 
@@ -159,7 +159,7 @@ public class InactiveReasonResourceIntTest {
         .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isBadRequest());
 
@@ -179,7 +179,7 @@ public class InactiveReasonResourceIntTest {
         .inactiveReasonToInactiveReasonDTO(inactiveReason);
 
     restInactiveReasonMockMvc.perform(post("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isBadRequest());
 
@@ -196,7 +196,7 @@ public class InactiveReasonResourceIntTest {
     // Get all the inactiveReasonList
     restInactiveReasonMockMvc.perform(get("/api/inactive-reasons?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(inactiveReason.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -215,7 +215,7 @@ public class InactiveReasonResourceIntTest {
     restInactiveReasonMockMvc
         .perform(get("/api/inactive-reasons?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedInactiveReason.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -230,7 +230,7 @@ public class InactiveReasonResourceIntTest {
     // Get the inactiveReason
     restInactiveReasonMockMvc.perform(get("/api/inactive-reasons/{id}", inactiveReason.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(inactiveReason.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -252,7 +252,8 @@ public class InactiveReasonResourceIntTest {
     int databaseSizeBeforeUpdate = inactiveReasonRepository.findAll().size();
 
     // Update the inactiveReason
-    InactiveReason updatedInactiveReason = inactiveReasonRepository.findOne(inactiveReason.getId());
+    InactiveReason updatedInactiveReason = inactiveReasonRepository
+        .findById(inactiveReason.getId()).get();
     updatedInactiveReason
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -260,7 +261,7 @@ public class InactiveReasonResourceIntTest {
         .inactiveReasonToInactiveReasonDTO(updatedInactiveReason);
 
     restInactiveReasonMockMvc.perform(put("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isOk());
 
@@ -283,7 +284,7 @@ public class InactiveReasonResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restInactiveReasonMockMvc.perform(put("/api/inactive-reasons")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(inactiveReasonDTO)))
         .andExpect(status().isCreated());
 
@@ -301,7 +302,7 @@ public class InactiveReasonResourceIntTest {
 
     // Get the inactiveReason
     restInactiveReasonMockMvc.perform(delete("/api/inactive-reasons/{id}", inactiveReason.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
@@ -79,7 +78,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CountryDTO> createCountry(@Valid @RequestBody CountryDTO countryDTO)
       throws URISyntaxException {
@@ -107,7 +105,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<CountryDTO> updateCountry(@Valid @RequestBody CountryDTO countryDTO)
       throws URISyntaxException {
@@ -134,7 +131,6 @@ public class CountryResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/countries")
-  @Timed
   public ResponseEntity<List<CountryDTO>> getAllCountries(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -167,7 +163,6 @@ public class CountryResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/current/countries")
-  @Timed
   public ResponseEntity<List<CountryDTO>> getAllCurrentCountries(@ApiParam Pageable pageable) {
     log.debug("REST request to get a page of current Countries");
     Country country = new Country();
@@ -185,7 +180,6 @@ public class CountryResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/countries/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> countriesExists(@RequestBody List<String> values) {
     Map<String, Boolean> countriesExistsMap = Maps.newHashMap();
     log.debug("REST request to check Countries exists : {}", values);
@@ -208,10 +202,9 @@ public class CountryResource {
    * 404 (Not Found)
    */
   @GetMapping("/countries/{id}")
-  @Timed
   public ResponseEntity<CountryDTO> getCountry(@PathVariable Long id) {
     log.debug("REST request to get Country : {}", id);
-    Country country = countryRepository.findOne(id);
+    Country country = countryRepository.findById(id).orElse(null);
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(country);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(countryDTO));
   }
@@ -223,11 +216,10 @@ public class CountryResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/countries/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
     log.debug("REST request to delete Country : {}", id);
-    countryRepository.delete(id);
+    countryRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -242,7 +234,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CountryDTO>> bulkCreateCountry(
       @Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
@@ -259,7 +250,7 @@ public class CountryResource {
       }
     }
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
-    countries = countryRepository.save(countries);
+    countries = countryRepository.saveAll(countries);
     List<CountryDTO> result = countryMapper.countriesToCountryDTOs(countries);
     return ResponseEntity.ok()
         .body(result);
@@ -275,7 +266,6 @@ public class CountryResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-countries")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<CountryDTO>> bulkUpdateCountry(
       @Valid @RequestBody List<CountryDTO> countryDTOS) throws URISyntaxException {
@@ -296,7 +286,7 @@ public class CountryResource {
       }
     }
     List<Country> countries = countryMapper.countryDTOsToCountries(countryDTOS);
-    countries = countryRepository.save(countries);
+    countries = countryRepository.saveAll(countries);
     List<CountryDTO> results = countryMapper.countriesToCountryDTOs(countries);
     return ResponseEntity.ok()
         .body(results);

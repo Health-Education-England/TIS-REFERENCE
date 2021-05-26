@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
@@ -87,7 +86,6 @@ public class GradeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/grades")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GradeDTO> createGrade(
       @Validated(Create.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
@@ -110,7 +108,6 @@ public class GradeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/grades")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GradeDTO> updateGrade(
       @Validated(Update.class) @RequestBody GradeDTO gradeDTO) throws URISyntaxException {
@@ -131,10 +128,9 @@ public class GradeResource {
    * (Not Found)
    */
   @GetMapping("/grades/{id}")
-  @Timed
   public ResponseEntity<GradeDTO> getGrade(@PathVariable Long id) {
     log.debug("REST request to get Grade : {}", id);
-    Grade grade = gradeRepository.findOne(id);
+    Grade grade = gradeRepository.findById(id).orElse(null);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gradeDTO));
   }
@@ -147,7 +143,6 @@ public class GradeResource {
    * list
    */
   @GetMapping("/grades/in/{codes}")
-  @Timed
   public ResponseEntity<List<GradeDTO>> getGradesIn(@PathVariable String codes) {
     log.debug("REST request to find several  Grades");
     List<GradeDTO> resp = new ArrayList<>();
@@ -177,7 +172,6 @@ public class GradeResource {
    * list
    */
   @GetMapping("/grades/ids/in")
-  @Timed
   public ResponseEntity<List<GradeDTO>> getGradesByIds(@RequestParam List<Long> ids) {
     log.debug("REST request to find several Grades by ids");
     List<GradeDTO> resp = new ArrayList<>();
@@ -185,7 +179,7 @@ public class GradeResource {
     if (CollectionUtils.isEmpty(ids)) {
       return new ResponseEntity<>(resp, HttpStatus.OK);
     } else {
-      List<Grade> grades = gradeRepository.findAll(ids);
+      List<Grade> grades = gradeRepository.findAllById(ids);
       resp = gradeMapper.gradesToGradeDTOs(grades);
       return new ResponseEntity<>(resp,
           CollectionUtils.isEmpty(resp) ? HttpStatus.NOT_FOUND : HttpStatus.OK);
@@ -204,7 +198,6 @@ public class GradeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "grades list")})
   @GetMapping("/grades")
-  @Timed
   public ResponseEntity<List<GradeDTO>> getAllGrades(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -234,7 +227,6 @@ public class GradeResource {
 
   @ApiOperation("Get all current grades using pagination or smart search")
   @GetMapping("/current/grades")
-  @Timed
   @Transactional(readOnly = true)
   public ResponseEntity<List<GradeDTO>> getAllCurrentGrades(
       @ApiParam Pageable pageable,
@@ -263,7 +255,6 @@ public class GradeResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/grades/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> gradeExists(@RequestBody List<String> abbreviations) {
     Map<String, Boolean> gradeExistsMap = Maps.newHashMap();
     log.debug("REST request to check Grade exists : {}", abbreviations);
@@ -284,12 +275,11 @@ public class GradeResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/grades/ids/exists/")
-  @Timed
   public ResponseEntity<Map<Long, Boolean>> gradeIdsExists(@RequestBody List<Long> ids) {
     Map<Long, Boolean> gradeExistsMap = Maps.newHashMap();
     log.debug("REST request to check Grade exists : {}", ids);
     if (!CollectionUtils.isEmpty(ids)) {
-      List<Grade> found = gradeRepository.findAll(ids);
+      List<Grade> found = gradeRepository.findAllById(ids);
       Set<Long> foundIds = found.stream().map(Grade::getId).collect(Collectors.toSet());
       ids.forEach(id -> {
         if (foundIds.contains(id)) {
@@ -312,7 +302,6 @@ public class GradeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-grades")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GradeDTO>> bulkCreateGrade(
       @Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
@@ -328,7 +317,7 @@ public class GradeResource {
       }
     }
     List<Grade> grades = gradeMapper.gradeDTOsToGrades(gradeDTOs);
-    grades = gradeRepository.save(grades);
+    grades = gradeRepository.saveAll(grades);
     List<GradeDTO> results = gradeMapper.gradesToGradeDTOs(grades);
     return ResponseEntity.ok()
         .body(results);
@@ -344,7 +333,6 @@ public class GradeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-grades")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GradeDTO>> bulkUpdateGrade(
       @Valid @RequestBody List<GradeDTO> gradeDTOs) throws URISyntaxException {
@@ -366,7 +354,7 @@ public class GradeResource {
     }
 
     List<Grade> grades = gradeMapper.gradeDTOsToGrades(gradeDTOs);
-    grades = gradeRepository.save(grades);
+    grades = gradeRepository.saveAll(grades);
     List<GradeDTO> results = gradeMapper.gradesToGradeDTOs(grades);
 
     return ResponseEntity.ok()

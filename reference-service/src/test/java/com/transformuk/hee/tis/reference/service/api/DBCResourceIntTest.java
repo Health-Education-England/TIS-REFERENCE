@@ -122,7 +122,7 @@ public class DBCResourceIntTest {
     // Create the DBC
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
     restDBCMockMvc.perform(post("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isCreated());
 
@@ -144,7 +144,7 @@ public class DBCResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restDBCMockMvc.perform(post("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isBadRequest());
 
@@ -163,7 +163,7 @@ public class DBCResourceIntTest {
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
     restDBCMockMvc.perform(post("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isBadRequest());
 
@@ -181,7 +181,7 @@ public class DBCResourceIntTest {
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
     restDBCMockMvc.perform(post("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isBadRequest());
 
@@ -199,7 +199,7 @@ public class DBCResourceIntTest {
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
 
     restDBCMockMvc.perform(post("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isBadRequest());
 
@@ -216,7 +216,7 @@ public class DBCResourceIntTest {
     // Get all the dBCList
     restDBCMockMvc.perform(get("/api/dbcs?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(dBC.getId().intValue())))
         .andExpect(jsonPath("$.[*].dbc").value(hasItem(DEFAULT_DBC.toString())))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
@@ -232,13 +232,13 @@ public class DBCResourceIntTest {
         .abbr(UNENCODED_ABBR);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
-    dBCRepository.save(dbcs);
+    dBCRepository.saveAll(dbcs);
     dBCRepository.flush();
 
     // Get all the dBCList
     restDBCMockMvc.perform(get("/api/dbcs?searchQuery=\"Te%24ting%20%26%20\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(encDbc.getId().intValue()))
         .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
@@ -254,7 +254,7 @@ public class DBCResourceIntTest {
     // Get the dBC
     restDBCMockMvc.perform(get("/api/dbcs/{id}", dBC.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(dBC.getId().intValue()))
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC.toString()))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
@@ -270,7 +270,7 @@ public class DBCResourceIntTest {
     // Get the dBC
     restDBCMockMvc.perform(get("/api/dbcs/code/" + DEFAULT_DBC))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
         .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
@@ -291,7 +291,7 @@ public class DBCResourceIntTest {
     dBCRepository.saveAndFlush(dBC);
 
     // Update the dBC
-    DBC updatedDBC = dBCRepository.findOne(dBC.getId());
+    DBC updatedDBC = dBCRepository.findById(dBC.getId()).get();
     updatedDBC
         .dbc(UPDATED_DBC)
         .name(UPDATED_NAME)
@@ -299,7 +299,7 @@ public class DBCResourceIntTest {
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(updatedDBC);
 
     restDBCMockMvc.perform(put("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isOk());
 
@@ -320,7 +320,7 @@ public class DBCResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restDBCMockMvc.perform(put("/api/dbcs")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(dBCDTO)))
         .andExpect(status().isCreated());
 
@@ -372,7 +372,7 @@ public class DBCResourceIntTest {
     // Get the local offices
     restDBCMockMvc.perform(get("/api/dbcs/user"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(testID)))
         .andExpect(jsonPath("$.[*].dbc").value(hasItem(HEKSS_DBC_CODE)))
         .andExpect(jsonPath("$.[*].dbc").value(hasItem(HENWL_DBC_CODE)))
@@ -387,7 +387,7 @@ public class DBCResourceIntTest {
 
     // Get the dBC
     restDBCMockMvc.perform(delete("/api/dbcs/{id}", dBC.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty

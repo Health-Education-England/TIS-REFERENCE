@@ -130,7 +130,7 @@ public class GradeResourceIntTest {
     // Create the Grade
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(grade);
     restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
         .andExpect(status().isCreated());
 
@@ -157,7 +157,7 @@ public class GradeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restGradeMockMvc.perform(post("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -175,7 +175,7 @@ public class GradeResourceIntTest {
     // Get all the gradeList
     restGradeMockMvc.perform(get("/api/grades?sort=abbreviation,asc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
@@ -193,7 +193,7 @@ public class GradeResourceIntTest {
     // Get grades given the codes
     restGradeMockMvc.perform(get("/api/grades/in/invalid," + DEFAULT_ABBREVIATION))
         .andExpect(status().isFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
@@ -218,7 +218,7 @@ public class GradeResourceIntTest {
     // Get grades given the codes
     restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=\"Te%24t\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(UNENCODED_ABBREVIATION)))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -233,10 +233,10 @@ public class GradeResourceIntTest {
 
     List<String> ids = Lists.newArrayList(grade.getAbbreviation());
     restGradeMockMvc.perform(post("/api/grades/exists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(ids)))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
@@ -249,7 +249,7 @@ public class GradeResourceIntTest {
     // Get the grade
     restGradeMockMvc.perform(get("/api/grades/{id}", grade.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(grade.getId()))
         .andExpect(jsonPath("$.abbreviation").value(DEFAULT_ABBREVIATION))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
@@ -275,7 +275,7 @@ public class GradeResourceIntTest {
 
     restGradeMockMvc.perform(get("/api/grades?page=0&size=200&sort=asc&searchQuery=\"AAA\""))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].abbreviation").value(hasItem(DEFAULT_ABBREVIATION)))
         .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
@@ -300,7 +300,7 @@ public class GradeResourceIntTest {
     int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
 
     // Update the grade
-    Grade updatedGrade = gradeRepository.findOne(grade.getId());
+    Grade updatedGrade = gradeRepository.findById(grade.getId()).get();
     updatedGrade
         .name(UPDATED_NAME)
         .label(UPDATED_LABEL)
@@ -310,7 +310,7 @@ public class GradeResourceIntTest {
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(updatedGrade);
 
     restGradeMockMvc.perform(put("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
         .andExpect(status().isOk());
 
@@ -336,7 +336,7 @@ public class GradeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restGradeMockMvc.perform(put("/api/grades")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(gradeDTO)))
         .andExpect(status().isBadRequest());
 

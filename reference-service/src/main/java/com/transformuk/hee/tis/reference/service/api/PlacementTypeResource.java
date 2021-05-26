@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
@@ -77,7 +76,6 @@ public class PlacementTypeResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/placement-types/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> placementTypeExists(@RequestBody List<String> codes) {
     Map<String, Boolean> placementTypeExistsMap = Maps.newHashMap();
     log.debug("REST request to check PlaceType exists : {}", codes);
@@ -101,7 +99,6 @@ public class PlacementTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/placement-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PlacementTypeDTO> createPlacementType(
       @Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
@@ -130,7 +127,6 @@ public class PlacementTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/placement-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<PlacementTypeDTO> updatePlacementType(
       @Valid @RequestBody PlacementTypeDTO placementTypeDTO) throws URISyntaxException {
@@ -160,7 +156,6 @@ public class PlacementTypeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "placement types list")})
   @GetMapping("/placement-types")
-  @Timed
   public ResponseEntity<List<PlacementTypeDTO>> getAllPlacementTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -193,10 +188,9 @@ public class PlacementTypeResource {
    * status 404 (Not Found)
    */
   @GetMapping("/placement-types/{id}")
-  @Timed
   public ResponseEntity<PlacementTypeDTO> getPlacementType(@PathVariable Long id) {
     log.debug("REST request to get PlacementType : {}", id);
-    PlacementType placementType = placementTypeRepository.findOne(id);
+    PlacementType placementType = placementTypeRepository.findById(id).orElse(null);
     PlacementTypeDTO placementTypeDTO = placementTypeMapper
         .placementTypeToPlacementTypeDTO(placementType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(placementTypeDTO));
@@ -209,11 +203,10 @@ public class PlacementTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/placement-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deletePlacementType(@PathVariable Long id) {
     log.debug("REST request to delete PlacementType : {}", id);
-    placementTypeRepository.delete(id);
+    placementTypeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -228,7 +221,6 @@ public class PlacementTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-placement-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PlacementTypeDTO>> bulkCreatePlacementType(
       @Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
@@ -246,7 +238,7 @@ public class PlacementTypeResource {
     }
     List<PlacementType> placementTypes = placementTypeMapper
         .placementTypeDTOsToPlacementTypes(placementTypeDTOS);
-    placementTypes = placementTypeRepository.save(placementTypes);
+    placementTypes = placementTypeRepository.saveAll(placementTypes);
     List<PlacementTypeDTO> result = placementTypeMapper
         .placementTypesToPlacementTypeDTOs(placementTypes);
     return ResponseEntity.ok()
@@ -263,7 +255,6 @@ public class PlacementTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-placement-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<PlacementTypeDTO>> bulkUpdatePlacementType(
       @Valid @RequestBody List<PlacementTypeDTO> placementTypeDTOS) throws URISyntaxException {
@@ -286,7 +277,7 @@ public class PlacementTypeResource {
     }
     List<PlacementType> placementTypes = placementTypeMapper
         .placementTypeDTOsToPlacementTypes(placementTypeDTOS);
-    placementTypes = placementTypeRepository.save(placementTypes);
+    placementTypes = placementTypeRepository.saveAll(placementTypes);
     List<PlacementTypeDTO> results = placementTypeMapper
         .placementTypesToPlacementTypeDTOs(placementTypes);
     return ResponseEntity.ok()

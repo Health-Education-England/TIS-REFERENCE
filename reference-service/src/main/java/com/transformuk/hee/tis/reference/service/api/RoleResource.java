@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,7 +83,6 @@ public class RoleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/roles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RoleDTO> createRole(@Valid @RequestBody RoleDTO roleDTO)
       throws URISyntaxException {
@@ -112,7 +110,6 @@ public class RoleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/roles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<RoleDTO> updateRole(@Valid @RequestBody RoleDTO roleDTO)
       throws URISyntaxException {
@@ -140,7 +137,6 @@ public class RoleResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "role list")})
   @GetMapping("/roles")
-  @Timed
   public ResponseEntity<List<RoleDTO>> getAllRoles(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -171,7 +167,6 @@ public class RoleResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "role list")})
   @GetMapping("/roles/categories/{categoryId}")
-  @Timed
   public ResponseEntity<List<RoleDTO>> getAllRolesByCategory(
       @ApiParam(value = "The role category id", required = true)
       @PathVariable(value = "categoryId") final Long categoryId) {
@@ -191,7 +186,6 @@ public class RoleResource {
    * @return the ResponseEntity with status 200 (OK) and the list of roles in body
    */
   @GetMapping("/current/roles")
-  @Timed
   public List<RoleDTO> getAllCurrentRoles() {
     log.debug("REST request to get all current Roles");
     Role role = new Role().status(Status.CURRENT);
@@ -207,10 +201,9 @@ public class RoleResource {
    *     (Not Found)
    */
   @GetMapping("/roles/{id}")
-  @Timed
   public ResponseEntity<RoleDTO> getRole(@PathVariable Long id) {
     log.debug("REST request to get Role : {}", id);
-    Role role = roleRepository.findOne(id);
+    Role role = roleRepository.findById(id).orElse(null);
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(roleDTO));
   }
@@ -223,12 +216,11 @@ public class RoleResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/roles/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> rolesExist(@RequestBody List<String> codes,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check Roles exist: {}", codes);
-    Specifications<Role> specs = Specifications.where(in("code", new ArrayList<>(codes)));
+    Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -254,11 +246,10 @@ public class RoleResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/roles/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
     log.debug("REST request to delete Role : {}", id);
-    roleRepository.delete(id);
+    roleRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -273,7 +264,6 @@ public class RoleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-roles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RoleDTO>> bulkCreateRole(@Valid @RequestBody List<RoleDTO> roleDTOS)
       throws URISyntaxException {
@@ -290,7 +280,7 @@ public class RoleResource {
       }
     }
     List<Role> roles = roleMapper.roleDTOsToRoles(roleDTOS);
-    roles = roleRepository.save(roles);
+    roles = roleRepository.saveAll(roles);
     List<RoleDTO> result = roleMapper.rolesToRoleDTOs(roles);
     return ResponseEntity.ok()
         .body(result);
@@ -306,7 +296,6 @@ public class RoleResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-roles")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<RoleDTO>> bulkUpdateRole(@Valid @RequestBody List<RoleDTO> roleDTOS)
       throws URISyntaxException {
@@ -327,7 +316,7 @@ public class RoleResource {
       }
     }
     List<Role> roleList = roleMapper.roleDTOsToRoles(roleDTOS);
-    roleList = roleRepository.save(roleList);
+    roleList = roleRepository.saveAll(roleList);
     List<RoleDTO> results = roleMapper.rolesToRoleDTOs(roleList);
     return ResponseEntity.ok()
         .body(results);
@@ -341,7 +330,6 @@ public class RoleResource {
    *     list
    */
   @GetMapping("/roles/in/{codes:.+}")
-  @Timed
   public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {
     log.debug("REST request to find several roles");
     List<RoleDTO> resp = new ArrayList<>();

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
@@ -79,7 +78,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MedicalSchoolDTO> createMedicalSchool(
       @Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
@@ -108,7 +106,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<MedicalSchoolDTO> updateMedicalSchool(
       @Valid @RequestBody MedicalSchoolDTO medicalSchoolDTO) throws URISyntaxException {
@@ -137,7 +134,6 @@ public class MedicalSchoolResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "medical schools list")})
   @GetMapping("/medical-schools")
-  @Timed
   public ResponseEntity<List<MedicalSchoolDTO>> getAllMedicalSchools(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -172,10 +168,9 @@ public class MedicalSchoolResource {
    * status 404 (Not Found)
    */
   @GetMapping("/medical-schools/{id}")
-  @Timed
   public ResponseEntity<MedicalSchoolDTO> getMedicalSchool(@PathVariable Long id) {
     log.debug("REST request to get MedicalSchool : {}", id);
-    MedicalSchool medicalSchool = medicalSchoolRepository.findOne(id);
+    MedicalSchool medicalSchool = medicalSchoolRepository.findById(id).orElse(null);
     MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
         .medicalSchoolToMedicalSchoolDTO(medicalSchool);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(medicalSchoolDTO));
@@ -188,7 +183,6 @@ public class MedicalSchoolResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/medical-schools/exists/")
-  @Timed
   public ResponseEntity<Map<String, Boolean>> medicalSchoolExists(
       @RequestBody List<String> values) {
     Map<String, Boolean> medicalSchoolExistsMap = Maps.newHashMap();
@@ -211,11 +205,10 @@ public class MedicalSchoolResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/medical-schools/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteMedicalSchool(@PathVariable Long id) {
     log.debug("REST request to delete MedicalSchool : {}", id);
-    medicalSchoolRepository.delete(id);
+    medicalSchoolRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -229,7 +222,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MedicalSchoolDTO>> bulkCreateMedicalSchool(
       @Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
@@ -247,7 +239,7 @@ public class MedicalSchoolResource {
     }
     List<MedicalSchool> medicalSchools = medicalSchoolMapper
         .medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
-    medicalSchools = medicalSchoolRepository.save(medicalSchools);
+    medicalSchools = medicalSchoolRepository.saveAll(medicalSchools);
     List<MedicalSchoolDTO> result = medicalSchoolMapper
         .medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
     return ResponseEntity.ok()
@@ -264,7 +256,6 @@ public class MedicalSchoolResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-medical-schools")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<MedicalSchoolDTO>> bulkUpdateMedicalSchool(
       @Valid @RequestBody List<MedicalSchoolDTO> medicalSchoolDTOS) throws URISyntaxException {
@@ -287,7 +278,7 @@ public class MedicalSchoolResource {
     }
     List<MedicalSchool> medicalSchools = medicalSchoolMapper
         .medicalSchoolDTOsToMedicalSchools(medicalSchoolDTOS);
-    medicalSchools = medicalSchoolRepository.save(medicalSchools);
+    medicalSchools = medicalSchoolRepository.saveAll(medicalSchools);
     List<MedicalSchoolDTO> results = medicalSchoolMapper
         .medicalSchoolsToMedicalSchoolDTOs(medicalSchools);
     return ResponseEntity.ok()

@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfileFromContext;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -77,7 +76,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/local-offices")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LocalOfficeDTO> createLocalOffice(
       @Valid @RequestBody LocalOfficeDTO localOfficeDTO) throws URISyntaxException {
@@ -105,7 +103,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/local-offices")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<LocalOfficeDTO> updateLocalOffice(
       @Valid @RequestBody LocalOfficeDTO localOfficeDTO) throws URISyntaxException {
@@ -129,7 +126,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/local-offices")
-  @Timed
   public ResponseEntity<List<LocalOfficeDTO>> getAllLocalOffices(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -164,7 +160,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
    */
   @GetMapping("/local-offices/user")
-  @Timed
   public ResponseEntity<List<LocalOfficeDTO>> getUserLocalOffices() {
     log.debug("REST request to get page of Local Offices for current user");
     UserProfile userProfile = getProfileFromContext();
@@ -185,10 +180,9 @@ public class LocalOfficeResource {
    * status 404 (Not Found)
    */
   @GetMapping("/local-offices/{id}")
-  @Timed
   public ResponseEntity<LocalOfficeDTO> getLocalOffice(@PathVariable Long id) {
     log.debug("REST request to get LocalOffice : {}", id);
-    LocalOffice localOffice = localOfficeRepository.findOne(id);
+    LocalOffice localOffice = localOfficeRepository.findById(id).orElse(null);
     LocalOfficeDTO localOfficeDTO = localOfficeMapper.localOfficeToLocalOfficeDTO(localOffice);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(localOfficeDTO));
   }
@@ -200,11 +194,10 @@ public class LocalOfficeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/local-offices/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteLocalOffice(@PathVariable Long id) {
     log.debug("REST request to delete LocalOffice : {}", id);
-    localOfficeRepository.delete(id);
+    localOfficeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -218,7 +211,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-local-offices")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<LocalOfficeDTO>> bulkCreateLocalOffice(
       @Valid @RequestBody List<LocalOfficeDTO> localOfficeDTOS) throws URISyntaxException {
@@ -236,7 +228,7 @@ public class LocalOfficeResource {
     }
     List<LocalOffice> localOffices = localOfficeMapper
         .localOfficeDTOsToLocalOffices(localOfficeDTOS);
-    localOffices = localOfficeRepository.save(localOffices);
+    localOffices = localOfficeRepository.saveAll(localOffices);
     List<LocalOfficeDTO> result = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
     return ResponseEntity.ok()
         .body(result);
@@ -252,7 +244,6 @@ public class LocalOfficeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-local-offices")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<LocalOfficeDTO>> bulkUpdateLocalOffice(
       @Valid @RequestBody List<LocalOfficeDTO> localOfficeDTOS) throws URISyntaxException {
@@ -274,7 +265,7 @@ public class LocalOfficeResource {
     }
     List<LocalOffice> localOffices = localOfficeMapper
         .localOfficeDTOsToLocalOffices(localOfficeDTOS);
-    localOffices = localOfficeRepository.save(localOffices);
+    localOffices = localOfficeRepository.saveAll(localOffices);
     List<LocalOfficeDTO> results = localOfficeMapper.localOfficesToLocalOfficeDTOs(localOffices);
     return ResponseEntity.ok()
         .body(results);

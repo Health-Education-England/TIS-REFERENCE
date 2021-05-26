@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
@@ -77,7 +76,6 @@ public class AssessmentTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/assessment-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<AssessmentTypeDto> createAssessmentType(
       @Validated(Create.class) @RequestBody AssessmentTypeDto assessmentType)
@@ -105,14 +103,13 @@ public class AssessmentTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/assessment-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<AssessmentTypeDto> updateAssessmentType(
       @Validated(Update.class) @RequestBody AssessmentTypeDto assessmentType)
       throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
 
-    if (assessmentTypeRepository.findOne(assessmentType.getId()) == null) {
+    if (!assessmentTypeRepository.findById(assessmentType.getId()).isPresent()) {
       return createAssessmentType(assessmentType);
     }
 
@@ -133,7 +130,6 @@ public class AssessmentTypeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "assessment types list")})
   @GetMapping("/assessment-types")
-  @Timed
   public ResponseEntity<List<AssessmentTypeDto>> getAllAssessmentTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -166,7 +162,6 @@ public class AssessmentTypeResource {
    *     status 404 (Not Found)
    */
   @GetMapping("/assessment-types/{code}")
-  @Timed
   public ResponseEntity<AssessmentTypeDto> getAssessmentTypeByCode(@PathVariable String code) {
     log.debug("REST request to get Assessment Type : {}", code);
     AssessmentType resultEntity = assessmentTypeRepository.findOneByCode(code);
@@ -183,7 +178,6 @@ public class AssessmentTypeResource {
    *     or with status 400 (Bad Request) if the assessmentTypeDto already has an ID.
    */
   @PostMapping("/bulk-assessment-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<AssessmentTypeDto>> bulkCreateAssessmentTypes(
       @Valid @RequestBody List<AssessmentTypeDto> assessmentTypeDtos) {
@@ -200,7 +194,7 @@ public class AssessmentTypeResource {
       }
     }
     List<AssessmentType> assessmentTypes = mapper.toEntities(assessmentTypeDtos);
-    assessmentTypes = assessmentTypeRepository.save(assessmentTypes);
+    assessmentTypes = assessmentTypeRepository.saveAll(assessmentTypes);
     List<AssessmentTypeDto> result = mapper.toDtos(assessmentTypes);
     return ResponseEntity.ok(result);
   }

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -76,7 +75,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingTypeDTO> createFundingType(
       @Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
@@ -104,7 +102,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingTypeDTO> updateFundingType(
       @Valid @RequestBody FundingTypeDTO fundingTypeDTO) throws URISyntaxException {
@@ -131,7 +128,6 @@ public class FundingTypeResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "funding types list")})
   @GetMapping("/funding-types")
-  @Timed
   public ResponseEntity<List<FundingTypeDTO>> getAllFundingTypes(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -165,10 +161,9 @@ public class FundingTypeResource {
    * status 404 (Not Found)
    */
   @GetMapping("/funding-types/{id}")
-  @Timed
   public ResponseEntity<FundingTypeDTO> getFundingType(@PathVariable Long id) {
     log.debug("REST request to get FundingType : {}", id);
-    FundingType fundingType = fundingTypeRepository.findOne(id);
+    FundingType fundingType = fundingTypeRepository.findById(id).orElse(null);
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingTypeDTO));
   }
@@ -180,11 +175,10 @@ public class FundingTypeResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/funding-types/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteFundingType(@PathVariable Long id) {
     log.debug("REST request to delete FundingType : {}", id);
-    fundingTypeRepository.delete(id);
+    fundingTypeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -198,7 +192,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingTypeDTO>> bulkCreateFundingType(
       @Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
@@ -216,7 +209,7 @@ public class FundingTypeResource {
     }
     List<FundingType> fundingTypes = fundingTypeMapper
         .fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
-    fundingTypes = fundingTypeRepository.save(fundingTypes);
+    fundingTypes = fundingTypeRepository.saveAll(fundingTypes);
     List<FundingTypeDTO> result = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
     return ResponseEntity.ok()
         .body(result);
@@ -232,7 +225,6 @@ public class FundingTypeResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-funding-types")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<FundingTypeDTO>> bulkUpdateFundingType(
       @Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
@@ -254,7 +246,7 @@ public class FundingTypeResource {
     }
     List<FundingType> fundingTypes = fundingTypeMapper
         .fundingTypeDTOsToFundingTypes(fundingTypeDTOS);
-    fundingTypes = fundingTypeRepository.save(fundingTypes);
+    fundingTypes = fundingTypeRepository.saveAll(fundingTypes);
     List<FundingTypeDTO> results = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
     return ResponseEntity.ok()
         .body(results);

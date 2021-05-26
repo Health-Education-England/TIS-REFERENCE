@@ -121,7 +121,7 @@ public class QualificationTypeResourceIntTest {
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(qualificationType);
     mockMvc.perform(post("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -146,7 +146,7 @@ public class QualificationTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -167,7 +167,7 @@ public class QualificationTypeResourceIntTest {
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     mockMvc.perform(post("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -187,7 +187,7 @@ public class QualificationTypeResourceIntTest {
         .qualificationTypeToQualificationTypeDTO(qualificationType);
 
     mockMvc.perform(post("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -204,7 +204,7 @@ public class QualificationTypeResourceIntTest {
     // Get all the qualificationTypeList
     mockMvc.perform(get("/api/qualification-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(qualificationType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -223,7 +223,7 @@ public class QualificationTypeResourceIntTest {
     mockMvc
         .perform(get("/api/qualification-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedQualificationType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -239,7 +239,7 @@ public class QualificationTypeResourceIntTest {
     mockMvc
         .perform(get("/api/qualification-types/{id}", qualificationType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(qualificationType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -262,7 +262,7 @@ public class QualificationTypeResourceIntTest {
 
     // Update the qualificationType
     QualificationType updatedQualificationType = qualificationTypeRepository
-        .findOne(qualificationType.getId());
+        .findById(qualificationType.getId()).get();
     updatedQualificationType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -270,7 +270,7 @@ public class QualificationTypeResourceIntTest {
         .qualificationTypeToQualificationTypeDTO(updatedQualificationType);
 
     mockMvc.perform(put("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isOk());
 
@@ -294,7 +294,7 @@ public class QualificationTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/qualification-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(qualificationTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -313,7 +313,7 @@ public class QualificationTypeResourceIntTest {
     // Get the QualificationType
     mockMvc
         .perform(delete("/api/qualification-types/{id}", qualificationType.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -331,7 +331,7 @@ public class QualificationTypeResourceIntTest {
   @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -343,7 +343,7 @@ public class QualificationTypeResourceIntTest {
     qualificationTypeRepository.saveAndFlush(qualificationType);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
@@ -355,7 +355,7 @@ public class QualificationTypeResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes("notExists_" + LocalDate.now())))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -370,7 +370,7 @@ public class QualificationTypeResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
@@ -385,7 +385,7 @@ public class QualificationTypeResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(DEFAULT_CODE)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));

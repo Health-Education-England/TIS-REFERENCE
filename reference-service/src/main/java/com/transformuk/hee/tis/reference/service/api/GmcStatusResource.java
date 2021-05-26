@@ -3,7 +3,6 @@ package com.transformuk.hee.tis.reference.service.api;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -33,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +78,6 @@ public class GmcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/gmc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GmcStatusDTO> createGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO)
       throws URISyntaxException {
@@ -107,7 +105,6 @@ public class GmcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/gmc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<GmcStatusDTO> updateGmcStatus(@Valid @RequestBody GmcStatusDTO gmcStatusDTO)
       throws URISyntaxException {
@@ -135,7 +132,6 @@ public class GmcStatusResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "country list")})
   @GetMapping("/gmc-statuses")
-  @Timed
   public ResponseEntity<List<GmcStatusDTO>> getAllGmcStatuses(
       @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
@@ -168,10 +164,9 @@ public class GmcStatusResource {
    *     404 (Not Found)
    */
   @GetMapping("/gmc-statuses/{id}")
-  @Timed
   public ResponseEntity<GmcStatusDTO> getGmcStatus(@PathVariable Long id) {
     log.debug("REST request to get GmcStatus : {}", id);
-    GmcStatus gmcStatus = gmcStatusRepository.findOne(id);
+    GmcStatus gmcStatus = gmcStatusRepository.findById(id).orElse(null);
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(gmcStatus);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gmcStatusDTO));
   }
@@ -184,12 +179,11 @@ public class GmcStatusResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/gmc-statuses/exists/")
-  @Timed
   public ResponseEntity<Boolean> gmcStatusExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.debug("REST request to check GmcStatus exists : {}", code);
-    Specifications<GmcStatus> specs = Specifications.where(isEqual("code", code));
+    Specification<GmcStatus> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -199,7 +193,7 @@ public class GmcStatusResource {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
 
-    boolean exists = gmcStatusRepository.findOne(specs) != null;
+    boolean exists = gmcStatusRepository.findOne(specs).isPresent();
     return new ResponseEntity<>(exists, HttpStatus.OK);
   }
 
@@ -210,11 +204,10 @@ public class GmcStatusResource {
    * @return the ResponseEntity with status 200 (OK)
    */
   @DeleteMapping("/gmc-statuses/{id}")
-  @Timed
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteGmcStatus(@PathVariable Long id) {
     log.debug("REST request to delete GmcStatus : {}", id);
-    gmcStatusRepository.delete(id);
+    gmcStatusRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
@@ -228,7 +221,6 @@ public class GmcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-gmc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GmcStatusDTO>> bulkCreateGmcStatus(
       @Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
@@ -245,7 +237,7 @@ public class GmcStatusResource {
       }
     }
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
-    gmcStatuses = gmcStatusRepository.save(gmcStatuses);
+    gmcStatuses = gmcStatusRepository.saveAll(gmcStatuses);
     List<GmcStatusDTO> result = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
     return ResponseEntity.ok()
         .body(result);
@@ -261,7 +253,6 @@ public class GmcStatusResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-gmc-statuses")
-  @Timed
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<List<GmcStatusDTO>> bulkUpdateGmcStatus(
       @Valid @RequestBody List<GmcStatusDTO> gmcStatusDTOS) throws URISyntaxException {
@@ -282,7 +273,7 @@ public class GmcStatusResource {
       }
     }
     List<GmcStatus> gmcStatuses = gmcStatusMapper.gmcStatusDTOsToGmcStatuses(gmcStatusDTOS);
-    gmcStatuses = gmcStatusRepository.save(gmcStatuses);
+    gmcStatuses = gmcStatusRepository.saveAll(gmcStatuses);
     List<GmcStatusDTO> results = gmcStatusMapper.gmcStatusesToGmcStatusDTOs(gmcStatuses);
     return ResponseEntity.ok()
         .body(results);

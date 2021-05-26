@@ -112,7 +112,7 @@ public class RoleResourceIntTest {
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
 
-    roleCategory = roleCategoryRepository.findOne(3L);
+    roleCategory = roleCategoryRepository.findById(3L).get();
     role = createEntity(em);
   }
 
@@ -124,7 +124,7 @@ public class RoleResourceIntTest {
     // Create the Role
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
     mockMvc.perform(post("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isCreated());
 
@@ -147,7 +147,7 @@ public class RoleResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     mockMvc.perform(post("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -167,7 +167,7 @@ public class RoleResourceIntTest {
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
     mockMvc.perform(post("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -186,7 +186,7 @@ public class RoleResourceIntTest {
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(role);
 
     mockMvc.perform(post("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isBadRequest());
 
@@ -203,7 +203,7 @@ public class RoleResourceIntTest {
     // Get all the roleList
     mockMvc.perform(get("/api/roles?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(role.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)));
@@ -222,7 +222,7 @@ public class RoleResourceIntTest {
     // Get the roleList
     mockMvc.perform(get("/api/roles?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedRole.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -233,7 +233,7 @@ public class RoleResourceIntTest {
   public void getAllRolesCategory() throws Exception {
     mockMvc.perform(get("/api/roles/categories/1"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$", hasSize(10)))
         .andExpect(jsonPath("$.[*].label").value(hasItem("Clinical Supervisor")))
         .andExpect(jsonPath("$.[*].label").value(hasItem("Dental Clinical Supervisor")))
@@ -256,7 +256,7 @@ public class RoleResourceIntTest {
     // Get the role
     mockMvc.perform(get("/api/roles/{id}", role.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(role.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
@@ -278,14 +278,14 @@ public class RoleResourceIntTest {
     int databaseSizeBeforeUpdate = roleRepository.findAll().size();
 
     // Update the role
-    Role updatedRole = roleRepository.findOne(role.getId());
+    Role updatedRole = roleRepository.findById(role.getId()).get();
     updatedRole
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(updatedRole);
 
     mockMvc.perform(put("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isOk());
 
@@ -307,7 +307,7 @@ public class RoleResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     mockMvc.perform(put("/api/roles")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(roleDTO)))
         .andExpect(status().isCreated());
 
@@ -325,7 +325,7 @@ public class RoleResourceIntTest {
 
     // Get the role
     mockMvc.perform(delete("/api/roles/{id}", role.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -345,7 +345,7 @@ public class RoleResourceIntTest {
     String code = "notExists_" + LocalDate.now();
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + code).value(false));
@@ -357,7 +357,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(role);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
@@ -370,7 +370,7 @@ public class RoleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + code).value(false));
@@ -385,7 +385,7 @@ public class RoleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(false));
@@ -400,7 +400,7 @@ public class RoleResourceIntTest {
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
@@ -419,7 +419,7 @@ public class RoleResourceIntTest {
     String codes = String.join(",", role.getCode(), role2.getCode());
     mockMvc.perform(get("/api/roles/in/{codes}", codes))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(UPDATED_CODE)));
@@ -437,7 +437,7 @@ public class RoleResourceIntTest {
 
     mockMvc.perform(get("/api/roles/in/{codes}", role2.getCode()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
   }

@@ -116,7 +116,7 @@ public class PlacementTypeResourceIntTest {
     PlacementTypeDTO placementTypeDTO = placementTypeMapper
         .placementTypeToPlacementTypeDTO(placementType);
     restPlacementTypeMockMvc.perform(post("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -140,7 +140,7 @@ public class PlacementTypeResourceIntTest {
 
     // An entity with an existing ID cannot be created, so this API call must fail
     restPlacementTypeMockMvc.perform(post("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -161,7 +161,7 @@ public class PlacementTypeResourceIntTest {
         .placementTypeToPlacementTypeDTO(placementType);
 
     restPlacementTypeMockMvc.perform(post("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -181,7 +181,7 @@ public class PlacementTypeResourceIntTest {
         .placementTypeToPlacementTypeDTO(placementType);
 
     restPlacementTypeMockMvc.perform(post("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isBadRequest());
 
@@ -198,7 +198,7 @@ public class PlacementTypeResourceIntTest {
     // Get all the placementTypeList
     restPlacementTypeMockMvc.perform(get("/api/placement-types?sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(placementType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
@@ -217,7 +217,7 @@ public class PlacementTypeResourceIntTest {
     restPlacementTypeMockMvc
         .perform(get("/api/placement-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedPlacementType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
@@ -232,7 +232,7 @@ public class PlacementTypeResourceIntTest {
     // Get the placementType
     restPlacementTypeMockMvc.perform(get("/api/placement-types/{id}", placementType.getId()))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(placementType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
@@ -254,7 +254,7 @@ public class PlacementTypeResourceIntTest {
     int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
 
     // Update the placementType
-    PlacementType updatedPlacementType = placementTypeRepository.findOne(placementType.getId());
+    PlacementType updatedPlacementType = placementTypeRepository.findById(placementType.getId()).get();
     updatedPlacementType
         .code(UPDATED_CODE)
         .label(UPDATED_LABEL);
@@ -262,7 +262,7 @@ public class PlacementTypeResourceIntTest {
         .placementTypeToPlacementTypeDTO(updatedPlacementType);
 
     restPlacementTypeMockMvc.perform(put("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isOk());
 
@@ -285,7 +285,7 @@ public class PlacementTypeResourceIntTest {
 
     // If the entity doesn't have an ID, it will be created instead of just being updated
     restPlacementTypeMockMvc.perform(put("/api/placement-types")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(placementTypeDTO)))
         .andExpect(status().isCreated());
 
@@ -303,7 +303,7 @@ public class PlacementTypeResourceIntTest {
 
     // Get the placementType
     restPlacementTypeMockMvc.perform(delete("/api/placement-types/{id}", placementType.getId())
-        .accept(TestUtil.APPLICATION_JSON_UTF8))
+        .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     // Validate the database is empty
@@ -320,10 +320,10 @@ public class PlacementTypeResourceIntTest {
     expectedMap.put("invalid_code", false);
     List<String> labels = Lists.newArrayList(placementType.getCode(), "invalid_code");
     restPlacementTypeMockMvc.perform(post("/api/placement-types/exists/")
-        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(labels)))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(content().string(TestUtil.convertObjectToJson(expectedMap)));
   }
 
