@@ -50,11 +50,11 @@ public class GenderResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNENCODED_CODE = "CCCCCCCCCC";
+  private static final String UNENCODED_CODE = "Te$t Code";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
-  private static final String UNENCODED_LABEL = "Te$t Gender";
+  private static final String UNENCODED_LABEL = "Te$t Label";
 
   @Autowired
   private GenderRepository genderRepository;
@@ -205,19 +205,37 @@ public class GenderResourceIntTest {
 
   @Test
   @Transactional
-  public void getGendersWithQuery() throws Exception {
-    // Initialize the database
-    Gender unencodedGender = new Gender()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
-    genderRepository.saveAndFlush(unencodedGender);
+  public void getGendersWithQueryMatchingCode() throws Exception {
+    // Initialize the database.
+    Gender entity = new Gender();
+    entity.setCode(UNENCODED_CODE);
+    entity.setLabel(DEFAULT_LABEL);
+    genderRepository.saveAndFlush(entity);
 
-    // Get all the genderList
+    // Get all the matching entities.
     mockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(unencodedGender.getId().intValue()))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(DEFAULT_LABEL));
+  }
+
+  @Test
+  @Transactional
+  public void getGendersWithQueryMatchingLabel() throws Exception {
+    // Initialize the database.
+    Gender entity = new Gender();
+    entity.setCode(DEFAULT_CODE);
+    entity.setLabel(UNENCODED_LABEL);
+    genderRepository.saveAndFlush(entity);
+
+    // Get all the matching entities.
+    mockMvc.perform(get("/api/genders?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 

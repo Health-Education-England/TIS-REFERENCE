@@ -44,11 +44,11 @@ public class FundingTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNENCODED_CODE = "BBBBBBBBBB";
+  private static final String UNENCODED_CODE = "Te$t Code";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
-  private static final String UNENCODED_LABEL = "Te$t Funding";
+  private static final String UNENCODED_LABEL = "Te$t Label";
 
   @Autowired
   private FundingTypeRepository fundingTypeRepository;
@@ -211,6 +211,42 @@ public class FundingTypeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(unencodedFundingType.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
+  }
+
+  @Test
+  @Transactional
+  public void getEntitiesWithQueryMatchingCode() throws Exception {
+    // Initialize the database.
+    FundingType entity = new FundingType();
+    entity.setCode(UNENCODED_CODE);
+    entity.setLabel(DEFAULT_LABEL);
+    fundingTypeRepository.saveAndFlush(entity);
+
+    // Get all the matching entities.
+    restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(DEFAULT_LABEL));
+  }
+
+  @Test
+  @Transactional
+  public void getEntitiesWithQueryMatchingLabel() throws Exception {
+    // Initialize the database.
+    FundingType entity = new FundingType();
+    entity.setCode(DEFAULT_CODE);
+    entity.setLabel(UNENCODED_LABEL);
+    fundingTypeRepository.saveAndFlush(entity);
+
+    // Get all the matching entities.
+    restFundingTypeMockMvc.perform(get("/api/funding-types?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 

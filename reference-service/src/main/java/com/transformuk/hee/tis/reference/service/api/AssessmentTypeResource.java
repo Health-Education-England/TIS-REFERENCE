@@ -109,7 +109,8 @@ public class AssessmentTypeResource {
       throws URISyntaxException {
     log.debug("REST request to update AssessmentType : {}", assessmentType);
 
-    if (!assessmentTypeRepository.findById(assessmentType.getId()).isPresent()) {
+    if (assessmentType.getId() == null || !assessmentTypeRepository.findById(assessmentType.getId())
+        .isPresent()) {
       return createAssessmentType(assessmentType);
     }
 

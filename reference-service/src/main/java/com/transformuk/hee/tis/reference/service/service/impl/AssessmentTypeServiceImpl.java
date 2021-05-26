@@ -20,7 +20,7 @@ public class AssessmentTypeServiceImpl extends AbstractReferenceService<Assessme
 
   @Override
   protected List<String> getSearchFields() {
-    return Arrays.asList("dbc", "name", "abbr");
+    return Arrays.asList("code", "label");
   }
 
   @Override
