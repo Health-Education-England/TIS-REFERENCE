@@ -545,6 +545,17 @@ public class LeavingReasonResourceIntegrationTest {
     assertThat("The leaving reason did not match the expected value.", leavingReason, nullValue());
   }
 
+  @Test
+  public void searchLeavingReasons() throws Exception {
+    mockMvc.perform(get("/api/leaving-reasons?searchQuery=completed"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$[0].code").value("Completed training"))
+        .andExpect(jsonPath("$[0].label").value("Completed training"))
+        .andExpect(jsonPath("$[0].status").value("CURRENT"));
+  }
+
   /**
    * Create a {@link LeavingReason}.
    *
