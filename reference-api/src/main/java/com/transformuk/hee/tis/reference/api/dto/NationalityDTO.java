@@ -1,15 +1,16 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A DTO for the Nationality entity.
  */
+@Data
 public class NationalityDTO implements Serializable {
 
   private Long id;
@@ -24,46 +25,6 @@ public class NationalityDTO implements Serializable {
 
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() {
-    return uuid;
-  }
-
-  public void setUuid(UUID uuid) {
-    this.uuid = uuid;
-  }
-
-  public String getCountryNumber() {
-    return countryNumber;
-  }
-
-  public void setCountryNumber(String countryNumber) {
-    this.countryNumber = countryNumber;
-  }
-
-  public String getNationality() {
-    return nationality;
-  }
-
-  public void setNationality(String nationality) {
-    this.nationality = nationality;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -75,26 +36,11 @@ public class NationalityDTO implements Serializable {
 
     NationalityDTO nationalityDTO = (NationalityDTO) o;
 
-    if (!Objects.equals(id, nationalityDTO.id)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(id, nationalityDTO.id);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "NationalityDTO{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", countryNumber='" + countryNumber + '\'' +
-        ", nationality='" + nationality + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

@@ -1,15 +1,16 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A DTO for the ReligiousBelief entity.
  */
+@Data
 public class ReligiousBeliefDTO implements Serializable {
 
   private Long id;
@@ -24,46 +25,6 @@ public class ReligiousBeliefDTO implements Serializable {
 
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() {
-    return uuid;
-  }
-
-  public void setUuid(UUID uuid) {
-    this.uuid = uuid;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -75,26 +36,11 @@ public class ReligiousBeliefDTO implements Serializable {
 
     ReligiousBeliefDTO religiousBeliefDTO = (ReligiousBeliefDTO) o;
 
-    if (!Objects.equals(id, religiousBeliefDTO.id)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(id, religiousBeliefDTO.id);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "ReligiousBeliefDTO{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", code='" + code + '\'' +
-        ", label='" + label + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

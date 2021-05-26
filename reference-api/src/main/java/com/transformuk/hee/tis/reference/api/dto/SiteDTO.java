@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;

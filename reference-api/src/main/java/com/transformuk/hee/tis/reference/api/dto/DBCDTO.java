@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -49,5 +48,4 @@ public class DBCDTO implements Serializable {
   public int hashCode() {
     return Objects.hashCode(id);
   }
-
 }

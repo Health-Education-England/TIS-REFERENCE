@@ -6,6 +6,9 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * A DTO for the RoleCategory entity.
+ */
 @Data
 public class RoleCategoryDTO implements Serializable {
 
@@ -28,24 +31,11 @@ public class RoleCategoryDTO implements Serializable {
 
     RoleCategoryDTO roleDTO = (RoleCategoryDTO) o;
 
-    if (!Objects.equals(id, roleDTO.id)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(id, roleDTO.id);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "RoleCategoryDTO{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", name='" + name + '\'' +
-        '}';
   }
 }
