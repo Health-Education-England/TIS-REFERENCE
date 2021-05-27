@@ -38,7 +38,7 @@ public interface LeavingReasonService {
    * @param columnFilters The columns filters to apply.
    * @return A List of all found LeavingReasons as LeavingReasonDtos.
    */
-  List<LeavingReasonDto> findAll(List<ColumnFilter> columnFilters);
+  List<LeavingReasonDto> findAll(String searchString, List<ColumnFilter> columnFilters);
 
   /**
    * Delete the LeavingReason with the given ID.

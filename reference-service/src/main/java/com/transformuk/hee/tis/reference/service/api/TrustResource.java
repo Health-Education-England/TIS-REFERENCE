@@ -155,7 +155,7 @@ public class TrustResource {
     List<ColumnFilter> columnFilters = ColumnFilterUtil
         .getColumnFilters(columnFilterJson, filterEnumList);
     Page<Trust> page;
-    if (StringUtils.isEmpty(columnFilterJson)) {
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
       page = trustRepository.findAll(pageable);
     } else {
       page = sitesTrustsService.advanceSearchTrust(searchQuery, columnFilters, pageable);

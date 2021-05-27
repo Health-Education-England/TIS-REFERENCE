@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
@@ -8,7 +9,9 @@ import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.repository.LeavingReasonRepository;
 import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LeavingReasonMapper;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,26 +54,29 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   }
 
   @Override
-  public List<LeavingReasonDto> findAll(List<ColumnFilter> columnFilters) {
-    Specification<LeavingReason> whereSpec = null;
+  public List<LeavingReasonDto> findAll(String searchString, List<ColumnFilter> columnFilters) {
     List<LeavingReason> result;
 
-    if (columnFilters != null) {
-
-      for (int i = 0; i < columnFilters.size(); i++) {
-        ColumnFilter columnFilter = columnFilters.get(i);
-        Specification<LeavingReason> inSpec = in(columnFilter.getName(), columnFilter.getValues());
-
-        if (i == 0) {
-          whereSpec = Specification.where(inSpec);
-        } else {
-          whereSpec.and(inSpec);
-        }
-      }
+    List<Specification<LeavingReason>> specs = new ArrayList<>();
+    // add the text search criteria
+    if (StringUtils.isNotEmpty(searchString)) {
+      specs.add(Specification.where(containsLike("code", searchString))
+          .or(containsLike("code", searchString))
+          .or(containsLike("label", searchString)));
     }
 
-    if (whereSpec != null) {
-      result = repository.findAll(whereSpec);
+    // add the column filters criteria
+    if (columnFilters != null && !columnFilters.isEmpty()) {
+      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
+    }
+
+    if (!specs.isEmpty()) {
+      Specification<LeavingReason> fullSpec = Specification.where(specs.get(0));
+      // add the rest of the specs that made it in
+      for (int i = 1; i < specs.size(); i++) {
+        fullSpec = fullSpec.and(specs.get(i));
+      }
+      result = repository.findAll(fullSpec);
     } else {
       result = repository.findAll();
     }
