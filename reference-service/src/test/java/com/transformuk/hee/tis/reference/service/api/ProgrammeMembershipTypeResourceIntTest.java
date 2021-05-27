@@ -82,9 +82,9 @@ public class ProgrammeMembershipTypeResourceIntTest {
    * which requires the current entity.
    */
   public static ProgrammeMembershipType createEntity(EntityManager em) {
-    ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    ProgrammeMembershipType programmeMembershipType = new ProgrammeMembershipType();
+    programmeMembershipType.setCode(DEFAULT_CODE);
+    programmeMembershipType.setLabel(DEFAULT_LABEL);
     return programmeMembershipType;
   }
 
@@ -212,9 +212,9 @@ public class ProgrammeMembershipTypeResourceIntTest {
   @Transactional
   public void getProgrammeMembershipTypesWithQuery() throws Exception {
     // Initialize the database
-    ProgrammeMembershipType unencodedProgrammeMembershipType = new ProgrammeMembershipType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    ProgrammeMembershipType unencodedProgrammeMembershipType = new ProgrammeMembershipType();
+    unencodedProgrammeMembershipType.setCode(UNENCODED_CODE);
+    unencodedProgrammeMembershipType.setLabel(UNENCODED_LABEL);
     programmeMembershipTypeRepository.saveAndFlush(unencodedProgrammeMembershipType);
 
     // Get all the programmeMembershipTypeList
@@ -262,9 +262,8 @@ public class ProgrammeMembershipTypeResourceIntTest {
     // Update the programmeMembershipType
     ProgrammeMembershipType updatedProgrammeMembershipType = programmeMembershipTypeRepository
         .findById(programmeMembershipType.getId()).get();
-    updatedProgrammeMembershipType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedProgrammeMembershipType.setCode(UPDATED_CODE);
+    updatedProgrammeMembershipType.setLabel(UPDATED_LABEL);
     ProgrammeMembershipTypeDTO programmeMembershipTypeDTO = programmeMembershipTypeMapper
         .programmeMembershipTypeToProgrammeMembershipTypeDTO(updatedProgrammeMembershipType);
 

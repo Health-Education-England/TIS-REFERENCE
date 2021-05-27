@@ -82,9 +82,9 @@ public class TrainingNumberTypeResourceIntTest {
    * which requires the current entity.
    */
   public static TrainingNumberType createEntity(EntityManager em) {
-    TrainingNumberType trainingNumberType = new TrainingNumberType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    TrainingNumberType trainingNumberType = new TrainingNumberType();
+    trainingNumberType.setCode(DEFAULT_CODE);
+    trainingNumberType.setLabel(DEFAULT_LABEL);
     return trainingNumberType;
   }
 
@@ -207,9 +207,9 @@ public class TrainingNumberTypeResourceIntTest {
   @Transactional
   public void getTrainingNumberTypesWithQuery() throws Exception {
     // Initialize the database
-    TrainingNumberType unencodedTrainingNumberType = new TrainingNumberType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    TrainingNumberType unencodedTrainingNumberType = new TrainingNumberType();
+    unencodedTrainingNumberType.setCode(UNENCODED_CODE);
+    unencodedTrainingNumberType.setLabel(UNENCODED_LABEL);
     trainingNumberTypeRepository.saveAndFlush(unencodedTrainingNumberType);
 
     // Get all the trainingNumberTypeList
@@ -256,9 +256,8 @@ public class TrainingNumberTypeResourceIntTest {
     // Update the trainingNumberType
     TrainingNumberType updatedTrainingNumberType = trainingNumberTypeRepository
         .findById(trainingNumberType.getId()).get();
-    updatedTrainingNumberType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedTrainingNumberType.setCode(UPDATED_CODE);
+    updatedTrainingNumberType.setLabel(UPDATED_LABEL);
     TrainingNumberTypeDTO trainingNumberTypeDTO = trainingNumberTypeMapper
         .trainingNumberTypeToTrainingNumberTypeDTO(updatedTrainingNumberType);
 

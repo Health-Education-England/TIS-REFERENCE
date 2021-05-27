@@ -82,9 +82,9 @@ public class LeavingDestinationResourceIntTest {
    * which requires the current entity.
    */
   public static LeavingDestination createEntity(EntityManager em) {
-    LeavingDestination leavingDestination = new LeavingDestination()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    LeavingDestination leavingDestination = new LeavingDestination();
+    leavingDestination.setCode(DEFAULT_CODE);
+    leavingDestination.setLabel(DEFAULT_LABEL);
     return leavingDestination;
   }
 
@@ -206,9 +206,9 @@ public class LeavingDestinationResourceIntTest {
   @Transactional
   public void getLeavingDestinationsWithQuery() throws Exception {
     // Initialize the database
-    LeavingDestination unencodedLeavingDestination = new LeavingDestination()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    LeavingDestination unencodedLeavingDestination = new LeavingDestination();
+    unencodedLeavingDestination.setCode(UNENCODED_CODE);
+    unencodedLeavingDestination.setLabel(UNENCODED_LABEL);
     leavingDestinationRepository.saveAndFlush(unencodedLeavingDestination);
 
     // Get all the leavingDestinationList
@@ -255,9 +255,8 @@ public class LeavingDestinationResourceIntTest {
     // Update the leavingDestination
     LeavingDestination updatedLeavingDestination = leavingDestinationRepository
         .findById(leavingDestination.getId()).get();
-    updatedLeavingDestination
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedLeavingDestination.setCode(UPDATED_CODE);
+    updatedLeavingDestination.setLabel(UPDATED_LABEL);
     LeavingDestinationDTO leavingDestinationDTO = leavingDestinationMapper
         .leavingDestinationToLeavingDestinationDTO(updatedLeavingDestination);
 

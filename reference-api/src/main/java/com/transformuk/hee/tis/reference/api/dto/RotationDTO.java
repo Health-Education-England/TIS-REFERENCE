@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-
 import com.transformuk.hee.tis.reference.api.dto.validation.Create;
 import com.transformuk.hee.tis.reference.api.dto.validation.Update;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -9,10 +8,12 @@ import java.util.Objects;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import lombok.Data;
 
 /**
  * A DTO for the Rotation entity.
  */
+@Data
 public class RotationDTO implements Serializable {
 
   @NotNull(groups = Update.class, message = "Id must not be null when updating a rotation")
@@ -30,46 +31,6 @@ public class RotationDTO implements Serializable {
   private String localOffice;
 
   private Status status;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public String getLocalOffice() {
-    return localOffice;
-  }
-
-  public void setLocalOffice(String localOffice) {
-    this.localOffice = localOffice;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -90,16 +51,5 @@ public class RotationDTO implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(getId());
-  }
-
-  @Override
-  public String toString() {
-    return "RotationDTO{" +
-        "id=" + id +
-        ", code='" + code + '\'' +
-        ", label='" + label + '\'' +
-        ", localOffice='" + localOffice + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

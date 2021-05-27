@@ -85,9 +85,9 @@ public class PlacementTypeResourceIntTest {
    * which requires the current entity.
    */
   public static PlacementType createEntity(EntityManager em) {
-    PlacementType placementType = new PlacementType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    PlacementType placementType = new PlacementType();
+    placementType.setCode(DEFAULT_CODE);
+    placementType.setLabel(DEFAULT_LABEL);
     return placementType;
   }
 
@@ -208,9 +208,9 @@ public class PlacementTypeResourceIntTest {
   @Transactional
   public void getPlacementTypesWithQuery() throws Exception {
     // Initialize the database
-    PlacementType unencodedPlacementType = new PlacementType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    PlacementType unencodedPlacementType = new PlacementType();
+    unencodedPlacementType.setCode(UNENCODED_CODE);
+    unencodedPlacementType.setLabel(UNENCODED_LABEL);
     placementTypeRepository.saveAndFlush(unencodedPlacementType);
 
     // Get all the placementTypeList
@@ -254,10 +254,10 @@ public class PlacementTypeResourceIntTest {
     int databaseSizeBeforeUpdate = placementTypeRepository.findAll().size();
 
     // Update the placementType
-    PlacementType updatedPlacementType = placementTypeRepository.findById(placementType.getId()).get();
-    updatedPlacementType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    PlacementType updatedPlacementType = placementTypeRepository.findById(placementType.getId())
+        .get();
+    updatedPlacementType.setCode(UPDATED_CODE);
+    updatedPlacementType.setLabel(UPDATED_LABEL);
     PlacementTypeDTO placementTypeDTO = placementTypeMapper
         .placementTypeToPlacementTypeDTO(updatedPlacementType);
 

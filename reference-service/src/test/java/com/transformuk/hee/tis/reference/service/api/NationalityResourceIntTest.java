@@ -87,9 +87,9 @@ public class NationalityResourceIntTest {
    * which requires the current entity.
    */
   public static Nationality createEntity(EntityManager em) {
-    Nationality nationality = new Nationality()
-        .countryNumber(DEFAULT_COUNTRY_NUMBER)
-        .nationality(DEFAULT_NATIONALITY);
+    Nationality nationality = new Nationality();
+    nationality.setCountryNumber(DEFAULT_COUNTRY_NUMBER);
+    nationality.setNationality(DEFAULT_NATIONALITY);
     return nationality;
   }
 
@@ -208,9 +208,9 @@ public class NationalityResourceIntTest {
   @Transactional
   public void getNationalitiesWithQuery() throws Exception {
     // Initialize the database
-    Nationality unencodedNationality = new Nationality()
-        .nationality(UNENCODED_NATIONALITY)
-        .countryNumber(UNENCODED_COUNTRY_NUMBER);
+    Nationality unencodedNationality = new Nationality();
+    unencodedNationality.setNationality(UNENCODED_NATIONALITY);
+    unencodedNationality.setCountryNumber(UNENCODED_COUNTRY_NUMBER);
     nationalityRepository.saveAndFlush(unencodedNationality);
 
     // Get all the nationalityList
@@ -254,9 +254,8 @@ public class NationalityResourceIntTest {
 
     // Update the nationality
     Nationality updatedNationality = nationalityRepository.findById(nationality.getId()).get();
-    updatedNationality
-        .countryNumber(UPDATED_COUNTRY_NUMBER)
-        .nationality(UPDATED_NATIONALITY);
+    updatedNationality.setCountryNumber(UPDATED_COUNTRY_NUMBER);
+    updatedNationality.setNationality(UPDATED_NATIONALITY);
     NationalityDTO nationalityDTO = nationalityMapper
         .nationalityToNationalityDTO(updatedNationality);
 

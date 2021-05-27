@@ -87,9 +87,9 @@ public class ReligiousBeliefResourceIntTest {
    * which requires the current entity.
    */
   public static ReligiousBelief createEntity(EntityManager em) {
-    ReligiousBelief religiousBelief = new ReligiousBelief()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    ReligiousBelief religiousBelief = new ReligiousBelief();
+    religiousBelief.setCode(DEFAULT_CODE);
+    religiousBelief.setLabel(DEFAULT_LABEL);
     return religiousBelief;
   }
 
@@ -211,9 +211,9 @@ public class ReligiousBeliefResourceIntTest {
   @Transactional
   public void getReligiousBeliefsWithQuery() throws Exception {
     // Initialize the database
-    ReligiousBelief unencodedReligiousBelief = new ReligiousBelief()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    ReligiousBelief unencodedReligiousBelief = new ReligiousBelief();
+    unencodedReligiousBelief.setCode(UNENCODED_CODE);
+    unencodedReligiousBelief.setLabel(UNENCODED_LABEL);
     religiousBeliefRepository.saveAndFlush(unencodedReligiousBelief);
 
     // Get the religiousBeliefList
@@ -259,9 +259,8 @@ public class ReligiousBeliefResourceIntTest {
     // Update the religiousBelief
     ReligiousBelief updatedReligiousBelief = religiousBeliefRepository
         .findById(religiousBelief.getId()).get();
-    updatedReligiousBelief
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedReligiousBelief.setCode(UPDATED_CODE);
+    updatedReligiousBelief.setLabel(UPDATED_LABEL);
     ReligiousBeliefDTO religiousBeliefDTO = religiousBeliefMapper
         .religiousBeliefToReligiousBeliefDTO(updatedReligiousBelief);
 

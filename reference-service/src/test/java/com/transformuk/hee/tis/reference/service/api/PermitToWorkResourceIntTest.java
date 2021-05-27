@@ -88,9 +88,9 @@ public class PermitToWorkResourceIntTest {
    * which requires the current entity.
    */
   public static PermitToWork createEntity() {
-    PermitToWork permitToWork = new PermitToWork()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    PermitToWork permitToWork = new PermitToWork();
+    permitToWork.setCode(DEFAULT_CODE);
+    permitToWork.setLabel(DEFAULT_LABEL);
     return permitToWork;
   }
 
@@ -212,9 +212,9 @@ public class PermitToWorkResourceIntTest {
   @Transactional
   public void getPermitToWorksWithQuery() throws Exception {
     // Initialize the database
-    PermitToWork unencodedPermitToWork = new PermitToWork()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    PermitToWork unencodedPermitToWork = new PermitToWork();
+    unencodedPermitToWork.setCode(UNENCODED_CODE);
+    unencodedPermitToWork.setLabel(UNENCODED_LABEL);
     permitToWorkRepository.saveAndFlush(unencodedPermitToWork);
 
     // Get the permitToWorkList
@@ -258,9 +258,8 @@ public class PermitToWorkResourceIntTest {
 
     // Update the maritalStatus
     PermitToWork updatedPermitToWork = permitToWorkRepository.findById(permitToWork.getId()).get();
-    updatedPermitToWork
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedPermitToWork.setCode(UPDATED_CODE);
+    updatedPermitToWork.setLabel(UPDATED_LABEL);
     PermitToWorkDTO maritalStatusDTO = permitToWorkMapper
         .permitToWorkToPermitToWorkDTO(updatedPermitToWork);
 

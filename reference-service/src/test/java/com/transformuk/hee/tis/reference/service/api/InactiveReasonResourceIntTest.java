@@ -82,9 +82,9 @@ public class InactiveReasonResourceIntTest {
    * which requires the current entity.
    */
   public static InactiveReason createEntity(EntityManager em) {
-    InactiveReason inactiveReason = new InactiveReason()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    InactiveReason inactiveReason = new InactiveReason();
+    inactiveReason.setCode(DEFAULT_CODE);
+    inactiveReason.setLabel(DEFAULT_LABEL);
     return inactiveReason;
   }
 
@@ -206,9 +206,9 @@ public class InactiveReasonResourceIntTest {
   @Transactional
   public void getInactiveReasonsWithQuery() throws Exception {
     // Initialize the database
-    InactiveReason unencodedInactiveReason = new InactiveReason()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    InactiveReason unencodedInactiveReason = new InactiveReason();
+    unencodedInactiveReason.setCode(UNENCODED_CODE);
+    unencodedInactiveReason.setLabel(UNENCODED_LABEL);
     inactiveReasonRepository.saveAndFlush(unencodedInactiveReason);
 
     // Get all the inactiveReasonList
@@ -254,9 +254,8 @@ public class InactiveReasonResourceIntTest {
     // Update the inactiveReason
     InactiveReason updatedInactiveReason = inactiveReasonRepository
         .findById(inactiveReason.getId()).get();
-    updatedInactiveReason
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedInactiveReason.setCode(UPDATED_CODE);
+    updatedInactiveReason.setLabel(UPDATED_LABEL);
     InactiveReasonDTO inactiveReasonDTO = inactiveReasonMapper
         .inactiveReasonToInactiveReasonDTO(updatedInactiveReason);
 

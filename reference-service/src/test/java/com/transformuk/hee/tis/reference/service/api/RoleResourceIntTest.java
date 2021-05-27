@@ -97,10 +97,11 @@ public class RoleResourceIntTest {
    * which requires the current entity.
    */
   public Role createEntity(EntityManager em) {
-    return new Role()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL)
-        .roleCategory(roleCategory);
+    Role role = new Role();
+    role.setCode(DEFAULT_CODE);
+    role.setLabel(DEFAULT_LABEL);
+    role.setRoleCategory(roleCategory);
+    return role;
   }
 
   @Before
@@ -213,10 +214,10 @@ public class RoleResourceIntTest {
   @Transactional
   public void getRolesWithQuery() throws Exception {
     // Initialize the database
-    Role unencodedRole = new Role()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL)
-        .roleCategory(roleCategory);
+    Role unencodedRole = new Role();
+    unencodedRole.setCode(UNENCODED_CODE);
+    unencodedRole.setLabel(UNENCODED_LABEL);
+    unencodedRole.setRoleCategory(roleCategory);
     roleRepository.saveAndFlush(unencodedRole);
 
     // Get the roleList
@@ -279,9 +280,8 @@ public class RoleResourceIntTest {
 
     // Update the role
     Role updatedRole = roleRepository.findById(role.getId()).get();
-    updatedRole
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedRole.setCode(UPDATED_CODE);
+    updatedRole.setLabel(UPDATED_LABEL);
     RoleDTO roleDTO = roleMapper.roleToRoleDTO(updatedRole);
 
     mockMvc.perform(put("/api/roles")
@@ -410,10 +410,10 @@ public class RoleResourceIntTest {
   @Transactional
   public void shouldReturnAllRolesInCodes() throws Exception {
     roleRepository.saveAndFlush(role);
-    Role role2 = new Role()
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL)
-        .roleCategory(roleCategory);
+    Role role2 = new Role();
+    role2.setCode(UPDATED_CODE);
+    role2.setLabel(UPDATED_LABEL);
+    role2.setRoleCategory(roleCategory);
     roleRepository.saveAndFlush(role2);
 
     String codes = String.join(",", role.getCode(), role2.getCode());
@@ -429,10 +429,10 @@ public class RoleResourceIntTest {
   @Transactional
   public void shouldReturnAllRolesInCodesWhenDotExistsInRole() throws Exception {
     String code2 = "code2.code2";
-    Role role2 = new Role()
-        .code("code2.code2")
-        .label(UPDATED_LABEL)
-        .roleCategory(roleCategory);
+    Role role2 = new Role();
+    role2.setCode("code2.code2");
+    role2.setLabel(UPDATED_LABEL);
+    role2.setRoleCategory(roleCategory);
     roleRepository.saveAndFlush(role2);
 
     mockMvc.perform(get("/api/roles/in/{codes}", role2.getCode()))

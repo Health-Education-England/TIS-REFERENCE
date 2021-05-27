@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -13,10 +12,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A Country.
  */
+@Data
 @Entity
 public class Country implements Serializable {
 
@@ -41,57 +42,6 @@ public class Country implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
-  public String getCountryNumber() {
-    return countryNumber;
-  }
-
-  public void setCountryNumber(String countryNumber) {
-    this.countryNumber = countryNumber;
-  }
-
-  public Country countryNumber(String countryNumber) {
-    this.countryNumber = countryNumber;
-    return this;
-  }
-
-  public String getNationality() {
-    return nationality;
-  }
-
-  public void setNationality(String nationality) {
-    this.nationality = nationality;
-  }
-
-  public Country nationality(String nationality) {
-    this.nationality = nationality;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public Country status(Status status) {
-    this.status = status;
-    return this;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -110,16 +60,5 @@ public class Country implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "Country{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", countryNumber='" + countryNumber + '\'' +
-        ", nationality='" + nationality + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

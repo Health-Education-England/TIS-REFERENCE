@@ -82,9 +82,9 @@ public class CollegeResourceIntTest {
    * which requires the current entity.
    */
   public static College createEntity(EntityManager em) {
-    College college = new College()
-        .abbreviation(DEFAULT_ABBREVIATION)
-        .name(DEFAULT_NAME);
+    College college = new College();
+    college.setAbbreviation(DEFAULT_ABBREVIATION);
+    college.setName(DEFAULT_NAME);
     return college;
   }
 
@@ -181,9 +181,9 @@ public class CollegeResourceIntTest {
   @Transactional
   public void getCollegesWithEscapedCharacterSearchShouldFindShoudReturnCollege() throws Exception {
     // Initialize the database
-    College unescapedCollege = new College()
-        .abbreviation(UNENCODED_ABBREVIATION)
-        .name(UNENCODED_NAME);
+    College unescapedCollege = new College();
+    unescapedCollege.setAbbreviation(UNENCODED_ABBREVIATION);
+    unescapedCollege.setName(UNENCODED_NAME);
     unescapedCollege = collegeRepository.saveAndFlush(unescapedCollege);
 
     // Get all the collegeList
@@ -227,9 +227,8 @@ public class CollegeResourceIntTest {
 
     // Update the college
     College updatedCollege = collegeRepository.findById(college.getId()).get();
-    updatedCollege
-        .abbreviation(UPDATED_ABBREVIATION)
-        .name(UPDATED_NAME);
+    updatedCollege.setAbbreviation(UPDATED_ABBREVIATION);
+    updatedCollege.setName(UPDATED_NAME);
     CollegeDTO collegeDTO = collegeMapper.collegeToCollegeDTO(updatedCollege);
 
     restCollegeMockMvc.perform(put("/api/colleges")

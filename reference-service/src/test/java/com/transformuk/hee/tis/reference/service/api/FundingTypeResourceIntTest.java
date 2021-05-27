@@ -81,9 +81,9 @@ public class FundingTypeResourceIntTest {
    * which requires the current entity.
    */
   public static FundingType createEntity(EntityManager em) {
-    FundingType fundingType = new FundingType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    FundingType fundingType = new FundingType();
+    fundingType.setCode(DEFAULT_CODE);
+    fundingType.setLabel(DEFAULT_LABEL);
     return fundingType;
   }
 
@@ -200,9 +200,9 @@ public class FundingTypeResourceIntTest {
   @Transactional
   public void getFundingTypesWithQuery() throws Exception {
     // Initialize the database
-    FundingType unencodedFundingType = new FundingType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    FundingType unencodedFundingType = new FundingType();
+    unencodedFundingType.setCode(UNENCODED_CODE);
+    unencodedFundingType.setLabel(UNENCODED_LABEL);
     fundingTypeRepository.saveAndFlush(unencodedFundingType);
 
     // Get all the fundingTypeList
@@ -282,9 +282,8 @@ public class FundingTypeResourceIntTest {
 
     // Update the fundingType
     FundingType updatedFundingType = fundingTypeRepository.findById(fundingType.getId()).get();
-    updatedFundingType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedFundingType.setCode(UPDATED_CODE);
+    updatedFundingType.setLabel(UPDATED_LABEL);
     FundingTypeDTO fundingTypeDTO = fundingTypeMapper
         .fundingTypeToFundingTypeDTO(updatedFundingType);
 

@@ -82,9 +82,9 @@ public class RecordTypeResourceIntTest {
    * which requires the current entity.
    */
   public static RecordType createEntity(EntityManager em) {
-    RecordType recordType = new RecordType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    RecordType recordType = new RecordType();
+    recordType.setCode(DEFAULT_CODE);
+    recordType.setLabel(DEFAULT_LABEL);
     return recordType;
   }
 
@@ -201,9 +201,9 @@ public class RecordTypeResourceIntTest {
   @Transactional
   public void getRecordTypesWithQuery() throws Exception {
     // Initialize the database
-    RecordType unencodedRecordType = new RecordType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    RecordType unencodedRecordType = new RecordType();
+    unencodedRecordType.setCode(UNENCODED_CODE);
+    unencodedRecordType.setLabel(UNENCODED_LABEL);
     recordTypeRepository.saveAndFlush(unencodedRecordType);
 
     // Get all the recordTypeList
@@ -247,9 +247,8 @@ public class RecordTypeResourceIntTest {
 
     // Update the recordType
     RecordType updatedRecordType = recordTypeRepository.findById(recordType.getId()).get();
-    updatedRecordType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedRecordType.setCode(UPDATED_CODE);
+    updatedRecordType.setLabel(UPDATED_LABEL);
     RecordTypeDTO recordTypeDTO = recordTypeMapper.recordTypeToRecordTypeDTO(updatedRecordType);
 
     restRecordTypeMockMvc.perform(put("/api/record-types")

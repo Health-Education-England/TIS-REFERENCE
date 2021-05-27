@@ -85,9 +85,9 @@ public class CountryResourceIntTest {
    * which requires the current entity.
    */
   public static Country createEntity(EntityManager em) {
-    Country country = new Country()
-        .countryNumber(DEFAULT_COUNTRY_NUMBER)
-        .nationality(DEFAULT_NATIONALITY);
+    Country country = new Country();
+    country.setCountryNumber(DEFAULT_COUNTRY_NUMBER);
+    country.setNationality(DEFAULT_NATIONALITY);
     return country;
   }
 
@@ -221,9 +221,9 @@ public class CountryResourceIntTest {
   @Transactional
   public void getCountriesMatchingEncodedQueryShouldReturnMatch() throws Exception {
     // Initialize the database
-    Country unencodedCountry = new Country()
-        .countryNumber(UNENCODED_COUNTRY_NUMBER)
-        .nationality(UNENCODED_NATIONALITY);
+    Country unencodedCountry = new Country();
+    unencodedCountry.setCountryNumber(UNENCODED_COUNTRY_NUMBER);
+    unencodedCountry.setNationality(UNENCODED_NATIONALITY);
     unencodedCountry = countryRepository.saveAndFlush(unencodedCountry);
 
     // Get all the countryList
@@ -284,9 +284,8 @@ public class CountryResourceIntTest {
 
     // Update the country
     Country updatedCountry = countryRepository.findById(country.getId()).get();
-    updatedCountry
-        .countryNumber(UPDATED_COUNTRY_NUMBER)
-        .nationality(UPDATED_NATIONALITY);
+    updatedCountry.setCountryNumber(UPDATED_COUNTRY_NUMBER);
+    updatedCountry.setNationality(UPDATED_NATIONALITY);
     CountryDTO countryDTO = countryMapper.countryToCountryDTO(updatedCountry);
 
     restCountryMockMvc.perform(put("/api/countries")

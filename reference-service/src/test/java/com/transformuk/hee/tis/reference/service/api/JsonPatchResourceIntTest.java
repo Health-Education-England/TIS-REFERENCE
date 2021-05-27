@@ -77,12 +77,12 @@ public class JsonPatchResourceIntTest {
    * which requires the current entity.
    */
   public static JsonPatch createEntity(EntityManager em) {
-    JsonPatch jsonPatch = new JsonPatch()
-        .tableDtoName(DEFAULT_TABLE_DTO_NAME)
-        .patchId(DEFAULT_PATCH_ID)
-        .patch(DEFAULT_PATCH)
-        .enabled(true)
-        .dateAdded(new Date());
+    JsonPatch jsonPatch = new JsonPatch();
+    jsonPatch.setTableDtoName(DEFAULT_TABLE_DTO_NAME);
+    jsonPatch.setPatchId(DEFAULT_PATCH_ID);
+    jsonPatch.setPatch(DEFAULT_PATCH);
+    jsonPatch.setEnabled(true);
+    jsonPatch.setDateAdded(new Date());
     return jsonPatch;
   }
 
@@ -215,9 +215,8 @@ public class JsonPatchResourceIntTest {
 
     // Update the jsonPatch
     JsonPatch updateJsonPatch = jsonPatchRepository.findById(jsonPatch.getId()).get();
-    updateJsonPatch
-        .patchId(UPDATED_DEFAULT_PATCH_ID)
-        .patch(UPDATED_DEFAULT_PATCH);
+    updateJsonPatch.setPatchId(UPDATED_DEFAULT_PATCH_ID);
+    updateJsonPatch.setPatch(UPDATED_DEFAULT_PATCH);
     JsonPatchDTO jsonPatchDTO = jsonPatchMapper.jsonPatchToJsonPatchDTO(updateJsonPatch);
 
     restCountryMockMvc.perform(put("/api/jsonPatches")

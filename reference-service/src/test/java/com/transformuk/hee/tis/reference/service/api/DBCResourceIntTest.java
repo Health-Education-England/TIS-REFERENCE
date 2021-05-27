@@ -62,7 +62,7 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
-  private static String[] dbcArray = new String[]{HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
+  private static String[] dbcArray = new String[] {HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
   private DBCRepository dBCRepository;
@@ -96,11 +96,11 @@ public class DBCResourceIntTest {
    * which requires the current entity.
    */
   public static DBC createEntity() {
-    DBC dBC = new DBC()
-        .dbc(DEFAULT_DBC)
-        .name(DEFAULT_NAME)
-        .abbr(DEFAULT_ABBR);
-    return dBC;
+    DBC dbc = new DBC();
+    dbc.setDbc(DEFAULT_DBC);
+    dbc.setName(DEFAULT_NAME);
+    dbc.setAbbr(DEFAULT_ABBR);
+    return dbc;
   }
 
   @Before
@@ -226,10 +226,10 @@ public class DBCResourceIntTest {
   @Test
   @Transactional
   public void getDBCWithEncodedQuery() throws Exception {
-    DBC encDbc = new DBC()
-        .dbc(UNENCODED_DBC)
-        .name(UNENCODED_NAME)
-        .abbr(UNENCODED_ABBR);
+    DBC encDbc = new DBC();
+    encDbc.setDbc(UNENCODED_DBC);
+    encDbc.setName(UNENCODED_NAME);
+    encDbc.setAbbr(UNENCODED_ABBR);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
     dBCRepository.saveAll(dbcs);
@@ -292,10 +292,9 @@ public class DBCResourceIntTest {
 
     // Update the dBC
     DBC updatedDBC = dBCRepository.findById(dBC.getId()).get();
-    updatedDBC
-        .dbc(UPDATED_DBC)
-        .name(UPDATED_NAME)
-        .abbr(UPDATED_ABBR);
+    updatedDBC.setDbc(UPDATED_DBC);
+    updatedDBC.setName(UPDATED_NAME);
+    updatedDBC.setAbbr(UPDATED_ABBR);
     DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(updatedDBC);
 
     restDBCMockMvc.perform(put("/api/dbcs")
@@ -344,10 +343,10 @@ public class DBCResourceIntTest {
 
     Integer count = 1;
     for (String dbc : dbcArray) {
-      DBC dbcReal = new DBC()
-          .dbc(dbc)
-          .name(dbc)
-          .abbr("AAA" + count.toString());
+      DBC dbcReal = new DBC();
+      dbcReal.setDbc(dbc);
+      dbcReal.setName(dbc);
+      dbcReal.setAbbr("AAA" + count.toString());
       dBCRepository.saveAndFlush(dbcReal);
       count++;
     }

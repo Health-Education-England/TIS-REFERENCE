@@ -88,9 +88,9 @@ public class MaritalStatusResourceIntTest {
    * which requires the current entity.
    */
   public static MaritalStatus createEntity(EntityManager em) {
-    MaritalStatus maritalStatus = new MaritalStatus()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    MaritalStatus maritalStatus = new MaritalStatus();
+    maritalStatus.setCode(DEFAULT_CODE);
+    maritalStatus.setLabel(DEFAULT_LABEL);
     return maritalStatus;
   }
 
@@ -212,9 +212,9 @@ public class MaritalStatusResourceIntTest {
   @Transactional
   public void getMaritalStatusesWithQuery() throws Exception {
     // Initialize the database
-    MaritalStatus unencodedMaritalStatus = new MaritalStatus()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    MaritalStatus unencodedMaritalStatus = new MaritalStatus();
+    unencodedMaritalStatus.setCode(UNENCODED_CODE);
+    unencodedMaritalStatus.setLabel(UNENCODED_LABEL);
     maritalStatusRepository.saveAndFlush(unencodedMaritalStatus);
 
     // Get all the maritalStatusList
@@ -258,10 +258,10 @@ public class MaritalStatusResourceIntTest {
     int databaseSizeBeforeUpdate = maritalStatusRepository.findAll().size();
 
     // Update the maritalStatus
-    MaritalStatus updatedMaritalStatus = maritalStatusRepository.findById(maritalStatus.getId()).get();
-    updatedMaritalStatus
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    MaritalStatus updatedMaritalStatus = maritalStatusRepository.findById(maritalStatus.getId())
+        .get();
+    updatedMaritalStatus.setCode(UPDATED_CODE);
+    updatedMaritalStatus.setLabel(UPDATED_LABEL);
     MaritalStatusDTO maritalStatusDTO = maritalStatusMapper
         .maritalStatusToMaritalStatusDTO(updatedMaritalStatus);
 

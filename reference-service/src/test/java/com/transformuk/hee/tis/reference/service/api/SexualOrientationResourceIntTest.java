@@ -87,9 +87,9 @@ public class SexualOrientationResourceIntTest {
    * which requires the current entity.
    */
   public static SexualOrientation createEntity(EntityManager em) {
-    SexualOrientation sexualOrientation = new SexualOrientation()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    SexualOrientation sexualOrientation = new SexualOrientation();
+    sexualOrientation.setCode(DEFAULT_CODE);
+    sexualOrientation.setLabel(DEFAULT_LABEL);
     return sexualOrientation;
   }
 
@@ -212,9 +212,9 @@ public class SexualOrientationResourceIntTest {
   @Transactional
   public void getSexualOrientationsWithQuery() throws Exception {
     // Initialize the database
-    SexualOrientation unencodedSexualOrientation = new SexualOrientation()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    SexualOrientation unencodedSexualOrientation = new SexualOrientation();
+    unencodedSexualOrientation.setCode(UNENCODED_CODE);
+    unencodedSexualOrientation.setLabel(UNENCODED_LABEL);
     sexualOrientationRepository.saveAndFlush(unencodedSexualOrientation);
 
     // Get the sexualOrientationList
@@ -261,9 +261,8 @@ public class SexualOrientationResourceIntTest {
     // Update the sexualOrientation
     SexualOrientation updatedSexualOrientation = sexualOrientationRepository
         .findById(sexualOrientation.getId()).get();
-    updatedSexualOrientation
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedSexualOrientation.setCode(UPDATED_CODE);
+    updatedSexualOrientation.setLabel(UPDATED_LABEL);
     SexualOrientationDTO sexualOrientationDTO = sexualOrientationMapper
         .sexualOrientationToSexualOrientationDTO(updatedSexualOrientation);
 

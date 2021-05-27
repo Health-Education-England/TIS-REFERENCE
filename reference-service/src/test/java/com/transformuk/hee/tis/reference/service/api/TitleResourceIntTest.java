@@ -88,9 +88,9 @@ public class TitleResourceIntTest {
    * which requires the current entity.
    */
   public static Title createEntity(EntityManager em) {
-    Title title = new Title()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    Title title = new Title();
+    title.setCode(DEFAULT_CODE);
+    title.setLabel(DEFAULT_LABEL);
     return title;
   }
 
@@ -206,9 +206,9 @@ public class TitleResourceIntTest {
   @Transactional
   public void getTitlesWithQuery() throws Exception {
     // Initialize the database
-    Title unencodedTitle = new Title()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    Title unencodedTitle = new Title();
+    unencodedTitle.setCode(UNENCODED_CODE);
+    unencodedTitle.setLabel(UNENCODED_LABEL);
     titleRepository.saveAndFlush(unencodedTitle);
 
     // Get all the titleList
@@ -252,9 +252,8 @@ public class TitleResourceIntTest {
 
     // Update the title
     Title updatedTitle = titleRepository.findById(title.getId()).get();
-    updatedTitle
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedTitle.setCode(UPDATED_CODE);
+    updatedTitle.setLabel(UPDATED_LABEL);
     TitleDTO titleDTO = titleMapper.titleToTitleDTO(updatedTitle);
 
     mockMvc.perform(put("/api/titles")

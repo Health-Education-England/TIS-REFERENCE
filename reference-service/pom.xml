@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -12,7 +13,7 @@
 
   <groupId>com.transformuk.hee.tis</groupId>
   <artifactId>reference-service</artifactId>
-  <version>3.21.0</version>
+  <version>3.21.1</version>
   <packaging>war</packaging>
 
   <prerequisites>
@@ -48,7 +49,8 @@
     <node.version>v6.10.0</node.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
+    <project.testresult.directory>${project.build.directory}/test-results
+    </project.testresult.directory>
     <run.addResources>false</run.addResources>
     <scala-maven-plugin.version>3.2.2</scala-maven-plugin.version>
     <scala.version>2.12.1</scala.version>
@@ -61,6 +63,7 @@
     <!-- Reset to default the values from the parent POM that break analysis. -->
     <jacoco.minimum>0.0</jacoco.minimum>
     <sonar.tests/>
+    <surefire.forkCount>1</surefire.forkCount>
   </properties>
 
   <dependencies>
@@ -115,7 +118,7 @@
     <dependency>
       <groupId>com.transformuk.hee</groupId>
       <artifactId>reference-api</artifactId>
-      <version>2.8.0</version>
+      <version>2.8.1</version>
     </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
@@ -435,6 +438,7 @@
         <configuration>
           <!-- Force alphabetical order to have a reproducible build -->
           <runOrder>alphabetical</runOrder>
+          <forkCount>${surefire.forkCount}</forkCount>
         </configuration>
       </plugin>
       <plugin>
@@ -547,6 +551,17 @@
           <version>${mapstruct.version}</version>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>platform-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <surefire.forkCount>0</surefire.forkCount>
+      </properties>
     </profile>
   </profiles>
 </project>

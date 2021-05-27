@@ -97,13 +97,13 @@ public class GradeResourceIntTest {
    * which requires the current entity.
    */
   public static Grade createEntity() {
-    Grade grade = new Grade()
-        .abbreviation(DEFAULT_ABBREVIATION)
-        .name(DEFAULT_NAME)
-        .label(DEFAULT_LABEL)
-        .trainingGrade(DEFAULT_TRAINING_GRADE)
-        .postGrade(DEFAULT_POST_GRADE)
-        .placementGrade(DEFAULT_PLACEMENT_GRADE);
+    Grade grade = new Grade();
+    grade.setAbbreviation(DEFAULT_ABBREVIATION);
+    grade.setName(DEFAULT_NAME);
+    grade.setLabel(DEFAULT_LABEL);
+    grade.setTrainingGrade(DEFAULT_TRAINING_GRADE);
+    grade.setPostGrade(DEFAULT_POST_GRADE);
+    grade.setPlacementGrade(DEFAULT_PLACEMENT_GRADE);
     return grade;
   }
 
@@ -141,9 +141,9 @@ public class GradeResourceIntTest {
     assertThat(testGrade.getAbbreviation()).isEqualTo(DEFAULT_ABBREVIATION);
     assertThat(testGrade.getName()).isEqualTo(DEFAULT_NAME);
     assertThat(testGrade.getLabel()).isEqualTo(DEFAULT_LABEL);
-    assertThat(testGrade.isTrainingGrade()).isEqualTo(DEFAULT_TRAINING_GRADE);
-    assertThat(testGrade.isPostGrade()).isEqualTo(DEFAULT_POST_GRADE);
-    assertThat(testGrade.isPlacementGrade()).isEqualTo(DEFAULT_PLACEMENT_GRADE);
+    assertThat(testGrade.getTrainingGrade()).isEqualTo(DEFAULT_TRAINING_GRADE);
+    assertThat(testGrade.getPostGrade()).isEqualTo(DEFAULT_POST_GRADE);
+    assertThat(testGrade.getPlacementGrade()).isEqualTo(DEFAULT_PLACEMENT_GRADE);
   }
 
   @Test
@@ -206,13 +206,13 @@ public class GradeResourceIntTest {
   @Transactional
   public void getGradesWithQuery() throws Exception {
     // Initialize the database
-    Grade unencodedGrade = new Grade()
-        .abbreviation(UNENCODED_ABBREVIATION)
-        .name(UNENCODED_NAME)
-        .label(UNENCODED_LABEL)
-        .trainingGrade(DEFAULT_TRAINING_GRADE)
-        .postGrade(DEFAULT_POST_GRADE)
-        .placementGrade(DEFAULT_PLACEMENT_GRADE);
+    Grade unencodedGrade = new Grade();
+    unencodedGrade.setAbbreviation(UNENCODED_ABBREVIATION);
+    unencodedGrade.setName(UNENCODED_NAME);
+    unencodedGrade.setLabel(UNENCODED_LABEL);
+    unencodedGrade.setTrainingGrade(DEFAULT_TRAINING_GRADE);
+    unencodedGrade.setPostGrade(DEFAULT_POST_GRADE);
+    unencodedGrade.setPlacementGrade(DEFAULT_PLACEMENT_GRADE);
     gradeRepository.saveAndFlush(unencodedGrade);
 
     // Get grades given the codes
@@ -263,13 +263,13 @@ public class GradeResourceIntTest {
   @Transactional
   public void findTrustShouldReturnGradeWithAttributesMatchingSearchTerm() throws Exception {
     gradeRepository.saveAndFlush(grade);
-    Grade anotherGrade = new Grade()
-        .abbreviation(UPDATED_ABBREVIATION)
-        .name(UPDATED_NAME)
-        .label(DEFAULT_LABEL)
-        .trainingGrade(DEFAULT_TRAINING_GRADE)
-        .postGrade(DEFAULT_POST_GRADE)
-        .placementGrade(DEFAULT_PLACEMENT_GRADE);
+    Grade anotherGrade = new Grade();
+    anotherGrade.setAbbreviation(UPDATED_ABBREVIATION);
+    anotherGrade.setName(UPDATED_NAME);
+    anotherGrade.setLabel(DEFAULT_LABEL);
+    anotherGrade.setTrainingGrade(DEFAULT_TRAINING_GRADE);
+    anotherGrade.setPostGrade(DEFAULT_POST_GRADE);
+    anotherGrade.setPlacementGrade(DEFAULT_PLACEMENT_GRADE);
 
     gradeRepository.saveAndFlush(anotherGrade);
 
@@ -301,12 +301,11 @@ public class GradeResourceIntTest {
 
     // Update the grade
     Grade updatedGrade = gradeRepository.findById(grade.getId()).get();
-    updatedGrade
-        .name(UPDATED_NAME)
-        .label(UPDATED_LABEL)
-        .trainingGrade(UPDATED_TRAINING_GRADE)
-        .postGrade(UPDATED_POST_GRADE)
-        .placementGrade(UPDATED_PLACEMENT_GRADE);
+    updatedGrade.setName(UPDATED_NAME);
+    updatedGrade.setLabel(UPDATED_LABEL);
+    updatedGrade.setTrainingGrade(UPDATED_TRAINING_GRADE);
+    updatedGrade.setPostGrade(UPDATED_POST_GRADE);
+    updatedGrade.setPlacementGrade(UPDATED_PLACEMENT_GRADE);
     GradeDTO gradeDTO = gradeMapper.gradeToGradeDTO(updatedGrade);
 
     restGradeMockMvc.perform(put("/api/grades")
@@ -321,9 +320,9 @@ public class GradeResourceIntTest {
     assertThat(testGrade.getAbbreviation()).isEqualTo(DEFAULT_ABBREVIATION);
     assertThat(testGrade.getName()).isEqualTo(UPDATED_NAME);
     assertThat(testGrade.getLabel()).isEqualTo(UPDATED_LABEL);
-    assertThat(testGrade.isTrainingGrade()).isEqualTo(UPDATED_TRAINING_GRADE);
-    assertThat(testGrade.isPostGrade()).isEqualTo(UPDATED_POST_GRADE);
-    assertThat(testGrade.isPlacementGrade()).isEqualTo(UPDATED_PLACEMENT_GRADE);
+    assertThat(testGrade.getTrainingGrade()).isEqualTo(UPDATED_TRAINING_GRADE);
+    assertThat(testGrade.getPostGrade()).isEqualTo(UPDATED_POST_GRADE);
+    assertThat(testGrade.getPlacementGrade()).isEqualTo(UPDATED_PLACEMENT_GRADE);
   }
 
   @Test

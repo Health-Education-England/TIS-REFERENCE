@@ -88,9 +88,9 @@ public class QualificationTypeResourceIntTest {
    * which requires the current entity.
    */
   public static QualificationType createEntity(EntityManager em) {
-    QualificationType qualificationType = new QualificationType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    QualificationType qualificationType = new QualificationType();
+    qualificationType.setCode(DEFAULT_CODE);
+    qualificationType.setLabel(DEFAULT_LABEL);
     return qualificationType;
   }
 
@@ -214,9 +214,9 @@ public class QualificationTypeResourceIntTest {
   @Transactional
   public void getQualificationTypesWithQuery() throws Exception {
     // Initialize the database
-    QualificationType unencodedQualificationType = new QualificationType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    QualificationType unencodedQualificationType = new QualificationType();
+    unencodedQualificationType.setCode(UNENCODED_CODE);
+    unencodedQualificationType.setLabel(UNENCODED_LABEL);
     qualificationTypeRepository.saveAndFlush(unencodedQualificationType);
 
     // Get the qualificationTypeList
@@ -263,9 +263,8 @@ public class QualificationTypeResourceIntTest {
     // Update the qualificationType
     QualificationType updatedQualificationType = qualificationTypeRepository
         .findById(qualificationType.getId()).get();
-    updatedQualificationType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedQualificationType.setCode(UPDATED_CODE);
+    updatedQualificationType.setLabel(UPDATED_LABEL);
     QualificationTypeDTO qualificationTypeDTO = qualificationTypeMapper
         .qualificationTypeToQualificationTypeDTO(updatedQualificationType);
 

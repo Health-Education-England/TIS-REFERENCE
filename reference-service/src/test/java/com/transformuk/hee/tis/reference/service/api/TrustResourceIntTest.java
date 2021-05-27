@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -114,9 +115,15 @@ public class TrustResourceIntTest {
    * which requires the current entity.
    */
   public static Trust createEntity(EntityManager em) {
-    Trust trust = new Trust().code(DEFAULT_CODE).localOffice(DEFAULT_LOCAL_OFFICE)
-        .status(DEFAULT_STATUS).trustKnownAs(DEFAULT_TRUST_KNOWN_AS).trustName(DEFAULT_TRUST_NAME)
-        .trustNumber(DEFAULT_TRUST_NUMBER).address(DEFAULT_ADDRESS).postCode(DEFAULT_POST_CODE);
+    Trust trust = new Trust();
+    trust.setCode(DEFAULT_CODE);
+    trust.setLocalOffice(DEFAULT_LOCAL_OFFICE);
+    trust.setStatus(DEFAULT_STATUS);
+    trust.setTrustKnownAs(DEFAULT_TRUST_KNOWN_AS);
+    trust.setTrustName(DEFAULT_TRUST_NAME);
+    trust.setTrustNumber(DEFAULT_TRUST_NUMBER);
+    trust.setAddress(DEFAULT_ADDRESS);
+    trust.setPostCode(DEFAULT_POST_CODE);
     return trust;
   }
 
@@ -286,7 +293,7 @@ public class TrustResourceIntTest {
   @Transactional
   public void shouldNotReturnInactiveTrust() throws Exception {
     Trust inactiveTrust = createEntity(em);
-    inactiveTrust.status(Status.INACTIVE);
+    inactiveTrust.setStatus(Status.INACTIVE);
     trustRepository.saveAndFlush((inactiveTrust));
 
     restTrustMockMvc.perform(get("/api/trusts/code/{code}", inactiveTrust.getCode()))
@@ -310,9 +317,13 @@ public class TrustResourceIntTest {
 
     // Update the trust
     Trust updatedTrust = trustRepository.findById(trust.getId()).get();
-    updatedTrust.localOffice(UPDATED_LOCAL_OFFICE).status(UPDATED_STATUS)
-        .trustKnownAs(UPDATED_TRUST_KNOWN_AS).trustName(UPDATED_TRUST_NAME)
-        .trustNumber(UPDATED_TRUST_NUMBER).address(UPDATED_ADDRESS).postCode(UPDATED_POST_CODE);
+    updatedTrust.setLocalOffice(UPDATED_LOCAL_OFFICE);
+    updatedTrust.setStatus(UPDATED_STATUS);
+    updatedTrust.setTrustKnownAs(UPDATED_TRUST_KNOWN_AS);
+    updatedTrust.setTrustName(UPDATED_TRUST_NAME);
+    updatedTrust.setTrustNumber(UPDATED_TRUST_NUMBER);
+    updatedTrust.setAddress(UPDATED_ADDRESS);
+    updatedTrust.setPostCode(UPDATED_POST_CODE);
     TrustDTO trustDTO = trustMapper.trustToTrustDTO(updatedTrust);
 
     restTrustMockMvc.perform(put("/api/trusts").contentType(MediaType.APPLICATION_JSON)
@@ -360,10 +371,15 @@ public class TrustResourceIntTest {
   @Transactional
   public void findTrustShouldReturnTrustWithAttributesMatchingSearchTerm() throws Exception {
     trust = trustRepository.saveAndFlush(trust);
-    Trust anotherTrust = new Trust().code(UPDATED_CODE).localOffice(UPDATED_LOCAL_OFFICE)
-        .status(UPDATED_STATUS).trustKnownAs(UPDATED_TRUST_KNOWN_AS).address(UPDATED_ADDRESS)
-        .postCode(UPDATED_POST_CODE).trustName(UPDATED_TRUST_NAME)
-        .trustNumber(UPDATED_TRUST_NUMBER);
+    Trust anotherTrust = new Trust();
+    anotherTrust.setCode(UPDATED_CODE);
+    anotherTrust.setLocalOffice(UPDATED_LOCAL_OFFICE);
+    anotherTrust.setStatus(UPDATED_STATUS);
+    anotherTrust.setTrustKnownAs(UPDATED_TRUST_KNOWN_AS);
+    anotherTrust.setAddress(UPDATED_ADDRESS);
+    anotherTrust.setPostCode(UPDATED_POST_CODE);
+    anotherTrust.setTrustName(UPDATED_TRUST_NAME);
+    anotherTrust.setTrustNumber(UPDATED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(anotherTrust);
 
@@ -386,10 +402,15 @@ public class TrustResourceIntTest {
   @Transactional
   public void getTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
     // Set up trust with reserved character.
-    Trust unencodedTrust = new Trust().code(UNENCODED_CODE).localOffice(UNENCODED_LOCAL_OFFICE)
-        .status(UNENCODED_STATUS).trustKnownAs(UNENCODED_TRUST_KNOWN_AS).address(UNENCODED_ADDRESS)
-        .postCode(UNENCODED_POST_CODE).trustName(UNENCODED_TRUST_NAME)
-        .trustNumber(UNENCODED_TRUST_NUMBER);
+    Trust unencodedTrust = new Trust();
+    unencodedTrust.setCode(UNENCODED_CODE);
+    unencodedTrust.setLocalOffice(UNENCODED_LOCAL_OFFICE);
+    unencodedTrust.setStatus(UNENCODED_STATUS);
+    unencodedTrust.setTrustKnownAs(UNENCODED_TRUST_KNOWN_AS);
+    unencodedTrust.setAddress(UNENCODED_ADDRESS);
+    unencodedTrust.setPostCode(UNENCODED_POST_CODE);
+    unencodedTrust.setTrustName(UNENCODED_TRUST_NAME);
+    unencodedTrust.setTrustNumber(UNENCODED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(unencodedTrust);
 
@@ -402,7 +423,6 @@ public class TrustResourceIntTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].trustName").value(UNENCODED_TRUST_NAME));
-
 
     // Search using the 'trustKnownAs'
     restTrustMockMvc
@@ -419,10 +439,15 @@ public class TrustResourceIntTest {
   @Transactional
   public void getCurrentTrustsWithEncodedCharacterSearchShouldReturnTrust() throws Exception {
     // Set up trust with reserved character.
-    Trust unencodedTrust = new Trust().code(UNENCODED_CODE).localOffice(UNENCODED_LOCAL_OFFICE)
-        .status(UNENCODED_STATUS).trustKnownAs(UNENCODED_TRUST_KNOWN_AS).address(UNENCODED_ADDRESS)
-        .postCode(UNENCODED_POST_CODE).trustName(UNENCODED_TRUST_NAME)
-        .trustNumber(UNENCODED_TRUST_NUMBER);
+    Trust unencodedTrust = new Trust();
+    unencodedTrust.setCode(UNENCODED_CODE);
+    unencodedTrust.setLocalOffice(UNENCODED_LOCAL_OFFICE);
+    unencodedTrust.setStatus(UNENCODED_STATUS);
+    unencodedTrust.setTrustKnownAs(UNENCODED_TRUST_KNOWN_AS);
+    unencodedTrust.setAddress(UNENCODED_ADDRESS);
+    unencodedTrust.setPostCode(UNENCODED_POST_CODE);
+    unencodedTrust.setTrustName(UNENCODED_TRUST_NAME);
+    unencodedTrust.setTrustNumber(UNENCODED_TRUST_NUMBER);
 
     trustRepository.saveAndFlush(unencodedTrust);
 
