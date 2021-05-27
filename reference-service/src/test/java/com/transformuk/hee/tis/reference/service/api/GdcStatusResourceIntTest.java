@@ -49,11 +49,11 @@ public class GdcStatusResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNENCODED_CODE = "CCCCCCCCCC";
+  private static final String UNENCODED_CODE = "Te$t Code";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
-  private static final String UNENCODED_LABEL = "Te$t GDC Status";
+  private static final String UNENCODED_LABEL = "Te$t Label";
 
   @Autowired
   private GdcStatusRepository gdcStatusRepository;
@@ -105,7 +105,7 @@ public class GdcStatusResourceIntTest {
 
   @Before
   public void initTest() {
-    gdcStatus = createEntity(em);
+    gdcStatus = createGdcStatus(em);
   }
 
   @Test
@@ -188,19 +188,37 @@ public class GdcStatusResourceIntTest {
 
   @Test
   @Transactional
-  public void getAllGdcStatuses() throws Exception {
-    // Initialize the database
-    GdcStatus unencodedGdcStatus = new GdcStatus();
-    unencodedGdcStatus.setCode(UNENCODED_CODE);
-    unencodedGdcStatus.setLabel(UNENCODED_LABEL);
-    gdcStatusRepository.saveAndFlush(unencodedGdcStatus);
+  public void getEntitiesWithQueryMatchingCode() throws Exception {
+    // Initialize the database.
+    GdcStatus entity = new GdcStatus();
+    entity.setCode(UNENCODED_CODE);
+    entity.setLabel(DEFAULT_LABEL);
+    gdcStatusRepository.saveAndFlush(entity);
 
-    // Get all the gdcStatusList
-    mockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te$t\"&sort=id,desc"))
+    // Get all the matching entities.
+    mockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(unencodedGdcStatus.getId().intValue()))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(DEFAULT_LABEL));
+  }
+
+  @Test
+  @Transactional
+  public void getEntitiesWithQueryMatchingLabel() throws Exception {
+    // Initialize the database.
+    GdcStatus entity = new GdcStatus();
+    entity.setCode(DEFAULT_CODE);
+    entity.setLabel(UNENCODED_LABEL);
+    gdcStatusRepository.saveAndFlush(entity);
+
+    // Get all the matching entities.
+    mockMvc.perform(get("/api/gdc-statuses?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 

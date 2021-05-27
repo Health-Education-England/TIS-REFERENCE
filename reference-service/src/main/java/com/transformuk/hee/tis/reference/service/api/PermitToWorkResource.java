@@ -272,7 +272,8 @@ public class PermitToWorkResource {
   public ResponseEntity<Boolean> permitToWorkExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
-    log.debug("REST request to check PermitToWork exists : {}", code);
+    String codeToLog = code != null ? code.replaceAll("[\n\r\t]", "_") : null;
+    log.debug("REST request to check PermitToWork exists : {}", codeToLog);
     Specification<PermitToWork> specs = Specification.where(isEqual("code", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
