@@ -105,12 +105,12 @@ public class GdcStatusResourceIntTest {
 
   @Before
   public void initTest() {
-    gdcStatus = createGdcStatus(em);
+    gdcStatus = createEntity(em);
   }
 
   @Test
   @Transactional
-  public void createGdcStatus() throws Exception {
+  public void createEntity() throws Exception {
     int databaseSizeBeforeCreate = gdcStatusRepository.findAll().size();
 
     // Create the GdcStatus
