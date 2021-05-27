@@ -54,15 +54,15 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
   }
 
   @Override
-  public List<LeavingReasonDto> findAll(String searchString, List<ColumnFilter> columnFilters) {
+  public List<LeavingReasonDto> findAll(String searchQuery, List<ColumnFilter> columnFilters) {
     List<LeavingReason> result;
 
     List<Specification<LeavingReason>> specs = new ArrayList<>();
     // add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString))
-          .or(containsLike("code", searchString))
-          .or(containsLike("label", searchString)));
+    if (StringUtils.isNotEmpty(searchQuery)) {
+      specs.add(Specification.where(containsLike("code", searchQuery))
+          .or(containsLike("code", searchQuery))
+          .or(containsLike("label", searchQuery)));
     }
 
     // add the column filters criteria
