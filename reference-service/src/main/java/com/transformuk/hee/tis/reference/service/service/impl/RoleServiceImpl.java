@@ -13,6 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
+/**
+ * The reference service implementation for Role.
+ */
 @Service
 public class RoleServiceImpl extends AbstractReferenceService<Role> {
 

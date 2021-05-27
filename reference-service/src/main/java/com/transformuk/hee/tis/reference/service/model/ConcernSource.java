@@ -9,6 +9,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the ConcernSource entity.
+ */
 @Data
 @Entity
 public class ConcernSource implements Serializable {

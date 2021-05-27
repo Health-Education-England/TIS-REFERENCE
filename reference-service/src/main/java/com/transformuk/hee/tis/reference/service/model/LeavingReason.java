@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the LeavingReason entity.
+ */
 @Data
 @Entity
 public class LeavingReason implements Serializable {

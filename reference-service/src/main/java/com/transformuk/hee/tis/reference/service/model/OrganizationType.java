@@ -9,6 +9,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the OrganizationType entity.
+ */
 @Data
 @Entity
 public class OrganizationType implements Serializable {

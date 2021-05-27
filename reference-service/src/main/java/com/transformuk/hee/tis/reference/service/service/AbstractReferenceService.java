@@ -16,6 +16,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Abstract service containing common behaviour of all reference types.
+ *
+ * @param <T> The reference type the implementing service is for.
+ */
 public abstract class AbstractReferenceService<T> {
 
   /**
