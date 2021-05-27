@@ -46,7 +46,7 @@ public class CurriculumSubTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNENCODED_CODE = "UnencCurr";
+  private static final String UNENCODED_CODE = "Te$t Code";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
@@ -266,27 +266,39 @@ public class CurriculumSubTypeResourceIntTest {
 
   @Test
   @Transactional
-  public void getCurriculumSubTypeWithEncodedQuery() throws Exception {
-    // Initialize the database
-    CurriculumSubType medicalCurriculum = new CurriculumSubType()
-        .code("MEDICAL1")
-        .label("Medical Curriculum - As defined by the GMC");
+  public void getEntitiesWithQueryMatchingCode() throws Exception {
+    // Initialize the database.
+    CurriculumSubType entity = new CurriculumSubType();
+    entity.setCode(UNENCODED_CODE);
+    entity.setLabel(DEFAULT_LABEL);
+    curriculumSubTypeRepository.saveAndFlush(entity);
 
-    CurriculumSubType expectedCurriculum = new CurriculumSubType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
-
-    List<CurriculumSubType> curriculumSubTypes = Lists
-        .newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
-    curriculumSubTypeRepository.saveAll(curriculumSubTypes);
-    curriculumSubTypeRepository.flush();
-
-    // Get the curriculumSubType
+    // Get all the matching entities.
     restCurriculumSubTypeMockMvc
-        .perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t%2FVal\""))
+        .perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
         .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE))
+        .andExpect(jsonPath("$.[*].label").value(DEFAULT_LABEL));
+  }
+
+  @Test
+  @Transactional
+  public void getEntitiesWithQueryMatchingLabel() throws Exception {
+    // Initialize the database.
+    CurriculumSubType entity = new CurriculumSubType();
+    entity.setCode(DEFAULT_CODE);
+    entity.setLabel(UNENCODED_LABEL);
+    curriculumSubTypeRepository.saveAndFlush(entity);
+
+    // Get all the matching entities.
+    restCurriculumSubTypeMockMvc
+        .perform(get("/api/curriculum-sub-types?searchQuery=\"Te%24t\"&sort=id,desc"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.[*].label").value(UNENCODED_LABEL));
   }
 

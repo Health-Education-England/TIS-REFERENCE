@@ -1,54 +1,35 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
-import java.util.ArrayList;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class FundingTypeServiceImpl {
+public class FundingTypeServiceImpl extends AbstractReferenceService<FundingType> {
 
-  @Autowired
-  private FundingTypeRepository fundingTypeRepository;
+  private FundingTypeRepository repository;
 
-  @Transactional(readOnly = true)
-  public Page<FundingType> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
-      Pageable pageable) {
+  FundingTypeServiceImpl(FundingTypeRepository repository) {
+    this.repository = repository;
+  }
 
-    List<Specification<FundingType>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString)).
-          or(containsLike("label", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("code", "label");
+  }
 
-    Page<FundingType> result;
-    if (!specs.isEmpty()) {
-      Specification<FundingType> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = fundingTypeRepository.findAll(fullSpec, pageable);
-    } else {
-      result = fundingTypeRepository.findAll(pageable);
-    }
+  @Override
+  protected JpaRepository<FundingType, Long> getRepository() {
+    return repository;
+  }
 
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<FundingType> getSpecificationExecutor() {
+    return repository;
   }
 }

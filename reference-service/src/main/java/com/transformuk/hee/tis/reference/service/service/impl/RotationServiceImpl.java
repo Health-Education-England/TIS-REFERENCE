@@ -1,24 +1,21 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
 import com.transformuk.hee.tis.reference.api.dto.RotationDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Rotation;
 import com.transformuk.hee.tis.reference.service.repository.RotationRepository;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
 import com.transformuk.hee.tis.reference.service.service.RotationService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RotationMapper;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class RotationServiceImpl implements RotationService {
+public class RotationServiceImpl extends AbstractReferenceService<Rotation> implements
+    RotationService {
 
   private final Logger log = LoggerFactory.getLogger(RotationServiceImpl.class);
 
-  private final RotationRepository rotationRepository;
+  private final RotationRepository repository;
 
-  private final RotationMapper rotationMapper;
+  private final RotationMapper mapper;
 
-  public RotationServiceImpl(RotationRepository rotationRepository, RotationMapper rotationMapper) {
-    this.rotationRepository = rotationRepository;
-    this.rotationMapper = rotationMapper;
+  public RotationServiceImpl(RotationRepository repository, RotationMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   /**
@@ -50,9 +48,9 @@ public class RotationServiceImpl implements RotationService {
   @Override
   public RotationDTO save(RotationDTO rotationDTO) {
     log.debug("Request to save Rotation : {}", rotationDTO);
-    Rotation rotation = rotationMapper.toEntity(rotationDTO);
-    rotation = rotationRepository.save(rotation);
-    return rotationMapper.toDto(rotation);
+    Rotation rotation = mapper.toEntity(rotationDTO);
+    rotation = repository.save(rotation);
+    return mapper.toDto(rotation);
   }
 
   /**
@@ -65,8 +63,8 @@ public class RotationServiceImpl implements RotationService {
   @Transactional(readOnly = true)
   public Page<RotationDTO> findAll(Pageable pageable) {
     log.debug("Request to get all Rotations");
-    return rotationRepository.findAll(pageable)
-        .map(rotationMapper::toDto);
+    return repository.findAll(pageable)
+        .map(mapper::toDto);
   }
 
   /**
@@ -80,8 +78,8 @@ public class RotationServiceImpl implements RotationService {
   public Page<RotationDTO> findAllCurrent(Pageable pageable) {
     log.debug("Request to get all Rotations");
     Rotation rotation = new Rotation().status(Status.CURRENT);
-    return rotationRepository.findAll(Example.of(rotation), pageable)
-        .map(rotationMapper::toDto);
+    return repository.findAll(Example.of(rotation), pageable)
+        .map(mapper::toDto);
   }
 
   /**
@@ -94,7 +92,7 @@ public class RotationServiceImpl implements RotationService {
   @Transactional(readOnly = true)
   public List<String> findByLabelsIn(List<String> values) {
     log.debug("Request to get labels list");
-    return rotationRepository.findByLabelsIn(values);
+    return repository.findByLabelsIn(values);
   }
 
   /**
@@ -107,8 +105,8 @@ public class RotationServiceImpl implements RotationService {
   @Transactional(readOnly = true)
   public RotationDTO findOne(Long id) {
     log.debug("Request to get Rotation : {}", id);
-    Rotation rotation = rotationRepository.findById(id).orElse(null);
-    return rotationMapper.toDto(rotation);
+    Rotation rotation = repository.findById(id).orElse(null);
+    return mapper.toDto(rotation);
   }
 
   /**
@@ -119,36 +117,21 @@ public class RotationServiceImpl implements RotationService {
   @Override
   public void delete(Long id) {
     log.debug("Request to delete Rotation : {}", id);
-    rotationRepository.deleteById(id);
+    repository.deleteById(id);
   }
 
-  @Transactional(readOnly = true)
-  public Page<Rotation> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
-      Pageable pageable) {
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("code", "label");
+  }
 
-    List<Specification<Rotation>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString)).
-          or(containsLike("label", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
+  @Override
+  protected JpaRepository<Rotation, Long> getRepository() {
+    return repository;
+  }
 
-    Page<Rotation> result;
-    if (!specs.isEmpty()) {
-      Specification<Rotation> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = rotationRepository.findAll(fullSpec, pageable);
-    } else {
-      result = rotationRepository.findAll(pageable);
-    }
-
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<Rotation> getSpecificationExecutor() {
+    return repository;
   }
 }

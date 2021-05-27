@@ -1,59 +1,35 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.DBC;
 import com.transformuk.hee.tis.reference.service.repository.DBCRepository;
-import com.transformuk.hee.tis.reference.service.service.mapper.DBCMapper;
-import java.util.ArrayList;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DBCServiceImpl {
+public class DBCServiceImpl extends AbstractReferenceService<DBC> {
 
-  @Autowired
-  private DBCRepository dbcRepository;
+  private DBCRepository repository;
 
-  @Autowired
-  private DBCMapper dbcMapper;
+  DBCServiceImpl(DBCRepository repository) {
+    this.repository = repository;
+  }
 
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("dbc", "name", "abbr");
+  }
 
-  @Transactional(readOnly = true)
-  public Page<DBC> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
-      Pageable pageable) {
+  @Override
+  protected JpaRepository<DBC, Long> getRepository() {
+    return repository;
+  }
 
-    List<Specification<DBC>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("dbc", searchString)).
-          or(containsLike("name", searchString))
-          .or(containsLike("abbr", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
-
-    Page<DBC> result;
-    if (!specs.isEmpty()) {
-      Specification<DBC> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = dbcRepository.findAll(fullSpec, pageable);
-    } else {
-      result = dbcRepository.findAll(pageable);
-    }
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<DBC> getSpecificationExecutor() {
+    return repository;
   }
 }

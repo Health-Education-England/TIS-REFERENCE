@@ -1,71 +1,51 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Role;
 import com.transformuk.hee.tis.reference.service.model.RoleCategory;
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class RoleServiceImpl {
+public class RoleServiceImpl extends AbstractReferenceService<Role> {
 
-  @Autowired
-  private RoleRepository roleRepository;
+  private RoleRepository repository;
+  private RoleMapper mapper;
 
-  @Autowired
-  private RoleMapper roleMapper;
+  RoleServiceImpl(RoleRepository repository, RoleMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
+  }
 
-  @Transactional(readOnly = true)
-  public Page<Role> advancedSearch(String searchString, List<ColumnFilter> columnFilters,
-      Pageable pageable) {
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("code", "label");
+  }
 
-    List<Specification<Role>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString)).
-          or(containsLike("label", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
+  @Override
+  protected JpaRepository<Role, Long> getRepository() {
+    return repository;
+  }
 
-    Page<Role> result;
-    if (!specs.isEmpty()) {
-      Specification<Role> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = roleRepository.findAll(fullSpec, pageable);
-    } else {
-      result = roleRepository.findAll(pageable);
-    }
-
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<Role> getSpecificationExecutor() {
+    return repository;
   }
 
   public List<RoleDTO> findAllByCategoryId(Long categoryId) {
     RoleCategory roleCategory = new RoleCategory();
     roleCategory.setId(categoryId);
 
-    return roleRepository.findAllByRoleCategory(roleCategory)
+    return repository.findAllByRoleCategory(roleCategory)
         .stream()
-        .map(roleMapper::roleToRoleDTO)
+        .map(mapper::roleToRoleDTO)
         .collect(Collectors.toList());
   }
 }

@@ -162,18 +162,18 @@ public class FundingIssueResourceIntTest {
 
   @Test
   @Transactional
-  public void getAllFundingIssues() throws Exception {
-    FundingIssue unencodedIssue = new FundingIssue()
-        .code(UNENCODED_CODE);
-    // Initialize the database
-    fundingIssueRepository.saveAndFlush(unencodedIssue);
+  public void getEntitiesWithQueryMatchingCode() throws Exception {
+    // Initialize the database.
+    FundingIssue entity = new FundingIssue();
+    entity.setCode(UNENCODED_CODE);
+    fundingIssueRepository.saveAndFlush(entity);
 
-    // Get all the fundingIssueList
+    // Get all the matching entities.
     restFundingIssueMockMvc.perform(get("/api/funding-issues?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.[*].id").value(unencodedIssue.getId().intValue()))
-        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE.toString()));
+        .andExpect(jsonPath("$.[*].id").value(entity.getId().intValue()))
+        .andExpect(jsonPath("$.[*].code").value(UNENCODED_CODE));
   }
 
   @Test

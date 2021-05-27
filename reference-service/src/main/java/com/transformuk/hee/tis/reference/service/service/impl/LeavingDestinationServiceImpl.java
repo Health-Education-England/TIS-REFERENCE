@@ -1,54 +1,35 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.containsLike;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-
-import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LeavingDestination;
 import com.transformuk.hee.tis.reference.service.repository.LeavingDestinationRepository;
-import java.util.ArrayList;
+import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class LeavingDestinationServiceImpl {
+public class LeavingDestinationServiceImpl extends AbstractReferenceService<LeavingDestination> {
 
-  @Autowired
-  private LeavingDestinationRepository leavingDestinationRepository;
+  private LeavingDestinationRepository repository;
 
-  @Transactional(readOnly = true)
-  public Page<LeavingDestination> advancedSearch(String searchString,
-      List<ColumnFilter> columnFilters, Pageable pageable) {
+  LeavingDestinationServiceImpl(LeavingDestinationRepository repository) {
+    this.repository = repository;
+  }
 
-    List<Specification<LeavingDestination>> specs = new ArrayList<>();
-    //add the text search criteria
-    if (StringUtils.isNotEmpty(searchString)) {
-      specs.add(Specification.where(containsLike("code", searchString)).
-          or(containsLike("label", searchString)));
-    }
-    //add the column filters criteria
-    if (columnFilters != null && !columnFilters.isEmpty()) {
-      columnFilters.forEach(cf -> specs.add(in(cf.getName(), cf.getValues())));
-    }
+  @Override
+  protected List<String> getSearchFields() {
+    return Arrays.asList("code", "label");
+  }
 
-    Page<LeavingDestination> result;
-    if (!specs.isEmpty()) {
-      Specification<LeavingDestination> fullSpec = Specification.where(specs.get(0));
-      //add the rest of the specs that made it in
-      for (int i = 1; i < specs.size(); i++) {
-        fullSpec = fullSpec.and(specs.get(i));
-      }
-      result = leavingDestinationRepository.findAll(fullSpec, pageable);
-    } else {
-      result = leavingDestinationRepository.findAll(pageable);
-    }
+  @Override
+  protected JpaRepository<LeavingDestination, Long> getRepository() {
+    return repository;
+  }
 
-    return result;
+  @Override
+  protected JpaSpecificationExecutor<LeavingDestination> getSpecificationExecutor() {
+    return repository;
   }
 }
