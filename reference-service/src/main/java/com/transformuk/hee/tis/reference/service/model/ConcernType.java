@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the ConcernType entity.
+ */
 @Data
 @Entity
 public class ConcernType implements Serializable {

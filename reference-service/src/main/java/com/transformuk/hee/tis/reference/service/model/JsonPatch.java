@@ -13,6 +13,9 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 
+/**
+ * The representation of the JsonPatch entity.
+ */
 @Data
 @Entity
 @DynamicInsert

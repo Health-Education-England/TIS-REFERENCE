@@ -15,6 +15,9 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * An interface for the client reference service.
+ */
 public interface ReferenceService extends ClientService {
 
   /**
@@ -91,8 +94,9 @@ public interface ReferenceService extends ClientService {
 
   /**
    * Find the trust given the id.
+   *
    * @param id The id of the requested trust.
-   * @return   The found trust.
+   * @return The found trust.
    */
   TrustDTO findTrustById(Long id);
 

@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
+/**
+ * The reference service implementation for Settled.
+ */
 @Service
 public class SettledServiceImpl extends AbstractReferenceService<Settled> {
 

@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for managing LeavingReason.
+ */
 @RestController
 @RequestMapping("/api")
 public class LeavingReasonResource {
@@ -48,8 +51,8 @@ public class LeavingReasonResource {
    *
    * @param leavingReasonDto The LeavingReasonDto to create.
    * @return A {@link ResponseEntity} with status 201 (CREATED) and a body of the created leaving
-   * reason if the creation was successful, or with status 400 (BAD REQUEST) if the DTO contained an
-   * ID.
+   *     reason if the creation was successful, or with status 400 (BAD REQUEST) if the DTO
+   *     contained an ID.
    * @throws URISyntaxException If the new ID could not be built in to a URI to return.
    */
   @PostMapping("/leaving-reasons")
@@ -79,8 +82,8 @@ public class LeavingReasonResource {
    *
    * @param leavingReasonDto The LeavingReasonDto to use for the update.
    * @return A {@link ResponseEntity} with a body of the new or updated leaving reason and with
-   * status 200 (OK) if the update was successful or with status 201 (CREATED) if no leaving reason
-   * exists with the ID.
+   *     status 200 (OK) if the update was successful or with status 201 (CREATED) if no leaving
+   *     reason exists with the ID.
    * @throws URISyntaxException If the new ID could not be built in to a URI to return.
    */
   @PutMapping("/leaving-reasons")
@@ -106,7 +109,7 @@ public class LeavingReasonResource {
    *
    * @param id The id of the leaving reason to retrieve.
    * @return A {@link ResponseEntity} with status 200 (OK) and body of LeavingReasonDto if found, or
-   * with status 404 (NOT FOUND) if no leaving reason exists with the ID
+   *     with status 404 (NOT FOUND) if no leaving reason exists with the ID
    */
   @GetMapping("/leaving-reasons/{id}")
   public ResponseEntity<LeavingReasonDto> getLeavingReason(@PathVariable Long id) {
@@ -130,7 +133,7 @@ public class LeavingReasonResource {
    * @param columnFiltersJson The column filter to apply as JSON. e.g. "columnFilters={ "status" :
    *                          ["CURRENT"] }"
    * @return A {@link ResponseEntity} with status 200 (OK) and body of a List of LeavingReasonDtos,
-   * matching the colummn filter, list is empty if no leaving reasons are found.
+   *     matching the colummn filter, list is empty if no leaving reasons are found.
    * @throws IOException If the column filter JSON could not be parsed.
    */
   @GetMapping("/leaving-reasons")
@@ -150,7 +153,7 @@ public class LeavingReasonResource {
    *
    * @param id The id of the leaving reason to delete.
    * @return A {@link ResponseEntity} with status 200 (OK) if the delete was successful, or with
-   * status 404 (NOT FOUND) if no leaving reason exists with the ID.
+   *     status 404 (NOT FOUND) if no leaving reason exists with the ID.
    */
   @DeleteMapping("/leaving-reasons/{id}")
   @PreAuthorize("hasAuthority('reference:delete:entities')")

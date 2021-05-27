@@ -16,6 +16,9 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the Role entity.
+ */
 @Data
 @Entity
 public class Role implements Serializable {

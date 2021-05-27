@@ -90,7 +90,7 @@ public class SiteResource {
    *
    * @param siteDTO the siteDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new siteDTO, or with
-   * status 400 (Bad Request) if the site has already an ID
+   *     status 400 (Bad Request) if the site has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/sites")
@@ -112,8 +112,8 @@ public class SiteResource {
    *
    * @param siteDTO the siteDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated siteDTO, or with
-   * status 400 (Bad Request) if the siteDTO is not valid, or with status 500 (Internal Server
-   * Error) if the siteDTO couldnt be updated
+   *     status 400 (Bad Request) if the siteDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the siteDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/sites")
@@ -169,7 +169,7 @@ public class SiteResource {
    *
    * @param codes the codes to search by
    * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
-   * list
+   *     list
    */
   @GetMapping("/sites/in/{codes}")
   public ResponseEntity<List<SiteDTO>> getSitesIn(@PathVariable String codes) {
@@ -197,7 +197,7 @@ public class SiteResource {
    *
    * @param ids the ids to search by
    * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
-   * list
+   *     list
    */
   @ApiOperation(value = "get a collection of sites by id")
   @GetMapping("/sites/ids/in")
@@ -215,13 +215,14 @@ public class SiteResource {
   }
 
   /**
-   * POST /sites/ids/in/query: post a query to fetch sites.
-   * Currently this is a fix for a large amount of sites requests(exceeding the requestParam length limit).
+   * POST /sites/ids/in/query: post a query to fetch sites. Currently this is a fix for a large
+   * amount of sites requests(exceeding the requestParam length limit).
+   *
    * @param idMap the siteIds to search by. Frontend sends a json.
    * @return the ResponseEntity with status 200 (OK) and with body the list of siteDTOs, or empty
    */
   @ApiOperation(value = "get a collection of sites by id")
-  @PostMapping(path="/sites/ids/in/query")
+  @PostMapping(path = "/sites/ids/in/query")
   public ResponseEntity<List<SiteDTO>> getSitesInByIds(@RequestBody Map<String, List<Long>> idMap) {
     return getSitesInById(idMap.get("ids"));
   }
@@ -258,7 +259,7 @@ public class SiteResource {
    *
    * @param id the siteCode of the siteDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the siteDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/sites/{id}")
   public ResponseEntity<SiteDTO> getSite(@PathVariable Long id) {
@@ -273,7 +274,7 @@ public class SiteResource {
    *
    * @param code the code of the siteDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the siteDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/sites/code/{code}")
   public ResponseEntity<SiteDTO> getSiteByCode(@PathVariable String code) {
@@ -375,7 +376,7 @@ public class SiteResource {
    *
    * @param siteDTOs the siteDTOs to create
    * @return the ResponseEntity with status 201 (Created) and with body the new siteDTOs, or with
-   * status 400 (Bad Request) if the site has already an ID
+   *     status 400 (Bad Request) if the site has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-sites")
@@ -396,8 +397,8 @@ public class SiteResource {
    *
    * @param siteDTOs the siteDTOs to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated siteDTOs, or with
-   * status 400 (Bad Request) if the siteDTOs is not valid, or with status 500 (Internal Server
-   * Error) if the siteDTOs couldnt be updated
+   *     status 400 (Bad Request) if the siteDTOs is not valid, or with status 500 (Internal Server
+   *     Error) if the siteDTOs couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-sites")

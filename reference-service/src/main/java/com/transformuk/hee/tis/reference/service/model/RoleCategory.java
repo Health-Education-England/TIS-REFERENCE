@@ -15,6 +15,9 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * The representation of the RoleCategory entity.
+ */
 @Data
 @Entity
 public class RoleCategory implements Serializable {
@@ -65,7 +68,7 @@ public class RoleCategory implements Serializable {
   public String toString() {
     return "RoleCategory{" +
         "id=" + id +
-         ", uuid='" + uuid + '\'' +
+        ", uuid='" + uuid + '\'' +
         ", name='" + name + '\'' +
         '}';
   }
