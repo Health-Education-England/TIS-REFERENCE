@@ -84,9 +84,9 @@ public class CurriculumSubTypeResourceIntTest {
    * which requires the current entity.
    */
   public static CurriculumSubType createEntity(EntityManager em) {
-    CurriculumSubType curriculumSubType = new CurriculumSubType()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    CurriculumSubType curriculumSubType = new CurriculumSubType();
+    curriculumSubType.setCode(DEFAULT_CODE);
+    curriculumSubType.setLabel(DEFAULT_LABEL);
     return curriculumSubType;
   }
 
@@ -241,13 +241,13 @@ public class CurriculumSubTypeResourceIntTest {
   public void getAllCurriculumSubTypeSmartSearch() throws Exception {
     // Initialize the database
 
-    CurriculumSubType medicalCurriculum = new CurriculumSubType()
-        .code("MEDICAL1")
-        .label("Medical Curriculum - As defined by the GMC");
+    CurriculumSubType medicalCurriculum = new CurriculumSubType();
+    medicalCurriculum.setCode("MEDICAL1");
+    medicalCurriculum.setLabel("Medical Curriculum - As defined by the GMC");
 
-    CurriculumSubType medicalSPR = new CurriculumSubType()
-        .code("MEDICAL2")
-        .label("Medical SpR - As defined by the GMC");
+    CurriculumSubType medicalSPR = new CurriculumSubType();
+    medicalSPR.setCode("MEDICAL2");
+    medicalSPR.setLabel("Medical SpR - As defined by the GMC");
 
     List<CurriculumSubType> curriculumSubTypes = Lists
         .newArrayList(curriculumSubType, medicalCurriculum, medicalSPR);
@@ -268,13 +268,13 @@ public class CurriculumSubTypeResourceIntTest {
   @Transactional
   public void getCurriculumSubTypeWithEncodedQuery() throws Exception {
     // Initialize the database
-    CurriculumSubType medicalCurriculum = new CurriculumSubType()
-        .code("MEDICAL1")
-        .label("Medical Curriculum - As defined by the GMC");
+    CurriculumSubType medicalCurriculum = new CurriculumSubType();
+    medicalCurriculum.setCode("MEDICAL1");
+    medicalCurriculum.setLabel("Medical Curriculum - As defined by the GMC");
 
-    CurriculumSubType expectedCurriculum = new CurriculumSubType()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    CurriculumSubType expectedCurriculum = new CurriculumSubType();
+    expectedCurriculum.setCode(UNENCODED_CODE);
+    expectedCurriculum.setLabel(UNENCODED_LABEL);
 
     List<CurriculumSubType> curriculumSubTypes = Lists
         .newArrayList(curriculumSubType, medicalCurriculum, expectedCurriculum);
@@ -308,9 +308,8 @@ public class CurriculumSubTypeResourceIntTest {
     // Update the curriculumSubType
     CurriculumSubType updatedCurriculumSubType = curriculumSubTypeRepository
         .findById(curriculumSubType.getId()).get();
-    updatedCurriculumSubType
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedCurriculumSubType.setCode(UPDATED_CODE);
+    updatedCurriculumSubType.setLabel(UPDATED_LABEL);
     CurriculumSubTypeDTO curriculumSubTypeDTO = curriculumSubTypeMapper
         .curriculumSubTypeToCurriculumSubTypeDTO(updatedCurriculumSubType);
 

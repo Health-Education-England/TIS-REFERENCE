@@ -14,7 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 @Entity
 public class Role implements Serializable {
 
@@ -43,70 +45,6 @@ public class Role implements Serializable {
   @JoinColumn(name = "categoryId")
   private RoleCategory roleCategory;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public Role code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public Role label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public Role status(Status status) {
-    this.status = status;
-    return this;
-  }
-
-  public RoleCategory getRoleCategory() {
-    return roleCategory;
-  }
-
-  public void setRoleCategory(RoleCategory roleCategory) {
-    this.roleCategory = roleCategory;
-  }
-
-  public Role roleCategory(RoleCategory roleCategory) {
-    this.roleCategory = roleCategory;
-    return this;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -125,17 +63,5 @@ public class Role implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "Role{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", code='" + code + '\'' +
-        ", label='" + label + '\'' +
-        ", status=" + status +
-        ", roleCategory=" + roleCategory +
-        '}';
   }
 }

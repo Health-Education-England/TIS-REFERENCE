@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -9,10 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A Status.
  */
+@Data
 @Entity
 public class Status implements Serializable {
 
@@ -29,40 +30,6 @@ public class Status implements Serializable {
   @NotNull
   @Column(name = "label", nullable = false)
   private String label;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public Status code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public Status label(String label) {
-    this.label = label;
-    return this;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -82,14 +49,5 @@ public class Status implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "Status{" +
-        "id=" + id +
-        ", code='" + code + "'" +
-        ", label='" + label + "'" +
-        '}';
   }
 }

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -13,10 +12,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A DBC (Designated Body Code).
  */
+@Data
 @Entity
 public class DBC implements Serializable {
 
@@ -45,75 +46,6 @@ public class DBC implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
-  public String getDbc() {
-    return dbc;
-  }
-
-  public void setDbc(String dbc) {
-    this.dbc = dbc;
-  }
-
-  public DBC dbc(String dbc) {
-    this.dbc = dbc;
-    return this;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public DBC name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public String getAbbr() {
-    return abbr;
-  }
-
-  public void setAbbr(String abbr) {
-    this.abbr = abbr;
-  }
-
-  public DBC abbr(String abbr) {
-    this.abbr = abbr;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public DBC status(Status status) {
-    this.status = status;
-    return this;
-  }
-
-  public DBC uuid(UUID uuid) {
-    this.uuid = uuid;
-    return this;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -132,18 +64,5 @@ public class DBC implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "DBC{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", dbc='" + dbc + '\'' +
-        ", name='" + name + '\'' +
-        ", abbr='" + abbr + '\'' +
-        ", status=" + status +
-        ", uuid" + uuid +
-        '}';
   }
 }

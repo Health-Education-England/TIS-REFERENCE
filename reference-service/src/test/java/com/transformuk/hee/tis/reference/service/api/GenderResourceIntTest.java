@@ -88,9 +88,9 @@ public class GenderResourceIntTest {
    * which requires the current entity.
    */
   public static Gender createEntity(EntityManager em) {
-    Gender gender = new Gender()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    Gender gender = new Gender();
+    gender.setCode(DEFAULT_CODE);
+    gender.setLabel(DEFAULT_LABEL);
     return gender;
   }
 
@@ -207,9 +207,9 @@ public class GenderResourceIntTest {
   @Transactional
   public void getGendersWithQuery() throws Exception {
     // Initialize the database
-    Gender unencodedGender = new Gender()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    Gender unencodedGender = new Gender();
+    unencodedGender.setCode(UNENCODED_CODE);
+    unencodedGender.setLabel(UNENCODED_LABEL);
     genderRepository.saveAndFlush(unencodedGender);
 
     // Get all the genderList
@@ -253,9 +253,8 @@ public class GenderResourceIntTest {
 
     // Update the gender
     Gender updatedGender = genderRepository.findById(gender.getId()).get();
-    updatedGender
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedGender.setCode(UPDATED_CODE);
+    updatedGender.setLabel(UPDATED_LABEL);
     GenderDTO genderDTO = genderMapper.genderToGenderDTO(updatedGender);
 
     mockMvc.perform(put("/api/genders")

@@ -81,9 +81,9 @@ public class MedicalSchoolResourceIntTest {
    * which requires the current entity.
    */
   public static MedicalSchool createEntity(EntityManager em) {
-    MedicalSchool medicalSchool = new MedicalSchool()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    MedicalSchool medicalSchool = new MedicalSchool();
+    medicalSchool.setCode(DEFAULT_CODE);
+    medicalSchool.setLabel(DEFAULT_LABEL);
     return medicalSchool;
   }
 
@@ -189,9 +189,9 @@ public class MedicalSchoolResourceIntTest {
   @Transactional
   public void getAllMedicalSchools() throws Exception {
     // Initialize the database
-    MedicalSchool unencodedMedicalSchool = new MedicalSchool()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    MedicalSchool unencodedMedicalSchool = new MedicalSchool();
+    unencodedMedicalSchool.setCode(UNENCODED_CODE);
+    unencodedMedicalSchool.setLabel(UNENCODED_LABEL);
     medicalSchoolRepository.saveAndFlush(unencodedMedicalSchool);
 
     // Get all the medicalSchoolList
@@ -235,10 +235,10 @@ public class MedicalSchoolResourceIntTest {
     int databaseSizeBeforeUpdate = medicalSchoolRepository.findAll().size();
 
     // Update the medicalSchool
-    MedicalSchool updatedMedicalSchool = medicalSchoolRepository.findById(medicalSchool.getId()).get();
-    updatedMedicalSchool
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    MedicalSchool updatedMedicalSchool = medicalSchoolRepository.findById(medicalSchool.getId())
+        .get();
+    updatedMedicalSchool.setCode(UPDATED_CODE);
+    updatedMedicalSchool.setLabel(UPDATED_LABEL);
     MedicalSchoolDTO medicalSchoolDTO = medicalSchoolMapper
         .medicalSchoolToMedicalSchoolDTO(updatedMedicalSchool);
 

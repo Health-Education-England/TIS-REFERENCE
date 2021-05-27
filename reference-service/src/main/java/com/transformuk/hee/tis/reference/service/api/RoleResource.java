@@ -188,7 +188,8 @@ public class RoleResource {
   @GetMapping("/current/roles")
   public List<RoleDTO> getAllCurrentRoles() {
     log.debug("REST request to get all current Roles");
-    Role role = new Role().status(Status.CURRENT);
+    Role role = new Role();
+    role.setStatus(Status.CURRENT);
     List<Role> roles = roleRepository.findAll(Example.of(role));
     return roleMapper.rolesToRoleDTOs(roles);
   }

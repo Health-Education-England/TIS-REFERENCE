@@ -88,9 +88,9 @@ public class QualificationReferenceResourceIntTest {
    * which requires the current entity.
    */
   public static QualificationReference createEntity(EntityManager em) {
-    QualificationReference qualificationReference = new QualificationReference()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    QualificationReference qualificationReference = new QualificationReference();
+    qualificationReference.setCode(DEFAULT_CODE);
+    qualificationReference.setLabel(DEFAULT_LABEL);
     return qualificationReference;
   }
 
@@ -220,9 +220,9 @@ public class QualificationReferenceResourceIntTest {
   @Transactional
   public void getQualificationReferences() throws Exception {
     // Initialize the database
-    QualificationReference unencodedQualificationReference = new QualificationReference()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    QualificationReference unencodedQualificationReference = new QualificationReference();
+    unencodedQualificationReference.setCode(UNENCODED_CODE);
+    unencodedQualificationReference.setLabel(UNENCODED_LABEL);
     qualificationReferenceRepository.saveAndFlush(unencodedQualificationReference);
 
     // Get the qualificationReferenceList
@@ -270,9 +270,8 @@ public class QualificationReferenceResourceIntTest {
     // Update the qualificationReference
     QualificationReference updatedQualificationReference = qualificationReferenceRepository
         .findById(qualificationReference.getId()).get();
-    updatedQualificationReference
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedQualificationReference.setCode(UPDATED_CODE);
+    updatedQualificationReference.setLabel(UPDATED_LABEL);
     QualificationReferenceDTO qualificationReferenceDTO = qualificationReferenceMapper
         .qualificationReferenceToQualificationReferenceDTO(updatedQualificationReference);
 

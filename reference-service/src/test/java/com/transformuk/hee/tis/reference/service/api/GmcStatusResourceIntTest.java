@@ -88,9 +88,9 @@ public class GmcStatusResourceIntTest {
    * which requires the current entity.
    */
   public static GmcStatus createEntity(EntityManager em) {
-    GmcStatus gmcStatus = new GmcStatus()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    GmcStatus gmcStatus = new GmcStatus();
+    gmcStatus.setCode(DEFAULT_CODE);
+    gmcStatus.setLabel(DEFAULT_LABEL);
     return gmcStatus;
   }
 
@@ -207,9 +207,9 @@ public class GmcStatusResourceIntTest {
   @Transactional
   public void getGmcStatusesWithQuery() throws Exception {
     // Initialize the database
-    GmcStatus unencodedGmcStatus = new GmcStatus()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    GmcStatus unencodedGmcStatus = new GmcStatus();
+    unencodedGmcStatus.setCode(UNENCODED_CODE);
+    unencodedGmcStatus.setLabel(UNENCODED_LABEL);
     gmcStatusRepository.saveAndFlush(unencodedGmcStatus);
 
     // Get all the gmcStatusList
@@ -253,9 +253,8 @@ public class GmcStatusResourceIntTest {
 
     // Update the gmcStatus
     GmcStatus updatedGmcStatus = gmcStatusRepository.findById(gmcStatus.getId()).get();
-    updatedGmcStatus
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedGmcStatus.setCode(UPDATED_CODE);
+    updatedGmcStatus.setLabel(UPDATED_LABEL);
     GmcStatusDTO gmcStatusDTO = gmcStatusMapper.gmcStatusToGmcStatusDTO(updatedGmcStatus);
 
     mockMvc.perform(put("/api/gmc-statuses")

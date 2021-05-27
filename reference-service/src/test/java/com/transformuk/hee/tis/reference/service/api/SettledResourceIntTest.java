@@ -82,9 +82,9 @@ public class SettledResourceIntTest {
    * which requires the current entity.
    */
   public static Settled createEntity(EntityManager em) {
-    Settled settled = new Settled()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    Settled settled = new Settled();
+    settled.setCode(DEFAULT_CODE);
+    settled.setLabel(DEFAULT_LABEL);
     return settled;
   }
 
@@ -201,9 +201,9 @@ public class SettledResourceIntTest {
   @Transactional
   public void getSettledsWithQuery() throws Exception {
     // Initialize the database
-    Settled unencodedSettled = new Settled()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    Settled unencodedSettled = new Settled();
+    unencodedSettled.setCode(UNENCODED_CODE);
+    unencodedSettled.setLabel(UNENCODED_LABEL);
     settledRepository.saveAndFlush(unencodedSettled);
 
     // Get all the settledList
@@ -247,9 +247,8 @@ public class SettledResourceIntTest {
 
     // Update the settled
     Settled updatedSettled = settledRepository.findById(settled.getId()).get();
-    updatedSettled
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedSettled.setCode(UPDATED_CODE);
+    updatedSettled.setLabel(UPDATED_LABEL);
     SettledDTO settledDTO = settledMapper.settledToSettledDTO(updatedSettled);
 
     restSettledMockMvc.perform(put("/api/settleds")

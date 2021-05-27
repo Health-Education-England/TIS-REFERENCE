@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,10 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A FundingIssue.
  */
+@Data
 @Entity
 public class FundingIssue implements Serializable {
 
@@ -32,40 +33,6 @@ public class FundingIssue implements Serializable {
   @Enumerated(value = EnumType.STRING)
   @Column(name = "status")
   private Status status;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public FundingIssue code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public FundingIssue status(Status status) {
-    this.status = status;
-    return this;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -85,14 +52,5 @@ public class FundingIssue implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "FundingIssue{" +
-        "id=" + id +
-        ", code='" + code + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

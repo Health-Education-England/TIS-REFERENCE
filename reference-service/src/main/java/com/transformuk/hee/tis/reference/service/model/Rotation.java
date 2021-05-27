@@ -10,10 +10,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.Data;
 
 /**
  * A Rotation.
  */
+@Data
 @Entity
 public class Rotation implements Serializable {
 
@@ -114,16 +116,5 @@ public class Rotation implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(getId());
-  }
-
-  @Override
-  public String toString() {
-    return "Rotation{" +
-        "id=" + id +
-        ", code='" + code + '\'' +
-        ", label='" + label + '\'' +
-        ", localOffice='" + localOffice + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

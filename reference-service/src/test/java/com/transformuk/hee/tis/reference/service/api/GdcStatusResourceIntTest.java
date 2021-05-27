@@ -86,9 +86,9 @@ public class GdcStatusResourceIntTest {
    * which requires the current entity.
    */
   public static GdcStatus createEntity(EntityManager em) {
-    GdcStatus gdcStatus = new GdcStatus()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    GdcStatus gdcStatus = new GdcStatus();
+    gdcStatus.setCode(DEFAULT_CODE);
+    gdcStatus.setLabel(DEFAULT_LABEL);
     return gdcStatus;
   }
 
@@ -190,9 +190,9 @@ public class GdcStatusResourceIntTest {
   @Transactional
   public void getAllGdcStatuses() throws Exception {
     // Initialize the database
-    GdcStatus unencodedGdcStatus = new GdcStatus()
-        .code(UNENCODED_CODE)
-        .label(UNENCODED_LABEL);
+    GdcStatus unencodedGdcStatus = new GdcStatus();
+    unencodedGdcStatus.setCode(UNENCODED_CODE);
+    unencodedGdcStatus.setLabel(UNENCODED_LABEL);
     gdcStatusRepository.saveAndFlush(unencodedGdcStatus);
 
     // Get all the gdcStatusList
@@ -236,9 +236,8 @@ public class GdcStatusResourceIntTest {
 
     // Update the gdcStatus
     GdcStatus updatedGdcStatus = gdcStatusRepository.findById(gdcStatus.getId()).get();
-    updatedGdcStatus
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedGdcStatus.setCode(UPDATED_CODE);
+    updatedGdcStatus.setLabel(UPDATED_LABEL);
     GdcStatusDTO gdcStatusDTO = gdcStatusMapper.gdcStatusToGdcStatusDTO(updatedGdcStatus);
 
     mockMvc.perform(put("/api/gdc-statuses")

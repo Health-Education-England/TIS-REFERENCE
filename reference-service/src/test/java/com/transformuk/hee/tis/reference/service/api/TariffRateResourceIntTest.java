@@ -93,12 +93,12 @@ public class TariffRateResourceIntTest {
    * which requires the current entity.
    */
   public static TariffRate createEntity(EntityManager em) {
-    TariffRate tariffRate = new TariffRate()
-        .code(DEFAULT_CODE)
-        .gradeAbbreviation(DEFAULT_GRADE_ABBREVIATION)
-        .tariffRate(DEFAULT_TARIFF_RATE)
-        .tariffRateFringe(DEFAULT_TARIFF_RATE_FRINGE)
-        .tariffRateLondon(DEFAULT_TARIFF_RATE_LONDON);
+    TariffRate tariffRate = new TariffRate();
+    tariffRate.setCode(DEFAULT_CODE);
+    tariffRate.setGradeAbbreviation(DEFAULT_GRADE_ABBREVIATION);
+    tariffRate.setTariffRate(DEFAULT_TARIFF_RATE);
+    tariffRate.setTariffRateFringe(DEFAULT_TARIFF_RATE_FRINGE);
+    tariffRate.setTariffRateLondon(DEFAULT_TARIFF_RATE_LONDON);
     return tariffRate;
   }
 
@@ -205,12 +205,12 @@ public class TariffRateResourceIntTest {
   @Transactional
   public void getTariffRatesWithQuery() throws Exception {
     // Initialize the database
-    TariffRate unencodedTariffRate = new TariffRate()
-        .code(UNENCODED_CODE)
-        .gradeAbbreviation(UNENCODED_GRADE_ABBREVIATION)
-        .tariffRate(UNENCODED_TARIFF_RATE)
-        .tariffRateFringe(UNENCODED_TARIFF_RATE_FRINGE)
-        .tariffRateLondon(UNENCODED_TARIFF_RATE_LONDON);
+    TariffRate unencodedTariffRate = new TariffRate();
+    unencodedTariffRate.setCode(UNENCODED_CODE);
+    unencodedTariffRate.setGradeAbbreviation(UNENCODED_GRADE_ABBREVIATION);
+    unencodedTariffRate.setTariffRate(UNENCODED_TARIFF_RATE);
+    unencodedTariffRate.setTariffRateFringe(UNENCODED_TARIFF_RATE_FRINGE);
+    unencodedTariffRate.setTariffRateLondon(UNENCODED_TARIFF_RATE_LONDON);
     tariffRateRepository.saveAndFlush(unencodedTariffRate);
 
     // Get all the tariffRateList
@@ -260,12 +260,11 @@ public class TariffRateResourceIntTest {
 
     // Update the tariffRate
     TariffRate updatedTariffRate = tariffRateRepository.findById(tariffRate.getId()).get();
-    updatedTariffRate
-        .code(UPDATED_CODE)
-        .gradeAbbreviation(UPDATED_GRADE_ABBREVIATION)
-        .tariffRate(UPDATED_TARIFF_RATE)
-        .tariffRateFringe(UPDATED_TARIFF_RATE_FRINGE)
-        .tariffRateLondon(UPDATED_TARIFF_RATE_LONDON);
+    updatedTariffRate.setCode(UPDATED_CODE);
+    updatedTariffRate.setGradeAbbreviation(UPDATED_GRADE_ABBREVIATION);
+    updatedTariffRate.setTariffRate(UPDATED_TARIFF_RATE);
+    updatedTariffRate.setTariffRateFringe(UPDATED_TARIFF_RATE_FRINGE);
+    updatedTariffRate.setTariffRateLondon(UPDATED_TARIFF_RATE_LONDON);
     TariffRateDTO tariffRateDTO = tariffRateMapper.tariffRateToTariffRateDTO(updatedTariffRate);
 
     restTariffRateMockMvc.perform(put("/api/tariff-rates")

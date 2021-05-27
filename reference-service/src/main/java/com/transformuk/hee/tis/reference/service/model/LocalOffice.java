@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -13,10 +12,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A LocalOffice.
  */
+@Data
 @Entity
 public class LocalOffice implements Serializable {
 
@@ -45,70 +46,6 @@ public class LocalOffice implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getUuid() { return uuid; }
-
-  public void setUuid(UUID uuid) { this.uuid = uuid; }
-
-  public String getAbbreviation() {
-    return abbreviation;
-  }
-
-  public void setAbbreviation(String abbreviation) {
-    this.abbreviation = abbreviation;
-  }
-
-  public LocalOffice abbreviation(String abbreviation) {
-    this.abbreviation = abbreviation;
-    return this;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public LocalOffice name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public String getPostAbbreviation() {
-    return postAbbreviation;
-  }
-
-  public void setPostAbbreviation(String postAbbreviation) {
-    this.postAbbreviation = postAbbreviation;
-  }
-
-  public LocalOffice postAbbreviation(String postAbbreviation) {
-    this.postAbbreviation = postAbbreviation;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public LocalOffice status(Status status) {
-    this.status = status;
-    return this;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -127,17 +64,5 @@ public class LocalOffice implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "LocalOffice{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
-        ", abbreviation='" + abbreviation + '\'' +
-        ", name='" + name + '\'' +
-        ", postAbbreviation='" + postAbbreviation + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

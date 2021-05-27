@@ -62,11 +62,9 @@ public class LocalOfficeResourceIntTest {
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
-  private static String[] localOfficeArray = new String[]{HENE_NAME, HENWL_NAME, HEKSS_NAME};
-  LocalOffice searchLO = new LocalOffice()
-      .abbreviation("SEARCHLO")
-      .name("SEARCHLO")
-      .postAbbreviation("SEARCHLO");
+  private static String[] localOfficeArray = new String[] {HENE_NAME, HENWL_NAME, HEKSS_NAME};
+  private LocalOffice searchLo;
+
   @Autowired
   private LocalOfficeRepository localOfficeRepository;
   @Autowired
@@ -91,15 +89,20 @@ public class LocalOfficeResourceIntTest {
    * which requires the current entity.
    */
   public static LocalOffice createEntity(EntityManager em) {
-    LocalOffice localOffice = new LocalOffice()
-        .abbreviation(DEFAULT_ABBREVIATION)
-        .name(DEFAULT_NAME)
-        .postAbbreviation(DEFAULT_POST_ABBREVIATION);
+    LocalOffice localOffice = new LocalOffice();
+    localOffice.setAbbreviation(DEFAULT_ABBREVIATION);
+    localOffice.setName(DEFAULT_NAME);
+    localOffice.setPostAbbreviation(DEFAULT_POST_ABBREVIATION);
     return localOffice;
   }
 
   @Before
   public void setup() {
+    searchLo = new LocalOffice();
+    searchLo.setAbbreviation("SEARCHLO");
+    searchLo.setName("SEARCHLO");
+    searchLo.setPostAbbreviation("SEARCHLO");
+
     MockitoAnnotations.initMocks(this);
     LocalOfficeResource localOfficeResource = new LocalOfficeResource(localOfficeRepository,
         sitesTrustsService, localOfficeMapper);
@@ -213,10 +216,10 @@ public class LocalOfficeResourceIntTest {
   @Transactional
   public void getLocalOfficesWithQuery() throws Exception {
     // Initialize the database
-    LocalOffice unencodedLocalOffice = new LocalOffice()
-        .abbreviation(UNENCODED_ABBREVIATION)
-        .name(UNENCODED_NAME)
-        .postAbbreviation(UNENCODED_POST_ABBREVIATION);
+    LocalOffice unencodedLocalOffice = new LocalOffice();
+    unencodedLocalOffice.setAbbreviation(UNENCODED_ABBREVIATION);
+    unencodedLocalOffice.setName(UNENCODED_NAME);
+    unencodedLocalOffice.setPostAbbreviation(UNENCODED_POST_ABBREVIATION);
     localOfficeRepository.saveAndFlush(unencodedLocalOffice);
 
     // Get all the localOfficeList
@@ -244,10 +247,10 @@ public class LocalOfficeResourceIntTest {
     // Use counter to change abbreviation to satisfy check constraint on table
     Integer count = 1;
     for (String lo : localOfficeArray) {
-      LocalOffice localOfficeReal = new LocalOffice()
-          .abbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString())
-          .name(lo)
-          .postAbbreviation(DEFAULT_POST_ABBREVIATION + count.toString());
+      LocalOffice localOfficeReal = new LocalOffice();
+      localOfficeReal.setAbbreviation(DEFAULT_ABBREVIATION.substring(1, 9) + count.toString());
+      localOfficeReal.setName(lo);
+      localOfficeReal.setPostAbbreviation(DEFAULT_POST_ABBREVIATION + count.toString());
       localOfficeRepository.saveAndFlush(localOfficeReal);
       count++;
     }
@@ -315,9 +318,8 @@ public class LocalOfficeResourceIntTest {
 
     // Update the localOffice
     LocalOffice updatedLocalOffice = localOfficeRepository.findById(localOffice.getId()).get();
-    updatedLocalOffice
-        .abbreviation(UPDATED_ABBREVIATION)
-        .name(UPDATED_NAME);
+    updatedLocalOffice.setAbbreviation(UPDATED_ABBREVIATION);
+    updatedLocalOffice.setName(UPDATED_NAME);
     LocalOfficeDTO localOfficeDTO = localOfficeMapper
         .localOfficeToLocalOfficeDTO(updatedLocalOffice);
 
@@ -380,7 +382,7 @@ public class LocalOfficeResourceIntTest {
   @Transactional
   public void searchLocalOffices() throws Exception {
     // Initialize the database
-    localOfficeRepository.saveAndFlush(searchLO);
+    localOfficeRepository.saveAndFlush(searchLo);
 
     // Get all the trustList
     restLocalOfficeMockMvc.perform(get("/api/local-offices?searchQuery=\"CHLO\""))

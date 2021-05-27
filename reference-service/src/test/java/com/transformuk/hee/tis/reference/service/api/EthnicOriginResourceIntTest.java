@@ -84,8 +84,8 @@ public class EthnicOriginResourceIntTest {
    * which requires the current entity.
    */
   public static EthnicOrigin createEntity(EntityManager em) {
-    EthnicOrigin ethnicOrigin = new EthnicOrigin()
-        .code(DEFAULT_CODE);
+    EthnicOrigin ethnicOrigin = new EthnicOrigin();
+    ethnicOrigin.setCode(DEFAULT_CODE);
     return ethnicOrigin;
   }
 
@@ -185,8 +185,8 @@ public class EthnicOriginResourceIntTest {
   @Transactional
   public void getEthnicOriginsWithQuery() throws Exception {
     // Initialize the database
-    EthnicOrigin unencodedEthnicOrigin = new EthnicOrigin()
-        .code(UNENCODED_CODE);
+    EthnicOrigin unencodedEthnicOrigin = new EthnicOrigin();
+    unencodedEthnicOrigin.setCode(UNENCODED_CODE);
     ethnicOriginRepository.saveAndFlush(unencodedEthnicOrigin);
 
     // Get all the ethnicOriginList
@@ -228,8 +228,7 @@ public class EthnicOriginResourceIntTest {
 
     // Update the ethnicOrigin
     EthnicOrigin updatedEthnicOrigin = ethnicOriginRepository.findById(ethnicOrigin.getId()).get();
-    updatedEthnicOrigin
-        .code(UPDATED_CODE);
+    updatedEthnicOrigin.setCode(UPDATED_CODE);
     EthnicOriginDTO ethnicOriginDTO = ethnicOriginMapper
         .ethnicOriginToEthnicOriginDTO(updatedEthnicOrigin);
 

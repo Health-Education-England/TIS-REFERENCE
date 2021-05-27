@@ -77,8 +77,8 @@ public class FundingIssueResourceIntTest {
    * which requires the current entity.
    */
   public static FundingIssue createEntity(EntityManager em) {
-    FundingIssue fundingIssue = new FundingIssue()
-        .code(DEFAULT_CODE);
+    FundingIssue fundingIssue = new FundingIssue();
+    fundingIssue.setCode(DEFAULT_CODE);
     return fundingIssue;
   }
 
@@ -163,8 +163,8 @@ public class FundingIssueResourceIntTest {
   @Test
   @Transactional
   public void getAllFundingIssues() throws Exception {
-    FundingIssue unencodedIssue = new FundingIssue()
-        .code(UNENCODED_CODE);
+    FundingIssue unencodedIssue = new FundingIssue();
+    unencodedIssue.setCode(UNENCODED_CODE);
     // Initialize the database
     fundingIssueRepository.saveAndFlush(unencodedIssue);
 
@@ -207,8 +207,7 @@ public class FundingIssueResourceIntTest {
 
     // Update the fundingIssue
     FundingIssue updatedFundingIssue = fundingIssueRepository.findById(fundingIssue.getId()).get();
-    updatedFundingIssue
-        .code(UPDATED_CODE);
+    updatedFundingIssue.setCode(UPDATED_CODE);
     FundingIssueDTO fundingIssueDTO = fundingIssueMapper
         .fundingIssueToFundingIssueDTO(updatedFundingIssue);
 

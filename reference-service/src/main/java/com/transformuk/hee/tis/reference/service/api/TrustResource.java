@@ -85,7 +85,7 @@ public class TrustResource {
    *
    * @param trustDTO the trustDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new trustDTO, or with
-   * status 400 (Bad Request) if the trust has already an ID
+   *     status 400 (Bad Request) if the trust has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/trusts")
@@ -111,8 +111,8 @@ public class TrustResource {
    *
    * @param trustDTO the trustDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTO, or with
-   * status 400 (Bad Request) if the trustDTO is not valid, or with status 500 (Internal Server
-   * Error) if the trustDTO couldn't be updated
+   *     status 400 (Bad Request) if the trustDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the trustDTO couldn't be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/trusts")
@@ -182,7 +182,8 @@ public class TrustResource {
         .toString();
     Page<Trust> page;
     if (StringUtils.isEmpty(searchQuery)) {
-      Trust trust = new Trust().status(Status.CURRENT);
+      Trust trust = new Trust();
+      trust.setStatus(Status.CURRENT);
       page = trustRepository.findAll(Example.of(trust), pageable);
     } else {
       page = sitesTrustsService.searchTrusts(searchQuery, pageable);
@@ -197,7 +198,7 @@ public class TrustResource {
    *
    * @param codes the codes to search by
    * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty
-   * list
+   *     list
    */
   @GetMapping("/trusts/in/{codes}")
   public ResponseEntity<List<TrustDTO>> getTrustsIn(@PathVariable String codes) {
@@ -225,7 +226,7 @@ public class TrustResource {
    *
    * @param ids the ids to search by
    * @return the ResponseEntity with status 200 (OK) and with body the list of trustDTOs, or empty
-   * list
+   *     list
    */
   @ApiOperation("Get a list of trusts by id")
   @GetMapping("/trusts/ids/in")
@@ -261,7 +262,7 @@ public class TrustResource {
    *
    * @param id the code of the trustDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/trusts/{id}")
   public ResponseEntity<TrustDTO> getTrust(@PathVariable Long id) {
@@ -276,7 +277,7 @@ public class TrustResource {
    *
    * @param code the code of the trustDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the trustDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/trusts/code/{code}")
   public ResponseEntity<TrustDTO> getTrustByCode(@PathVariable String code) {
@@ -294,7 +295,7 @@ public class TrustResource {
    *
    * @param trustDTOs the trustDTOs to create
    * @return the ResponseEntity with status 201 (Created) and with body the new trustDTOs, or with
-   * status 400 (Bad Request) if the trust has already an ID
+   *     status 400 (Bad Request) if the trust has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-trusts")
@@ -325,8 +326,8 @@ public class TrustResource {
    *
    * @param trustDTOs the trustDTOs to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated trustDTOs, or with
-   * status 400 (Bad Request) if the trustDTOs is not valid, or with status 500 (Internal Server
-   * Error) if the trustDTOs couldnt be updated
+   *     status 400 (Bad Request) if the trustDTOs is not valid, or with status 500 (Internal Server
+   *     Error) if the trustDTOs couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-trusts")

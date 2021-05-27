@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.model;
 
-
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,10 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * A TariffRate.
  */
+@Data
 @Entity
 public class TariffRate implements Serializable {
 
@@ -44,105 +45,6 @@ public class TariffRate implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public TariffRate code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  public Long getGradeId() {
-    return gradeId;
-  }
-
-  public void setGradeId(Long gradeId) {
-    this.gradeId = gradeId;
-  }
-
-  public TariffRate gradeId(Long gradeId) {
-    this.gradeId = gradeId;
-    return this;
-  }
-
-  public String getGradeAbbreviation() {
-    return gradeAbbreviation;
-  }
-
-  public void setGradeAbbreviation(String gradeAbbreviation) {
-    this.gradeAbbreviation = gradeAbbreviation;
-  }
-
-  public TariffRate gradeAbbreviation(String gradeAbbreviation) {
-    this.gradeAbbreviation = gradeAbbreviation;
-    return this;
-  }
-
-  public String getTariffRate() {
-    return tariffRate;
-  }
-
-  public void setTariffRate(String tariffRate) {
-    this.tariffRate = tariffRate;
-  }
-
-  public TariffRate tariffRate(String tariffRate) {
-    this.tariffRate = tariffRate;
-    return this;
-  }
-
-  public String getTariffRateFringe() {
-    return tariffRateFringe;
-  }
-
-  public void setTariffRateFringe(String tariffRateFringe) {
-    this.tariffRateFringe = tariffRateFringe;
-  }
-
-  public TariffRate tariffRateFringe(String tariffRateFringe) {
-    this.tariffRateFringe = tariffRateFringe;
-    return this;
-  }
-
-  public String getTariffRateLondon() {
-    return tariffRateLondon;
-  }
-
-  public void setTariffRateLondon(String tariffRateLondon) {
-    this.tariffRateLondon = tariffRateLondon;
-  }
-
-  public TariffRate tariffRateLondon(String tariffRateLondon) {
-    this.tariffRateLondon = tariffRateLondon;
-    return this;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public TariffRate status(Status status) {
-    this.status = status;
-    return this;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -161,18 +63,5 @@ public class TariffRate implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
-  }
-
-  @Override
-  public String toString() {
-    return "TariffRate{" +
-        "id=" + id +
-        ", code='" + code + '\'' +
-        ", gradeAbbreviation='" + gradeAbbreviation + '\'' +
-        ", tariffRate='" + tariffRate + '\'' +
-        ", tariffRateFringe='" + tariffRateFringe + '\'' +
-        ", tariffRateLondon='" + tariffRateLondon + '\'' +
-        ", status=" + status +
-        '}';
   }
 }

@@ -76,9 +76,9 @@ public class StatusResourceIntTest {
    * which requires the current entity.
    */
   public static Status createEntity(EntityManager em) {
-    Status status = new Status()
-        .code(DEFAULT_CODE)
-        .label(DEFAULT_LABEL);
+    Status status = new Status();
+    status.setCode(DEFAULT_CODE);
+    status.setLabel(DEFAULT_LABEL);
     return status;
   }
 
@@ -222,9 +222,8 @@ public class StatusResourceIntTest {
 
     // Update the status
     Status updatedStatus = statusRepository.findById(status.getId()).get();
-    updatedStatus
-        .code(UPDATED_CODE)
-        .label(UPDATED_LABEL);
+    updatedStatus.setCode(UPDATED_CODE);
+    updatedStatus.setLabel(UPDATED_LABEL);
     StatusDTO statusDTO = statusMapper.statusToStatusDTO(updatedStatus);
 
     restStatusMockMvc.perform(put("/api/statuses")
