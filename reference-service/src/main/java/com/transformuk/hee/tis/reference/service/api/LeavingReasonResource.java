@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing LeavingReason.
@@ -132,20 +134,29 @@ public class LeavingReasonResource {
    *
    * @param columnFiltersJson The column filter to apply as JSON. e.g. "columnFilters={ "status" :
    *                          ["CURRENT"] }"
+   * @param searchQuery       The string to filter leaving reasons by.
    * @return A {@link ResponseEntity} with status 200 (OK) and body of a List of LeavingReasonDtos,
    *     matching the colummn filter, list is empty if no leaving reasons are found.
    * @throws IOException If the column filter JSON could not be parsed.
    */
   @GetMapping("/leaving-reasons")
   public ResponseEntity<List<LeavingReasonDto>> getAllLeavingReasons(
-      @RequestParam(name = "columnFilters", required = false) String columnFiltersJson)
+      @RequestParam(name = "columnFilters", required = false) String columnFiltersJson,
+      @RequestParam(value = "searchQuery", required = false) String searchQuery)
       throws IOException {
     LOGGER.debug("REST request to get all leaving reasons.");
+    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+        .toString();
 
     List<Class> filterEnums = Collections.singletonList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil
         .getColumnFilters(columnFiltersJson, filterEnums);
-    return ResponseEntity.ok(service.findAll(columnFilters));
+
+    if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFiltersJson)) {
+      return ResponseEntity.ok(service.findAll());
+    } else {
+      return ResponseEntity.ok(service.findAll(searchQuery, columnFilters));
+    }
   }
 
   /**
