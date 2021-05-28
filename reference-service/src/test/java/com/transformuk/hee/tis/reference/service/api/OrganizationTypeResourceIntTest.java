@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.api.enums.Status.CURRENT;
+import static com.transformuk.hee.tis.reference.api.enums.Status.INACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -81,6 +83,7 @@ public class OrganizationTypeResourceIntTest {
     OrganizationType entity = new OrganizationType();
     entity.setCode(DEFAULT_CODE);
     entity.setLabel(DEFAULT_LABEL);
+    entity.setStatus(CURRENT);
     return entity;
   }
 
@@ -117,6 +120,7 @@ public class OrganizationTypeResourceIntTest {
     OrganizationType foundEntity = foundEntities.get(foundEntities.size() - 1);
     assertThat(foundEntity.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(foundEntity.getLabel()).isEqualTo(DEFAULT_LABEL);
+    assertThat(foundEntity.getStatus()).isEqualTo(CURRENT);
   }
 
   @Test
@@ -170,7 +174,8 @@ public class OrganizationTypeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(entity.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)));
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(CURRENT.toString())));
   }
 
   @Test
@@ -181,6 +186,7 @@ public class OrganizationTypeResourceIntTest {
     OrganizationType unescapedEntity = new OrganizationType();
     unescapedEntity.setCode(UNENCODED_CODE);
     unescapedEntity.setLabel(UNENCODED_LABEL);
+    unescapedEntity.setStatus(CURRENT);
     unescapedEntity = repository.saveAndFlush(unescapedEntity);
 
     // Get all the entities.
@@ -189,7 +195,8 @@ public class OrganizationTypeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(unescapedEntity.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(UNENCODED_CODE)))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(UNENCODED_LABEL)));
+        .andExpect(jsonPath("$.[*].label").value(hasItem(UNENCODED_LABEL)))
+        .andExpect(jsonPath("$.[*].status").value(hasItem(CURRENT.toString())));
   }
 
   @Test
@@ -204,7 +211,8 @@ public class OrganizationTypeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(entity.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
-        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
+        .andExpect(jsonPath("$.label").value(DEFAULT_LABEL))
+        .andExpect(jsonPath("$.status").value(CURRENT.toString()));
   }
 
   @Test
@@ -226,6 +234,7 @@ public class OrganizationTypeResourceIntTest {
     OrganizationType updatedEntity = service.findById(entity.getId()).get();
     updatedEntity.setCode(UPDATED_CODE);
     updatedEntity.setLabel(UPDATED_LABEL);
+    updatedEntity.setStatus(INACTIVE);
     OrganizationTypeDto dto = mapper.toDto(updatedEntity);
 
     mockMvc.perform(put("/api/organization-types")
@@ -239,6 +248,7 @@ public class OrganizationTypeResourceIntTest {
     OrganizationType foundEntity = foundEntities.get(foundEntities.size() - 1);
     assertThat(foundEntity.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(foundEntity.getLabel()).isEqualTo(UPDATED_LABEL);
+    assertThat(foundEntity.getStatus()).isEqualTo(INACTIVE);
   }
 
   @Test

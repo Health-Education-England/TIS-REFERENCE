@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.model;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -29,4 +30,7 @@ public class OrganizationType implements Serializable {
 
   @NotNull
   private String label;
+
+  @NotNull
+  private Status status;
 }
