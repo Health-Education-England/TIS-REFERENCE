@@ -29,6 +29,8 @@ public class TrustDTO implements Serializable {
 
   private String postCode;
 
+  private OrganizationTypeDto organizationType;
+
   private String intrepidId;
 
   @Override

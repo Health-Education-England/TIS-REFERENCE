@@ -11,6 +11,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -51,6 +53,10 @@ public class Site implements Serializable {
   private String siteNumber;
 
   private String organisationalUnit;
+
+  @ManyToOne
+  @JoinColumn(name = "organizationTypeId", referencedColumnName = "id")
+  private OrganizationType organizationType;
 
   @Enumerated(value = EnumType.STRING)
   @Column(name = "status")
