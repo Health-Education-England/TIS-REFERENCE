@@ -10,6 +10,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -45,6 +47,10 @@ public class Trust implements Serializable {
   private String address;
 
   private String postCode;
+
+  @ManyToOne
+  @JoinColumn(name = "organizationTypeId", referencedColumnName = "id")
+  private OrganizationType organizationType;
 
   private String intrepidId;
 

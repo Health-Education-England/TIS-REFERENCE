@@ -13,7 +13,9 @@ import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.model.OrganizationType;
 import com.transformuk.hee.tis.reference.service.model.Trust;
+import com.transformuk.hee.tis.reference.service.repository.OrganizationTypeRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.TrustMapper;
@@ -79,12 +81,18 @@ public class TrustResourceIntTest {
 
   private static final String NON_EXISTING_TRUST_CODE = "XFK43F6";
 
+  private static final String ORGANIZATION_TYPE_CODE = "org_type_code";
+  private static final String ORGANIZATION_TYPE_LABEL = "org_type_label";
+
   // The ADMINS-UI, json encodes the string, which wraps the value in quotes.
   private static final String ENCODED_SEARCH_QUERY = "\"Guy's%20%26%20%24t%20T\"";
   private static final String ENCODED_KNOWN_AS_QUERY = "\"(G%24T)\"";
 
   @Autowired
   private TrustRepository trustRepository;
+
+  @Autowired
+  private OrganizationTypeRepository organizationTypeRepository;
 
   @Autowired
   private TrustMapper trustMapper;
@@ -107,6 +115,8 @@ public class TrustResourceIntTest {
   private MockMvc restTrustMockMvc;
 
   private Trust trust;
+
+  private OrganizationType organizationType;
 
   /**
    * Create an entity for this test.
@@ -136,11 +146,15 @@ public class TrustResourceIntTest {
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator).setMessageConverters(jacksonMessageConverter)
         .build();
-  }
 
-  @Before
-  public void initTest() {
+    organizationType = new OrganizationType();
+    organizationType.setCode(ORGANIZATION_TYPE_CODE);
+    organizationType.setLabel(ORGANIZATION_TYPE_LABEL);
+    organizationType.setStatus(Status.CURRENT);
+    organizationType = organizationTypeRepository.saveAndFlush(organizationType);
+
     trust = createEntity(em);
+    trust.setOrganizationType(organizationType);
   }
 
   @Test
@@ -165,6 +179,7 @@ public class TrustResourceIntTest {
     assertThat(testTrust.getTrustNumber()).isEqualTo(DEFAULT_TRUST_NUMBER);
     assertThat(testTrust.getAddress()).isEqualTo(DEFAULT_ADDRESS);
     assertThat(testTrust.getPostCode()).isEqualTo(DEFAULT_POST_CODE);
+    assertThat(testTrust.getOrganizationType()).isEqualTo(organizationType);
   }
 
   @Test
@@ -205,7 +220,13 @@ public class TrustResourceIntTest {
         .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
         .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
         .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
-        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)));
+        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)))
+        .andExpect(jsonPath("$.[*].organizationType.id")
+            .value(hasItem(organizationType.getId().intValue())))
+        .andExpect(jsonPath("$.[*].organizationType.code").value(hasItem(ORGANIZATION_TYPE_CODE)))
+        .andExpect(jsonPath("$.[*].organizationType.label").value(hasItem(ORGANIZATION_TYPE_LABEL)))
+        .andExpect(
+            jsonPath("$.[*].organizationType.status").value(hasItem(Status.CURRENT.toString())));
   }
 
   @Test
@@ -225,7 +246,13 @@ public class TrustResourceIntTest {
         .andExpect(jsonPath("$.[*].trustName").value(hasItem(DEFAULT_TRUST_NAME)))
         .andExpect(jsonPath("$.[*].trustNumber").value(hasItem(DEFAULT_TRUST_NUMBER)))
         .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
-        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)));
+        .andExpect(jsonPath("$.[*].postCode").value(hasItem(DEFAULT_POST_CODE)))
+        .andExpect(jsonPath("$.[*].organizationType.id")
+            .value(hasItem(organizationType.getId().intValue())))
+        .andExpect(jsonPath("$.[*].organizationType.code").value(hasItem(ORGANIZATION_TYPE_CODE)))
+        .andExpect(jsonPath("$.[*].organizationType.label").value(hasItem(ORGANIZATION_TYPE_LABEL)))
+        .andExpect(
+            jsonPath("$.[*].organizationType.status").value(hasItem(Status.CURRENT.toString())));
   }
 
   @Test
@@ -254,7 +281,11 @@ public class TrustResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.id").value(trust.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
-        .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME));
+        .andExpect(jsonPath("$.trustName").value(DEFAULT_TRUST_NAME))
+        .andExpect(jsonPath("$.organizationType.id").value(organizationType.getId().intValue()))
+        .andExpect(jsonPath("$.organizationType.code").value(ORGANIZATION_TYPE_CODE))
+        .andExpect(jsonPath("$.organizationType.label").value(ORGANIZATION_TYPE_LABEL))
+        .andExpect(jsonPath("$.organizationType.status").value(Status.CURRENT.toString()));
   }
 
 
@@ -342,6 +373,7 @@ public class TrustResourceIntTest {
     assertThat(testTrust.getTrustNumber()).isEqualTo(UPDATED_TRUST_NUMBER);
     assertThat(testTrust.getAddress()).isEqualTo(UPDATED_ADDRESS);
     assertThat(testTrust.getPostCode()).isEqualTo(UPDATED_POST_CODE);
+    assertThat(testTrust.getOrganizationType()).isEqualTo(organizationType);
   }
 
   @Test

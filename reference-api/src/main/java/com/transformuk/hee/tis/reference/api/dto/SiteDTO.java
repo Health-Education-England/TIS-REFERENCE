@@ -44,6 +44,8 @@ public class SiteDTO implements Serializable {
 
   private String organisationalUnit;
 
+  private OrganizationTypeDto organizationType;
+
   private Status status;
 
   private String intrepidId;

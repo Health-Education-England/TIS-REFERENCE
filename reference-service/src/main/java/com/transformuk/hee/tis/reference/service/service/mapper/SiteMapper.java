@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 /**
  * Mapper for the entity Site and its DTO SiteDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {OrganizationTypeMapper.class})
 public interface SiteMapper {
 
   SiteDTO siteToSiteDTO(Site site);

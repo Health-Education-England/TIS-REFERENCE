@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 /**
  * Mapper for the entity Trust and its DTO TrustDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {OrganizationTypeMapper.class})
 public interface TrustMapper {
 
   TrustDTO trustToTrustDTO(Trust trust);
