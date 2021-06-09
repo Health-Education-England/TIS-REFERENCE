@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service;
 import com.transformuk.hee.tis.reference.service.config.ApplicationProperties;
 import com.transformuk.hee.tis.reference.service.config.DefaultProfileUtil;
 import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.metrics.PrometheusRegistry;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -22,7 +23,8 @@ import org.springframework.core.env.Environment;
  * Main application class from which the app starts
  */
 @ComponentScan
-@EnableAutoConfiguration(exclude = {HibernateMetricsAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {HibernateMetricsAutoConfiguration.class,
+    PrometheusRegistry.class})
 @EnableConfigurationProperties({ApplicationProperties.class})
 @PropertySource({"classpath:/config/application.yml",
     "classpath:/config/profileclientapplication.properties"})
