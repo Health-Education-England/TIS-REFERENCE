@@ -30,7 +30,7 @@ public class SiteDTO implements Serializable {
 
   private String trustCode;
 
-  private Long trustId;
+  private TrustDTO trust;
 
   private String siteName;
 

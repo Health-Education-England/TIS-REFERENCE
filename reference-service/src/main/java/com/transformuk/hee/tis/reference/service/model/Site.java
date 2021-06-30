@@ -40,7 +40,9 @@ public class Site implements Serializable {
 
   private String trustCode;
 
-  private Long trustId;
+  @ManyToOne
+  @JoinColumn(name= "trustId", referencedColumnName = "id")
+  private Trust trust;
 
   private String siteName;
 
