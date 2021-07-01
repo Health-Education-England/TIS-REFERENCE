@@ -16,6 +16,7 @@ import com.transformuk.hee.tis.reference.service.api.util.UrlDecoderUtil;
 import com.transformuk.hee.tis.reference.service.api.validation.SiteValidator;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
@@ -99,6 +100,8 @@ public class SiteResource {
       throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
+    Trust trust = sitesTrustsService.getTrustByCode(siteDTO.getTrustCode());
+    siteDTO.setTrustId(trust.getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
@@ -121,6 +124,8 @@ public class SiteResource {
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
+    Trust trust = sitesTrustsService.getTrustByCode(siteDTO.getTrustCode());
+    siteDTO.setTrustId(trust.getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
