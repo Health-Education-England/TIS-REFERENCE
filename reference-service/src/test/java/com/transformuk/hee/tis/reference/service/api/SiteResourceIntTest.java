@@ -20,8 +20,10 @@ import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedEx
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.OrganizationType;
 import com.transformuk.hee.tis.reference.service.model.Site;
+import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.OrganizationTypeRepository;
 import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
+import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.SiteMapper;
 import java.time.LocalDate;
@@ -73,6 +75,10 @@ public class SiteResourceIntTest {
   private static final String UNENCODED_TRUST_CODE = "CCCCCCCCCC";
   private static final String UNENCODED_TRUST_CODE1 = "RCB";
 
+  private static final Long DEFAULT_TRUST_ID = 1L;
+  private static final Long UPDATED_TRUST_ID = 2L;
+  private static final Long UNENCODED_TRUST_ID = 1L;
+
   private static final String DEFAULT_SITE_NAME = "AAAAAAAAAA";
   private static final String UPDATED_SITE_NAME = "BBBBBBBBBB";
   private static final String UNENCODED_SITE_NAME = "Te$t Site";
@@ -121,6 +127,9 @@ public class SiteResourceIntTest {
   private SiteRepository siteRepository;
 
   @Autowired
+  private TrustRepository trustRepository;
+
+  @Autowired
   private OrganizationTypeRepository organizationTypeRepository;
 
   @Autowired
@@ -147,6 +156,8 @@ public class SiteResourceIntTest {
   private MockMvc restSiteMockMvc;
 
   private Site site;
+
+  private Trust trust;
 
   private OrganizationType organizationType;
 
@@ -182,6 +193,10 @@ public class SiteResourceIntTest {
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
 
+    trust = new Trust();
+    trust.setId(DEFAULT_TRUST_ID);
+    trust.setCode(DEFAULT_TRUST_CODE);
+
     organizationType = new OrganizationType();
     organizationType.setCode(ORGANIZATION_TYPE_CODE);
     organizationType.setLabel(ORGANIZATION_TYPE_LABEL);
@@ -196,6 +211,7 @@ public class SiteResourceIntTest {
   @Transactional
   public void createSite() throws Exception {
     int databaseSizeBeforeCreate = siteRepository.findAll().size();
+    trustRepository.saveAndFlush(trust);
 
     // Create the Site
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
@@ -213,6 +229,7 @@ public class SiteResourceIntTest {
     assertThat(testSite.getEndDate()).isEqualTo(DEFAULT_END_DATE);
     assertThat(testSite.getLocalOffice()).isEqualTo(DEFAULT_LOCAL_OFFICE);
     assertThat(testSite.getTrustCode()).isEqualTo(DEFAULT_TRUST_CODE);
+    assertThat(testSite.getTrustId()).isEqualTo(DEFAULT_TRUST_ID);
     assertThat(testSite.getSiteName()).isEqualTo(DEFAULT_SITE_NAME);
     assertThat(testSite.getAddress()).isEqualTo(DEFAULT_ADDRESS);
     assertThat(testSite.getPostCode()).isEqualTo(DEFAULT_POST_CODE);
@@ -280,6 +297,7 @@ public class SiteResourceIntTest {
     unencodedSite.setSiteCode(UNENCODED_SITE_CODE);
     unencodedSite.setLocalOffice(UNENCODED_LOCAL_OFFICE);
     unencodedSite.setTrustCode(UNENCODED_TRUST_CODE);
+    unencodedSite.setTrustId(DEFAULT_TRUST_ID);
     unencodedSite.setSiteName(UNENCODED_SITE_NAME);
     unencodedSite.setAddress(UNENCODED_ADDRESS);
     unencodedSite.setPostCode(UNENCODED_POST_CODE);
@@ -289,6 +307,8 @@ public class SiteResourceIntTest {
     unencodedSite.setOrganizationType(organizationType);
     siteRepository.saveAndFlush(unencodedSite);
 
+    trustRepository.saveAndFlush(trust);
+
     // Get all the siteList
     restSiteMockMvc.perform(get("/api/sites?searchQuery=\"Te%24t\"&sort=siteCode,asc"))
         .andExpect(status().isOk())
@@ -296,6 +316,7 @@ public class SiteResourceIntTest {
         .andExpect(jsonPath("$.[*].siteCode").value(UNENCODED_SITE_CODE))
         .andExpect(jsonPath("$.[*].localOffice").value(UNENCODED_LOCAL_OFFICE))
         .andExpect(jsonPath("$.[*].trustCode").value(UNENCODED_TRUST_CODE))
+        .andExpect(jsonPath("$.[*].trustId").value(UNENCODED_TRUST_ID.intValue()))
         .andExpect(jsonPath("$.[*].siteName").value(UNENCODED_SITE_NAME))
         .andExpect(jsonPath("$.[*].address").value(UNENCODED_ADDRESS))
         .andExpect(jsonPath("$.[*].postCode").value(UNENCODED_POST_CODE))
@@ -527,6 +548,7 @@ public class SiteResourceIntTest {
   public void updateSite() throws Exception {
     // Initialize the database
     site = siteRepository.saveAndFlush(site);
+    trustRepository.saveAndFlush(trust);
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
 
     // Update the site
@@ -535,6 +557,7 @@ public class SiteResourceIntTest {
     updatedSite.setStartDate(UPDATED_START_DATE);
     updatedSite.setEndDate(UPDATED_END_DATE);
     updatedSite.setTrustCode(UPDATED_TRUST_CODE);
+    updatedSite.setTrustId(UPDATED_TRUST_ID);
     updatedSite.setSiteName(UPDATED_SITE_NAME);
     updatedSite.setAddress(UPDATED_ADDRESS);
     updatedSite.setPostCode(UPDATED_POST_CODE);
@@ -542,6 +565,12 @@ public class SiteResourceIntTest {
     updatedSite.setSiteNumber(UPDATED_SITE_NUMBER);
     updatedSite.setOrganisationalUnit(UPDATED_ORGANISATIONAL_UNIT);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
+
+    // have a different Trust ready in the database
+    Trust trust2 = new Trust();
+    trust2.setId(UPDATED_TRUST_ID);
+    trust2.setCode(UPDATED_TRUST_CODE);
+    trustRepository.saveAndFlush(trust2);
 
     restSiteMockMvc.perform(put("/api/sites")
         .contentType(MediaType.APPLICATION_JSON)
@@ -557,6 +586,7 @@ public class SiteResourceIntTest {
     assertThat(testSite.getEndDate()).isEqualTo(UPDATED_END_DATE.toString());
     assertThat(testSite.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
     assertThat(testSite.getTrustCode()).isEqualTo(UPDATED_TRUST_CODE);
+    assertThat(testSite.getTrustId()).isEqualTo(UPDATED_TRUST_ID);
     assertThat(testSite.getSiteName()).isEqualTo(UPDATED_SITE_NAME);
     assertThat(testSite.getAddress()).isEqualTo(UPDATED_ADDRESS);
     assertThat(testSite.getPostCode()).isEqualTo(UPDATED_POST_CODE);
