@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.http.ResponseEntity;
+import uk.nhs.tis.ObjectMapperUtil;
 
 /**
  * Aspect for auditing execution of rest calls Spring components.
@@ -48,6 +49,7 @@ public class AuditingAspect {
   private JsonPatchRepository rebaseTypeRepository;
   private ConcurrentHashMap<String, String> classToPrimaryKeyMap = new ConcurrentHashMap<>();
   private Map<String, Class> classToIdClass = new ConcurrentHashMap<>();
+  private ObjectMapper mapper = ObjectMapperUtil.createMapper();
 
   public AuditingAspect(AuditEventRepository auditEventRepository) {
     this.auditEventRepository = auditEventRepository;
@@ -114,7 +116,6 @@ public class AuditingAspect {
           idField.setAccessible(true);
           final Object idFieldValue = idField.get(newValue);
           Object oldValue = null;
-          ObjectMapper mapper = new ObjectMapper();
           JsonNode newJsonNode = mapper.convertValue(newValue, JsonNode.class);
           JsonNode oldJsonNode = NullNode.getInstance();
           // if the idFieldValue is null means it's new record so don't fetch old value from db
