@@ -4,7 +4,6 @@ import static com.transformuk.hee.tis.security.util.TisSecurityHelper.getProfile
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
-import com.transformuk.hee.tis.reference.api.enums.DbcType;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
@@ -139,7 +138,7 @@ public class DBCResource {
     log.info("REST request to get a page of dbcs begin");
     searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
         .toString();
-    List<Class> filterEnumList = Lists.newArrayList(Status.class, DbcType.class);
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
         ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
     Page<DBC> page;

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.api.dto;
 
-import com.transformuk.hee.tis.reference.api.enums.DbcType;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -30,8 +29,6 @@ public class DBCDTO implements Serializable {
   private String abbr;
 
   private Status status;
-
-  private DbcType dbcType;
 
   @Override
   public boolean equals(Object o) {
