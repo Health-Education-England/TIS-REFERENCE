@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.enums.DbcType;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.DBC;
@@ -243,6 +244,26 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.[*].dbc").value(UNENCODED_DBC))
         .andExpect(jsonPath("$.[*].name").value(UNENCODED_NAME))
         .andExpect(jsonPath("$.[*].abbr").value(UNENCODED_ABBR));
+  }
+
+  @Test
+  @Transactional
+  public void getDBCWithColumnFilters() throws Exception {
+    DBC newDbc = new DBC();
+    newDbc.setDbc(UNENCODED_DBC);
+    newDbc.setName(UNENCODED_NAME);
+    newDbc.setAbbr(UNENCODED_ABBR);
+    newDbc.setDbcType(DbcType.INTERNAL);
+    ArrayList<DBC> dbcs = Lists.newArrayList(dBC, newDbc);
+    // Initialize the database
+    dBCRepository.saveAll(dbcs);
+    dBCRepository.flush();
+
+    // Get all the dBCList
+    restDBCMockMvc.perform(get("/api/dbcs?columnFilters=%7B\"dbcType\"%3A%5B\"INTERNAL\"%5D%7D"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].dbcType").value(DbcType.INTERNAL.toString()));
   }
 
   @Test

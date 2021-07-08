@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.model;
 
+import com.transformuk.hee.tis.reference.api.enums.DbcType;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
@@ -45,6 +46,10 @@ public class DBC implements Serializable {
   @Enumerated(value = EnumType.STRING)
   @Column(name = "status")
   private Status status;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "dbcType")
+  private DbcType dbcType;
 
   @Override
   public boolean equals(Object o) {
