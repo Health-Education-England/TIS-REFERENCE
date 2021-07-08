@@ -1,0 +1,8 @@
+ALTER TABLE `DBC`
+ADD COLUMN `dbcType` VARCHAR(255) NULL;
+
+ALTER TABLE `DBC`
+ADD INDEX `idx_dbctype` (`dbcType` ASC);
+
+UPDATE `DBC`
+SET dbcType = 'DEANERY_LETB';
