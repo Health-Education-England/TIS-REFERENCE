@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.Site;
 import com.transformuk.hee.tis.reference.service.model.Trust;
@@ -13,6 +14,7 @@ import com.transformuk.hee.tis.reference.service.repository.SiteRepository;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -108,6 +110,20 @@ public class SitesTrustsServiceTest {
 
     // then
     assertEquals(trust, actualTrust);
+  }
+
+  @Test
+  public void shouldGetTrustsWithGivenCodeAndStatus() {
+    // given
+    Trust trust = new Trust();
+    given(trustRepository.findByCodeAndStatus(TRUST_CODE, Status.CURRENT)).willReturn(
+        Lists.newArrayList(trust));
+
+    // when
+    List<Trust> actualTrusts = service.getTrustsByCodeAndStatus(TRUST_CODE, Status.CURRENT);
+
+    // then
+    assertEquals(trust, actualTrusts.get(0));
   }
 
   @Test
