@@ -111,7 +111,7 @@ public class SitesTrustsService {
    * Returns a list of trusts with a given code and status.
    *
    * @param trustCode Code for a trust - NOT NULL.
-   * @return {@link List<Trust>} list of all found Trusts.
+   * @return {@link List} list of all found Trusts.
    */
   public List<Trust> getTrustsByCodeAndStatus(String trustCode, Status status) {
     checkNotNull(trustCode);

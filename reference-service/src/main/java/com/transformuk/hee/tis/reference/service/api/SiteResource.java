@@ -100,7 +100,8 @@ public class SiteResource {
       throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
-    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(), Status.CURRENT);
+    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
+        Status.CURRENT);
     siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
@@ -124,7 +125,8 @@ public class SiteResource {
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
-    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(), Status.CURRENT);
+    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
+        Status.CURRENT);
     siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
