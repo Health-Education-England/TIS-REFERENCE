@@ -253,6 +253,47 @@ public class SiteResourceIntTest {
 
   @Test
   @Transactional
+  public void createSiteWithInactiveTrustShouldFail() throws Exception {
+    int databaseSizeBeforeCreate = siteRepository.findAll().size();
+
+    // save an INACTIVE trust only
+    trustRepository.saveAndFlush(inactiveTrust);
+
+    // Create the Site (with trustCode same as code of inactiveTrust)
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
+    restSiteMockMvc.perform(post("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+
+    List<Site> siteList = siteRepository.findAll();
+    assertThat(siteList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Transactional
+  public void createSiteWithDuplicateTrustCodesShouldFail() throws Exception {
+    int databaseSizeBeforeCreate = siteRepository.findAll().size();
+
+    // save two CURRENT Trusts with the same code
+    Trust trustDuplicate = new Trust();
+    trustDuplicate.setCode(DEFAULT_TRUST_CODE);
+    trustDuplicate.setId(5L);
+    trustDuplicate.setStatus(Status.CURRENT);
+    trustRepository.saveAllAndFlush(Lists.newArrayList(trust, trustDuplicate));
+
+    // Create the Site (with trustCode same as code of inactiveTrust)
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
+    restSiteMockMvc.perform(post("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+
+    List<Site> siteList = siteRepository.findAll();
+    assertThat(siteList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Test
+  @Transactional
   public void createSiteWithExistingSiteId() throws Exception {
     int databaseSizeBeforeCreate = siteRepository.findAll().size();
     Long siteId = siteRepository.findAll().get(0).getId();
@@ -613,6 +654,56 @@ public class SiteResourceIntTest {
     assertThat(testSite.getSiteNumber()).isEqualTo(UPDATED_SITE_NUMBER);
     assertThat(testSite.getOrganisationalUnit()).isEqualTo(UPDATED_ORGANISATIONAL_UNIT);
     assertThat(testSite.getOrganizationType()).isEqualTo(organizationType);
+  }
+
+  @Test
+  @Transactional
+  public void updateSiteWithInactiveTrustShouldFail() throws Exception {
+    // Initialize the database
+    site = siteRepository.saveAndFlush(site);
+
+    // save an INACTIVE trust
+    inactiveTrust.setCode(UPDATED_TRUST_CODE);
+    trustRepository.saveAndFlush(inactiveTrust);
+
+    // Update the site
+    Site updatedSite = siteRepository.findById(site.getId()).get();
+    updatedSite.setTrustCode(UPDATED_TRUST_CODE);
+
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
+
+    restSiteMockMvc.perform(put("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+  }
+
+  @Test
+  @Transactional
+  public void updateSiteWithNonUniqueTrustCodeShouldFail() throws Exception {
+    // Initialize the database
+    site = siteRepository.saveAndFlush(site);
+    int databaseSizeBeforeUpdate = siteRepository.findAll().size();
+
+    // save two CURRENT trusts with the same code (i.e. there's a data quality issue)
+    trust.setCode(UPDATED_TRUST_CODE);
+    Trust trustDuplicate = new Trust();
+    trustDuplicate.setId(5L);
+    trustDuplicate.setCode(UPDATED_TRUST_CODE);
+    trustDuplicate.setStatus(Status.CURRENT);
+    trustRepository.saveAll(Lists.newArrayList(trust, trustDuplicate));
+
+    // Update the site
+    Site updatedSite = siteRepository.findById(site.getId()).get();
+    updatedSite.setTrustCode(UPDATED_TRUST_CODE);
+    updatedSite.setTrustId(UPDATED_INACTIVE_TRUST_ID);
+
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
+
+    restSiteMockMvc.perform(put("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
   }
 
   @Test

@@ -102,6 +102,9 @@ public class SiteResource {
     siteValidator.validate(siteDTO);
     List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
         Status.CURRENT);
+    if (trusts.size() != 1) {
+      return ResponseEntity.internalServerError().build();
+    }
     siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
@@ -127,6 +130,9 @@ public class SiteResource {
     siteValidator.validate(siteDTO);
     List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
         Status.CURRENT);
+    if (trusts.size() != 1) {
+      return ResponseEntity.internalServerError().build();
+    }
     siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
