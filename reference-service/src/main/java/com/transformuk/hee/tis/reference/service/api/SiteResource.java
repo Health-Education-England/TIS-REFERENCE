@@ -100,8 +100,12 @@ public class SiteResource {
       throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
-    Trust trust = sitesTrustsService.getTrustByCode(siteDTO.getTrustCode());
-    siteDTO.setTrustId(trust.getId());
+    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
+        Status.CURRENT);
+    if (trusts.size() != 1) {
+      return ResponseEntity.internalServerError().build();
+    }
+    siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);
@@ -124,8 +128,12 @@ public class SiteResource {
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
-    Trust trust = sitesTrustsService.getTrustByCode(siteDTO.getTrustCode());
-    siteDTO.setTrustId(trust.getId());
+    List<Trust> trusts = sitesTrustsService.getTrustsByCodeAndStatus(siteDTO.getTrustCode(),
+        Status.CURRENT);
+    if (trusts.size() != 1) {
+      return ResponseEntity.internalServerError().build();
+    }
+    siteDTO.setTrustId(trusts.get(0).getId());
     Site site = siteMapper.siteDTOToSite(siteDTO);
     site = siteRepository.save(site);
     SiteDTO result = siteMapper.siteToSiteDTO(site);

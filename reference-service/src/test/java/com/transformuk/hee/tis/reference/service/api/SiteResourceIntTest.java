@@ -77,6 +77,8 @@ public class SiteResourceIntTest {
 
   private static final Long DEFAULT_TRUST_ID = 1L;
   private static final Long UPDATED_TRUST_ID = 2L;
+  private static final Long INACTIVE_TRUST_ID = 3L;
+  private static final Long UPDATED_INACTIVE_TRUST_ID = 4L;
   private static final Long UNENCODED_TRUST_ID = 1L;
 
   private static final String DEFAULT_SITE_NAME = "AAAAAAAAAA";
@@ -159,6 +161,8 @@ public class SiteResourceIntTest {
 
   private Trust trust;
 
+  private Trust inactiveTrust;
+
   private OrganizationType organizationType;
 
   /**
@@ -196,6 +200,12 @@ public class SiteResourceIntTest {
     trust = new Trust();
     trust.setId(DEFAULT_TRUST_ID);
     trust.setCode(DEFAULT_TRUST_CODE);
+    trust.setStatus(Status.CURRENT);
+
+    inactiveTrust = new Trust();
+    inactiveTrust.setId(INACTIVE_TRUST_ID);
+    inactiveTrust.setCode(DEFAULT_TRUST_CODE);
+    inactiveTrust.setStatus(Status.INACTIVE);
 
     organizationType = new OrganizationType();
     organizationType.setCode(ORGANIZATION_TYPE_CODE);
@@ -211,7 +221,9 @@ public class SiteResourceIntTest {
   @Transactional
   public void createSite() throws Exception {
     int databaseSizeBeforeCreate = siteRepository.findAll().size();
-    trustRepository.saveAndFlush(trust);
+
+    // save a CURRENT and an INACTIVE trust
+    trustRepository.saveAllAndFlush(Lists.newArrayList(trust, inactiveTrust));
 
     // Create the Site
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
@@ -237,6 +249,47 @@ public class SiteResourceIntTest {
     assertThat(testSite.getSiteNumber()).isEqualTo(DEFAULT_SITE_NUMBER);
     assertThat(testSite.getOrganisationalUnit()).isEqualTo(DEFAULT_ORGANISATIONAL_UNIT);
     assertThat(testSite.getOrganizationType()).isEqualTo(organizationType);
+  }
+
+  @Test
+  @Transactional
+  public void createSiteWithInactiveTrustShouldFail() throws Exception {
+    int databaseSizeBeforeCreate = siteRepository.findAll().size();
+
+    // save an INACTIVE trust only
+    trustRepository.saveAndFlush(inactiveTrust);
+
+    // Create the Site (with trustCode same as code of inactiveTrust)
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
+    restSiteMockMvc.perform(post("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+
+    List<Site> siteList = siteRepository.findAll();
+    assertThat(siteList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Transactional
+  public void createSiteWithDuplicateTrustCodesShouldFail() throws Exception {
+    int databaseSizeBeforeCreate = siteRepository.findAll().size();
+
+    // save two CURRENT Trusts with the same code
+    Trust trustDuplicate = new Trust();
+    trustDuplicate.setCode(DEFAULT_TRUST_CODE);
+    trustDuplicate.setId(5L);
+    trustDuplicate.setStatus(Status.CURRENT);
+    trustRepository.saveAllAndFlush(Lists.newArrayList(trust, trustDuplicate));
+
+    // Create the Site (with trustCode same as code of inactiveTrust)
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(site);
+    restSiteMockMvc.perform(post("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+
+    List<Site> siteList = siteRepository.findAll();
+    assertThat(siteList).hasSize(databaseSizeBeforeCreate);
   }
 
   @Test
@@ -548,8 +601,10 @@ public class SiteResourceIntTest {
   public void updateSite() throws Exception {
     // Initialize the database
     site = siteRepository.saveAndFlush(site);
-    trustRepository.saveAndFlush(trust);
     int databaseSizeBeforeUpdate = siteRepository.findAll().size();
+
+    // save a CURRENT and an INACTIVE trust
+    trustRepository.saveAll(Lists.newArrayList(trust, inactiveTrust));
 
     // Update the site
     Site updatedSite = siteRepository.findById(site.getId()).get();
@@ -566,11 +621,16 @@ public class SiteResourceIntTest {
     updatedSite.setOrganisationalUnit(UPDATED_ORGANISATIONAL_UNIT);
     SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
 
-    // have a different Trust ready in the database
+    // have a different Trust ready in the database (one CURRENT and one INACTIVE)
     Trust trust2 = new Trust();
     trust2.setId(UPDATED_TRUST_ID);
     trust2.setCode(UPDATED_TRUST_CODE);
-    trustRepository.saveAndFlush(trust2);
+    trust2.setStatus(Status.CURRENT);
+    Trust inactiveTrust2 = new Trust();
+    inactiveTrust2.setId(UPDATED_INACTIVE_TRUST_ID);
+    inactiveTrust2.setCode(UPDATED_TRUST_CODE);
+    inactiveTrust2.setStatus(Status.INACTIVE);
+    trustRepository.saveAllAndFlush(Lists.newArrayList(trust2, inactiveTrust2));
 
     restSiteMockMvc.perform(put("/api/sites")
         .contentType(MediaType.APPLICATION_JSON)
@@ -594,6 +654,56 @@ public class SiteResourceIntTest {
     assertThat(testSite.getSiteNumber()).isEqualTo(UPDATED_SITE_NUMBER);
     assertThat(testSite.getOrganisationalUnit()).isEqualTo(UPDATED_ORGANISATIONAL_UNIT);
     assertThat(testSite.getOrganizationType()).isEqualTo(organizationType);
+  }
+
+  @Test
+  @Transactional
+  public void updateSiteWithInactiveTrustShouldFail() throws Exception {
+    // Initialize the database
+    site = siteRepository.saveAndFlush(site);
+
+    // save an INACTIVE trust
+    inactiveTrust.setCode(UPDATED_TRUST_CODE);
+    trustRepository.saveAndFlush(inactiveTrust);
+
+    // Update the site
+    Site updatedSite = siteRepository.findById(site.getId()).get();
+    updatedSite.setTrustCode(UPDATED_TRUST_CODE);
+
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
+
+    restSiteMockMvc.perform(put("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
+  }
+
+  @Test
+  @Transactional
+  public void updateSiteWithNonUniqueTrustCodeShouldFail() throws Exception {
+    // Initialize the database
+    site = siteRepository.saveAndFlush(site);
+    int databaseSizeBeforeUpdate = siteRepository.findAll().size();
+
+    // save two CURRENT trusts with the same code (i.e. there's a data quality issue)
+    trust.setCode(UPDATED_TRUST_CODE);
+    Trust trustDuplicate = new Trust();
+    trustDuplicate.setId(5L);
+    trustDuplicate.setCode(UPDATED_TRUST_CODE);
+    trustDuplicate.setStatus(Status.CURRENT);
+    trustRepository.saveAll(Lists.newArrayList(trust, trustDuplicate));
+
+    // Update the site
+    Site updatedSite = siteRepository.findById(site.getId()).get();
+    updatedSite.setTrustCode(UPDATED_TRUST_CODE);
+    updatedSite.setTrustId(UPDATED_INACTIVE_TRUST_ID);
+
+    SiteDTO siteDTO = siteMapper.siteToSiteDTO(updatedSite);
+
+    restSiteMockMvc.perform(put("/api/sites")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(siteDTO)))
+        .andExpect(status().isInternalServerError());
   }
 
   @Test

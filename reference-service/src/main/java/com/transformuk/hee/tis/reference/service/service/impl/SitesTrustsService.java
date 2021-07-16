@@ -108,6 +108,19 @@ public class SitesTrustsService {
   }
 
   /**
+   * Returns a list of trusts with a given code and status.
+   *
+   * @param trustCode Code for a trust - NOT NULL
+   * @param status    Status of the trust
+   * @return {@link List} list of all found Trusts
+   */
+  public List<Trust> getTrustsByCodeAndStatus(String trustCode, Status status) {
+    checkNotNull(trustCode);
+    checkNotNull(status);
+    return trustRepository.findByCodeAndStatus(trustCode, status);
+  }
+
+  /**
    * Searches all trusts who have data containing given searchString
    *
    * @param searchString search string to be searched for trust data
