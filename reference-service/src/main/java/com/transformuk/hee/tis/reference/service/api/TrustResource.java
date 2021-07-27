@@ -11,6 +11,7 @@ import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.api.util.UrlDecoderUtil;
+import com.transformuk.hee.tis.reference.service.api.validation.TrustValidator;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.Trust;
 import com.transformuk.hee.tis.reference.service.repository.TrustRepository;
@@ -66,15 +67,17 @@ public class TrustResource {
   private static final String ENTITY_NAME = "trust";
   private final Logger log = LoggerFactory.getLogger(TrustResource.class);
   private final TrustRepository trustRepository;
+  private final TrustValidator trustValidator;
   private final TrustMapper trustMapper;
   private final SitesTrustsService sitesTrustsService;
 
   private final int limit;
 
-  public TrustResource(TrustRepository trustRepository, TrustMapper trustMapper,
-      SitesTrustsService sitesTrustsService,
+  public TrustResource(TrustRepository trustRepository, TrustValidator trustValidator,
+      TrustMapper trustMapper, SitesTrustsService sitesTrustsService,
       @Value("${search.result.limit:100}") int limit) {
     this.trustRepository = trustRepository;
+    this.trustValidator = trustValidator;
     this.trustMapper = trustMapper;
     this.sitesTrustsService = sitesTrustsService;
     this.limit = limit;
@@ -93,9 +96,12 @@ public class TrustResource {
   public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO)
       throws URISyntaxException {
     log.debug("REST request to save Trust : {}", trustDTO);
+
+    trustValidator.validate(trustDTO);
+
     if (trustDTO.getId() != null && trustRepository.findById(trustDTO.getId()).isPresent()) {
       return ResponseEntity.badRequest().headers(HeaderUtil
-          .createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that Code"))
+          .createFailureAlert(ENTITY_NAME, "idexists", "A Trust already exists with that id"))
           .body(null);
     }
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
@@ -123,6 +129,8 @@ public class TrustResource {
     if (trustDTO.getId() == null) {
       return createTrust(trustDTO);
     }
+    trustValidator.validate(trustDTO);
+
     Trust trust = trustMapper.trustDTOToTrust(trustDTO);
     trust = trustRepository.save(trust);
     TrustDTO result = trustMapper.trustToTrustDTO(trust);
