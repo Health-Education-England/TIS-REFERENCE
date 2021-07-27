@@ -63,6 +63,18 @@ class TrustValidatorTest {
   }
 
   @Test
+  void shouldPassValidationWhenCodeIsNull() {
+    Trust trust = new Trust();
+    trust.setStatus(Status.CURRENT);
+    repository.save(trust);
+
+    TrustDTO trustDto = new TrustDTO();
+    trustDto.setStatus(Status.CURRENT);
+
+    assertDoesNotThrow(() -> validator.validate(trustDto));
+  }
+
+  @Test
   void shouldFailValidationWhenCurrentCodeExistsAndNewTrustCurrent() {
     Trust trust = new Trust();
     trust.setStatus(Status.CURRENT);

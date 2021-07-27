@@ -23,7 +23,7 @@ public class TrustValidator {
   public void validate(TrustDTO trustDto) {
     log.debug("Validating trust: {}", trustDto);
 
-    if (trustDto.getStatus() == Status.CURRENT) {
+    if (trustDto.getStatus() == Status.CURRENT && trustDto.getCode() != null) {
       Long id = trustDto.getId();
       String code = trustDto.getCode();
 
