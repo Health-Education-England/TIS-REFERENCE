@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.api.validation.TrustValidator;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.OrganizationType;
 import com.transformuk.hee.tis.reference.service.model.Trust;
@@ -92,6 +93,9 @@ public class TrustResourceIntTest {
   private TrustRepository trustRepository;
 
   @Autowired
+  private TrustValidator trustValidator;
+
+  @Autowired
   private OrganizationTypeRepository organizationTypeRepository;
 
   @Autowired
@@ -141,7 +145,7 @@ public class TrustResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     TrustResource trustResource =
-        new TrustResource(trustRepository, trustMapper, sitesTrustsService, 100);
+        new TrustResource(trustRepository, trustValidator, trustMapper, sitesTrustsService, 100);
     this.restTrustMockMvc = MockMvcBuilders.standaloneSetup(trustResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator).setMessageConverters(jacksonMessageConverter)
@@ -184,7 +188,7 @@ public class TrustResourceIntTest {
 
   @Test
   @Transactional
-  public void createTrustWithExistingCode() throws Exception {
+  public void shouldNotCreateTrustWithExistingId() throws Exception {
     trust = trustRepository.save(this.trust);
     int databaseSizeBeforeCreate = trustRepository.findAll().size();
 
@@ -198,11 +202,32 @@ public class TrustResourceIntTest {
             .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
         .andExpect(status().isBadRequest());
 
-    // Validate the Alice in the database
+    // Validate the trust in the database
     List<Trust> trustList = trustRepository.findAll();
     assertThat(trustList).hasSize(databaseSizeBeforeCreate);
   }
 
+  @Test
+  @Transactional
+  public void shouldNotCreateTrustWhenCodeExists() throws Exception {
+    trustRepository.save(this.trust);
+    int databaseSizeBeforeCreate = trustRepository.findAll().size();
+
+    // Create the Trust with an existing ID
+    TrustDTO anotherTrust = new TrustDTO();
+    anotherTrust.setCode(this.trust.getCode());
+    anotherTrust.setStatus(Status.CURRENT);
+
+    // An entity with an existing ID cannot be created, so this API call must fail
+    restTrustMockMvc
+        .perform(post("/api/trusts").contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(anotherTrust)))
+        .andExpect(status().isBadRequest());
+
+    // Validate the trust in the database
+    List<Trust> trustList = trustRepository.findAll();
+    assertThat(trustList).hasSize(databaseSizeBeforeCreate);
+  }
 
   @Test
   @Transactional
@@ -348,7 +373,7 @@ public class TrustResourceIntTest {
     int databaseSizeBeforeUpdate = trustRepository.findAll().size();
 
     // Update the trust
-    Trust updatedTrust = trustRepository.findById(trust.getId()).get();
+    Trust updatedTrust = trustRepository.getById(trust.getId());
     updatedTrust.setLocalOffice(UPDATED_LOCAL_OFFICE);
     updatedTrust.setStatus(UPDATED_STATUS);
     updatedTrust.setTrustKnownAs(UPDATED_TRUST_KNOWN_AS);
@@ -374,6 +399,64 @@ public class TrustResourceIntTest {
     assertThat(testTrust.getAddress()).isEqualTo(UPDATED_ADDRESS);
     assertThat(testTrust.getPostCode()).isEqualTo(UPDATED_POST_CODE);
     assertThat(testTrust.getOrganizationType()).isEqualTo(organizationType);
+  }
+
+  @Test
+  @Transactional
+  public void shouldUpdateCurrentTrustWhenCodeNotChanged() throws Exception {
+    // Initialize the database
+    trust = trustRepository.saveAndFlush(trust);
+    int databaseSizeBeforeUpdate = trustRepository.findAll().size();
+
+    // Update the trust
+    Trust updatedTrust = trustRepository.getById(trust.getId());
+    updatedTrust.setLocalOffice(UPDATED_LOCAL_OFFICE);
+    updatedTrust.setTrustKnownAs(UPDATED_TRUST_KNOWN_AS);
+    updatedTrust.setTrustName(UPDATED_TRUST_NAME);
+    updatedTrust.setTrustNumber(UPDATED_TRUST_NUMBER);
+    updatedTrust.setAddress(UPDATED_ADDRESS);
+    updatedTrust.setPostCode(UPDATED_POST_CODE);
+    TrustDTO trustDTO = trustMapper.trustToTrustDTO(updatedTrust);
+
+    restTrustMockMvc.perform(put("/api/trusts").contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(trustDTO))).andExpect(status().isOk());
+
+    // Validate the Trust in the database
+    List<Trust> trustList = trustRepository.findAll();
+    assertThat(trustList).hasSize(databaseSizeBeforeUpdate);
+    Trust testTrust = trustList.get(trustList.size() - 1);
+    assertThat(testTrust.getCode()).isEqualTo(DEFAULT_CODE);
+    assertThat(testTrust.getLocalOffice()).isEqualTo(UPDATED_LOCAL_OFFICE);
+    assertThat(testTrust.getStatus()).isEqualTo(DEFAULT_STATUS);
+    assertThat(testTrust.getTrustKnownAs()).isEqualTo(UPDATED_TRUST_KNOWN_AS);
+    assertThat(testTrust.getTrustName()).isEqualTo(UPDATED_TRUST_NAME);
+    assertThat(testTrust.getTrustNumber()).isEqualTo(UPDATED_TRUST_NUMBER);
+    assertThat(testTrust.getAddress()).isEqualTo(UPDATED_ADDRESS);
+    assertThat(testTrust.getPostCode()).isEqualTo(UPDATED_POST_CODE);
+    assertThat(testTrust.getOrganizationType()).isEqualTo(organizationType);
+  }
+
+  @Test
+  @Transactional
+  public void shouldNotUpdateTrustWhenNewCodeExists() throws Exception {
+    Trust existingTrust = new Trust();
+    existingTrust.setCode(UPDATED_CODE);
+    existingTrust.setStatus(Status.CURRENT);
+    trustRepository.save(existingTrust);
+
+    trust = trustRepository.save(trust);
+
+    int databaseSizeBeforeUpdate = trustRepository.findAll().size();
+
+    TrustDTO trustDto = trustMapper.trustToTrustDTO(trust);
+    trustDto.setCode(UPDATED_CODE);
+
+    restTrustMockMvc.perform(put("/api/trusts").contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(trustDto))).andExpect(status().isBadRequest());
+
+    // Validate the Trust in the database
+    List<Trust> trustList = trustRepository.findAll();
+    assertThat(trustList).hasSize(databaseSizeBeforeUpdate);
   }
 
   @Test
