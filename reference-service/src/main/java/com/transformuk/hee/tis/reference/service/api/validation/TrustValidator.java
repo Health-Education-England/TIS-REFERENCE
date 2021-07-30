@@ -16,8 +16,6 @@ public class TrustValidator {
 
   private final TrustRepository repository;
 
-  private static final String ERROR_MESSAGE_NOT_UNIQUE = "Trust failed validation due to non-unique code ";
-
   public TrustValidator(TrustRepository repository) {
     this.repository = repository;
   }
@@ -33,8 +31,10 @@ public class TrustValidator {
       existingTrusts.removeIf(t -> t.getId().equals(id));
 
       if (!existingTrusts.isEmpty()) {
-          log.warn(ERROR_MESSAGE_NOT_UNIQUE + "'{}'.", code);
-        throw new CustomParameterizedException(ERROR_MESSAGE_NOT_UNIQUE + code, ErrorConstants.ERR_VALIDATION);
+        String ERROR_MESSAGE_NOT_UNIQUE = "Trust failed validation due to non-unique code ";
+        log.warn(ERROR_MESSAGE_NOT_UNIQUE + "'{}'.", code);
+        throw new CustomParameterizedException(ERROR_MESSAGE_NOT_UNIQUE + code,
+            ErrorConstants.ERR_VALIDATION);
       }
     }
   }
