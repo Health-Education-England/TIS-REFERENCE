@@ -9,7 +9,7 @@ DELETE FROM reference.DBC Where dbc = 'LDN-MOCK-DBC';
 
 UPDATE reference.DBC
 SET dbc_type = 'LETB/Deanery'
-WHERE dbc = '1-8W6121' || dbc = '1-2SXJST';
+WHERE dbc IN ('1-8W6121', '1-2SXJST');
 
 UPDATE reference.DBC SET is_internal_dbc = 'true';
 
