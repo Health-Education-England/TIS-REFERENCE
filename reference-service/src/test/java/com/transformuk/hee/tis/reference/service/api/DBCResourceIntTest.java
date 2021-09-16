@@ -236,6 +236,8 @@ public class DBCResourceIntTest {
     encDbc.setDbc(UNENCODED_DBC);
     encDbc.setName(UNENCODED_NAME);
     encDbc.setAbbr(UNENCODED_ABBR);
+    encDbc.setType(DEFAULT_TYPE);
+    encDbc.setInternal(DEFAULT_INTERNAL);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
     dBCRepository.saveAll(dbcs);
@@ -369,6 +371,8 @@ public class DBCResourceIntTest {
       dbcReal.setDbc(dbc);
       dbcReal.setName(dbc);
       dbcReal.setAbbr("AAA" + count.toString());
+      dbcReal.setType(dbc);
+      dbcReal.setInternal(true);
       dBCRepository.saveAndFlush(dbcReal);
       count++;
     }
