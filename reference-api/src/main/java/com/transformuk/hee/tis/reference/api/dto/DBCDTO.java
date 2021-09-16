@@ -30,6 +30,12 @@ public class DBCDTO implements Serializable {
 
   private Status status;
 
+  @NotNull
+  private String type;
+
+  @NotNull
+  private boolean internal;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

@@ -46,6 +46,14 @@ public class DBC implements Serializable {
   @Column(name = "status")
   private Status status;
 
+  @NotNull
+  @Column(name = "type", nullable = false)
+  private String type;
+
+  @NotNull
+  @Column(name = "internal", nullable = false)
+  private boolean internal;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
