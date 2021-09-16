@@ -292,10 +292,10 @@ public class DBCResourceIntTest {
     restDBCMockMvc.perform(get("/api/dbcs/internal/" + DEFAULT_INTERNAL))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
-        .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR))
-        .andExpect(jsonPath("$.internal").value(DEFAULT_INTERNAL));
+        .andExpect(jsonPath("$.[*].dbc").value(DEFAULT_DBC))
+        .andExpect(jsonPath("$.[*].name").value(DEFAULT_NAME))
+        .andExpect(jsonPath("$.[*].abbr").value(DEFAULT_ABBR))
+        .andExpect(jsonPath("$.[*].internal").value(DEFAULT_INTERNAL));
   }
 
   @Test
