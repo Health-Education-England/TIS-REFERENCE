@@ -62,6 +62,10 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
+  private static final String DEFAULT_TYPE = "LETB/DEANERY";
+
+  private static final boolean DEFAULT_INTERNAL = true;
+
   private static String[] dbcArray = new String[] {HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
@@ -100,6 +104,8 @@ public class DBCResourceIntTest {
     dbc.setDbc(DEFAULT_DBC);
     dbc.setName(DEFAULT_NAME);
     dbc.setAbbr(DEFAULT_ABBR);
+    dbc.setType(DEFAULT_TYPE);
+    dbc.setInternal(DEFAULT_INTERNAL);
     return dbc;
   }
 
@@ -274,6 +280,22 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
         .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
+  }
+
+  @Test
+  @Transactional
+  public void getDBCByInternal() throws Exception {
+    // Initialize the database
+    dBCRepository.saveAndFlush(dBC);
+
+    // Get the dBC
+    restDBCMockMvc.perform(get("/api/dbcs/internal/" + DEFAULT_INTERNAL))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
+        .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+        .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR))
+        .andExpect(jsonPath("$.internal").value(DEFAULT_INTERNAL));
   }
 
   @Test
