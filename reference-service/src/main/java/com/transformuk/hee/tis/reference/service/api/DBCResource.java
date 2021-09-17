@@ -199,6 +199,21 @@ public class DBCResource {
   }
 
   /**
+   * GET /dbcs/internal/:internal : get the "internal" dBC.
+   *
+   * @param internal the internal field of the dBCDTO to retrieve
+   * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404
+   *     (Not Found)
+   */
+  @GetMapping("/dbcs/internal/{internal}")
+  public ResponseEntity<List<DBCDTO>> getDbcByInternal(@PathVariable boolean internal) {
+    log.debug("REST request to get DBC by internal: {}", internal);
+    List<DBC> dbcList = dBCRepository.findByInternal(internal);
+    List<DBCDTO> dbcDtoList = dBCMapper.dBCSToDBCDTOs(dbcList);
+    return new ResponseEntity<>(dbcDtoList, HttpStatus.OK);
+  }
+
+  /**
    * DELETE /dbcs/:id : delete the "id" dBC.
    *
    * @param id the id of the dBCDTO to delete

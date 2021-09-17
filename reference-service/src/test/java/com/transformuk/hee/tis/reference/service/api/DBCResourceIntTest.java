@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsNot.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -62,6 +63,11 @@ public class DBCResourceIntTest {
   private static final String HENWL_DBC_CODE = "1-AIIDWA";
   private static final String HEKSS_DBC_CODE = "1-AIIDR8";
 
+  private static final String DEFAULT_TYPE = "LETB/DEANERY";
+
+  private static final boolean DEFAULT_INTERNAL = true;
+  private static final boolean DEFAULT_EXTERNAL = false;
+
   private static String[] dbcArray = new String[] {HENE_DBC_CODE, HENWL_DBC_CODE, HEKSS_DBC_CODE};
 
   @Autowired
@@ -100,6 +106,8 @@ public class DBCResourceIntTest {
     dbc.setDbc(DEFAULT_DBC);
     dbc.setName(DEFAULT_NAME);
     dbc.setAbbr(DEFAULT_ABBR);
+    dbc.setType(DEFAULT_TYPE);
+    dbc.setInternal(DEFAULT_INTERNAL);
     return dbc;
   }
 
@@ -230,6 +238,8 @@ public class DBCResourceIntTest {
     encDbc.setDbc(UNENCODED_DBC);
     encDbc.setName(UNENCODED_NAME);
     encDbc.setAbbr(UNENCODED_ABBR);
+    encDbc.setType(DEFAULT_TYPE);
+    encDbc.setInternal(DEFAULT_INTERNAL);
     ArrayList<DBC> dbcs = Lists.newArrayList(dBC, encDbc);
     // Initialize the database
     dBCRepository.saveAll(dbcs);
@@ -274,6 +284,31 @@ public class DBCResourceIntTest {
         .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
         .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
         .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
+  }
+
+  @Test
+  @Transactional
+  public void getDBCByInternal() throws Exception {
+    // Initialize the database with one internal and one external dbc
+    DBC externalDbc = new DBC();
+    externalDbc.setDbc(UPDATED_DBC);
+    externalDbc.setName(UPDATED_NAME);
+    externalDbc.setAbbr(UPDATED_ABBR);
+    externalDbc.setType(DEFAULT_TYPE);
+    externalDbc.setInternal(DEFAULT_EXTERNAL);
+    ArrayList<DBC> dbcs = Lists.newArrayList(dBC, externalDbc);
+
+    dBCRepository.saveAllAndFlush(dbcs);
+
+    // Get the one internal dBC
+    restDBCMockMvc.perform(get("/api/dbcs/internal/" + DEFAULT_INTERNAL))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].dbc").value(DEFAULT_DBC))
+        .andExpect(jsonPath("$.[*].name").value(DEFAULT_NAME))
+        .andExpect(jsonPath("$.[*].abbr").value(DEFAULT_ABBR))
+        .andExpect(jsonPath("$.[*].internal").value(DEFAULT_INTERNAL))
+        .andExpect(jsonPath("$", hasSize(1)));
   }
 
   @Test
@@ -347,6 +382,8 @@ public class DBCResourceIntTest {
       dbcReal.setDbc(dbc);
       dbcReal.setName(dbc);
       dbcReal.setAbbr("AAA" + count.toString());
+      dbcReal.setType(dbc);
+      dbcReal.setInternal(true);
       dBCRepository.saveAndFlush(dbcReal);
       count++;
     }
