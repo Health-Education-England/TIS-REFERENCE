@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
@@ -220,6 +221,9 @@ public class RoleResource {
   public ResponseEntity<Map<String, Boolean>> rolesExist(@RequestBody List<String> codes,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
+    codes = codes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check Roles exist: {}", codes);
     Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
 

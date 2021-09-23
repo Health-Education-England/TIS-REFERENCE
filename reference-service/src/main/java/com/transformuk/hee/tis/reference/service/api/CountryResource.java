@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static uk.nhs.tis.StringConverter.getConverter;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.CountryDTO;
@@ -46,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing Country.
@@ -139,8 +140,7 @@ public class CountryResource {
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.info("REST request to get a page of countries begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
-        .toString();
+    searchQuery = getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil
         .getColumnFilters(columnFilterJson, filterEnumList);
@@ -182,7 +182,10 @@ public class CountryResource {
   @PostMapping("/countries/exists/")
   public ResponseEntity<Map<String, Boolean>> countriesExists(@RequestBody List<String> values) {
     Map<String, Boolean> countriesExistsMap = Maps.newHashMap();
-    log.debug("REST request to check Countries exists : {}", values);
+    values = values.stream()
+        .map(val -> getConverter(val).decodeUrl().toString())
+        .collect(Collectors.toList());
+    log.debug("REST request to check {} Countries exist.", values.size());
     if (!CollectionUtils.isEmpty(values)) {
       List<String> dbLabels = countryRepository.findByNationality(values);
       values.forEach(label -> {

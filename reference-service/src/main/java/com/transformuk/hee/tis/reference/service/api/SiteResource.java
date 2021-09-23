@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -306,6 +307,9 @@ public class SiteResource {
   @PostMapping("/sites/exists")
   public ResponseEntity<Map<String, Boolean>> siteExists(@RequestBody List<String> siteCodes) {
     Map<String, Boolean> siteExistsMap = Maps.newHashMap();
+    siteCodes = siteCodes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check Site exists : {}", siteCodes);
     if (!CollectionUtils.isEmpty(siteCodes)) {
       List<String> dbIds = siteRepository.findSiteCodesBySiteCodeIn(siteCodes);
@@ -351,6 +355,7 @@ public class SiteResource {
    */
   @PostMapping("/sites/codeexists/")
   public ResponseEntity siteCodeExists(@RequestBody String code) {
+    code = getConverter(code).decodeUrl().toString();
     log.debug("REST request to check Site exists : {}", code);
     HttpStatus siteFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {
@@ -372,6 +377,7 @@ public class SiteResource {
   @PostMapping("/sites/trustmatch/{trustCode}")
   public ResponseEntity siteTrustMatch(@RequestBody String siteCode,
       @PathVariable String trustCode) {
+    siteCode = getConverter(siteCode).decodeUrl().toString();
     log.debug("REST request to check Site exists : {} {}", siteCode, trustCode);
     HttpStatus siteTrustMatchFound = HttpStatus.NO_CONTENT;
     if (!siteCode.isEmpty() && !trustCode.isEmpty()) {

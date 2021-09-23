@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static uk.nhs.tis.StringConverter.getConverter;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.PlacementTypeDTO;
@@ -78,6 +80,9 @@ public class PlacementTypeResource {
   @PostMapping("/placement-types/exists/")
   public ResponseEntity<Map<String, Boolean>> placementTypeExists(@RequestBody List<String> codes) {
     Map<String, Boolean> placementTypeExistsMap = Maps.newHashMap();
+    codes = codes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check PlaceType exists : {}", codes);
     if (!CollectionUtils.isEmpty(codes)) {
       List<String> dbPlaceTypeCodes = placementTypeRepository.findCodeByCodesIn(codes);

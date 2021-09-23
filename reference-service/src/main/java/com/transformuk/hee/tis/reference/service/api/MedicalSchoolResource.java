@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static uk.nhs.tis.StringConverter.getConverter;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.MedicalSchoolDTO;
@@ -186,6 +188,9 @@ public class MedicalSchoolResource {
   public ResponseEntity<Map<String, Boolean>> medicalSchoolExists(
       @RequestBody List<String> values) {
     Map<String, Boolean> medicalSchoolExistsMap = Maps.newHashMap();
+    values = values.stream()
+        .map(val -> getConverter(val).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check MedicalSchool exists : {}", values);
     if (!CollectionUtils.isEmpty(values)) {
       List<String> dbLabels = medicalSchoolRepository.findByLabel(values);

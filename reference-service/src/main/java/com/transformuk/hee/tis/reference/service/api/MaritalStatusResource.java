@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.MaritalStatusDTO;
@@ -46,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing MaritalStatus.
@@ -144,8 +144,7 @@ public class MaritalStatusResource {
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.info("REST request to get a page of marital statuses begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
-        .toString();
+    searchQuery = getConverter(searchQuery).fromJson().decodeUrl().escapeForSql().toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil
         .getColumnFilters(columnFilterJson, filterEnumList);
@@ -188,6 +187,7 @@ public class MaritalStatusResource {
   public ResponseEntity<Boolean> maritalStatusExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
+    code = getConverter(code).decodeUrl().toString();
     log.debug("REST request to check MaritalStatus exists : {}", code);
     Specification<MaritalStatus> specs = Specification.where(isEqual("code", code));
 

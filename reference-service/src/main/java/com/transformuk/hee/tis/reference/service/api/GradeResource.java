@@ -1,5 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static uk.nhs.tis.StringConverter.getConverter;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
@@ -257,6 +259,9 @@ public class GradeResource {
   @PostMapping("/grades/exists/")
   public ResponseEntity<Map<String, Boolean>> gradeExists(@RequestBody List<String> abbreviations) {
     Map<String, Boolean> gradeExistsMap = Maps.newHashMap();
+    abbreviations = abbreviations.stream()
+        .map(val -> getConverter(val).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check Grade exists : {}", abbreviations);
     if (!CollectionUtils.isEmpty(abbreviations)) {
       List<String> dbGradeIds = gradeRepository.findByAbbreviationsIn(abbreviations);
