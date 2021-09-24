@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -376,6 +377,9 @@ public class TrustResource {
   @PostMapping("/trusts/exists/")
   public ResponseEntity<Map<String, Boolean>> trustExists(@RequestBody List<String> codes) {
     Map<String, Boolean> trustExistsMap = Maps.newHashMap();
+    codes = codes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
     log.debug("REST request to check Trust exists : {}", codes);
     if (!CollectionUtils.isEmpty(codes)) {
       List<String> dbIds = trustRepository.findCodesByCodesIn(codes);
@@ -420,6 +424,7 @@ public class TrustResource {
    */
   @PostMapping("/trusts/codeexists/")
   public ResponseEntity trustCodeExists(@RequestBody String code) {
+    code = getConverter(code).decodeUrl().toString();
     log.debug("REST request to check Trust exists : {}", code);
     HttpStatus trustFound = HttpStatus.NO_CONTENT;
     if (!code.isEmpty()) {

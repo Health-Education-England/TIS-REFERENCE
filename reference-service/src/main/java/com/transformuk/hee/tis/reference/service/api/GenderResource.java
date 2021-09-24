@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.isEqual;
+import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
@@ -181,6 +182,7 @@ public class GenderResource {
   public ResponseEntity<Boolean> genderExists(@RequestBody String code,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
+    code = getConverter(code).decodeUrl().toString();
     log.debug("REST request to check Gender exists : {}", code);
     Specification<Gender> specs = Specification.where(isEqual("code", code));
 

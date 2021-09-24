@@ -99,6 +99,7 @@ public class AuditingAspect {
    */
   @Before("execution(* com.transformuk.hee.tis.reference.service.api.*.update*(..))")
   public void auditUpdateBeforeExecution(JoinPoint joinPoint) throws Throwable {
+    // TODO: review implementation, accessibility update via reflection flagged as potential issue.
     // store old value to map, wait until the update process
     try {
       UserProfile userPofile = getProfileFromContext();
