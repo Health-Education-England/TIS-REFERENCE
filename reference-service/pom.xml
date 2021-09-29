@@ -216,7 +216,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>5.1.3.Final</version>
+      <version>6.2.0.Final</version>
     </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -334,7 +334,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.2</version>
         <configuration>
           <attachClasses>true</attachClasses>
         </configuration>
