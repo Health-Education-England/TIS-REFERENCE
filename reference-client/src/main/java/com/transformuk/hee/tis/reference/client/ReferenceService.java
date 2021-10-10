@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.client;
 
 import com.transformuk.hee.tis.client.ClientService;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
@@ -99,6 +100,13 @@ public interface ReferenceService extends ClientService {
    * @return The found trust.
    */
   TrustDTO findTrustById(Long id);
+
+  /**
+   * Find all AssessmentTypes.
+   *
+   * @return the list of AssessmentTypes
+   */
+  List<AssessmentTypeDto> findAllAssessmentTypes();
 
   List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
 

@@ -116,6 +116,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String QUALIFICATION_TYPE_MAPPINGS_ENDPOINT =
       "/api/qualification-types/exists/";
   private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
+  private static final String ASSESSMENT_TYPES_ENDPOINT = "/api/assessment-types";
 
   private static String gradesJsonQuerystringURLEncoded;
   private static String labelJsonQuerystringURLEncoded;
@@ -303,6 +304,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   private ParameterizedTypeReference<HttpStatus> getSiteTrustMatchReference() {
     return new ParameterizedTypeReference<HttpStatus>() {
+    };
+  }
+
+  private ParameterizedTypeReference<List<AssessmentTypeDto>> getAssessmentTypes() {
+    return new ParameterizedTypeReference<List<AssessmentTypeDto>>() {
     };
   }
 
@@ -709,6 +715,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public Set<DBCDTO> getAllDBCs() {
     ResponseEntity<Set<DBCDTO>> responseEntity = referenceRestTemplate
         .exchange(serviceUrl + "/api/dbcs?size=100&page=0", HttpMethod.GET, null, getDBCDto());
+    return responseEntity.getBody();
+  }
+
+  @Override
+  public List<AssessmentTypeDto> findAllAssessmentTypes() {
+    ResponseEntity<List<AssessmentTypeDto>> responseEntity = referenceRestTemplate
+        .exchange(serviceUrl + ASSESSMENT_TYPES_ENDPOINT + "?size=3000&page=0&columnFilters=" + statusCurrentUrlEncoded,
+            HttpMethod.GET, null, getAssessmentTypes());
     return responseEntity.getBody();
   }
 }

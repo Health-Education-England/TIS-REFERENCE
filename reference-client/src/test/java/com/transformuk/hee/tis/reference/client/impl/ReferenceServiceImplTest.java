@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
@@ -30,6 +31,7 @@ import com.transformuk.hee.tis.reference.api.dto.SexualOrientationDTO;
 import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,10 +68,10 @@ public class ReferenceServiceImplTest {
   private static final String SITE_CODE = "RJ706";
   private static final String UNKNOWN_CODE = "XXX";
 
-  private List<String> ids = Lists.newArrayList("SSL", "ADL");
-  private List<String> medicalSchoolValues = Lists
+  private final List<String> ids = Lists.newArrayList("SSL", "ADL");
+  private final List<String> medicalSchoolValues = Lists
       .newArrayList("University of London", "United Medical & Dental School, London");
-  private List<String> countryValues = Lists.newArrayList("United Kingdom");
+  private final List<String> countryValues = Lists.newArrayList("United Kingdom");
 
   @Mock
   private RestTemplate referenceRestTemplate;
@@ -380,6 +382,11 @@ public class ReferenceServiceImplTest {
 
   private ParameterizedTypeReference<Boolean> getValueExistsReference() {
     return new ParameterizedTypeReference<Boolean>() {
+    };
+  }
+
+  private ParameterizedTypeReference<List<AssessmentTypeDto>> getAssessmentTypes() {
+    return new ParameterizedTypeReference<List<AssessmentTypeDto>>() {
     };
   }
 
@@ -1324,5 +1331,31 @@ public class ReferenceServiceImplTest {
     verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/roles/in/" + codes),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
     assertEquals(roleDtos, respList);
+  }
+
+  @Test
+  public void shouldGetAllAssessmentTypes() {
+    // Given.
+    ParameterizedTypeReference<List<AssessmentTypeDto>> responseType = getAssessmentTypes();
+    List<AssessmentTypeDto> assessmentTypeDtos = new ArrayList<>();
+    AssessmentTypeDto assessmentType = new AssessmentTypeDto();
+    assessmentType.setId(1L);
+    assessmentType.setLabel("ARCP");
+    assessmentType.setStatus(Status.CURRENT);
+    assessmentTypeDtos.add(assessmentType);
+    ResponseEntity<List<AssessmentTypeDto>> responseEntity = new ResponseEntity<>(
+        assessmentTypeDtos, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(), any(HttpMethod.class),
+        isNull(RequestEntity.class), any(ParameterizedTypeReference.class))).willReturn(
+        responseEntity);
+
+    // When.
+    List<AssessmentTypeDto> respList = referenceServiceImpl.findAllAssessmentTypes();
+
+    // Then.
+    assertThat("Unexpected 'AssessmentType' result value.", respList.get(0).getLabel(), is("ARCP"));
+    verify(referenceRestTemplate).exchange(REFERENCE_URL
+            + "/api/assessment-types?size=3000&page=0&columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.GET, null, responseType);
   }
 }
