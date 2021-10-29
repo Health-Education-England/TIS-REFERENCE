@@ -84,6 +84,7 @@ public class FundingTypeResourceIntTest {
     FundingType fundingType = new FundingType();
     fundingType.setCode(DEFAULT_CODE);
     fundingType.setLabel(DEFAULT_LABEL);
+    fundingType.setAcademic(false);
     return fundingType;
   }
 
@@ -119,6 +120,7 @@ public class FundingTypeResourceIntTest {
     List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
     assertThat(fundingTypeList).hasSize(databaseSizeBeforeCreate + 1);
     FundingType testFundingType = fundingTypeList.get(fundingTypeList.size() - 1);
+    assertThat(testFundingType.isAcademic()).isEqualTo(false);
     assertThat(testFundingType.getCode()).isEqualTo(DEFAULT_CODE);
     assertThat(testFundingType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
@@ -193,7 +195,8 @@ public class FundingTypeResourceIntTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(fundingType.getId().intValue())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE.toString())))
-        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())));
+        .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL.toString())))
+        .andExpect(jsonPath("$.[*].academic").value(hasItem(false)));
   }
 
   @Test

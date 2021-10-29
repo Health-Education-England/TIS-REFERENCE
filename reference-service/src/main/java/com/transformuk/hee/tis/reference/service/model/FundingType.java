@@ -42,6 +42,10 @@ public class FundingType implements Serializable {
   @Column(name = "status")
   private Status status;
 
+  @NotNull
+  @Column(name = "academic", nullable = false)
+  private boolean academic;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
