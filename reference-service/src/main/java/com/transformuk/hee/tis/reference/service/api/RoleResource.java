@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.inIgnoreCase;
 import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
@@ -25,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -211,7 +213,7 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/exists/ : check if roles exist.
+   * EXISTS /roles/exists/ : check if roles exist (ignore casing)
    *
    * @param codes            the codes of the RoleDTOs to check
    * @param columnFilterJson The column filters to apply
@@ -225,7 +227,7 @@ public class RoleResource {
         .map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
     log.debug("REST request to check Roles exist: {}", codes);
-    Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
+    Specification<Role> specs = Specification.where(inIgnoreCase("code", new ArrayList<>(codes)));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -238,8 +240,18 @@ public class RoleResource {
     List<Role> roles = roleRepository.findAll(specs);
 
     Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
-    Map<String, Boolean> result =
-        codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+    Map<String, Boolean> result = new HashMap<>();
+
+        codes.stream()
+            .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
+                .anyMatch(fc -> fc.equalsIgnoreCase(c))))
+        .forEach((k,v) -> {
+          if (v && !foundCodes.contains(k)) {
+            result.put(foundCodes.stream().filter(fc -> fc.equalsIgnoreCase(k)).collect(Collectors.toList()).get(0), v);
+          } else {
+            result.put(k, v);
+          }
+        });
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

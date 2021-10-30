@@ -86,6 +86,27 @@ public final class SpecificationFactory {
     };
   }
 
+  public static Specification inIgnoreCase(String attribute, Collection<String> values) {
+    return (root, query, cb) -> {
+      CriteriaBuilder.In cbi;
+      if (StringUtils.isNotEmpty(attribute) && attribute.contains(DOT)) {
+        // this support multiple entity in criteria e.g specialties.specialty.name or sites.siteId
+        String[] joinTable = StringUtils.split(attribute, DOT);
+        Join tableJoin = root.join(joinTable[0], JoinType.INNER);
+        for (int i = 1; i < joinTable.length - 1; i++) {
+          tableJoin = tableJoin.join(joinTable[i], JoinType.INNER);
+        }
+        cbi = cb.in(cb.upper(tableJoin.get(joinTable[joinTable.length - 1]))); // attribute
+      } else {
+        cbi = cb.in(cb.upper(root.get(attribute)));
+      }
+      values.forEach(v -> {
+        cbi.value(v.toUpperCase());
+      });
+      return cbi;
+    };
+  }
+
   public static Specification isBetween(String attribute, int min, int max) {
     return (root, query, cb) -> cb.between(root.get(attribute), min, max);
   }
