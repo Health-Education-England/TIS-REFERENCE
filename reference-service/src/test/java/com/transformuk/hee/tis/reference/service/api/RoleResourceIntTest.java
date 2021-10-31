@@ -21,7 +21,6 @@ import com.transformuk.hee.tis.reference.service.repository.RoleCategoryReposito
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -373,7 +372,8 @@ public class RoleResourceIntTest {
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(defaultCodeButDifferentCase))))
+        .content(TestUtil.convertObjectToJsonBytes(Collections.
+            singletonList(defaultCodeButDifferentCase))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
   }
@@ -433,7 +433,8 @@ public class RoleResourceIntTest {
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(defaultCodeWithDifferentCase))))
+        .content(TestUtil.convertObjectToJsonBytes(Collections
+            .singletonList(defaultCodeWithDifferentCase))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
   }
@@ -473,5 +474,4 @@ public class RoleResourceIntTest {
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
   }
-
 }
