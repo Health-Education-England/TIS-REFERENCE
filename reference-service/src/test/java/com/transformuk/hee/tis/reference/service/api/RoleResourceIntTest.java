@@ -21,6 +21,7 @@ import com.transformuk.hee.tis.reference.service.repository.RoleCategoryReposito
 import com.transformuk.hee.tis.reference.service.repository.RoleRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -365,6 +366,20 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
+  public void shouldReturnTrueWhenExistsWithDifferentCasingAndFilterNotApplied()
+      throws Exception {
+    roleRepository.saveAndFlush(role);
+    String defaultCodeButDifferentCase = DEFAULT_CODE.toLowerCase();
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(defaultCodeButDifferentCase))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
   public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
@@ -408,6 +423,23 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
+  public void shouldReturnTrueWhenExistsWithDifferentCasingAndFilterIncludes() throws Exception {
+    role.setStatus(Status.CURRENT);
+    roleRepository.saveAndFlush(role);
+
+    String defaultCodeWithDifferentCase = DEFAULT_CODE.toLowerCase();
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(defaultCodeWithDifferentCase))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
   public void shouldReturnAllRolesInCodes() throws Exception {
     roleRepository.saveAndFlush(role);
     Role role2 = new Role();
@@ -441,4 +473,5 @@ public class RoleResourceIntTest {
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
   }
+
 }
