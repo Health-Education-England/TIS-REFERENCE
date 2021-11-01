@@ -82,7 +82,7 @@ public class RoleResource {
    *
    * @param roleDTO the roleDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new roleDTO, or with
-   * status 400 (Bad Request) if the role has already an ID
+   *     status 400 (Bad Request) if the role has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/roles")
@@ -108,8 +108,8 @@ public class RoleResource {
    *
    * @param roleDTO the roleDTO to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated roleDTO, or with
-   * status 400 (Bad Request) if the roleDTO is not valid, or with status 500 (Internal Server
-   * Error) if the roleDTO couldnt be updated
+   *     status 400 (Bad Request) if the roleDTO is not valid, or with status 500 (Internal Server
+   *     Error) if the roleDTO couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/roles")
@@ -202,7 +202,7 @@ public class RoleResource {
    *
    * @param id the id of the roleDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the roleDTO, or with status 404
-   * (Not Found)
+   *     (Not Found)
    */
   @GetMapping("/roles/{id}")
   public ResponseEntity<RoleDTO> getRole(@PathVariable Long id) {
@@ -213,7 +213,7 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/exists/ : check if roles exist (ignore casing)
+   * EXISTS /roles/exists/ : check if roles exist (ignoring casing).
    *
    * @param codes            the codes of the RoleDTOs to check
    * @param columnFilterJson The column filters to apply
@@ -248,7 +248,7 @@ public class RoleResource {
         .forEach((k, v) -> {
           if (v && !foundCodes.contains(k)) {
             result.put(foundCodes.stream().filter(fc -> fc.equalsIgnoreCase(k))
-                .collect(Collectors.toList()).get(0), v);
+                .collect(Collectors.toList()).get(0), true);
           } else {
             result.put(k, v);
           }
@@ -278,7 +278,7 @@ public class RoleResource {
    *
    * @param roleDTOS List of the roleDTOS to create
    * @return the ResponseEntity with status 200 (Created) and with body the new roleDTOS, or with
-   * status 400 (Bad Request) if the RoleDTO has already an ID
+   *     status 400 (Bad Request) if the RoleDTO has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/bulk-roles")
@@ -309,8 +309,8 @@ public class RoleResource {
    *
    * @param roleDTOS List of the roleDTOS to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated roleDTOS, or with
-   * status 400 (Bad Request) if the roleDTOS is not valid, or with status 500 (Internal Server
-   * Error) if the roleDTOS couldnt be updated
+   *     status 400 (Bad Request) if the roleDTOS is not valid, or with status 500 (Internal Server
+   *     Error) if the roleDTOS couldnt be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/bulk-roles")
@@ -345,7 +345,7 @@ public class RoleResource {
    *
    * @param codes the codes to search by, using a ',' separator
    * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
-   * list
+   *     list
    */
   @GetMapping("/roles/in/{codes:.+}")
   public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {

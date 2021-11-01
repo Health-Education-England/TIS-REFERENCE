@@ -86,6 +86,14 @@ public final class SpecificationFactory {
     };
   }
 
+  /**
+   * In condition for entity property, if property is from sub entity then it should contain '.' e.g
+   * sites.siteId, and is made specifically for strings where case is not relevant.
+   *
+   * @param attribute table name
+   * @param values values to be searched
+   * @return Specification
+   */
   public static Specification inIgnoreCase(String attribute, Collection<String> values) {
     return (root, query, cb) -> {
       CriteriaBuilder.In cbi;
@@ -100,9 +108,8 @@ public final class SpecificationFactory {
       } else {
         cbi = cb.in(cb.upper(root.get(attribute)));
       }
-      values.forEach(v -> {
-        cbi.value(v.toUpperCase());
-      });
+      values.forEach(v ->
+          cbi.value(v.toUpperCase()));
       return cbi;
     };
   }
