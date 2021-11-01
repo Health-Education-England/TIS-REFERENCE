@@ -84,6 +84,7 @@ public class FundingTypeResource {
           .createFailureAlert(ENTITY_NAME, "idexists",
               "A new fundingType cannot already have an ID")).body(null);
     }
+    fundingTypeDTO.setAcademic(false); // set default to false
     FundingType fundingType = fundingTypeMapper.fundingTypeDTOToFundingType(fundingTypeDTO);
     fundingType = fundingTypeRepository.save(fundingType);
     FundingTypeDTO result = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
