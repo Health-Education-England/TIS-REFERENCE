@@ -277,7 +277,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
-  private ParameterizedTypeReference<Map<String, String>> getExistsStrReference() {
+  private ParameterizedTypeReference<Map<String, String>> getCorrectsStringReference() {
     return new ParameterizedTypeReference<Map<String, String>>() {
     };
   }
@@ -337,7 +337,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   private Map<String, String> existsString(String url, List<String> ids) {
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
-    ParameterizedTypeReference<Map<String, String>> responseType = getExistsStrReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectsStringReference();
     ResponseEntity<Map<String, String>> responseEntity = referenceRestTemplate
         .exchange(url, HttpMethod.POST, requestEntity,
             responseType);
