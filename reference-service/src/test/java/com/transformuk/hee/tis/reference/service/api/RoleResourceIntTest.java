@@ -341,31 +341,31 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotExistsAndFilterNotApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(false));
+        .andExpect(jsonPath("$." + code).value(""));
   }
 
   @Test
   @Transactional
-  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnValueWhenExistsAndFilterNotApplied() throws Exception {
     roleRepository.saveAndFlush(role);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
   }
 
   @Test
   @Transactional
-  public void shouldReturnTrueWhenExistsWithDifferentCasingAndFilterNotApplied()
+  public void shouldReturnValueWhenExistsWithDifferentCasingAndFilterNotApplied()
       throws Exception {
     roleRepository.saveAndFlush(role);
     String defaultCodeButDifferentCase = DEFAULT_CODE.toLowerCase();
@@ -375,12 +375,12 @@ public class RoleResourceIntTest {
         .content(TestUtil.convertObjectToJsonBytes(Collections.
             singletonList(defaultCodeButDifferentCase))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+        .andExpect(jsonPath("$." + defaultCodeButDifferentCase).value(DEFAULT_CODE));
   }
 
   @Test
   @Transactional
-  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotExistsAndFilterApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
@@ -388,12 +388,12 @@ public class RoleResourceIntTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(false));
+        .andExpect(jsonPath("$." + code).value(""));
   }
 
   @Test
   @Transactional
-  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+  public void shouldReturnEmptyWhenExistsAndFilterExcludes() throws Exception {
     role.setStatus(Status.INACTIVE);
     roleRepository.saveAndFlush(role);
 
@@ -403,12 +403,12 @@ public class RoleResourceIntTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + DEFAULT_CODE).value(false));
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(""));
   }
 
   @Test
   @Transactional
-  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+  public void shouldReturnValueWhenExistsAndFilterIncludes() throws Exception {
     role.setStatus(Status.CURRENT);
     roleRepository.saveAndFlush(role);
 
@@ -418,12 +418,12 @@ public class RoleResourceIntTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
   }
 
   @Test
   @Transactional
-  public void shouldReturnTrueWhenExistsWithDifferentCasingAndFilterIncludes() throws Exception {
+  public void shouldReturnValueWhenExistsWithDifferentCasingAndFilterIncludes() throws Exception {
     role.setStatus(Status.CURRENT);
     roleRepository.saveAndFlush(role);
 
@@ -436,7 +436,7 @@ public class RoleResourceIntTest {
         .content(TestUtil.convertObjectToJsonBytes(Collections
             .singletonList(defaultCodeWithDifferentCase))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+        .andExpect(jsonPath("$." + defaultCodeWithDifferentCase).value(DEFAULT_CODE));
   }
 
   @Test

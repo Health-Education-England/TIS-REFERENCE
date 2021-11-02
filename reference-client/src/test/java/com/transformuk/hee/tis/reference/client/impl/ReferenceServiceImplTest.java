@@ -10,6 +10,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
@@ -372,6 +373,11 @@ public class ReferenceServiceImplTest {
 
   private ParameterizedTypeReference<Map<String, Boolean>> getExistsStringReference() {
     return new ParameterizedTypeReference<Map<String, Boolean>>() {
+    };
+  }
+
+  private ParameterizedTypeReference<Map<String, String>> getCorrectStringReference() {
+    return new ParameterizedTypeReference<Map<String, String>>() {
     };
   }
 
@@ -1265,23 +1271,23 @@ public class ReferenceServiceImplTest {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectStringReference();
 
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("code1", true);
-    response.put("code2", false);
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "code1");
+    response.put("code2", "");
 
     given(referenceRestTemplate
         .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
-            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, Boolean> exists = referenceServiceImpl.rolesExist(codes, false);
+    Map<String, String> exists = referenceServiceImpl.rolesExist(codes, false);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
-    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("code1"));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(""));
     verify(referenceRestTemplate)
         .exchange(REFERENCE_URL + "/api/roles/exists/", HttpMethod.POST, requestEntity,
             responseType);
@@ -1292,23 +1298,23 @@ public class ReferenceServiceImplTest {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectStringReference();
 
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("code1", true);
-    response.put("code2", false);
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "code1");
+    response.put("code2", "");
 
     given(referenceRestTemplate
         .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
-            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, Boolean> exists = referenceServiceImpl.rolesExist(codes, true);
+    Map<String, String> exists = referenceServiceImpl.rolesExist(codes, true);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
-    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("code1"));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(""));
     verify(referenceRestTemplate).exchange(
         REFERENCE_URL + "/api/roles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);

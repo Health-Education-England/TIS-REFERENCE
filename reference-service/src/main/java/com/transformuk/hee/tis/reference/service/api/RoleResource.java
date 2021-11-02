@@ -220,7 +220,7 @@ public class RoleResource {
    * @return boolean true if exists otherwise false
    */
   @PostMapping("/roles/exists/")
-  public ResponseEntity<Map<String, Boolean>> rolesExist(@RequestBody List<String> codes,
+  public ResponseEntity<Map<String, String>> rolesExist(@RequestBody List<String> codes,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     codes = codes.stream()
@@ -240,19 +240,12 @@ public class RoleResource {
     List<Role> roles = roleRepository.findAll(specs);
 
     Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
-    Map<String, Boolean> result = new HashMap<>();
 
-    codes.stream()
+    Map<String, String> result = codes.stream()
         .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
-            .anyMatch(fc -> fc.equalsIgnoreCase(c))))
-        .forEach((k, v) -> {
-          if (v && !foundCodes.contains(k)) {
-            result.put(foundCodes.stream().filter(fc -> fc.equalsIgnoreCase(k))
-                .collect(Collectors.toList()).get(0), true);
-          } else {
-            result.put(k, v);
-          }
-        });
+            .filter(fc -> fc.equalsIgnoreCase(c))
+            .findFirst()
+            .orElse("")));
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

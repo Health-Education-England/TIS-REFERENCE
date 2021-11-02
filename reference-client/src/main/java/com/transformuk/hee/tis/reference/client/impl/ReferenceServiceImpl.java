@@ -277,6 +277,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Map<String, String>> getExistsStrReference() {
+    return new ParameterizedTypeReference<Map<String, String>>() {
+    };
+  }
+
   private ParameterizedTypeReference<Map<Long, Boolean>> getExistsLongReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
     };
@@ -325,6 +330,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
+    return responseEntity.getBody();
+  }
+
+  private Map<String, String> existsString(String url, List<String> ids) {
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<String, String>> responseType = getExistsStrReference();
+    ResponseEntity<Map<String, String>> responseEntity = referenceRestTemplate
         .exchange(url, HttpMethod.POST, requestEntity,
             responseType);
     return responseEntity.getBody();
@@ -570,14 +584,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<String, Boolean> rolesExist(List<String> codes, boolean currentOnly) {
+  public Map<String, String> rolesExist(List<String> codes, boolean currentOnly) {
     String url = serviceUrl + ROLES_MAPPINGS_ENDPOINT;
 
     if (currentOnly) {
       url += "?columnFilters=" + statusCurrentUrlEncoded;
     }
 
-    return exists(url, codes);
+    return existsString(url, codes);
   }
 
   @Override
