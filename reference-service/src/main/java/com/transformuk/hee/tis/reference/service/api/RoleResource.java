@@ -1,7 +1,6 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.inIgnoreCase;
 import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
@@ -262,7 +261,7 @@ public class RoleResource {
         .map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
     log.debug("REST request to check Roles match: {}", codes);
-    Specification<Role> specs = Specification.where(inIgnoreCase("code", new ArrayList<>(codes)));
+    Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
