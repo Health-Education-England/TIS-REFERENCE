@@ -91,7 +91,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
-  private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/matches/";
+  private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/exists/";
+  private static final String ROLES_MATCHING_MAPPINGS_ENDPOINT = "/api/roles/matches/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
@@ -461,7 +462,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getRolesByCategory with {}", categoryId);
 
     return referenceRestTemplate
-        .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + String.valueOf(categoryId), HttpMethod.GET,
+        .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + categoryId, HttpMethod.GET,
             null, new ParameterizedTypeReference<List<RoleDTO>>() {
             })
         .getBody();
@@ -584,8 +585,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<String, String> rolesMatch(List<String> codes, boolean currentOnly) {
+  public Map<String, Boolean> rolesExist(List<String> codes, boolean currentOnly) {
     String url = serviceUrl + ROLES_MAPPINGS_ENDPOINT;
+
+    if (currentOnly) {
+      url += "?columnFilters=" + statusCurrentUrlEncoded;
+    }
+
+    return exists(url, codes);
+  }
+
+  @Override
+  public Map<String, String> rolesMatch(List<String> codes, boolean currentOnly) {
+    String url = serviceUrl + ROLES_MATCHING_MAPPINGS_ENDPOINT;
 
     if (currentOnly) {
       url += "?columnFilters=" + statusCurrentUrlEncoded;
@@ -735,7 +747,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public List<AssessmentTypeDto> findAllAssessmentTypes() {
     ResponseEntity<List<AssessmentTypeDto>> responseEntity = referenceRestTemplate
-        .exchange(serviceUrl + ASSESSMENT_TYPES_ENDPOINT + "?size=3000&page=0&columnFilters=" + statusCurrentUrlEncoded,
+        .exchange(serviceUrl + ASSESSMENT_TYPES_ENDPOINT + "?size=3000&page=0&columnFilters="
+                + statusCurrentUrlEncoded,
             HttpMethod.GET, null, getAssessmentTypes());
     return responseEntity.getBody();
   }

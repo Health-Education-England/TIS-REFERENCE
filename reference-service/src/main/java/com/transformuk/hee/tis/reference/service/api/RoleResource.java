@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -213,13 +212,47 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/matches/ : check if there's a role in the database that matches the code
-   *     provided, regardless of casing.
+   * EXISTS /roles/exists/ : check if roles exist.
    *
    * @param codes            the codes of the RoleDTOs to check
    * @param columnFilterJson The column filters to apply
-   * @return Map             Where a key is the code to be matched, and a value is the code that
-   *     was matched from the database.
+   * @return boolean true if exists otherwise false
+   */
+  @PostMapping("/roles/exists/")
+  public ResponseEntity<Map<String, Boolean>> rolesExist(@RequestBody List<String> codes,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
+    codes = codes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
+    log.debug("REST request to check Roles exist: {}", codes);
+    Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    List<Role> roles = roleRepository.findAll(specs);
+
+    Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
+    Map<String, Boolean> result =
+        codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  /**
+   * EXISTS /roles/matches/ : check if there's a role in the database that matches the code
+   * provided, regardless of casing.
+   *
+   * @param codes            the codes of the RoleDTOs to check
+   * @param columnFilterJson The column filters to apply
+   * @return Map             Where a key is the code to be matched, and a value is the code that was
+   *     matched from the database.
    */
   @PostMapping("/roles/matches/")
   public ResponseEntity<Map<String, String>> rolesMatch(@RequestBody List<String> codes,
