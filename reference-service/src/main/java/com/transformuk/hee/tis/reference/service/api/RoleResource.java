@@ -213,11 +213,13 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/exists/ : check if roles exist (ignoring casing).
+   * EXISTS /roles/exists/ : check if there's a role in the database that matches the code
+   *     provided, regardless of casing.
    *
    * @param codes            the codes of the RoleDTOs to check
    * @param columnFilterJson The column filters to apply
-   * @return boolean true if exists otherwise false
+   * @return Map             Where a key is the code to be matched, and a value is the code that
+   *     was matched from the database.
    */
   @PostMapping("/roles/exists/")
   public ResponseEntity<Map<String, String>> rolesExist(@RequestBody List<String> codes,
