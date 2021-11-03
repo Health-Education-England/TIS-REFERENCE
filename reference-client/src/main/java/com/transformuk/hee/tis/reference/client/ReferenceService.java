@@ -122,7 +122,7 @@ public interface ReferenceService extends ClientService {
 
   Map<Long, Boolean> gradeIdsExists(List<Long> ids);
 
-  Map<String, String> rolesExist(List<String> codes, boolean currentOnly);
+  Map<String, String> rolesMatch(List<String> codes, boolean currentOnly);
 
   Map<String, Boolean> trustExists(List<String> Ids);
 

@@ -10,7 +10,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
@@ -376,7 +375,7 @@ public class ReferenceServiceImplTest {
     };
   }
 
-  private ParameterizedTypeReference<Map<String, String>> getCorrectStringReference() {
+  private ParameterizedTypeReference<Map<String, String>> getMatchesStringReference() {
     return new ParameterizedTypeReference<Map<String, String>>() {
     };
   }
@@ -1267,11 +1266,11 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
-  public void shouldCheckAnyRolesExistsWhenNotCurrentOnly() {
+  public void shouldCheckAnyRolesMatchesWhenNotCurrentOnly() {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
 
     Map<String, String> response = new HashMap<>();
     response.put("code1", "code1");
@@ -1283,22 +1282,22 @@ public class ReferenceServiceImplTest {
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, String> exists = referenceServiceImpl.rolesExist(codes, false);
+    Map<String, String> exists = referenceServiceImpl.rolesMatch(codes, false);
 
     // Then.
     assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("code1"));
     assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(""));
     verify(referenceRestTemplate)
-        .exchange(REFERENCE_URL + "/api/roles/exists/", HttpMethod.POST, requestEntity,
+        .exchange(REFERENCE_URL + "/api/roles/matches/", HttpMethod.POST, requestEntity,
             responseType);
   }
 
   @Test
-  public void shouldCheckCurrentRolesExistsWhenCurrentOnly() {
+  public void shouldCheckCurrentRolesMatchesWhenCurrentOnly() {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
 
     Map<String, String> response = new HashMap<>();
     response.put("code1", "code1");
@@ -1310,13 +1309,13 @@ public class ReferenceServiceImplTest {
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, String> exists = referenceServiceImpl.rolesExist(codes, true);
+    Map<String, String> exists = referenceServiceImpl.rolesMatch(codes, true);
 
     // Then.
     assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("code1"));
     assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(""));
     verify(referenceRestTemplate).exchange(
-        REFERENCE_URL + "/api/roles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        REFERENCE_URL + "/api/roles/matches/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
   }
 

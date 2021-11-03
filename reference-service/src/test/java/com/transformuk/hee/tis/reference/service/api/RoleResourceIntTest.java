@@ -50,7 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = Application.class)
 public class RoleResourceIntTest {
 
-  private static final String EXISTS_ENDPOINT = "/api/roles/exists/";
+  private static final String EXISTS_ENDPOINT = "/api/roles/matches/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -341,7 +341,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnEmptyWhenNotExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotMatchesAndFilterNotApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
@@ -353,7 +353,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnValueWhenExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnValueWhenMatchesAndFilterNotApplied() throws Exception {
     roleRepository.saveAndFlush(role);
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
@@ -365,7 +365,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnValueWhenExistsWithDifferentCasingAndFilterNotApplied()
+  public void shouldReturnValueWhenMatchesWithDifferentCasingAndFilterNotApplied()
       throws Exception {
     roleRepository.saveAndFlush(role);
     String defaultCodeButDifferentCase = DEFAULT_CODE.toLowerCase();
@@ -380,7 +380,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnEmptyWhenNotExistsAndFilterApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotMatchesAndFilterApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
@@ -393,7 +393,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnEmptyWhenExistsAndFilterExcludes() throws Exception {
+  public void shouldReturnEmptyWhenMatchesAndFilterExcludes() throws Exception {
     role.setStatus(Status.INACTIVE);
     roleRepository.saveAndFlush(role);
 
@@ -408,7 +408,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnValueWhenExistsAndFilterIncludes() throws Exception {
+  public void shouldReturnValueWhenMatchesAndFilterIncludes() throws Exception {
     role.setStatus(Status.CURRENT);
     roleRepository.saveAndFlush(role);
 
@@ -423,7 +423,7 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnValueWhenExistsWithDifferentCasingAndFilterIncludes() throws Exception {
+  public void shouldReturnValueWhenMatchesWithDifferentCasingAndFilterIncludes() throws Exception {
     role.setStatus(Status.CURRENT);
     roleRepository.saveAndFlush(role);
 

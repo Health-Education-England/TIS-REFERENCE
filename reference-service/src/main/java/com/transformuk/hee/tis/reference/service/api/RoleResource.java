@@ -213,7 +213,7 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/exists/ : check if there's a role in the database that matches the code
+   * EXISTS /roles/matches/ : check if there's a role in the database that matches the code
    *     provided, regardless of casing.
    *
    * @param codes            the codes of the RoleDTOs to check
@@ -221,14 +221,14 @@ public class RoleResource {
    * @return Map             Where a key is the code to be matched, and a value is the code that
    *     was matched from the database.
    */
-  @PostMapping("/roles/exists/")
-  public ResponseEntity<Map<String, String>> rolesExist(@RequestBody List<String> codes,
+  @PostMapping("/roles/matches/")
+  public ResponseEntity<Map<String, String>> rolesMatch(@RequestBody List<String> codes,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     codes = codes.stream()
         .map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
-    log.debug("REST request to check Roles exist: {}", codes);
+    log.debug("REST request to check Roles match: {}", codes);
     Specification<Role> specs = Specification.where(inIgnoreCase("code", new ArrayList<>(codes)));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);

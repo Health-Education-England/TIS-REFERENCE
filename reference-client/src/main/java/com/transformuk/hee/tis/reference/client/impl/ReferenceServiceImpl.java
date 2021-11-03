@@ -91,7 +91,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
-  private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/exists/";
+  private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/matches/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
@@ -277,7 +277,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
-  private ParameterizedTypeReference<Map<String, String>> getCorrectsStringReference() {
+  private ParameterizedTypeReference<Map<String, String>> getMatchesStringReference() {
     return new ParameterizedTypeReference<Map<String, String>>() {
     };
   }
@@ -335,9 +335,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return responseEntity.getBody();
   }
 
-  private Map<String, String> existsString(String url, List<String> ids) {
+  private Map<String, String> matchString(String url, List<String> ids) {
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
-    ParameterizedTypeReference<Map<String, String>> responseType = getCorrectsStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
     ResponseEntity<Map<String, String>> responseEntity = referenceRestTemplate
         .exchange(url, HttpMethod.POST, requestEntity,
             responseType);
@@ -584,14 +584,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<String, String> rolesExist(List<String> codes, boolean currentOnly) {
+  public Map<String, String> rolesMatch(List<String> codes, boolean currentOnly) {
     String url = serviceUrl + ROLES_MAPPINGS_ENDPOINT;
 
     if (currentOnly) {
       url += "?columnFilters=" + statusCurrentUrlEncoded;
     }
 
-    return existsString(url, codes);
+    return matchString(url, codes);
   }
 
   @Override
