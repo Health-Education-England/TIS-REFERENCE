@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -23,6 +24,8 @@ import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -417,6 +420,18 @@ public class RoleResourceIntTest {
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + code).value(""));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnOneValueWhenDuplicateRolesArePassedIn() throws Exception {
+    roleRepository.saveAndFlush(role);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Arrays.asList(DEFAULT_CODE, DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
   }
 
   @Test

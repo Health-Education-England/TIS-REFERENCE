@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -279,7 +280,8 @@ public class RoleResource {
         .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
             .filter(fc -> fc.equalsIgnoreCase(c))
             .findFirst()
-            .orElse("")));
+            .orElse(""),
+            (c1,c2) -> c1));
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
