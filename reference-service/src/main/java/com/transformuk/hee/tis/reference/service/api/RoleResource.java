@@ -245,7 +245,7 @@ public class RoleResource {
   }
 
   /**
-   * EXISTS /roles/matches/ : check if there's a role in the database that matches the code
+   * POST /roles/matches/ : check if there's a role in the database that matches the code
    * provided, regardless of casing.
    *
    * @param codes            the codes of the RoleDTOs to check

@@ -50,7 +50,8 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = Application.class)
 public class RoleResourceIntTest {
 
-  private static final String EXISTS_ENDPOINT = "/api/roles/matches/";
+  private static final String EXISTS_ENDPOINT = "/api/roles/exists/";
+  private static final String MATCHES_ENDPOINT = "/api/roles/matches/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -341,10 +342,77 @@ public class RoleResourceIntTest {
 
   @Test
   @Transactional
-  public void shouldReturnEmptyWhenNotMatchesAndFilterNotApplied() throws Exception {
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
     String code = "notExists_" + LocalDate.now();
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    roleRepository.saveAndFlush(role);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    role.setStatus(Status.INACTIVE);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    role.setStatus(Status.CURRENT);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnEmptyWhenNotMatchesAndFilterNotApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
@@ -356,7 +424,7 @@ public class RoleResourceIntTest {
   public void shouldReturnValueWhenMatchesAndFilterNotApplied() throws Exception {
     roleRepository.saveAndFlush(role);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT)
+    mockMvc.perform(post(MATCHES_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
@@ -370,7 +438,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(role);
     String defaultCodeButDifferentCase = DEFAULT_CODE.toLowerCase();
 
-    mockMvc.perform(post(EXISTS_ENDPOINT)
+    mockMvc.perform(post(MATCHES_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.
             singletonList(defaultCodeButDifferentCase))))
@@ -384,7 +452,7 @@ public class RoleResourceIntTest {
     String code = "notExists_" + LocalDate.now();
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
@@ -399,7 +467,7 @@ public class RoleResourceIntTest {
 
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
@@ -414,7 +482,7 @@ public class RoleResourceIntTest {
 
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
@@ -431,7 +499,7 @@ public class RoleResourceIntTest {
 
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections
             .singletonList(defaultCodeWithDifferentCase))))
