@@ -26,11 +26,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -276,14 +276,18 @@ public class RoleResource {
 
     Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
 
+    // Filter out exact duplicates in codes
     Map<String, String> result = codes.stream()
         .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
             .filter(fc -> fc.equalsIgnoreCase(c))
             .findFirst()
             .orElse(""),
-            (c1,c2) -> c1));
+            (c1, c2) -> c1));
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    // Filter out any other duplicate (e.g.: duplicates with different casing)
+    TreeMap<String, String> uniqueResults = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    uniqueResults.putAll(result);
+    return new ResponseEntity<>(uniqueResults, HttpStatus.OK);
   }
 
   /**

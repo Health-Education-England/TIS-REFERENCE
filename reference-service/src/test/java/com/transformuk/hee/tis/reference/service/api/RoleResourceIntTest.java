@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.RoleDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -24,7 +23,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import java.net.URLEncoder;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
