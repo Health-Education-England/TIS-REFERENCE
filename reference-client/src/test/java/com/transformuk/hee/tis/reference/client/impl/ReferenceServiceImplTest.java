@@ -375,6 +375,11 @@ public class ReferenceServiceImplTest {
     };
   }
 
+  private ParameterizedTypeReference<Map<String, String>> getMatchesStringReference() {
+    return new ParameterizedTypeReference<Map<String, String>>() {
+    };
+  }
+
   private ParameterizedTypeReference<HttpStatus> getCodeExistsReference() {
     return new ParameterizedTypeReference<HttpStatus>() {
     };
@@ -1311,6 +1316,60 @@ public class ReferenceServiceImplTest {
     assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
     verify(referenceRestTemplate).exchange(
         REFERENCE_URL + "/api/roles/exists/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyRolesMatchesWhenNotCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
+
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "code1");
+    response.put("code2", "");
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, String> matches = referenceServiceImpl.rolesMatch(codes, false);
+
+    // Then.
+    assertThat("Unexpected 'matches' result value.", matches.get("code1"), is("code1"));
+    assertThat("Unexpected 'matches' result value.", matches.get("code2"), is(""));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/roles/matches/", HttpMethod.POST, requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentRolesMatchesWhenCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
+
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "code1");
+    response.put("code2", "");
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, String> matches = referenceServiceImpl.rolesMatch(codes, true);
+
+    // Then.
+    assertThat("Unexpected 'matches' result value.", matches.get("code1"), is("code1"));
+    assertThat("Unexpected 'matches' result value.", matches.get("code2"), is(""));
+    verify(referenceRestTemplate).exchange(
+        REFERENCE_URL + "/api/roles/matches/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
   }
 

@@ -23,6 +23,7 @@ import com.transformuk.hee.tis.reference.service.service.impl.RoleServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.RoleMapper;
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -51,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleResourceIntTest {
 
   private static final String EXISTS_ENDPOINT = "/api/roles/exists/";
+  private static final String MATCHES_ENDPOINT = "/api/roles/matches/";
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -404,6 +406,118 @@ public class RoleResourceIntTest {
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnEmptyWhenNotMatchesAndFilterNotApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(""));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnOneValueWhenDuplicateRolesArePassedIn() throws Exception {
+    roleRepository.saveAndFlush(role);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Arrays.asList(DEFAULT_CODE, DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnValueWhenMatchesAndFilterNotApplied() throws Exception {
+    roleRepository.saveAndFlush(role);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnValueWhenMatchesWithDifferentCasingAndFilterNotApplied()
+      throws Exception {
+    roleRepository.saveAndFlush(role);
+    String defaultCodeButDifferentCase = DEFAULT_CODE.toLowerCase();
+
+    mockMvc.perform(post(MATCHES_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.
+            singletonList(defaultCodeButDifferentCase))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + defaultCodeButDifferentCase).value(DEFAULT_CODE));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnEmptyWhenNotMatchesAndFilterApplied() throws Exception {
+    String code = "notExists_" + LocalDate.now();
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(""));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnEmptyWhenMatchesAndFilterExcludes() throws Exception {
+    role.setStatus(Status.INACTIVE);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(""));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnValueWhenMatchesAndFilterIncludes() throws Exception {
+    role.setStatus(Status.CURRENT);
+    roleRepository.saveAndFlush(role);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(DEFAULT_CODE));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnValueWhenMatchesWithDifferentCasingAndFilterIncludes() throws Exception {
+    role.setStatus(Status.CURRENT);
+    roleRepository.saveAndFlush(role);
+
+    String defaultCodeWithDifferentCase = DEFAULT_CODE.toLowerCase();
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(MATCHES_ENDPOINT + "?columnFilters=" + columnFilter)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections
+            .singletonList(defaultCodeWithDifferentCase))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + defaultCodeWithDifferentCase).value(DEFAULT_CODE));
   }
 
   @Test

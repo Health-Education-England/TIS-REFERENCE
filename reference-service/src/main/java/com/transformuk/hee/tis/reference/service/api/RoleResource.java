@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -242,6 +243,51 @@ public class RoleResource {
         codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
 
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  /**
+   * POST /roles/matches/ : check if there's a role in the database that matches the code
+   * provided, regardless of casing.
+   *
+   * @param codes            the codes of the RoleDTOs to check
+   * @param columnFilterJson The column filters to apply
+   * @return Map             Where a key is the code to be matched, and a value is the code that was
+   *     matched from the database.
+   */
+  @PostMapping("/roles/matches/")
+  public ResponseEntity<Map<String, String>> rolesMatch(@RequestBody List<String> codes,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
+      throws IOException {
+    codes = codes.stream()
+        .map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
+    log.debug("REST request to check Roles match: {}", codes);
+    Specification<Role> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    List<Role> roles = roleRepository.findAll(specs);
+
+    Set<String> foundCodes = roles.stream().map(Role::getCode).collect(Collectors.toSet());
+
+    // Filter out exact duplicates in codes
+    Map<String, String> result = codes.stream()
+        .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
+            .filter(fc -> fc.equalsIgnoreCase(c))
+            .findFirst()
+            .orElse(""),
+            (c1, c2) -> c1));
+
+    // Filter out any other duplicate (e.g.: duplicates with different casing)
+    TreeMap<String, String> uniqueResults = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    uniqueResults.putAll(result);
+    return new ResponseEntity<>(uniqueResults, HttpStatus.OK);
   }
 
   /**

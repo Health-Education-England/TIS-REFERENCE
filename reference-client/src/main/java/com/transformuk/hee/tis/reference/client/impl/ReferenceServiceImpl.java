@@ -92,6 +92,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String GRADES_MAPPINGS_ENDPOINT = "/api/grades/exists/";
   private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
   private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/exists/";
+  private static final String ROLES_MATCHING_MAPPINGS_ENDPOINT = "/api/roles/matches/";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
@@ -277,6 +278,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     };
   }
 
+  private ParameterizedTypeReference<Map<String, String>> getMatchesStringReference() {
+    return new ParameterizedTypeReference<Map<String, String>>() {
+    };
+  }
+
   private ParameterizedTypeReference<Map<Long, Boolean>> getExistsLongReference() {
     return new ParameterizedTypeReference<Map<Long, Boolean>>() {
     };
@@ -325,6 +331,15 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
     ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsReference();
     ResponseEntity<Map<String, Boolean>> responseEntity = referenceRestTemplate
+        .exchange(url, HttpMethod.POST, requestEntity,
+            responseType);
+    return responseEntity.getBody();
+  }
+
+  private Map<String, String> matchString(String url, List<String> ids) {
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
+    ResponseEntity<Map<String, String>> responseEntity = referenceRestTemplate
         .exchange(url, HttpMethod.POST, requestEntity,
             responseType);
     return responseEntity.getBody();
@@ -447,7 +462,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getRolesByCategory with {}", categoryId);
 
     return referenceRestTemplate
-        .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + String.valueOf(categoryId), HttpMethod.GET,
+        .exchange(serviceUrl + ROLES_BY_ROLE_CATEGORY + categoryId, HttpMethod.GET,
             null, new ParameterizedTypeReference<List<RoleDTO>>() {
             })
         .getBody();
@@ -578,6 +593,17 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     }
 
     return exists(url, codes);
+  }
+
+  @Override
+  public Map<String, String> rolesMatch(List<String> codes, boolean currentOnly) {
+    String url = serviceUrl + ROLES_MATCHING_MAPPINGS_ENDPOINT;
+
+    if (currentOnly) {
+      url += "?columnFilters=" + statusCurrentUrlEncoded;
+    }
+
+    return matchString(url, codes);
   }
 
   @Override
@@ -721,7 +747,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public List<AssessmentTypeDto> findAllAssessmentTypes() {
     ResponseEntity<List<AssessmentTypeDto>> responseEntity = referenceRestTemplate
-        .exchange(serviceUrl + ASSESSMENT_TYPES_ENDPOINT + "?size=3000&page=0&columnFilters=" + statusCurrentUrlEncoded,
+        .exchange(serviceUrl + ASSESSMENT_TYPES_ENDPOINT + "?size=3000&page=0&columnFilters="
+                + statusCurrentUrlEncoded,
             HttpMethod.GET, null, getAssessmentTypes());
     return responseEntity.getBody();
   }

@@ -124,6 +124,8 @@ public interface ReferenceService extends ClientService {
 
   Map<String, Boolean> rolesExist(List<String> codes, boolean currentOnly);
 
+  Map<String, String> rolesMatch(List<String> codes, boolean currentOnly);
+
   Map<String, Boolean> trustExists(List<String> Ids);
 
   Map<Long, Boolean> trustIdsExists(List<Long> ids);
