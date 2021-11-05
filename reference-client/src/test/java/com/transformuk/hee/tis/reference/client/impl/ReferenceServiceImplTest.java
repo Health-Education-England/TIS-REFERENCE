@@ -1339,8 +1339,8 @@ public class ReferenceServiceImplTest {
     Map<String, String> matches = referenceServiceImpl.rolesMatch(codes, false);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", matches.get("code1"), is("code1"));
-    assertThat("Unexpected 'exists' result value.", matches.get("code2"), is(""));
+    assertThat("Unexpected 'matches' result value.", matches.get("code1"), is("code1"));
+    assertThat("Unexpected 'matches' result value.", matches.get("code2"), is(""));
     verify(referenceRestTemplate)
         .exchange(REFERENCE_URL + "/api/roles/matches/", HttpMethod.POST, requestEntity,
             responseType);
@@ -1366,8 +1366,8 @@ public class ReferenceServiceImplTest {
     Map<String, String> matches = referenceServiceImpl.rolesMatch(codes, true);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", matches.get("code1"), is("code1"));
-    assertThat("Unexpected 'exists' result value.", matches.get("code2"), is(""));
+    assertThat("Unexpected 'matches' result value.", matches.get("code1"), is("code1"));
+    assertThat("Unexpected 'matches' result value.", matches.get("code2"), is(""));
     verify(referenceRestTemplate).exchange(
         REFERENCE_URL + "/api/roles/matches/?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
