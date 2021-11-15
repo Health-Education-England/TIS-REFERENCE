@@ -74,6 +74,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_FUNDING_TYPES_ENDPOINT = "/api/funding-types?columnFilters=";
   private static final String FIND_GRADES_BY_NAME_ENDPOINT = "/api/grades?columnFilters=";
+  private static final String FIND_GRADES_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
   private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
   private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
@@ -120,6 +121,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String ASSESSMENT_TYPES_ENDPOINT = "/api/assessment-types";
 
   private static String gradesJsonQuerystringURLEncoded;
+  private static String gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded;
   private static String labelJsonQuerystringURLEncoded;
   private static String localOfficesJsonQuerystringURLEncoded;
   private static String sitesKnownAsJsonQuerystringURLEncoded;
@@ -130,6 +132,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     try {
       gradesJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
+      gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded =
+          new URLCodec().encode("{\"status\":[\"CURRENT\"], " +
+                  "\"placementGrade\": [\"true\"], " +
+                  "\"trainingGrade\": [\"true\"]}");
       labelJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       localOfficesJsonQuerystringURLEncoded = new URLCodec()
@@ -444,6 +450,18 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
                 .replace("PARAMETER_NAME", urlEncode(gradeName)), HttpMethod.GET, null,
             new ParameterizedTypeReference<List<GradeDTO>>() {
             })
+        .getBody();
+  }
+
+  @Cacheable("gradesCurrent")
+  @Override
+  public List<GradeDTO> findGradesCurrentPlacementAndTrainingGrades() {
+    LOG.debug("calling findGradesCurrentPlacementAndTrainingGrades");
+    return referenceRestTemplate
+        .exchange(serviceUrl + FIND_GRADES_ENDPOINT + gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded,
+                 HttpMethod.GET, null,
+             new ParameterizedTypeReference<List<GradeDTO>>() {
+             })
         .getBody();
   }
 

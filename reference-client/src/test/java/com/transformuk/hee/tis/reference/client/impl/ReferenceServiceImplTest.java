@@ -189,6 +189,28 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldFindCurrentPlacementAndTrainingGrades() {
+    // given
+    List<GradeDTO> gradesCurrentPlacementAndTraining = Collections.singletonList(new GradeDTO());
+
+    ResponseEntity<List<GradeDTO>> responseEntity = new ResponseEntity(gradesCurrentPlacementAndTraining, HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+            any(HttpMethod.class), isNull(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any()))
+            .willReturn(responseEntity);
+
+    // when
+    List<GradeDTO> respList = referenceServiceImpl.findGradesCurrentPlacementAndTrainingGrades();
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+                    + "/api/grades?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%2C+%22placementGrade%22%3A+%5B%22true%22%5D%2C+%22trainingGrade%22%3A+%5B%22true%22%5D%7D"),
+            eq(HttpMethod.GET), isNull(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.GradeDTO>>>any());
+    assertEquals(gradesCurrentPlacementAndTraining, respList);
+  }
+
+  @Test
   public void shouldFindTrustByTrustKnownAs() {
     // given
     String trustNameWithSpecialCharacters = "trustNameWithSpecialCharacters@!£&£$%@/\\";
