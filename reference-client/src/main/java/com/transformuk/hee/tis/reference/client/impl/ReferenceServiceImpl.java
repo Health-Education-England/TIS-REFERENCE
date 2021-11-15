@@ -133,9 +133,9 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       gradesJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded =
-          new URLCodec().encode("{\"status\":[\"CURRENT\"], " +
-                  "\"placementGrade\": [\"true\"], " +
-                  "\"trainingGrade\": [\"true\"]}");
+          new URLCodec().encode("{\"status\":[\"CURRENT\"], "
+                  + "\"placementGrade\": [\"true\"], "
+                  + "\"trainingGrade\": [\"true\"]}");
       labelJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       localOfficesJsonQuerystringURLEncoded = new URLCodec()
@@ -458,8 +458,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<GradeDTO> findGradesCurrentPlacementAndTrainingGrades() {
     LOG.debug("calling findGradesCurrentPlacementAndTrainingGrades");
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_GRADES_ENDPOINT + gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded,
-                 HttpMethod.GET, null,
+        .exchange(serviceUrl + FIND_GRADES_ENDPOINT
+                + gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded, HttpMethod.GET, null,
              new ParameterizedTypeReference<List<GradeDTO>>() {
              })
         .getBody();
