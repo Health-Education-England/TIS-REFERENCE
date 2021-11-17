@@ -73,7 +73,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_FUNDING_TYPES_ENDPOINT = "/api/funding-types?columnFilters=";
-  private static final String FIND_GRADES_BY_NAME_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
   private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
@@ -446,7 +445,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<GradeDTO> findGradesByName(String gradeName) {
     LOG.debug("calling getGradesByName with {}", gradeName);
     return referenceRestTemplate
-        .exchange(serviceUrl + FIND_GRADES_BY_NAME_ENDPOINT + gradesJsonQuerystringURLEncoded
+        .exchange(serviceUrl + FIND_GRADES_ENDPOINT + gradesJsonQuerystringURLEncoded
                 .replace("PARAMETER_NAME", urlEncode(gradeName)), HttpMethod.GET, null,
             new ParameterizedTypeReference<List<GradeDTO>>() {
             })
