@@ -85,6 +85,14 @@ public interface ReferenceService extends ClientService {
   List<GradeDTO> findGradesByName(String name);
 
   /**
+   * Find the grades with status=CURRENT and placementGrade=true and trainingGrade=true.
+   * This does one API call and one SQL call to retrieve all the grades.
+   *
+   * @return the found grades or an empty list
+   */
+  List<GradeDTO> findGradesCurrentPlacementAndTrainingGrades();
+
+  /**
    * Find the trusts given the trustKnownAs. This does one API call and one SQL call to retrieve all
    * the trusts.
    *
