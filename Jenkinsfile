@@ -122,7 +122,7 @@ node {
               }
             }
 
-            milestone 5
+            milestone 6
 
             stage('Production') {
               node {
