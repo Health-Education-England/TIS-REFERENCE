@@ -108,7 +108,7 @@ node {
 
             stage('Health check on STAGE') {
                         withEnv(["endpoint=${healthcheckEndpoint}"]) {
-                          def httpStatus=sh(returnStdout: true, script: 'sleep 15; curl -m 300 -s -o /dev/null -w "%{http_code}" 10.160.0.137:8088${endpoint}').trim()
+                          def httpStatus=sh(returnStdout: true, script: 'sleep 30; curl -m 300 -s -o /dev/null -w "%{http_code}" 10.160.0.137:8088${endpoint}').trim()
                           if("200" == "${httpStatus}")  println "Status is 200"
                           else  throw new Exception("health check failed on STAGE with http status: $httpStatus")
                         }
