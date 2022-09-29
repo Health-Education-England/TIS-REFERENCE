@@ -531,7 +531,7 @@ public class RoleResourceIntTest {
     roleRepository.saveAndFlush(role2);
 
     String codes = String.join(",", role.getCode(), role2.getCode());
-    mockMvc.perform(get("/api/roles/in/{codes}", codes))
+    mockMvc.perform(get("/api/roles/in?codes={codes}", codes))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$", hasSize(2)))
@@ -542,17 +542,35 @@ public class RoleResourceIntTest {
   @Test
   @Transactional
   public void shouldReturnAllRolesInCodesWhenDotExistsInRole() throws Exception {
-    String code2 = "code2.code2";
+    String code2 = "code/code2.code2";
     Role role2 = new Role();
-    role2.setCode("code2.code2");
+    role2.setCode(code2);
     role2.setLabel(UPDATED_LABEL);
     role2.setRoleCategory(roleCategory);
     roleRepository.saveAndFlush(role2);
 
-    mockMvc.perform(get("/api/roles/in/{codes}", role2.getCode()))
+    mockMvc.perform(get("/api/roles/in?codes={codes}", code2))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
+  }
+
+  @Test
+  public void shouldReturnEmptyListWhenRolesIsEmpty() throws Exception {
+    String code2 = "";
+
+    mockMvc.perform(get("/api/roles/in?codes={codes}", code2))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
+
+  @Test
+  public void shouldReturnEmptyListWhenRolesIsNotSpecified() throws Exception {
+    mockMvc.perform(get("/api/roles/in"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(0)));
   }
 }

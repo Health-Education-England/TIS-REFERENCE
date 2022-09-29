@@ -374,19 +374,20 @@ public class RoleResource {
   }
 
   /**
-   * GET /roles/in/:codes : get roles given to codes.
+   * GET /roles/in : get roles given to codes.
    *
    * @param codes the codes to search by, using a ',' separator
    * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
    *     list
    */
-  @GetMapping("/roles/in/{codes:.+}")
-  public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {
+  @GetMapping("/roles/in")
+  public ResponseEntity<List<RoleDTO>> getRolesIn(
+      @RequestParam(value = "codes", required = false) String codes) {
     log.debug("REST request to find several roles");
     List<RoleDTO> resp = new ArrayList<>();
     Set<String> codeSet = new HashSet<>();
 
-    if (codes == null || codes.isEmpty()) {
+    if (StringUtils.isEmpty(codes)) {
       return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
