@@ -374,26 +374,48 @@ public class RoleResource {
   }
 
   /**
-   * GET /roles/in : get roles given to codes.
+   * GET /roles/in/:codes : get roles given to codes.
    *
    * @param codes the codes to search by, using a ',' separator
    * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
    *     list
    */
-  @GetMapping("/roles/in")
-  public ResponseEntity<List<RoleDTO>> getRolesIn(
-      @RequestParam(value = "codes", required = false) String codes) {
+  @Deprecated
+  @GetMapping("/roles/in/{codes:.+}")
+  public ResponseEntity<List<RoleDTO>> getRolesIn(@PathVariable String codes) {
     log.debug("REST request to find several roles");
     List<RoleDTO> resp = new ArrayList<>();
     Set<String> codeSet = new HashSet<>();
 
-    if (StringUtils.isEmpty(codes)) {
+    if (codes == null || codes.isEmpty()) {
       return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
     codeSet.addAll(Arrays.asList(codes.split(",")));
 
     if (!codeSet.isEmpty()) {
+      List<Role> roles = roleRepository.findByCodeIn(codeSet);
+      resp = roleMapper.rolesToRoleDTOs(roles);
+    }
+    return new ResponseEntity<>(resp, HttpStatus.OK);
+  }
+
+  /**
+   * GET /roles/codes : get roles given to codes.
+   *
+   * @param codes the codes to search by, using a ',' separator
+   * @return the ResponseEntity with status 200 (OK) and with body the list of roleDTOs, or empty
+   *     list
+   */
+  @GetMapping("/roles/codes")
+  public ResponseEntity<List<RoleDTO>> getRolesByCodes(
+      @RequestParam(value = "codes", required = false, defaultValue = "") String codes) {
+    log.debug("REST request to get roles by specified codes");
+    List<RoleDTO> resp = new ArrayList<>();
+
+    if (StringUtils.isNotEmpty(codes)) {
+      Set<String> codeSet = new HashSet<>();
+      codeSet.addAll(Arrays.asList(codes.split(",")));
       List<Role> roles = roleRepository.findByCodeIn(codeSet);
       resp = roleMapper.rolesToRoleDTOs(roles);
     }

@@ -79,7 +79,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
-  private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/in?codes=%s";
+  private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/codes?codes=%s";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
