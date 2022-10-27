@@ -79,7 +79,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
-  private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/in/";
+  private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/codes?codes=%s";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
@@ -537,7 +537,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<RoleDTO> findRolesIn(String codes) {
-    String url = serviceUrl + FIND_ROLE_IN_ENDPOINT + codes;
+    String url = serviceUrl + String.format(FIND_ROLE_IN_ENDPOINT, codes);
     ResponseEntity<List<RoleDTO>> responseEntity = referenceRestTemplate.
         exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<RoleDTO>>() {
         });

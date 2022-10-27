@@ -1409,7 +1409,7 @@ public class ReferenceServiceImplTest {
     List<RoleDTO> respList = referenceServiceImpl.findRolesIn(codes);
 
     //then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/roles/in/" + codes),
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/roles/codes?codes=" + codes),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
     assertEquals(roleDtos, respList);
   }

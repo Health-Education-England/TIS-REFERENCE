@@ -555,4 +555,58 @@ public class RoleResourceIntTest {
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
   }
+
+  @Test
+  @Transactional
+  public void shouldReturnAllRolesByCodes() throws Exception {
+    roleRepository.saveAndFlush(role);
+    Role role2 = new Role();
+    role2.setCode(UPDATED_CODE);
+    role2.setLabel(UPDATED_LABEL);
+    role2.setRoleCategory(roleCategory);
+    roleRepository.saveAndFlush(role2);
+
+    String codes = String.join(",", role.getCode(), role2.getCode());
+    mockMvc.perform(get("/api/roles/codes?codes={codes}", codes))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(UPDATED_CODE)));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnAllRolesByCodesWhenSpecialCharsInRole() throws Exception {
+    String code2 = "code/code2.code2";
+    Role role2 = new Role();
+    role2.setCode(code2);
+    role2.setLabel(UPDATED_LABEL);
+    role2.setRoleCategory(roleCategory);
+    roleRepository.saveAndFlush(role2);
+
+    mockMvc.perform(get("/api/roles/codes?codes={codes}", code2))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$.[*].code").value(hasItem(code2)));
+  }
+
+  @Test
+  public void shouldReturnEmptyListWhenRolesIsEmpty() throws Exception {
+    String code2 = "";
+
+    mockMvc.perform(get("/api/roles/codes?codes={codes}", code2))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
+
+  @Test
+  public void shouldReturnEmptyListWhenRolesIsNotSpecified() throws Exception {
+    mockMvc.perform(get("/api/roles/codes"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
 }
