@@ -16,7 +16,7 @@ public class DbcToLocalOfficeMapperTest {
   @Test
   public void shouldMap() {
     //Given
-    Set<String> dbcs = Sets.newHashSet("1-AIIDWA", "1-AIIDR8", "1-AIIDNQ");
+    Set<String> dbcs = Sets.newHashSet("1-1RUZV6H", "1-1RUZV1D", "1-1RSSQ2H");
     //When
     Set<String> mapResult = DbcToLocalOfficeMapper.map(dbcs);
     //Then

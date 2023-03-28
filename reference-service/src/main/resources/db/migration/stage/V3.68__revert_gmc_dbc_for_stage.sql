@@ -12,5 +12,3 @@ UPDATE `DBC` set `dbc` = '1-AIIDR8' where `name` = 'Health Education England Ken
 UPDATE `DBC` set `dbc` = '1-AIIDVS' where `name` = 'Health Education England North Central and East London' and `id` = 6;
 UPDATE `DBC` set `dbc` = '1-AIIDWA' where `name` = 'Health Education England North West London' and `id` = 5;
 
-UPDATE `DBC` set `dbc` = '1-5PBFHF' where `name` = 'Pharmaceutical Medicine Deanery' and `id` = 302;
-UPDATE `DBC` set `dbc` = '1-2SXJST' where `name` = 'Defence Postgraduate Medical Deanery' and `id` = 17;
