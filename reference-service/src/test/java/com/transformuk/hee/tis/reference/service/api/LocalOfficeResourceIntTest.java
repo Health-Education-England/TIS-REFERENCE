@@ -111,7 +111,7 @@ public class LocalOfficeResourceIntTest {
         .setControllerAdvice(exceptionTranslator)
         .setMessageConverters(jacksonMessageConverter).build();
     // jamesh has dbcs for North West London and Kent, Surrey & Sussex
-    TestUtil.mockUserProfile("jamesh", "1-AIIDR8", "1-AIIDWA");
+    TestUtil.mockUserProfile("jamesh", "1-1RUZV1D", "1-1RUZV6H");
   }
 
   @Before
