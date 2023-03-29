@@ -1,0 +1,13 @@
+UPDATE `DBC` set `dbc` = '1-1RSG4X0' where `dbc` = '1-AIIDQQ' and `name` = 'Health Education England Yorkshire and the Humber';
+UPDATE `DBC` set `dbc` = '1-1RSSPZ7' where `dbc` = '1-AIIDSA' and `name` = 'Health Education England East Midlands';
+UPDATE `DBC` set `dbc` = '1-1RSSQ05' where `dbc` = '1-AIIDWT' and `name` = 'Health Education England East of England';
+UPDATE `DBC` set `dbc` = '1-1RSSQ1B' where `dbc` = '1-AIIDSI' and `name` = 'Health Education England North East';
+UPDATE `DBC` set `dbc` = '1-1RSSQ2H' where `dbc` = '1-AIIDNQ' and `name` = 'Health Education England North West';
+UPDATE `DBC` set `dbc` = '1-1RSSQ5L' where `dbc` = '1-AIIDWI' and `name` = 'Health Education England South London';
+UPDATE `DBC` set `dbc` = '1-1RSSQ6R' where `dbc` = '1-AIIDH1' and `name` = 'Health Education England Thames Valley';
+UPDATE `DBC` set `dbc` = '1-1RUZUSF' where `dbc` = '1-AIIDHJ' and `name` = 'Health Education England Wessex';
+UPDATE `DBC` set `dbc` = '1-1RUZUVB' where `dbc` = '1-AIIDMQ' and `name` = 'Health Education England South West';
+UPDATE `DBC` set `dbc` = '1-1RUZUYF' where `dbc` = '1-AIIDMY' and `name` = 'Health Education England West Midlands';
+UPDATE `DBC` set `dbc` = '1-1RUZV1D' where `dbc` = '1-AIIDR8' and `name` = 'Health Education England Kent, Surrey and Sussex';
+UPDATE `DBC` set `dbc` = '1-1RUZV4H' where `dbc` = '1-AIIDVS' and `name` = 'Health Education England North Central and East London';
+UPDATE `DBC` set `dbc` = '1-1RUZV6H' where `dbc` = '1-AIIDWA' and `name` = 'Health Education England North West London';

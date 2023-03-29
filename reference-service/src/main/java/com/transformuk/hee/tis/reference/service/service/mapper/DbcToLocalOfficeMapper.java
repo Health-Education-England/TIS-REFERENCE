@@ -21,7 +21,7 @@ public class DbcToLocalOfficeMapper {
           .put("1-AIIDR8", Lists.newArrayList("Health Education England Kent, Surrey and Sussex"))
           .put("1-AIIDWA", Lists.newArrayList("Health Education England North West London"))
           .put("1-AIIDVS",
-              Lists.newArrayList("Health Education England North Central and East London"))
+              Lists.newArrayList("Health Education England North Central and East London"))
           .put("1-AIIDWI", Lists.newArrayList("Health Education England South London"))
           .put("1-AIIDSA", Lists.newArrayList("Health Education England East Midlands"))
           .put("1-AIIDWT", Lists.newArrayList("Health Education England East of England"))
@@ -38,20 +38,20 @@ public class DbcToLocalOfficeMapper {
           .build();
     } else {
       dbcToLocalOfficeMap = ImmutableMap.<String, List<String>>builder()
-          .put("1-AIIDR8", Lists.newArrayList("Health Education England Kent, Surrey and Sussex"))
-          .put("1-AIIDWA", Lists.newArrayList("Health Education England North West London"))
-          .put("1-AIIDVS",
-              Lists.newArrayList("Health Education England North Central and East London"))
-          .put("1-AIIDWI", Lists.newArrayList("Health Education England South London"))
-          .put("1-AIIDSA", Lists.newArrayList("Health Education England East Midlands"))
-          .put("1-AIIDWT", Lists.newArrayList("Health Education England East of England"))
-          .put("1-AIIDSI", Lists.newArrayList("Health Education England North East"))
-          .put("1-AIIDH1", Lists.newArrayList("Health Education England Thames Valley"))
-          .put("1-AIIDQQ", Lists.newArrayList("Health Education England Yorkshire and the Humber"))
-          .put("1-AIIDMY", Lists.newArrayList("Health Education England West Midlands"))
-          .put("1-AIIDMQ", Lists.newArrayList("Health Education England South West"))
-          .put("1-AIIDHJ", Lists.newArrayList("Health Education England Wessex"))
-          .put("1-AIIDNQ", Lists.newArrayList("Health Education England North West"))
+          .put("1-1RUZV1D", Lists.newArrayList("Health Education England Kent, Surrey and Sussex"))
+          .put("1-1RUZV6H", Lists.newArrayList("Health Education England North West London"))
+          .put("1-1RUZV4H",
+              Lists.newArrayList("Health Education England North Central and East London"))
+          .put("1-1RSSQ5L", Lists.newArrayList("Health Education England South London"))
+          .put("1-1RSSPZ7", Lists.newArrayList("Health Education England East Midlands"))
+          .put("1-1RSSQ05", Lists.newArrayList("Health Education England East of England"))
+          .put("1-1RSSQ1B", Lists.newArrayList("Health Education England North East"))
+          .put("1-1RSSQ6R", Lists.newArrayList("Health Education England Thames Valley"))
+          .put("1-1RSG4X0", Lists.newArrayList("Health Education England Yorkshire and the Humber"))
+          .put("1-1RUZUYF", Lists.newArrayList("Health Education England West Midlands"))
+          .put("1-1RUZUVB", Lists.newArrayList("Health Education England South West"))
+          .put("1-1RUZUSF", Lists.newArrayList("Health Education England Wessex"))
+          .put("1-1RSSQ2H", Lists.newArrayList("Health Education England North West"))
           .put("1-25U-830",
               Lists.newArrayList("Northern Ireland Medical and Dental Training Agency"))
           .build();
