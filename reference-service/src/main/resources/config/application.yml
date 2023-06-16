@@ -163,3 +163,7 @@ jhipster:
 # ===================================================================
 
 application:
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:}
