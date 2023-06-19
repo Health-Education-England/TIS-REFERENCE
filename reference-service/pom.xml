@@ -64,6 +64,7 @@
     <jacoco.minimum>0.0</jacoco.minimum>
     <sonar.tests/>
     <surefire.forkCount>1</surefire.forkCount>
+    <sentryVersion>6.22.0</sentryVersion>
   </properties>
 
   <dependencies>
@@ -326,6 +327,17 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.sentry</groupId>
+      <artifactId>sentry-spring-boot-starter</artifactId>
+      <version>${sentryVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.sentry</groupId>
+      <artifactId>sentry-logback</artifactId>
+      <version>${sentryVersion}</version>
     </dependency>
     <!-- jhipster-needle-maven-add-dependency -->
   </dependencies>
