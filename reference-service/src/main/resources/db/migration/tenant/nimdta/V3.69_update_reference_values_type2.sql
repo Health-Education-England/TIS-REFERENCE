@@ -3,7 +3,7 @@ USE `reference prod`;
 /* update_reference_values_type2: 
 - UUID EXISTS IN UK REFERENCE TABLE AND ACTIVE, BUT UUID NOT IN NIMDTA
 - Comparison to see where new refeference values with new UUIDs have been added into UK reference and activated, but have not been added to nimdta. 
-- Need to add the new values in UK reference table to nimdta and ensure values are consistent with same UUID acrossboth tables, rather than creating new UUIDs for same reference valuesactivate in nimdta instead of creating new value. 
+- Need to add the new values in UK reference table to nimdta and ensure values are consistent with same UUID acrossboth tables, rather than creating new UUIDs for same reference values, activate in nimdta instead of creating new value. 
 - This script add the new values already in UK reference table to nimdta and activates them
 - - Please take particular notice of Section for #3 - RELIGIOUS BELIEF. Appropriate comments already added
 #====================================================================================================================================*/
