@@ -1,9 +1,9 @@
 USE `reference prod`;
 
-/* update_reference_values_type1: (PLEASE RUN THE SCRIPT compare_reference_values_type1.sql TO SEE DIFFERENCE BEFORE UPDATING!!!!!)
+/* update_reference_values_type1)
 - SAME UUID IN BOTH REFERENCE TABLES, ACTIVE IN UK BUT NOT IN NIMDTA
 - Comparison for same UUID with different status i.e. value already exist in both tables, but active in UK reference tables only. 
-- This script activates in nimdta instead of creating new value 
+- This script activates already existing values with same UUID in nimdta instead of creating new value 
 #====================================================================================================================================*/
 
 #1 - GENDER
