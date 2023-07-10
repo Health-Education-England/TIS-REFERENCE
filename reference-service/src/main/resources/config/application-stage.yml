@@ -6,7 +6,6 @@ spring:
   flyway:
     password: ${DBPASSWORD}
     schemas: ${DBNAME}
-    locations: classpath:db/migration/common,classpath:db/migration/tenant/hee,classpath:db/migration/stage
 
 logging:
   file: ${LOG_DIR}/reference.log
