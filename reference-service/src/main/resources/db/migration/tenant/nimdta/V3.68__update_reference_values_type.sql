@@ -23,25 +23,20 @@ SET `status` = 'INACTIVE'
 WHERE	`id` IN (86, 87, 88, 89, 93, 96, 98);
 
 -- RELIGIOUS BELIEF
-INSERT IGNORE INTO `ReligiousBelief`(`id`, `code`, `label`, `status`, `uuid`)
+INSERT INTO `ReligiousBelief`(`id`, `code`, `label`, `status`, `uuid`)
 VALUES
   (8,'Agnostic','Agnostic','CURRENT','0f8d7be9-3efb-11'),
   (15,'Atheist','Atheist','CURRENT','0f8d8039-3efb-11'),
-  (18,'Baptist','Baptist','CURRENT','0f8d81a9-3efb-11'),
   (22,'Christian','Christian','CURRENT','0f8d832e-3efb-11'),
   (24,'Church of England','Church of England','CURRENT','0f8d83ea-3efb-11'),
-  (25,'Church of Ireland','Church of Ireland','CURRENT','0f8d8448-3efb-11'),
   (26,'Church of Scotland','Church of Scotland','CURRENT','0f8d84ab-3efb-11'),
   (27,'Druze','Druze','CURRENT','0f8d8510-3efb-11'),
   (29,'Greek Catholic','Greek Catholic','CURRENT','0f8d85d0-3efb-11'),
   (30,'Greek Orthodox','Greek Orthodox','CURRENT','0f8d862e-3efb-11'),
   (31,'Hindu','Hindu','CURRENT','0f8d868c-3efb-11'),
-  (45,'Methodist','Methodist','CURRENT','0f8d8be1-3efb-11'),
   (55,'Not religious','Not religious','CURRENT','0f8d8f98-3efb-11'),
   (57,'Orthodox Christian','Orthodox Christian','CURRENT','0f8d9054-3efb-11'),
-  (62,'Presbyterian','Presbyterian','CURRENT','0f8d9257-3efb-11'),
   (65,'Quaker','Quaker','CURRENT','0f8d9374-3efb-11'),
-  (68,'Roman Catholic','Roman Catholic','CURRENT','0f8d9682-3efb-11'),
   (70,'Scientologist','Scientologist','CURRENT','0f8d976d-3efb-11'),
   (71,'Shinto','Shinto','CURRENT','0f8d97db-3efb-11'),
   (80,'Zoroastrian','Zzoroastrian','CURRENT','0f8d9b3a-3efb-11'),
@@ -184,8 +179,24 @@ VALUES
   (296,'Not Stated','Not Stated','CURRENT','39cc8d78-f0d6-11ed-9eb2-0638a616fc76');
 
 UPDATE `ReligiousBelief`
-SET `status` = 'INACTIVE'
-WHERE	`id` IN (141, 143, 146, 149, 150);
+SET `status` = 'CURRENT', `uuid` = '0f8d81a9-3efb-11'
+WHERE	`code` = 'Baptist';
+
+UPDATE `ReligiousBelief`
+SET `status` = 'CURRENT', `uuid` = '0f8d8448-3efb-11'
+WHERE	`code` = 'Church of Ireland';
+
+UPDATE `ReligiousBelief`
+SET `status` = 'CURRENT', `uuid` = '0f8d8be1-3efb-11'
+WHERE	`code` = 'Methodist';
+
+UPDATE `ReligiousBelief`
+SET `status` = 'CURRENT', `uuid` = '0f8d9257-3efb-11'
+WHERE	`code` = 'Presbyterian';
+
+UPDATE `ReligiousBelief`
+SET `status` = 'CURRENT', `uuid` = '0f8d9682-3efb-11'
+WHERE	`code` = 'Roman Catholic';
  
 -- NATIONALITY
 INSERT IGNORE INTO `Nationality`(`id`, `countryNumber`, `nationality`, `status`, `uuid`)
