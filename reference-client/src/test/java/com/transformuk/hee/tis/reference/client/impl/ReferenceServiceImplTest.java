@@ -136,7 +136,7 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(any(URI.class),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
-    assertEquals(respList.size(), 0);
+    assertEquals(0, respList.size());
   }
 
   @Test
@@ -154,7 +154,7 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(any(URI.class),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
-    assertEquals(respList.size(), 0);
+    assertEquals(0, respList.size());
   }
 
   @Test
@@ -172,7 +172,7 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(any(URI.class),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
-    assertEquals(respList.size(), 0);
+    assertEquals(0, respList.size());
   }
 
   @Test
@@ -190,7 +190,7 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(any(URI.class),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
-    assertEquals(respList.size(), 0);
+    assertEquals(0, respList.size());
   }
 
   @Test
