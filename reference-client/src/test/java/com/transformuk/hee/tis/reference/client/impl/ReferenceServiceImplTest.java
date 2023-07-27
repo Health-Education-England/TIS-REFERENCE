@@ -32,6 +32,7 @@ import com.transformuk.hee.tis.reference.api.dto.SiteDTO;
 import com.transformuk.hee.tis.reference.api.dto.TitleDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,6 +55,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -117,6 +119,78 @@ public class ReferenceServiceImplTest {
     verify(referenceRestTemplate).exchange(eq(REFERENCE_URL + "/api/sites/in/code2,code1"),
         eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
     assertEquals(sites, respList);
+  }
+
+  @Test
+  public void shouldHandleNotFoundWhenFindSitesIdIn() {
+    // given
+    Set<Long> ids = Sets.newHashSet(1L, 2L);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "not found", null, null, null));
+
+    // when
+    List<SiteDTO> respList = referenceServiceImpl.findSitesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
+  }
+
+  @Test
+  public void shouldHandleOtherExceptionWhenFindSitesIdIn() {
+    // given
+    Set<Long> ids = Sets.newHashSet(1L, 2L);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(new RuntimeException("Don't panic! this is an expected exception"));
+
+    // when
+    List<SiteDTO> respList = referenceServiceImpl.findSitesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
+  }
+
+  @Test
+  public void shouldHandleNotFoundWhenFindGradesIdIn() {
+    // given
+    Set<Long> ids = Sets.newHashSet(1L, 2L);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "not found", null, null, null));
+
+    // when
+    List<GradeDTO> respList = referenceServiceImpl.findGradesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
+  }
+
+  @Test
+  public void shouldHandleOtherExceptionWhenFindGradesIdIn() {
+    // given
+    Set<Long> ids = Sets.newHashSet(1L, 2L);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(new RuntimeException("Don't panic! this is an expected exception"));
+
+    // when
+    List<GradeDTO> respList = referenceServiceImpl.findGradesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
   }
 
   @Test

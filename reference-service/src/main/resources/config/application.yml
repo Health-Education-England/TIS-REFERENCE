@@ -44,7 +44,7 @@ spring:
     open-in-view: false
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     database: MYSQL
-    show-sql: true
+    show-sql: false
     format-sql: true
     properties:
       hibernate.id.new_generator_mappings: true

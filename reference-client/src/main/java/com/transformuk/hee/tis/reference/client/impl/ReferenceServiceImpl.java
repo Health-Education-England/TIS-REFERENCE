@@ -60,6 +60,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -432,10 +433,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<SiteDTO>>() {
               });
       return responseEntity.getBody();
+    } catch (HttpClientErrorException.NotFound e) {
+      LOG.info("Not found sites for ids [{}].", joinedIds);
+      return Collections.emptyList();
     } catch (Exception e) {
       LOG.error(
-          "Exception during find sites id in for ids [{}], returning empty list. Here's the error message {}",
-          joinedIds, e.getMessage());
+          "Exception during find sites id in for ids [{}],"
+              + " returning empty list. Here's the error message:",
+          joinedIds, e);
       return Collections.emptyList();
     }
   }
@@ -527,10 +532,14 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<GradeDTO>>() {
               });
       return responseEntity.getBody();
+    } catch (HttpClientErrorException.NotFound e) {
+      LOG.info("Not found grades for ids [{}].", joinedIds);
+      return Collections.emptyList();
     } catch (Exception e) {
       LOG.error(
-          "Exception during find grade id in for ids [{}], returning empty list. Here's the error message {}",
-          joinedIds, e.getMessage());
+          "Exception during find grade id in for ids [{}], "
+              + "returning empty list. Here's the error message:",
+          joinedIds, e);
       return Collections.emptyList();
     }
   }
