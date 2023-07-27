@@ -438,7 +438,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       return Collections.emptyList();
     } catch (Exception e) {
       LOG.error(
-          "Exception during find sites id in for ids [{}], returning empty list. Here's the error message:",
+          "Exception during find sites id in for ids [{}],"
+              + " returning empty list. Here's the error message:",
           joinedIds, e);
       return Collections.emptyList();
     }
@@ -536,7 +537,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       return Collections.emptyList();
     } catch (Exception e) {
       LOG.error(
-          "Exception during find grade id in for ids [{}], returning empty list. Here's the error message:",
+          "Exception during find grade id in for ids [{}], "
+              + "returning empty list. Here's the error message:",
           joinedIds, e);
       return Collections.emptyList();
     }
