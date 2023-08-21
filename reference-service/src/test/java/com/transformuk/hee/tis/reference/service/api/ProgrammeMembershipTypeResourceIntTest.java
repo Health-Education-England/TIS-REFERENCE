@@ -6,19 +6,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.model.ProgrammeMembershipType;
 import com.transformuk.hee.tis.reference.service.repository.ProgrammeMembershipTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.ProgrammeMembershipTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.ProgrammeMembershipTypeMapper;
+import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +55,7 @@ public class ProgrammeMembershipTypeResourceIntTest {
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
   private static final String UNENCODED_LABEL = "Te$t Programme Membership Type";
+  private static final String EXISTS_ENDPOINT = "/api/programme-membership-types/exist/";
 
   @Autowired
   private ProgrammeMembershipTypeRepository programmeMembershipTypeRepository;
@@ -326,5 +333,72 @@ public class ProgrammeMembershipTypeResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(ProgrammeMembershipType.class);
+  }
+
+  @Test
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    String code = "notExists";
+
+    restProgrammeMembershipTypeMockMvc.perform(post(EXISTS_ENDPOINT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    programmeMembershipTypeRepository.saveAndFlush(programmeMembershipType);
+
+    restProgrammeMembershipTypeMockMvc.perform(post(EXISTS_ENDPOINT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String code = "notExists";
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    restProgrammeMembershipTypeMockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    programmeMembershipType.setStatus(Status.INACTIVE);
+    programmeMembershipTypeRepository.saveAndFlush(programmeMembershipType);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    restProgrammeMembershipTypeMockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(false));
+  }
+
+  @Test
+  @Transactional
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    programmeMembershipType.setStatus(Status.CURRENT);
+    programmeMembershipTypeRepository.saveAndFlush(programmeMembershipType);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    restProgrammeMembershipTypeMockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(DEFAULT_CODE))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + DEFAULT_CODE).value(true));
   }
 }

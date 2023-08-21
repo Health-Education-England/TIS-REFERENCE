@@ -1513,4 +1513,116 @@ public class ReferenceServiceImplTest {
             + "/api/assessment-types?size=3000&page=0&columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.GET, null, responseType);
   }
+
+  @Test
+  public void shouldCheckAnyProgrammeMembershipTypesExistWhenNotCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.programmeMembershipTypesExist(codes, false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/programme-membership-types/exist", HttpMethod.POST,
+            requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentProgrammeMembershipTypesExistWhenCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.programmeMembershipTypesExist(codes, true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate).exchange(
+        REFERENCE_URL
+            + "/api/programme-membership-types/exist?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldCheckAnyLeavingReasonsExistWhenNotCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.leavingReasonsExist(codes, false);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate)
+        .exchange(REFERENCE_URL + "/api/leaving-reasons/exist", HttpMethod.POST,
+            requestEntity,
+            responseType);
+  }
+
+  @Test
+  public void shouldCheckCurrentLeavingReasonsExistWhenCurrentOnly() {
+    // Given.
+    List<String> codes = Arrays.asList("code1", "code2");
+    HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
+    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("code1", true);
+    response.put("code2", false);
+
+    given(referenceRestTemplate
+        .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+        .willReturn(ResponseEntity.ok(response));
+
+    // When.
+    Map<String, Boolean> exists = referenceServiceImpl.leavingReasonsExist(codes, true);
+
+    // Then.
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    verify(referenceRestTemplate).exchange(
+        REFERENCE_URL
+            + "/api/leaving-reasons/exist?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.POST, requestEntity, responseType);
+  }
 }

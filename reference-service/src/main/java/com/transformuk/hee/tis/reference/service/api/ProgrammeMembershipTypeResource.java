@@ -1,5 +1,8 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static uk.nhs.tis.StringConverter.getConverter;
+
 import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.ProgrammeMembershipTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
@@ -20,8 +23,11 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.tis.StringConverter;
 
 /**
  * REST controller for managing ProgrammeMembershipType.
@@ -147,7 +153,7 @@ public class ProgrammeMembershipTypeResource {
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
     log.info("REST request to get a page of programme membership types begin");
-    searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
+    searchQuery = getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
         .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil
@@ -276,4 +282,36 @@ public class ProgrammeMembershipTypeResource {
         .body(results);
   }
 
+  /**
+   *
+   * @param codes
+   * @param columnFilterJson
+   * @return
+   * @throws IOException
+   */
+  @PostMapping("/programme-membership-types/exist")
+  public ResponseEntity<Map<String, Boolean>> programmeMembershipTypesExist(
+      @RequestBody List<String> codes,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson
+  ) throws IOException {
+    codes = codes.stream().map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
+    log.debug("REST request to check ProgrammeMembershipTypes existence: {}", codes);
+    Specification<ProgrammeMembershipType> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll(specs);
+
+    Set<String> foundCodes = programmeMembershipTypes.stream().map(ProgrammeMembershipType::getCode).collect(
+        Collectors.toSet());
+    Map<String, Boolean> result = codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
 }

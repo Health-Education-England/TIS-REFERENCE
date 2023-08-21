@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,6 +20,9 @@ import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.model.LeavingReason;
 import com.transformuk.hee.tis.reference.service.repository.LeavingReasonRepository;
 import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
+import java.net.URLEncoder;
+import java.util.Collections;
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = Application.class)
 @Transactional
 public class LeavingReasonResourceIntegrationTest {
+
+  private static final String EXISTS_ENDPOINT = "/api/leaving-reasons/exist/";
 
   @Autowired
   private LeavingReasonRepository repository;
@@ -587,5 +593,73 @@ public class LeavingReasonResourceIntegrationTest {
     leavingReasonDto.setStatus(status);
 
     return leavingReasonDto;
+  }
+
+  @Test
+  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+    String code = "notExists";
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+    String code = "code1";
+    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.CURRENT);
+    repository.save(leavingReason);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(true));
+  }
+
+  @Test
+  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+    String code = "notExists";
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+    String code = "code1";
+    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.INACTIVE);
+    repository.save(leavingReason);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(false));
+  }
+
+  @Test
+  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+    String code = "code1";
+    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.CURRENT);
+
+    repository.save(leavingReason);
+
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + code).value(true));
   }
 }

@@ -1,5 +1,9 @@
 package com.transformuk.hee.tis.reference.service.api;
 
+import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
+import static uk.nhs.tis.StringConverter.getConverter;
+
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
@@ -10,13 +14,18 @@ import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -182,5 +191,32 @@ public class LeavingReasonResource {
               "A entity with the given ID could not be found."))
           .build();
     }
+  }
+
+  @PostMapping("/leaving-reasons/exist")
+  public ResponseEntity<Map<String, Boolean>> leavingReasonsExist(
+      @RequestBody List<String> codes,
+      @RequestParam(value = "columnFilters", required = false) String columnFilterJson
+  ) throws IOException {
+    codes = codes.stream().map(code -> getConverter(code).decodeUrl().toString())
+        .collect(Collectors.toList());
+    LOGGER.debug("REST request to check leaving reasons existence: {}", codes);
+    Specification<LeavingReason> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
+    List<Class> filterEnumList = Lists.newArrayList(Status.class);
+    List<ColumnFilter> columnFilters =
+        ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    List<LeavingReasonDto> leavingReasonDtos = service.findAll(null, columnFilters);
+
+    Set<String> foundCodes = leavingReasonDtos.stream().map(LeavingReasonDto::getCode).collect(
+        Collectors.toSet());
+    Map<String, Boolean> result = codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }
