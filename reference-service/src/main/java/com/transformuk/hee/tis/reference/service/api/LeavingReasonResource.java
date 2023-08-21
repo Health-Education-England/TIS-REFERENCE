@@ -193,6 +193,14 @@ public class LeavingReasonResource {
     }
   }
 
+  /**
+   * POST /leaving-reasons/exist : check if leaving reasons exist.
+   *
+   * @param codes             the codes of the leaving reasons to check
+   * @param columnFilterJson  the column filters to apply
+   * @return a map contains the code as key and boolean value for its existence
+   * @throws IOException
+   */
   @PostMapping("/leaving-reasons/exist")
   public ResponseEntity<Map<String, Boolean>> leavingReasonsExist(
       @RequestBody List<String> codes,
@@ -215,7 +223,8 @@ public class LeavingReasonResource {
 
     Set<String> foundCodes = leavingReasonDtos.stream().map(LeavingReasonDto::getCode).collect(
         Collectors.toSet());
-    Map<String, Boolean> result = codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+    Map<String, Boolean> result = codes.stream()
+        .collect(Collectors.toMap(c -> c, foundCodes::contains));
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

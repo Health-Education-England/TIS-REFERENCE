@@ -283,10 +283,11 @@ public class ProgrammeMembershipTypeResource {
   }
 
   /**
+   * POST /programme-membership-types/exist : check if programme membership types exist.
    *
-   * @param codes
-   * @param columnFilterJson
-   * @return
+   * @param codes             the codes of the leaving reasons to check
+   * @param columnFilterJson  the column filters to apply
+   * @return a map contains the code as key and boolean value for its existence
    * @throws IOException
    */
   @PostMapping("/programme-membership-types/exist")
@@ -297,7 +298,8 @@ public class ProgrammeMembershipTypeResource {
     codes = codes.stream().map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
     log.debug("REST request to check ProgrammeMembershipTypes existence: {}", codes);
-    Specification<ProgrammeMembershipType> specs = Specification.where(in("code", new ArrayList<>(codes)));
+    Specification<ProgrammeMembershipType> specs = Specification.where(
+        in("code", new ArrayList<>(codes)));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
@@ -306,11 +308,13 @@ public class ProgrammeMembershipTypeResource {
     for (ColumnFilter columnFilter : columnFilters) {
       specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
     }
-    List<ProgrammeMembershipType> programmeMembershipTypes = programmeMembershipTypeRepository.findAll(specs);
+    List<ProgrammeMembershipType> programmeMembershipTypes =
+        programmeMembershipTypeRepository.findAll(specs);
 
-    Set<String> foundCodes = programmeMembershipTypes.stream().map(ProgrammeMembershipType::getCode).collect(
-        Collectors.toSet());
-    Map<String, Boolean> result = codes.stream().collect(Collectors.toMap(c -> c, foundCodes::contains));
+    Set<String> foundCodes = programmeMembershipTypes.stream()
+        .map(ProgrammeMembershipType::getCode).collect(Collectors.toSet());
+    Map<String, Boolean> result = codes.stream()
+        .collect(Collectors.toMap(c -> c, foundCodes::contains));
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

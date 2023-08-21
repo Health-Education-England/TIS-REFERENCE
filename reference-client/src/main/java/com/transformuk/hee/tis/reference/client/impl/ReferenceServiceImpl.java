@@ -94,7 +94,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String GRADES_IDS_MAPPINGS_ENDPOINT = "/api/grades/ids/exists/";
   private static final String ROLES_MAPPINGS_ENDPOINT = "/api/roles/exists/";
   private static final String ROLES_MATCHING_MAPPINGS_ENDPOINT = "/api/roles/matches/";
-  private static final String PROGRAMME_MEMBERSHIP_TYPES_MAPPINGS_ENDPOINT = "/api/programme-membership-types/exist";
+  private static final String PROGRAMME_MEMBERSHIP_TYPES_MAPPINGS_ENDPOINT =
+      "/api/programme-membership-types/exist";
   private static final String LEAVING_REASONS_MAPPINGS_ENDPOINT = "/api/leaving-reasons/exist";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
@@ -136,8 +137,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
           new URLCodec().encode("{\"name\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"status\":[\"CURRENT\"], "
-                  + "\"placementGrade\": [\"true\"], "
-                  + "\"trainingGrade\": [\"true\"]}");
+              + "\"placementGrade\": [\"true\"], "
+              + "\"trainingGrade\": [\"true\"]}");
       labelJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       localOfficesJsonQuerystringURLEncoded = new URLCodec()
@@ -466,8 +467,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     return referenceRestTemplate
         .exchange(serviceUrl + FIND_GRADES_ENDPOINT
                 + gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded, HttpMethod.GET, null,
-             new ParameterizedTypeReference<List<GradeDTO>>() {
-             })
+            new ParameterizedTypeReference<List<GradeDTO>>() {
+            })
         .getBody();
   }
 
@@ -624,7 +625,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<String, Boolean> programmeMembershipTypesExist(List<String> codes, boolean currentOnly) {
+  public Map<String, Boolean> programmeMembershipTypesExist(List<String> codes,
+      boolean currentOnly) {
     String url = serviceUrl + PROGRAMME_MEMBERSHIP_TYPES_MAPPINGS_ENDPOINT;
 
     if (currentOnly) {
