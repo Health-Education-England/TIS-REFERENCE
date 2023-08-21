@@ -288,7 +288,7 @@ public class ProgrammeMembershipTypeResource {
    * @param codes             the codes of the leaving reasons to check
    * @param columnFilterJson  the column filters to apply
    * @return a map contains the code as key and boolean value for its existence
-   * @throws IOException
+   * @throws IOException when getting column filters
    */
   @PostMapping("/programme-membership-types/exist")
   public ResponseEntity<Map<String, Boolean>> programmeMembershipTypesExist(
