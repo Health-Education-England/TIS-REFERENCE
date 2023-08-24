@@ -163,4 +163,8 @@ public interface ReferenceService extends ClientService {
   Collection<RoleDTO> getRolesByCategory(final Long categoryId);
 
   Set<DBCDTO> getAllDBCs();
+
+  Map<String, Boolean> programmeMembershipTypesExist(List<String> codes, boolean currentOnly);
+
+  Map<String, Boolean> leavingReasonsExist(List<String> codes, boolean currentOnly);
 }
