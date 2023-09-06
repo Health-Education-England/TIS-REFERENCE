@@ -598,7 +598,7 @@ public class LeavingReasonResourceIntTest {
   }
 
   @Test
-  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotExistsAndFilterNotApplied() throws Exception {
     String code = "notExists";
 
     mockMvc.perform(post(MATCH_ENDPOINT)
@@ -609,7 +609,7 @@ public class LeavingReasonResourceIntTest {
   }
 
   @Test
-  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnCodesFromDbWhenExistsAndFilterNotApplied() throws Exception {
     final String code2 = "CODE2";
     final String code2LowerCase = code2.toLowerCase();
     LeavingReason leavingReason1 = createLeavingReason(CODE1, "label1", Status.CURRENT);
@@ -626,7 +626,7 @@ public class LeavingReasonResourceIntTest {
   }
 
   @Test
-  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotExistsAndFilterApplied() throws Exception {
     final String code = "notExists";
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
@@ -639,7 +639,7 @@ public class LeavingReasonResourceIntTest {
   }
 
   @Test
-  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
+  public void shouldReturnEmptyWhenExistsAndFilterExcludes() throws Exception {
     LeavingReason leavingReason = createLeavingReason(CODE1, "label1", Status.INACTIVE);
     repository.save(leavingReason);
 
@@ -653,7 +653,7 @@ public class LeavingReasonResourceIntTest {
   }
 
   @Test
-  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
+  public void shouldReturnCodeWhenExistsAndFilterIncludes() throws Exception {
     LeavingReason leavingReason = createLeavingReason(CODE1, "label1", Status.CURRENT);
 
     repository.save(leavingReason);
