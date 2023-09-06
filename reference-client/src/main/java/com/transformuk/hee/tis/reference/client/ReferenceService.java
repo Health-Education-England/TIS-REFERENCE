@@ -166,5 +166,5 @@ public interface ReferenceService extends ClientService {
 
   Map<String, Boolean> programmeMembershipTypesExist(List<String> codes, boolean currentOnly);
 
-  Map<String, Boolean> leavingReasonsExist(List<String> codes, boolean currentOnly);
+  Map<String, String> leavingReasonsMatch(List<String> codes, boolean currentOnly);
 }

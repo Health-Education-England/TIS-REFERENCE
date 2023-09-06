@@ -96,7 +96,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String ROLES_MATCHING_MAPPINGS_ENDPOINT = "/api/roles/matches/";
   private static final String PROGRAMME_MEMBERSHIP_TYPES_MAPPINGS_ENDPOINT =
       "/api/programme-membership-types/exist";
-  private static final String LEAVING_REASONS_MAPPINGS_ENDPOINT = "/api/leaving-reasons/exist";
+  private static final String LEAVING_REASONS_MATCHING_MAPPINGS_ENDPOINT =
+      "/api/leaving-reasons/match";
   private static final String SITES_MAPPINGS_ENDPOINT = "/api/sites/exists/";
   private static final String SITES_IDS_MAPPINGS_ENDPOINT = "/api/sites/ids/exists/";
   private static final String TRUSTS_MAPPINGS_ENDPOINT = "/api/trusts/exists/";
@@ -636,13 +637,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public Map<String, Boolean> leavingReasonsExist(List<String> codes, boolean currentOnly) {
-    String url = serviceUrl + LEAVING_REASONS_MAPPINGS_ENDPOINT;
+  public Map<String, String> leavingReasonsMatch(List<String> codes, boolean currentOnly) {
+    String url = serviceUrl + LEAVING_REASONS_MATCHING_MAPPINGS_ENDPOINT;
 
     if (currentOnly) {
       url += "?columnFilters=" + statusCurrentUrlEncoded;
     }
-    return valuesExists(url, codes);
+    return matchString(url, codes);
   }
 
   @Override

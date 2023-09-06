@@ -84,6 +84,25 @@ public class LeavingReasonServiceImpl implements LeavingReasonService {
     return mapper.leavingReasonsToLeavingReasonDtos(result);
   }
 
+  /**
+   * Find LeavingReasons by codes, filtered by columnFilters (mainly status).
+   *
+   * @param codes         the codes to find.
+   * @param columnFilters The columns filters to apply.
+   * @return a list of found LeavingReasons as LeavingReasonDtos.
+   */
+  @Override
+  public List<LeavingReasonDto> findCodes(List<String> codes, List<ColumnFilter> columnFilters) {
+    Specification<LeavingReason> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
+    for (ColumnFilter columnFilter : columnFilters) {
+      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
+    }
+
+    List<LeavingReason> leavingReasons = repository.findAll(specs);
+    return mapper.leavingReasonsToLeavingReasonDtos(leavingReasons);
+  }
+
   @Override
   public void delete(Long id) {
     LOGGER.debug("Request to delete leaving reason with id {}.", id);

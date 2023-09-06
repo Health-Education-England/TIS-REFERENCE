@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
@@ -14,18 +13,17 @@ import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -194,38 +192,46 @@ public class LeavingReasonResource {
   }
 
   /**
-   * POST /leaving-reasons/exist : check if leaving reasons exist.
+   * POST /leaving-reasons/match : check if there's a role in the database that matches the code
+   * provided, regardless of casing.
    *
    * @param codes             the codes of the leaving reasons to check
    * @param columnFilterJson  the column filters to apply
-   * @return a map contains the code as key and boolean value for its existence
-   * @throws IOException when getting column filters
+   * @return a map            Where a key is the code to be matched,
+   *     and a value is the code that was matched from the database.
+   * @throws IOException      when getting column filters
    */
-  @PostMapping("/leaving-reasons/exist")
-  public ResponseEntity<Map<String, Boolean>> leavingReasonsExist(
+  @PostMapping("/leaving-reasons/match")
+  public ResponseEntity<Map<String, String>> leavingReasonsMatch(
       @RequestBody List<String> codes,
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson
   ) throws IOException {
     codes = codes.stream().map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
-    LOGGER.debug("REST request to check leaving reasons existence: {}", codes);
-    Specification<LeavingReason> specs = Specification.where(in("code", new ArrayList<>(codes)));
+    LOGGER.debug("REST request to check leaving reasons match: {}", codes);
+
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
         ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
 
-    for (ColumnFilter columnFilter : columnFilters) {
-      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
-    }
-
-    List<LeavingReasonDto> leavingReasonDtos = service.findAll(null, columnFilters);
+    List<LeavingReasonDto> leavingReasonDtos = service.findCodes(codes, columnFilters);
 
     Set<String> foundCodes = leavingReasonDtos.stream().map(LeavingReasonDto::getCode).collect(
         Collectors.toSet());
-    Map<String, Boolean> result = codes.stream()
-        .collect(Collectors.toMap(c -> c, foundCodes::contains));
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    // Get a <code, foundCode> map, in this step we filter out exact duplicates
+    Map<String, String> result = codes.stream()
+        .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
+                .filter(fc -> fc.equalsIgnoreCase(c))
+                .findFirst()
+                .orElse(""),
+            (c1, c2) -> c1));
+
+    // Filter out any other duplicate (e.g.: duplicates with different casing)
+    TreeMap<String, String> uniqueResults = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    uniqueResults.putAll(result);
+
+    return new ResponseEntity<>(uniqueResults, HttpStatus.OK);
   }
 }

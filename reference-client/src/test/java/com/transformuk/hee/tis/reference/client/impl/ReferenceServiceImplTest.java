@@ -1575,25 +1575,25 @@ public class ReferenceServiceImplTest {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
 
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("code1", true);
-    response.put("code2", false);
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "CODE1");
+    response.put("code2", "");
 
     given(referenceRestTemplate
         .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
-            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, Boolean> exists = referenceServiceImpl.leavingReasonsExist(codes, false);
+    Map<String, String> exists = referenceServiceImpl.leavingReasonsMatch(codes, false);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
-    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("CODE1"));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(""));
     verify(referenceRestTemplate)
-        .exchange(REFERENCE_URL + "/api/leaving-reasons/exist", HttpMethod.POST,
+        .exchange(REFERENCE_URL + "/api/leaving-reasons/match", HttpMethod.POST,
             requestEntity,
             responseType);
   }
@@ -1603,26 +1603,26 @@ public class ReferenceServiceImplTest {
     // Given.
     List<String> codes = Arrays.asList("code1", "code2");
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(codes);
-    ParameterizedTypeReference<Map<String, Boolean>> responseType = getExistsStringReference();
+    ParameterizedTypeReference<Map<String, String>> responseType = getMatchesStringReference();
 
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("code1", true);
-    response.put("code2", false);
+    Map<String, String> response = new HashMap<>();
+    response.put("code1", "CODE1");
+    response.put("code2", "CODE2");
 
     given(referenceRestTemplate
         .exchange(anyString(), any(HttpMethod.class), any(RequestEntity.class),
-            Matchers.<ParameterizedTypeReference<Map<String, Boolean>>>any()))
+            Matchers.<ParameterizedTypeReference<Map<String, String>>>any()))
         .willReturn(ResponseEntity.ok(response));
 
     // When.
-    Map<String, Boolean> exists = referenceServiceImpl.leavingReasonsExist(codes, true);
+    Map<String, String> exists = referenceServiceImpl.leavingReasonsMatch(codes, true);
 
     // Then.
-    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is(true));
-    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is(false));
+    assertThat("Unexpected 'exists' result value.", exists.get("code1"), is("CODE1"));
+    assertThat("Unexpected 'exists' result value.", exists.get("code2"), is("CODE2"));
     verify(referenceRestTemplate).exchange(
         REFERENCE_URL
-            + "/api/leaving-reasons/exist?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
+            + "/api/leaving-reasons/match?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
   }
 }

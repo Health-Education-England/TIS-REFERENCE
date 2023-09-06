@@ -42,6 +42,15 @@ public interface LeavingReasonService {
   List<LeavingReasonDto> findAll(String searchQuery, List<ColumnFilter> columnFilters);
 
   /**
+   * Find LeavingReasons by codes, filtered by columnFilters (mainly status).
+   *
+   * @param codes         the codes to find.
+   * @param columnFilters The columns filters to apply.
+   * @return a list of found LeavingReasons as LeavingReasonDtos.
+   */
+  List<LeavingReasonDto> findCodes(List<String> codes, List<ColumnFilter> columnFilters);
+
+  /**
    * Delete the LeavingReason with the given ID.
    *
    * @param id The ID of the LeavingReason to delete.

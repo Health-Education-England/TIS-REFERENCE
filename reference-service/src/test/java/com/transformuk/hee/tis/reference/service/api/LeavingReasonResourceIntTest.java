@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.common.collect.Lists;
 import com.transformuk.hee.tis.reference.api.dto.LeavingReasonDto;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
@@ -41,9 +42,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @Transactional
-public class LeavingReasonResourceIntegrationTest {
+public class LeavingReasonResourceIntTest {
 
-  private static final String EXISTS_ENDPOINT = "/api/leaving-reasons/exist/";
+  private static final String MATCH_ENDPOINT = "/api/leaving-reasons/match/";
+  private static final String CODE1 = "code1";
 
   @Autowired
   private LeavingReasonRepository repository;
@@ -596,70 +598,72 @@ public class LeavingReasonResourceIntegrationTest {
   }
 
   @Test
-  public void shouldReturnFalseWhenNotExistsAndFilterNotApplied() throws Exception {
+  public void shouldReturnEmptyWhenNotExistsAndFilterNotApplied() throws Exception {
     String code = "notExists";
 
-    mockMvc.perform(post(EXISTS_ENDPOINT)
+    mockMvc.perform(post(MATCH_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
         .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(false));
+        .andExpect(jsonPath("$." + code).value(""));
   }
 
   @Test
-  public void shouldReturnTrueWhenExistsAndFilterNotApplied() throws Exception {
-    String code = "code1";
-    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.CURRENT);
-    repository.save(leavingReason);
+  public void shouldReturnCodesFromDbWhenExistsAndFilterNotApplied() throws Exception {
+    final String code2 = "CODE2";
+    final String code2LowerCase = code2.toLowerCase();
+    LeavingReason leavingReason1 = createLeavingReason(CODE1, "label1", Status.CURRENT);
+    LeavingReason leavingReason2 = createLeavingReason(code2, "label2", Status.CURRENT);
+    repository.save(leavingReason1);
+    repository.save(leavingReason2);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT)
+    mockMvc.perform(post(MATCH_ENDPOINT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Lists.newArrayList(CODE1, code2LowerCase))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$." + CODE1).value(CODE1))
+        .andExpect(jsonPath("$." + code2LowerCase).value(code2));
+  }
+
+  @Test
+  public void shouldReturnEmptyWhenNotExistsAndFilterApplied() throws Exception {
+    final String code = "notExists";
+    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
+
+    mockMvc.perform(post(MATCH_ENDPOINT + "?columnFilters=" + columnFilter)
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
         .andDo(print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(true));
+        .andExpect(jsonPath("$." + code).value(""));
   }
 
   @Test
-  public void shouldReturnFalseWhenNotExistsAndFilterApplied() throws Exception {
-    String code = "notExists";
-    String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
-
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(false));
-  }
-
-  @Test
-  public void shouldReturnFalseWhenExistsAndFilterExcludes() throws Exception {
-    String code = "code1";
-    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.INACTIVE);
+  public void shouldReturnEmptyWhenExistsAndFilterExcludes() throws Exception {
+    LeavingReason leavingReason = createLeavingReason(CODE1, "label1", Status.INACTIVE);
     repository.save(leavingReason);
 
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCH_ENDPOINT + "?columnFilters=" + columnFilter)
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(CODE1))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(false));
+        .andExpect(jsonPath("$." + CODE1).value(""));
   }
 
   @Test
-  public void shouldReturnTrueWhenExistsAndFilterIncludes() throws Exception {
-    String code = "code1";
-    LeavingReason leavingReason = createLeavingReason(code, "label1", Status.CURRENT);
+  public void shouldReturnCodeWhenExistsAndFilterIncludes() throws Exception {
+    LeavingReason leavingReason = createLeavingReason(CODE1, "label1", Status.CURRENT);
 
     repository.save(leavingReason);
 
     String columnFilter = URLEncoder.encode("{\"status\":[\"CURRENT\"]}", CharEncoding.UTF_8);
 
-    mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
+    mockMvc.perform(post(MATCH_ENDPOINT + "?columnFilters=" + columnFilter)
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(code))))
+            .content(TestUtil.convertObjectToJsonBytes(Collections.singletonList(CODE1))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$." + code).value(true));
+        .andExpect(jsonPath("$." + CODE1).value(CODE1));
   }
 }
