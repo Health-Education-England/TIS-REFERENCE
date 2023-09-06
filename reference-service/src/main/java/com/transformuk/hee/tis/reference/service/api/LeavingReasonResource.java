@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.api;
 
-import static com.transformuk.hee.tis.reference.service.service.impl.SpecificationFactory.in;
 import static uk.nhs.tis.StringConverter.getConverter;
 
 import com.google.common.collect.Lists;
@@ -14,7 +13,6 @@ import com.transformuk.hee.tis.reference.service.service.LeavingReasonService;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -212,21 +209,18 @@ public class LeavingReasonResource {
     codes = codes.stream().map(code -> getConverter(code).decodeUrl().toString())
         .collect(Collectors.toList());
     LOGGER.debug("REST request to check leaving reasons match: {}", codes);
-    Specification<LeavingReason> specs = Specification.where(in("code", new ArrayList<>(codes)));
+
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
         ColumnFilterUtil.getColumnFilters(columnFilterJson, filterEnumList);
 
-    for (ColumnFilter columnFilter : columnFilters) {
-      specs = specs.and(in(columnFilter.getName(), columnFilter.getValues()));
-    }
-
-    List<LeavingReasonDto> leavingReasonDtos = service.findAll(null, columnFilters);
+    List<LeavingReasonDto> leavingReasonDtos = service.findCodes(codes, columnFilters);
 
     Set<String> foundCodes = leavingReasonDtos.stream().map(LeavingReasonDto::getCode).collect(
         Collectors.toSet());
 
+    // Get a <code, foundCode> map, in this step we filter out exact duplicates
     Map<String, String> result = codes.stream()
         .collect(Collectors.toMap(c -> c, c -> foundCodes.stream()
                 .filter(fc -> fc.equalsIgnoreCase(c))
@@ -234,6 +228,7 @@ public class LeavingReasonResource {
                 .orElse(""),
             (c1, c2) -> c1));
 
+    // Filter out any other duplicate (e.g.: duplicates with different casing)
     TreeMap<String, String> uniqueResults = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     uniqueResults.putAll(result);
 
