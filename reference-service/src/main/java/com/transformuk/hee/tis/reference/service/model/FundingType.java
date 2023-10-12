@@ -43,8 +43,8 @@ public class FundingType implements Serializable {
   private Status status;
 
   @NotNull
-  @Column(name = "academic", nullable = false)
-  private boolean academic;
+  @Column(name = "allowDetails", nullable = false)
+  private boolean allowDetails;
 
   @Override
   public boolean equals(Object o) {
