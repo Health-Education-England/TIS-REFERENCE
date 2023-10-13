@@ -25,7 +25,7 @@ public class FundingTypeDTO implements Serializable {
 
   private Status status;
 
-  private boolean academic;
+  private boolean allowDetails;
 
   @Override
   public boolean equals(Object o) {
