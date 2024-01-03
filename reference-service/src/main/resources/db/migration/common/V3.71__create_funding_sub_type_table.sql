@@ -3,8 +3,9 @@ CREATE TABLE FundingSubType (
   `code` varchar(255) NOT NULL,
   `label` varchar(255) NOT NULL,
   `parentId` bigint(20) NOT NULL,
+  `status` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
-  UNIQUE KEY idx_uuid_unique (`uuid`)
+  CONSTRAINT fk_funding_sub_type_parent_id FOREIGN KEY (parentId) REFERENCES FundingType (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TRIGGER before_insert_FundingSubType
