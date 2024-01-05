@@ -8,20 +8,20 @@ CREATE TABLE FundingSubType (
   CONSTRAINT fk_funding_sub_type_parent_id FOREIGN KEY (`parentId`) REFERENCES FundingType (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-SELECT @uuidHeeNonTariff := `id` FROM FundingType WHERE `code` = 'HEE_FUNDED_NON_TARIFF';
-SELECT @uuidSuperNumerary := `id` FROM FundingType WHERE `code` = 'SUPERNUMERARY';
+SELECT @idHeeNonTariff := `id` FROM FundingType WHERE `code` = 'HEE_FUNDED_NON_TARIFF';
+SELECT @idSuperNumerary := `id` FROM FundingType WHERE `code` = 'SUPERNUMERARY';
 
 INSERT INTO FundingSubType (`uuid`, `code`, `label`, `parentId`) VALUES
-(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @uuidHeeNonTariff),
-(uuid(), 'DENTAL_50%', 'Dental – 50%', @uuidHeeNonTariff),
-(uuid(), 'DENTAL_100%', 'Dental – 100%', @uuidHeeNonTariff),
-(uuid(), 'FY2GP', 'FY2GP', @uuidHeeNonTariff),
-(uuid(), 'PUBLIC_HEALTH', 'Public Health', @uuidHeeNonTariff),
-(uuid(), 'HOSPICE_OR_CHARITY', 'Hospice or Charity', @uuidHeeNonTariff),
-(uuid(), 'OCCUPATIONAL_MEDICINE', 'Occupational Medicine', @uuidHeeNonTariff),
-(uuid(), 'COMMUNITY_SETTING', 'Community setting', @uuidHeeNonTariff),
-(uuid(), 'FOUNDATION_ACADEMIC', 'Foundation academic', @uuidHeeNonTariff),
-(uuid(), 'OTHER_POST_FUNDING', 'Other post funding', @uuidHeeNonTariff),
-(uuid(), 'EXCEPTIONAL_TRAINING', 'Exceptional training', @uuidSuperNumerary),
-(uuid(), 'SRTT', 'SRTT', @uuidSuperNumerary),
-(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @uuidSuperNumerary);
+(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @idHeeNonTariff),
+(uuid(), 'DENTAL_50%', 'Dental – 50%', @idHeeNonTariff),
+(uuid(), 'DENTAL_100%', 'Dental – 100%', @idHeeNonTariff),
+(uuid(), 'FY2GP', 'FY2GP', @idHeeNonTariff),
+(uuid(), 'PUBLIC_HEALTH', 'Public Health', @idHeeNonTariff),
+(uuid(), 'HOSPICE_OR_CHARITY', 'Hospice or Charity', @idHeeNonTariff),
+(uuid(), 'OCCUPATIONAL_MEDICINE', 'Occupational Medicine', @idHeeNonTariff),
+(uuid(), 'COMMUNITY_SETTING', 'Community setting', @idHeeNonTariff),
+(uuid(), 'FOUNDATION_ACADEMIC', 'Foundation academic', @idHeeNonTariff),
+(uuid(), 'OTHER_POST_FUNDING', 'Other post funding', @idHeeNonTariff),
+(uuid(), 'EXCEPTIONAL_TRAINING', 'Exceptional training', @idSuperNumerary),
+(uuid(), 'SRTT', 'SRTT', @idSuperNumerary),
+(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @idSuperNumerary);
