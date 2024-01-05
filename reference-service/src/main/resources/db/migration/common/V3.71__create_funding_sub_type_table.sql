@@ -11,17 +11,17 @@ CREATE TABLE FundingSubType (
 SELECT @idHeeNonTariff := `id` FROM FundingType WHERE `code` = 'HEE_FUNDED_NON_TARIFF';
 SELECT @idSuperNumerary := `id` FROM FundingType WHERE `code` = 'SUPERNUMERARY';
 
-INSERT INTO FundingSubType (`uuid`, `code`, `label`, `parentId`) VALUES
-(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @idHeeNonTariff),
-(uuid(), 'DENTAL_50%', 'Dental – 50%', @idHeeNonTariff),
-(uuid(), 'DENTAL_100%', 'Dental – 100%', @idHeeNonTariff),
-(uuid(), 'FY2GP', 'FY2GP', @idHeeNonTariff),
-(uuid(), 'PUBLIC_HEALTH', 'Public Health', @idHeeNonTariff),
-(uuid(), 'HOSPICE_OR_CHARITY', 'Hospice or Charity', @idHeeNonTariff),
-(uuid(), 'OCCUPATIONAL_MEDICINE', 'Occupational Medicine', @idHeeNonTariff),
-(uuid(), 'COMMUNITY_SETTING', 'Community setting', @idHeeNonTariff),
-(uuid(), 'FOUNDATION_ACADEMIC', 'Foundation academic', @idHeeNonTariff),
-(uuid(), 'OTHER_POST_FUNDING', 'Other post funding', @idHeeNonTariff),
-(uuid(), 'EXCEPTIONAL_TRAINING', 'Exceptional training', @idSuperNumerary),
-(uuid(), 'SRTT', 'SRTT', @idSuperNumerary),
-(uuid(), 'SALARY_RECHARGES', 'Salary recharges', @idSuperNumerary);
+INSERT INTO FundingSubType (`uuid`, `code`, `label`, `status`, `parentId`) VALUES
+(uuid(), 'SALARY_RECHARGES', 'Salary recharges', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'DENTAL_50%', 'Dental – 50%', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'DENTAL_100%', 'Dental – 100%', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'FY2GP', 'FY2GP', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'PUBLIC_HEALTH', 'Public Health', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'HOSPICE_OR_CHARITY', 'Hospice or Charity', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'OCCUPATIONAL_MEDICINE', 'Occupational Medicine', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'COMMUNITY_SETTING', 'Community setting', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'FOUNDATION_ACADEMIC', 'Foundation academic', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'OTHER_POST_FUNDING', 'Other post funding', 'CURRENT', @idHeeNonTariff),
+(uuid(), 'EXCEPTIONAL_TRAINING', 'Exceptional training', 'CURRENT', @idSuperNumerary),
+(uuid(), 'SRTT', 'SRTT', 'CURRENT', @idSuperNumerary),
+(uuid(), 'SALARY_RECHARGES', 'Salary recharges', 'CURRENT', @idSuperNumerary);
