@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for OrganizationType.
  */
 @Service
-public class OrganizationTypeServiceImpl extends AbstractReferenceService<OrganizationType> {
+public class OrganizationTypeServiceImpl extends AbstractReferenceService<OrganizationType, Long> {
 
   private OrganizationTypeRepository repository;
 

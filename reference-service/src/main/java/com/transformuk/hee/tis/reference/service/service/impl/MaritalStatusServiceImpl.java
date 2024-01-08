@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for MaritalStatus.
  */
 @Service
-public class MaritalStatusServiceImpl extends AbstractReferenceService<MaritalStatus> {
+public class MaritalStatusServiceImpl extends AbstractReferenceService<MaritalStatus, Long> {
 
   private MaritalStatusRepository repository;
 

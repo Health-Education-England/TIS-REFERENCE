@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for College.
  */
 @Service
-public class CollegeServiceImpl extends AbstractReferenceService<College> {
+public class CollegeServiceImpl extends AbstractReferenceService<College, Long> {
 
   private CollegeRepository repository;
 

@@ -1,10 +1,13 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import com.transformuk.hee.tis.reference.service.model.FundingSubType;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
+import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
@@ -13,11 +16,11 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for FundingType.
  */
 @Service
-public class FundingTypeServiceImpl extends AbstractReferenceService<FundingType, Long> {
+public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingSubType, UUID> {
 
-  private FundingTypeRepository repository;
+  private FundingSubTypeRepository repository;
 
-  FundingTypeServiceImpl(FundingTypeRepository repository) {
+  FundingSubTypeServiceImpl(FundingSubTypeRepository repository) {
     this.repository = repository;
   }
 
@@ -27,12 +30,12 @@ public class FundingTypeServiceImpl extends AbstractReferenceService<FundingType
   }
 
   @Override
-  protected JpaRepository<FundingType, Long> getRepository() {
+  protected JpaRepository<FundingSubType, UUID> getRepository() {
     return repository;
   }
 
   @Override
-  protected JpaSpecificationExecutor<FundingType> getSpecificationExecutor() {
+  protected JpaSpecificationExecutor<FundingSubType> getSpecificationExecutor() {
     return repository;
   }
 }

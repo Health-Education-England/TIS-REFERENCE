@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class QualificationReferenceServiceImpl extends
-    AbstractReferenceService<QualificationReference> {
+    AbstractReferenceService<QualificationReference, Long> {
 
   private QualificationReferenceRepository repository;
 

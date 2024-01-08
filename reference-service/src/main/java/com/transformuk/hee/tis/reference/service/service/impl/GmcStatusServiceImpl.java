@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for GmcStatus.
  */
 @Service
-public class GmcStatusServiceImpl extends AbstractReferenceService<GmcStatus> {
+public class GmcStatusServiceImpl extends AbstractReferenceService<GmcStatus, Long> {
 
   private GmcStatusRepository repository;
 

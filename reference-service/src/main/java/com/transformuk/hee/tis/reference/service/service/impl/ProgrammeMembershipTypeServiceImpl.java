@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProgrammeMembershipTypeServiceImpl extends
-    AbstractReferenceService<ProgrammeMembershipType> {
+    AbstractReferenceService<ProgrammeMembershipType, Long> {
 
   private ProgrammeMembershipTypeRepository repository;
 

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Role.
  */
 @Service
-public class RoleServiceImpl extends AbstractReferenceService<Role> {
+public class RoleServiceImpl extends AbstractReferenceService<Role, Long> {
 
   private RoleRepository repository;
   private RoleMapper mapper;

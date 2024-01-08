@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for LeavingDestination.
  */
 @Service
-public class LeavingDestinationServiceImpl extends AbstractReferenceService<LeavingDestination> {
+public class LeavingDestinationServiceImpl extends AbstractReferenceService<LeavingDestination, Long> {
 
   private LeavingDestinationRepository repository;
 

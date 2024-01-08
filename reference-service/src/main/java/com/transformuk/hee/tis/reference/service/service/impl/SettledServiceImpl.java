@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Settled.
  */
 @Service
-public class SettledServiceImpl extends AbstractReferenceService<Settled> {
+public class SettledServiceImpl extends AbstractReferenceService<Settled, Long> {
 
   private SettledRepository repository;
 

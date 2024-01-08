@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for InactiveReason.
  */
 @Service
-public class InactiveReasonServiceImpl extends AbstractReferenceService<InactiveReason> {
+public class InactiveReasonServiceImpl extends AbstractReferenceService<InactiveReason, Long> {
 
   private InactiveReasonRepository repository;
 

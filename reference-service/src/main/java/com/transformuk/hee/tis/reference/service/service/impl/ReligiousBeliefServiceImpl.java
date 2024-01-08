@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for ReligiousBelief.
  */
 @Service
-public class ReligiousBeliefServiceImpl extends AbstractReferenceService<ReligiousBelief> {
+public class ReligiousBeliefServiceImpl extends AbstractReferenceService<ReligiousBelief, Long> {
 
   private ReligiousBeliefRepository repository;
 

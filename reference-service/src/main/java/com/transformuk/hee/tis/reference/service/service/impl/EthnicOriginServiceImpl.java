@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for EthnicOrigin.
  */
 @Service
-public class EthnicOriginServiceImpl extends AbstractReferenceService<EthnicOrigin> {
+public class EthnicOriginServiceImpl extends AbstractReferenceService<EthnicOrigin, Long> {
 
   private EthnicOriginRepository repository;
 

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Gender.
  */
 @Service
-public class GenderServiceImpl extends AbstractReferenceService<Gender> {
+public class GenderServiceImpl extends AbstractReferenceService<Gender, Long> {
 
   private GenderRepository repository;
 

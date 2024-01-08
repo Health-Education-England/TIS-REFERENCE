@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for PlacementType.
  */
 @Service
-public class PlacementTypeServiceImpl extends AbstractReferenceService<PlacementType> {
+public class PlacementTypeServiceImpl extends AbstractReferenceService<PlacementType, Long> {
 
   private PlacementTypeRepository repository;
 

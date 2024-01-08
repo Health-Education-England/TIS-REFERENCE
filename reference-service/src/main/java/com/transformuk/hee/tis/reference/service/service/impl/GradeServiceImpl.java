@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Grade.
  */
 @Service
-public class GradeServiceImpl extends AbstractReferenceService<Grade> {
+public class GradeServiceImpl extends AbstractReferenceService<Grade, Long> {
 
   private GradeRepository repository;
 

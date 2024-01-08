@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for GdcStatus.
  */
 @Service
-public class GdcStatusServiceImpl extends AbstractReferenceService<GdcStatus> {
+public class GdcStatusServiceImpl extends AbstractReferenceService<GdcStatus, Long> {
 
   private GdcStatusRepository repository;
 
