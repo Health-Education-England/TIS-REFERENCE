@@ -25,8 +25,8 @@ public class FundingSubTypeValidator {
     log.debug("Validating fundingSubType: {}", fundingSubTypeDto);
 
     Long fundingTypeId = fundingSubTypeDto.getFundingTypeDto().getId();
-    Optional<FundingType> optionalfundingType = fundingTypeRepository.findById(fundingTypeId);
-    if (!optionalfundingType.isPresent()) {
+    Optional<FundingType> optionalFundingType = fundingTypeRepository.findById(fundingTypeId);
+    if (!optionalFundingType.isPresent()) {
       String error = String.format(PARENT_FUNDING_TYPE_NOT_FOUND, fundingTypeId);
       log.warn(error);
       throw new CustomParameterizedException(error, ErrorConstants.ERR_VALIDATION);
