@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Validator to validate user input data for FundingSugType
+ * Validator to validate user input data for FundingSugType.
  */
 @Slf4j
 @Component

@@ -2,7 +2,6 @@ package com.transformuk.hee.tis.reference.service.model;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,24 +47,4 @@ public class FundingSubType implements Serializable {
   @ManyToOne(targetEntity = FundingType.class)
   @JoinColumn(name = "parentId", referencedColumnName = "id")
   private FundingType fundingType;
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    FundingSubType fundingSubType = (FundingSubType) o;
-    if (fundingSubType.uuid == null || uuid == null) {
-      return false;
-    }
-    return Objects.equals(uuid, fundingSubType.uuid);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(uuid);
-  }
 }

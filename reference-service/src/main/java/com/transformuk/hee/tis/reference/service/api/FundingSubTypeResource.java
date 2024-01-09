@@ -76,7 +76,7 @@ public class FundingSubTypeResource {
    *
    * @param fundingSubTypeDto the fundingTypeDTO to create
    * @return the ResponseEntity with status 201 (Created) and with body the new fundingSubTypeDTO,
-   *    or with status 400 (Bad Request) if the fundingSubType has already an ID
+   *     or with status 400 (Bad Request) if the fundingSubType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/funding-sub-type")
@@ -105,8 +105,8 @@ public class FundingSubTypeResource {
    *
    * @param fundingSubTypeDto the fundingSubTypeDto to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated fundingSubTypeDto, or
-   *    with status 400 (Bad Request) if the fundingSubTypeDto is not valid, or with status 500
-   *    (Internal Server Error) if the fundingSubTypeDto couldn't be updated
+   *     with status 400 (Bad Request) if the fundingSubTypeDto is not valid, or with status 500
+   *     (Internal Server Error) if the fundingSubTypeDto couldn't be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/funding-sub-type")
@@ -147,7 +147,7 @@ public class FundingSubTypeResource {
    *
    * @param uuid the uuid of the fundingSubTypeDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the fundingSubTypeDTO, or with
-   *    status 404 (Not Found)
+   *     status 404 (Not Found)
    */
   @GetMapping("/funding-sub-type/{uuid}")
   public ResponseEntity<FundingSubTypeDto> getFundingSubType(@PathVariable UUID uuid) {
