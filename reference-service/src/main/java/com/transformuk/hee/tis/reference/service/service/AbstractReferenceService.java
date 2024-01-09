@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Abstract service containing common behaviour of all reference types.
  *
- * @param <T, D> The reference type the implementing service is for,
- *              the ID type of the reference type.
+ * @param <T> The reference type the implementing service is for
+ * @param <D> The ID type of the reference type
  */
 public abstract class AbstractReferenceService<T, D> {
 
