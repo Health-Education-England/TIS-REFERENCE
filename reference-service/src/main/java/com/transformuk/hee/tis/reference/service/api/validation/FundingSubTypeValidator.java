@@ -9,6 +9,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * Validator to validate user input data for FundingSugType
+ */
 @Slf4j
 @Component
 public class FundingSubTypeValidator {
@@ -21,6 +24,12 @@ public class FundingSubTypeValidator {
     this.fundingTypeRepository = fundingTypeRepository;
   }
 
+  /**
+   * validate if fundingSubTypeDto is valid.
+   * Currently, we only check for parent fundingType id.
+   *
+   * @param fundingSubTypeDto user input fundingSubType dto
+   */
   public void validate(FundingSubTypeDto fundingSubTypeDto) {
     log.debug("Validating fundingSubType: {}", fundingSubTypeDto);
 

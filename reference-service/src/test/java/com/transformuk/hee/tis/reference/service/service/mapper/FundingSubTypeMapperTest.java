@@ -49,7 +49,7 @@ public class FundingSubTypeMapperTest {
   }
 
   @Test
-  public void fundingSubTypeDtoToEndity() {
+  public void fundingSubTypeDtoToEntity() {
     FundingTypeDTO fundingTypeDto = new FundingTypeDTO();
     fundingTypeDto.setId(FUNDING_TYPE_ID);
     fundingTypeDto.setStatus(Status.CURRENT);

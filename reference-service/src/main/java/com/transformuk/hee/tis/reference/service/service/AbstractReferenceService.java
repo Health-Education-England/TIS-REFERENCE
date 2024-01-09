@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @param <T> The reference type the implementing service is for.
  */
-public abstract class AbstractReferenceService<T, IDType> {
+public abstract class AbstractReferenceService<T, IdType> {
 
   /**
    * Find the entity with the given ID.
@@ -30,7 +29,7 @@ public abstract class AbstractReferenceService<T, IDType> {
    * @param id The ID to find the entity for.
    * @return An optional entity, will be empty if no entity with the given ID was found.
    */
-  public Optional<T> findById(IDType id) {
+  public Optional<T> findById(IdType id) {
     return getRepository().findById(id);
   }
 
@@ -59,7 +58,7 @@ public abstract class AbstractReferenceService<T, IDType> {
    *
    * @param id The ID of the entity to delete.
    */
-  public void deleteById(IDType id) {
+  public void deleteById(IdType id) {
     getRepository().deleteById(id);
   }
 
@@ -131,7 +130,7 @@ public abstract class AbstractReferenceService<T, IDType> {
    *
    * @return The repository for the entity.
    */
-  protected abstract JpaRepository<T, IDType> getRepository();
+  protected abstract JpaRepository<T, IdType> getRepository();
 
   /**
    * Get the specification executor for the entity.

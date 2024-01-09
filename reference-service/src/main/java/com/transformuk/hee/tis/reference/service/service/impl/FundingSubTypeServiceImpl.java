@@ -1,9 +1,7 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import com.transformuk.hee.tis.reference.service.model.FundingSubType;
-import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
-import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
 import java.util.Arrays;
 import java.util.List;
@@ -13,12 +11,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
 /**
- * The reference service implementation for FundingType.
+ * The reference service implementation for FundingSubType.
  */
 @Service
 public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingSubType, UUID> {
 
-  private FundingSubTypeRepository repository;
+  private final FundingSubTypeRepository repository;
 
   FundingSubTypeServiceImpl(FundingSubTypeRepository repository) {
     this.repository = repository;

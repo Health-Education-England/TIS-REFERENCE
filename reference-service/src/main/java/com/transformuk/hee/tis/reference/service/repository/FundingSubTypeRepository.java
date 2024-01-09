@@ -12,5 +12,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 @SuppressWarnings("unused")
 public interface FundingSubTypeRepository extends JpaRepository<FundingSubType, UUID>,
-    JpaSpecificationExecutor {
+    JpaSpecificationExecutor<FundingSubType> {
 }
