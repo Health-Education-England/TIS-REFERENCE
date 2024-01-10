@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for TrainingNumber.
  */
 @Service
-public class TrainingNumberTypeServiceImpl extends AbstractReferenceService<TrainingNumberType, Long> {
+public class TrainingNumberTypeServiceImpl
+    extends AbstractReferenceService<TrainingNumberType, Long> {
 
   private TrainingNumberTypeRepository repository;
 
