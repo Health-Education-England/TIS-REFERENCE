@@ -23,8 +23,8 @@ import com.transformuk.hee.tis.reference.service.service.impl.FundingSubTypeServ
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class FundingSubTypeResourceTest {
+class FundingSubTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
@@ -81,8 +81,8 @@ public class FundingSubTypeResourceTest {
 
   private FundingSubType fundingSubType;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     MockitoAnnotations.initMocks(this);
     FundingSubTypeResource fundingSubTypeResource = new FundingSubTypeResource(fundingSubTypeMapper,
         fundingSubTypeService, fundingSubTypeValidator);
@@ -92,8 +92,8 @@ public class FundingSubTypeResourceTest {
         .setMessageConverters(jacksonMessageConverter).build();
   }
 
-  @Before
-  public void initTestData() {
+  @BeforeEach
+  void initTestData() {
     FundingType fundingType = new FundingType();
     fundingType.setId(FUNDING_TYPE_ID);
     fundingSubType = new FundingSubType();
@@ -105,7 +105,7 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void createFundingSubType() throws Exception {
+  void createFundingSubType() throws Exception {
     int dbSizeBeforeCreate = fundingSubTypeRepository.findAll().size();
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
 
@@ -124,12 +124,11 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void createFundingTypeWithExistingId() throws Exception {
+  void createFundingTypeWithExistingId() throws Exception {
     fundingSubType = fundingSubTypeRepository.saveAndFlush(fundingSubType);
     int dbSizeBeforeCreate = fundingSubTypeRepository.findAll().size();
 
     // Create the FundingSubType with an existing ID
-    fundingSubType.setUuid(fundingSubType.getUuid());
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
 
     // An entity with an existing uuid cannot be created, so this API call must fail
@@ -145,17 +144,18 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void updateFundingSubType() throws Exception {
+  void updateFundingSubType() throws Exception {
     // Initialize the database
-    fundingSubTypeRepository.saveAndFlush(fundingSubType);
+    fundingSubType = fundingSubTypeRepository.saveAndFlush(fundingSubType);
     int dbSizeBeforeUpdate = fundingSubTypeRepository.findAll().size();
 
     // Update the fundingSubType
     FundingSubType updatedFundingSubType = fundingSubTypeRepository.findById(
         fundingSubType.getUuid()).get();
-    updatedFundingSubType.setCode(UPDATED_CODE);
-    updatedFundingSubType.setLabel(UPDATED_LABEL);
-    FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(updatedFundingSubType);
+    FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
+    fundingSubTypeDto.setUuid(fundingSubType.getUuid());
+    fundingSubTypeDto.setCode(UPDATED_CODE);
+    fundingSubTypeDto.setLabel(UPDATED_LABEL);
 
     restFundingSubTypeMockMvc.perform(put("/api/funding-sub-type")
             .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +172,7 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void updateNonExistingFundingSubType() throws Exception {
+  void updateNonExistingFundingSubType() throws Exception {
     int dbSizeBeforeUpdate = fundingSubTypeRepository.findAll().size();
 
     // Create the FundingSubType
@@ -191,7 +191,7 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void deleteFundingSubType() throws Exception {
+  void deleteFundingSubType() throws Exception {
     // Initialize the database
     fundingSubTypeRepository.saveAndFlush(fundingSubType);
     int dbSizeBeforeDelete = fundingSubTypeRepository.findAll().size();
@@ -209,7 +209,7 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void getAllFundingSubTypes() throws Exception {
+  void getAllFundingSubTypes() throws Exception {
     // Initialize the database
     fundingSubTypeRepository.saveAndFlush(fundingSubType);
 
@@ -221,12 +221,12 @@ public class FundingSubTypeResourceTest {
         .andExpect(jsonPath("$.[*].uuid").value(hasItem(fundingSubType.getUuid().toString())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
-        .andExpect(jsonPath("$.[*].fundingTypeDto.id").value(hasItem(FUNDING_TYPE_ID.intValue())));
+        .andExpect(jsonPath("$.[*].fundingType.id").value(hasItem(FUNDING_TYPE_ID.intValue())));
   }
 
   @Test
   @Transactional
-  public void getFundingSubTypesWithQuery() throws Exception {
+  void getFundingSubTypesWithQuery() throws Exception {
     // Initialize the database
     FundingSubType unencodedFundingSubType = new FundingSubType();
     unencodedFundingSubType.setCode(UNENCODED_CODE);
@@ -244,12 +244,12 @@ public class FundingSubTypeResourceTest {
         .andExpect(jsonPath("$.[0].uuid").value(unencodedFundingSubType.getUuid().toString()))
         .andExpect(jsonPath("$.[0].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[0].label").value(UNENCODED_LABEL))
-        .andExpect(jsonPath("$.[0].fundingTypeDto.id").value(FUNDING_TYPE_ID.intValue()));
+        .andExpect(jsonPath("$.[0].fundingType.id").value(FUNDING_TYPE_ID.intValue()));
   }
 
   @Test
   @Transactional
-  public void getFundingSubType() throws Exception {
+  void getFundingSubType() throws Exception {
     // Initialize the database
     fundingSubTypeRepository.saveAndFlush(fundingSubType);
 
@@ -264,7 +264,7 @@ public class FundingSubTypeResourceTest {
 
   @Test
   @Transactional
-  public void getNonExistingFundingSubType() throws Exception {
+  void getNonExistingFundingSubType() throws Exception {
     restFundingSubTypeMockMvc.perform(get("/api/funding-sub-type/{uuid}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
   }

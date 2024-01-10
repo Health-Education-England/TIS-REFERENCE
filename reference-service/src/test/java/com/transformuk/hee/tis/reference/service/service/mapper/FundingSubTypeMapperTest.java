@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class FundingSubTypeMapperTest {
+class FundingSubTypeMapperTest {
 
   private static final String FUNDING_SUB_TYPE_LABEL = "label";
   private static final String FUNDING_SUB_TYPE_CODE = "code";
@@ -22,13 +22,13 @@ public class FundingSubTypeMapperTest {
   FundingSubTypeMapper mapper;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     mapper = new FundingSubTypeMapperImpl();
     ReflectionTestUtils.setField(mapper, "fundingTypeMapper", new FundingTypeMapperImpl());
   }
 
   @Test
-  public void fundingSubTypeToDto() {
+  void fundingSubTypeToDto() {
     FundingType fundingType = new FundingType();
     fundingType.setId(FUNDING_TYPE_ID);
     fundingType.setStatus(Status.CURRENT);
@@ -45,16 +45,16 @@ public class FundingSubTypeMapperTest {
     assertEquals(FUNDING_SUB_TYPE_CODE, fundingSubTypeDto.getCode());
     assertEquals(FUNDING_SUB_TYPE_UUID, fundingSubTypeDto.getUuid());
     assertEquals(Status.CURRENT, fundingSubTypeDto.getStatus());
-    assertEquals(FUNDING_TYPE_ID, fundingSubTypeDto.getFundingTypeDto().getId());
+    assertEquals(FUNDING_TYPE_ID, fundingSubTypeDto.getFundingType().getId());
   }
 
   @Test
-  public void fundingSubTypeDtoToEntity() {
+  void fundingSubTypeDtoToEntity() {
     FundingTypeDTO fundingTypeDto = new FundingTypeDTO();
     fundingTypeDto.setId(FUNDING_TYPE_ID);
     fundingTypeDto.setStatus(Status.CURRENT);
     FundingSubTypeDto fundingSubTypeDto = new FundingSubTypeDto();
-    fundingSubTypeDto.setFundingTypeDto(fundingTypeDto);
+    fundingSubTypeDto.setFundingType(fundingTypeDto);
     fundingSubTypeDto.setLabel(FUNDING_SUB_TYPE_LABEL);
     fundingSubTypeDto.setCode(FUNDING_SUB_TYPE_CODE);
     fundingSubTypeDto.setUuid(FUNDING_SUB_TYPE_UUID);

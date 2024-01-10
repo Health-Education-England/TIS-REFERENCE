@@ -7,6 +7,7 @@ import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedException;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +39,7 @@ public class FundingSubTypeValidatorTest {
     FundingTypeDTO fundingTypeDto = new FundingTypeDTO();
     fundingTypeDto.setId(fundingType.getId());
     FundingSubTypeDto fundingSubTypeDto = new FundingSubTypeDto();
-    fundingSubTypeDto.setFundingTypeDto(fundingTypeDto);
+    fundingSubTypeDto.setFundingType(fundingTypeDto);
 
     assertDoesNotThrow(() -> validator.validate(fundingSubTypeDto));
   }
@@ -48,8 +49,8 @@ public class FundingSubTypeValidatorTest {
     FundingTypeDTO fundingTypeDto = new FundingTypeDTO();
     fundingTypeDto.setId(999L);
     FundingSubTypeDto fundingSubTypeDto = new FundingSubTypeDto();
-    fundingSubTypeDto.setFundingTypeDto(fundingTypeDto);
+    fundingSubTypeDto.setFundingType(fundingTypeDto);
 
-    assertThrows(RuntimeException.class, () -> validator.validate(fundingSubTypeDto));
+    assertThrows(CustomParameterizedException.class, () -> validator.validate(fundingSubTypeDto));
   }
 }

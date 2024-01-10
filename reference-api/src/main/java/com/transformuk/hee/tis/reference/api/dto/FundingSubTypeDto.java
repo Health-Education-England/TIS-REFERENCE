@@ -22,5 +22,5 @@ public class FundingSubTypeDto implements Serializable {
 
   private Status status;
 
-  private FundingTypeDTO fundingTypeDto;
+  private FundingTypeDTO fundingType;
 }

@@ -74,7 +74,7 @@ public class FundingSubTypeResource {
   /**
    * POST  /funding-sub-type : Create a new fundingType.
    *
-   * @param fundingSubTypeDto the fundingTypeDTO to create
+   * @param fundingSubTypeDto the fundingSubTypeDto to create
    * @return the ResponseEntity with status 201 (Created) and with body the new fundingSubTypeDTO,
    *     or with status 400 (Bad Request) if the fundingSubType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
