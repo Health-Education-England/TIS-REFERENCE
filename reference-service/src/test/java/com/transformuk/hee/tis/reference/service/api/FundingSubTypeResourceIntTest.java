@@ -150,10 +150,7 @@ class FundingSubTypeResourceIntTest {
     int dbSizeBeforeUpdate = fundingSubTypeRepository.findAll().size();
 
     // Update the fundingSubType
-    FundingSubType updatedFundingSubType = fundingSubTypeRepository.findById(
-        fundingSubType.getUuid()).get();
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
-    fundingSubTypeDto.setUuid(fundingSubType.getUuid());
     fundingSubTypeDto.setCode(UPDATED_CODE);
     fundingSubTypeDto.setLabel(UPDATED_LABEL);
 

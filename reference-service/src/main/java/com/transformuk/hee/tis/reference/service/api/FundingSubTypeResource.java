@@ -121,7 +121,7 @@ public class FundingSubTypeResource {
     FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseEntity.ok()
         .headers(
-            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, fundingSubTypeDto.getUuid().toString()))
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getUuid().toString()))
         .body(result);
   }
 
