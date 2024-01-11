@@ -92,9 +92,7 @@ public class FundingSubTypeResource {
     }
     FundingSubType fundingSubType = fundingSubTypeMapper.toEntity(fundingSubTypeDto);
     fundingSubType = fundingSubTypeService.save(fundingSubType);
-    FundingSubType fundingSubTypeWithParentInfo = fundingSubTypeService.findById(
-        fundingSubType.getUuid()).get();
-    FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubTypeWithParentInfo);
+    FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseEntity.created(new URI("/api/funding-sub-type/" + result.getUuid()))
         .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getUuid().toString()))
         .body(result);
