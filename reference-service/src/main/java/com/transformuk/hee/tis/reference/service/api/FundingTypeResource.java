@@ -114,7 +114,7 @@ public class FundingTypeResource {
     fundingType = fundingTypeRepository.save(fundingType);
     FundingTypeDTO result = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, fundingTypeDTO.getId().toString()))
+        .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 

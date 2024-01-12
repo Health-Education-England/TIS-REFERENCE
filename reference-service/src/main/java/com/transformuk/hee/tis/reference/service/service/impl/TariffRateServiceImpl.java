@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for TariffRate.
  */
 @Service
-public class TariffRateServiceImpl extends AbstractReferenceService<TariffRate> {
+public class TariffRateServiceImpl extends AbstractReferenceService<TariffRate, Long> {
 
   private TariffRateRepository repository;
 

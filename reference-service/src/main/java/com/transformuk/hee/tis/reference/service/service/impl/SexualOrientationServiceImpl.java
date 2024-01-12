@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for SexualOrientation.
  */
 @Service
-public class SexualOrientationServiceImpl extends AbstractReferenceService<SexualOrientation> {
+public class SexualOrientationServiceImpl
+    extends AbstractReferenceService<SexualOrientation, Long> {
 
   private SexualOrientationRepository repository;
 

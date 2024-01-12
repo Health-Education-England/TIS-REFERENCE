@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for AssessmentType.
  */
 @Service
-public class AssessmentTypeServiceImpl extends AbstractReferenceService<AssessmentType> {
+public class AssessmentTypeServiceImpl extends AbstractReferenceService<AssessmentType, Long> {
 
   private AssessmentTypeRepository repository;
 

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for PermitToWork.
  */
 @Service
-public class PermitToWorkServiceImpl extends AbstractReferenceService<PermitToWork> {
+public class PermitToWorkServiceImpl extends AbstractReferenceService<PermitToWork, Long> {
 
   private PermitToWorkRepository repository;
 

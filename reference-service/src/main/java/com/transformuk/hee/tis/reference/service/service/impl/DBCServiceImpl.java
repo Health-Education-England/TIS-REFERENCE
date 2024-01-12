@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for DBC.
  */
 @Service
-public class DBCServiceImpl extends AbstractReferenceService<DBC> {
+public class DBCServiceImpl extends AbstractReferenceService<DBC, Long> {
 
   private DBCRepository repository;
 

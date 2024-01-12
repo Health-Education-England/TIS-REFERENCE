@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for FundingIssue.
  */
 @Service
-public class FundingIssueServiceImpl extends AbstractReferenceService<FundingIssue> {
+public class FundingIssueServiceImpl extends AbstractReferenceService<FundingIssue, Long> {
 
   private FundingIssueRepository repository;
 

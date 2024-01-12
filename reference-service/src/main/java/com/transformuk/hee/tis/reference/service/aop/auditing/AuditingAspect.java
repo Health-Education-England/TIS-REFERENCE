@@ -14,6 +14,7 @@ import com.transformuk.hee.tis.security.model.UserProfile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +61,7 @@ public class AuditingAspect {
     classToPrimaryKeyMap.put("TrustDTO", "id");
     classToPrimaryKeyMap.put("SiteDTO", "id");
     classToPrimaryKeyMap.put("GradeDTO", "id");
+    classToPrimaryKeyMap.put("FundingSubTypeDto", "uuid");
   }
 
   @PostConstruct
@@ -67,6 +69,7 @@ public class AuditingAspect {
     classToIdClass.put("TrustDTO", Long.class);
     classToIdClass.put("SiteDTO", Long.class);
     classToIdClass.put("GradeDTO", Long.class);
+    classToIdClass.put("FundingSubTypeDto", UUID.class);
   }
 
   /**

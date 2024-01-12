@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for MedicalSchool.
  */
 @Service
-public class MedicalSchoolServiceImpl extends AbstractReferenceService<MedicalSchool> {
+public class MedicalSchoolServiceImpl extends AbstractReferenceService<MedicalSchool, Long> {
 
   private MedicalSchoolRepository repository;
 

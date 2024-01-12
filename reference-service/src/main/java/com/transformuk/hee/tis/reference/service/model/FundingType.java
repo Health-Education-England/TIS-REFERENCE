@@ -3,7 +3,9 @@ package com.transformuk.hee.tis.reference.service.model;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -45,6 +48,9 @@ public class FundingType implements Serializable {
   @NotNull
   @Column(name = "allowDetails", nullable = false)
   private boolean allowDetails;
+
+  @OneToMany(mappedBy = "fundingType", orphanRemoval = true, cascade = CascadeType.ALL)
+  private Set<FundingSubType> fundingSubTypes;
 
   @Override
   public boolean equals(Object o) {

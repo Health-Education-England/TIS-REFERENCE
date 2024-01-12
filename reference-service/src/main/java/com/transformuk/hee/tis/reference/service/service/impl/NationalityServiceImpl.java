@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Nationality.
  */
 @Service
-public class NationalityServiceImpl extends AbstractReferenceService<Nationality> {
+public class NationalityServiceImpl extends AbstractReferenceService<Nationality, Long> {
 
   private NationalityRepository repository;
 

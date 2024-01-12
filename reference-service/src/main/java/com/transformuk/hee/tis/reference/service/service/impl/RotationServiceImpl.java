@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class RotationServiceImpl extends AbstractReferenceService<Rotation> implements
+public class RotationServiceImpl extends AbstractReferenceService<Rotation, Long> implements
     RotationService {
 
   private final Logger log = LoggerFactory.getLogger(RotationServiceImpl.class);

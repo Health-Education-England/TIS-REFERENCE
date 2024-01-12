@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for Title.
  */
 @Service
-public class TitleServiceImpl extends AbstractReferenceService<Title> {
+public class TitleServiceImpl extends AbstractReferenceService<Title, Long> {
 
   private TitleRepository repository;
 

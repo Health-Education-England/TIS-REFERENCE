@@ -19,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Abstract service containing common behaviour of all reference types.
  *
- * @param <T> The reference type the implementing service is for.
+ * @param <T> The reference type the implementing service is for
+ * @param <D> The ID type of the reference type
  */
-public abstract class AbstractReferenceService<T> {
+public abstract class AbstractReferenceService<T, D> {
 
   /**
    * Find the entity with the given ID.
@@ -29,7 +30,7 @@ public abstract class AbstractReferenceService<T> {
    * @param id The ID to find the entity for.
    * @return An optional entity, will be empty if no entity with the given ID was found.
    */
-  public Optional<T> findById(Long id) {
+  public Optional<T> findById(D id) {
     return getRepository().findById(id);
   }
 
@@ -58,7 +59,7 @@ public abstract class AbstractReferenceService<T> {
    *
    * @param id The ID of the entity to delete.
    */
-  public void deleteById(Long id) {
+  public void deleteById(D id) {
     getRepository().deleteById(id);
   }
 
@@ -130,7 +131,7 @@ public abstract class AbstractReferenceService<T> {
    *
    * @return The repository for the entity.
    */
-  protected abstract JpaRepository<T, Long> getRepository();
+  protected abstract JpaRepository<T, D> getRepository();
 
   /**
    * Get the specification executor for the entity.

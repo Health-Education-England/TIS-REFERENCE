@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * The reference service implementation for RecordType.
  */
 @Service
-public class RecordTypeServiceImpl extends AbstractReferenceService<RecordType> {
+public class RecordTypeServiceImpl extends AbstractReferenceService<RecordType, Long> {
 
   private RecordTypeRepository repository;
 

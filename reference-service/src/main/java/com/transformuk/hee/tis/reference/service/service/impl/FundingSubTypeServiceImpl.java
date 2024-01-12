@@ -1,23 +1,24 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import com.transformuk.hee.tis.reference.service.model.OrganizationType;
-import com.transformuk.hee.tis.reference.service.repository.OrganizationTypeRepository;
+import com.transformuk.hee.tis.reference.service.model.FundingSubType;
+import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
 /**
- * The reference service implementation for OrganizationType.
+ * The reference service implementation for FundingSubType.
  */
 @Service
-public class OrganizationTypeServiceImpl extends AbstractReferenceService<OrganizationType, Long> {
+public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingSubType, UUID> {
 
-  private OrganizationTypeRepository repository;
+  private final FundingSubTypeRepository repository;
 
-  OrganizationTypeServiceImpl(OrganizationTypeRepository repository) {
+  FundingSubTypeServiceImpl(FundingSubTypeRepository repository) {
     this.repository = repository;
   }
 
@@ -27,12 +28,12 @@ public class OrganizationTypeServiceImpl extends AbstractReferenceService<Organi
   }
 
   @Override
-  protected JpaRepository<OrganizationType, Long> getRepository() {
+  protected JpaRepository<FundingSubType, UUID> getRepository() {
     return repository;
   }
 
   @Override
-  protected JpaSpecificationExecutor<OrganizationType> getSpecificationExecutor() {
+  protected JpaSpecificationExecutor<FundingSubType> getSpecificationExecutor() {
     return repository;
   }
 }
