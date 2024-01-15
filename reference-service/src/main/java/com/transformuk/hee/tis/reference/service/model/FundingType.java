@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.model;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class FundingType implements Serializable {
   private boolean allowDetails;
 
   @OneToMany(mappedBy = "fundingType", orphanRemoval = true, cascade = CascadeType.ALL)
-  private Set<FundingSubType> fundingSubTypes;
+  private Set<FundingSubType> fundingSubTypes = new HashSet();
 
   @Override
   public boolean equals(Object o) {
