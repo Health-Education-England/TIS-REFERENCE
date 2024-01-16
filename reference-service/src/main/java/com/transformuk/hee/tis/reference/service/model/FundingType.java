@@ -51,7 +51,7 @@ public class FundingType implements Serializable {
   private boolean allowDetails;
 
   @OneToMany(mappedBy = "fundingType", orphanRemoval = true, cascade = CascadeType.ALL)
-  private Set<FundingSubType> fundingSubTypes = new HashSet();
+  private Set<FundingSubType> fundingSubTypes = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
