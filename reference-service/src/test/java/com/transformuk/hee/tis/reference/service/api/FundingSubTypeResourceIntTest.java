@@ -106,7 +106,7 @@ class FundingSubTypeResourceIntTest {
     int dbSizeBeforeCreate = fundingSubTypeRepository.findAll().size();
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
 
-    restFundingSubTypeMockMvc.perform(post("/api/funding-sub-type")
+    restFundingSubTypeMockMvc.perform(post("/api/funding-sub-types")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(fundingSubTypeDto)))
         .andExpect(status().isCreated());
@@ -128,8 +128,8 @@ class FundingSubTypeResourceIntTest {
     // Create the FundingSubType with an existing ID
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
 
-    // An entity with an existing uuid cannot be created, so this API call must fail
-    restFundingSubTypeMockMvc.perform(post("/api/funding-sub-type")
+    // An entity with an existing id cannot be created, so this API call must fail
+    restFundingSubTypeMockMvc.perform(post("/api/funding-sub-types")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(fundingSubTypeDto)))
         .andExpect(status().isBadRequest());
@@ -151,7 +151,7 @@ class FundingSubTypeResourceIntTest {
     fundingSubTypeDto.setCode(UPDATED_CODE);
     fundingSubTypeDto.setLabel(UPDATED_LABEL);
 
-    restFundingSubTypeMockMvc.perform(put("/api/funding-sub-type")
+    restFundingSubTypeMockMvc.perform(put("/api/funding-sub-types")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(fundingSubTypeDto)))
         .andExpect(status().isOk());
@@ -172,8 +172,8 @@ class FundingSubTypeResourceIntTest {
     // Create the FundingSubType
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
 
-    // If the entity doesn't have an uuid, it will be created instead of just being updated
-    restFundingSubTypeMockMvc.perform(put("/api/funding-sub-type")
+    // If the entity doesn't have an id, it will be created instead of just being updated
+    restFundingSubTypeMockMvc.perform(put("/api/funding-sub-types")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(fundingSubTypeDto)))
         .andExpect(status().isCreated());
@@ -192,7 +192,7 @@ class FundingSubTypeResourceIntTest {
 
     // Get the fundingSubType
     restFundingSubTypeMockMvc.perform(
-            delete("/api/funding-sub-type/{uuid}", fundingSubType.getUuid())
+            delete("/api/funding-sub-types/{id}", fundingSubType.getId())
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
@@ -208,11 +208,11 @@ class FundingSubTypeResourceIntTest {
     fundingSubTypeRepository.saveAndFlush(fundingSubType);
 
     // Get all the fundingSubTypeList
-    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types?sort=uuid,desc"))
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types?sort=id,desc"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.[*].uuid").value(hasItem(fundingSubType.getUuid().toString())))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(fundingSubType.getId().toString())))
         .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
         .andExpect(jsonPath("$.[*].label").value(hasItem(DEFAULT_LABEL)))
         .andExpect(jsonPath("$.[*].fundingType.id").value(hasItem(FUNDING_TYPE_ID.intValue())));
@@ -232,10 +232,10 @@ class FundingSubTypeResourceIntTest {
 
     // Get all the fundingSubTypeList
     restFundingSubTypeMockMvc.perform(
-            get("/api/funding-sub-types?searchQuery=\"Te%24t\"&sort=uuid,desc"))
+            get("/api/funding-sub-types?searchQuery=\"Te%24t\"&sort=id,desc"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.[0].uuid").value(unencodedFundingSubType.getUuid().toString()))
+        .andExpect(jsonPath("$.[0].id").value(unencodedFundingSubType.getId().toString()))
         .andExpect(jsonPath("$.[0].code").value(UNENCODED_CODE))
         .andExpect(jsonPath("$.[0].label").value(UNENCODED_LABEL))
         .andExpect(jsonPath("$.[0].fundingType.id").value(FUNDING_TYPE_ID.intValue()));
@@ -248,10 +248,10 @@ class FundingSubTypeResourceIntTest {
     fundingSubTypeRepository.saveAndFlush(fundingSubType);
 
     // Get the fundingSubType
-    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-type/{uuid}", fundingSubType.getUuid()))
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/{id}", fundingSubType.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.uuid").value(fundingSubType.getUuid().toString()))
+        .andExpect(jsonPath("$.id").value(fundingSubType.getId().toString()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL));
   }
@@ -259,7 +259,7 @@ class FundingSubTypeResourceIntTest {
   @Test
   @Transactional
   void getNonExistingFundingSubType() throws Exception {
-    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-type/{uuid}", UUID.randomUUID()))
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/{id}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
   }
 }

@@ -36,14 +36,14 @@ class FundingSubTypeMapperTest {
     fundingSubType.setFundingType(fundingType);
     fundingSubType.setLabel(FUNDING_SUB_TYPE_LABEL);
     fundingSubType.setCode(FUNDING_SUB_TYPE_CODE);
-    fundingSubType.setUuid(FUNDING_SUB_TYPE_UUID);
+    fundingSubType.setId(FUNDING_SUB_TYPE_UUID);
     fundingSubType.setStatus(Status.CURRENT);
 
     FundingSubTypeDto fundingSubTypeDto = mapper.toDto(fundingSubType);
 
     assertEquals(FUNDING_SUB_TYPE_LABEL, fundingSubTypeDto.getLabel());
     assertEquals(FUNDING_SUB_TYPE_CODE, fundingSubTypeDto.getCode());
-    assertEquals(FUNDING_SUB_TYPE_UUID, fundingSubTypeDto.getUuid());
+    assertEquals(FUNDING_SUB_TYPE_UUID, fundingSubTypeDto.getId());
     assertEquals(Status.CURRENT, fundingSubTypeDto.getStatus());
     assertEquals(FUNDING_TYPE_ID, fundingSubTypeDto.getFundingType().getId());
   }
@@ -57,14 +57,14 @@ class FundingSubTypeMapperTest {
     fundingSubTypeDto.setFundingType(fundingTypeDto);
     fundingSubTypeDto.setLabel(FUNDING_SUB_TYPE_LABEL);
     fundingSubTypeDto.setCode(FUNDING_SUB_TYPE_CODE);
-    fundingSubTypeDto.setUuid(FUNDING_SUB_TYPE_UUID);
+    fundingSubTypeDto.setId(FUNDING_SUB_TYPE_UUID);
     fundingSubTypeDto.setStatus(Status.CURRENT);
 
     FundingSubType fundingSubType = mapper.toEntity(fundingSubTypeDto);
 
     assertEquals(FUNDING_SUB_TYPE_LABEL, fundingSubType.getLabel());
     assertEquals(FUNDING_SUB_TYPE_CODE, fundingSubType.getCode());
-    assertEquals(FUNDING_SUB_TYPE_UUID, fundingSubType.getUuid());
+    assertEquals(FUNDING_SUB_TYPE_UUID, fundingSubType.getId());
     assertEquals(Status.CURRENT, fundingSubType.getStatus());
     assertEquals(FUNDING_TYPE_ID, fundingSubType.getFundingType().getId());
   }

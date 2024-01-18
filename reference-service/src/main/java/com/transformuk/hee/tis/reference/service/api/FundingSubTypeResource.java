@@ -72,34 +72,34 @@ public class FundingSubTypeResource {
   }
 
   /**
-   * POST  /funding-sub-type : Create a new fundingType.
+   * POST  /funding-sub-types : Create a new fundingSubType.
    *
    * @param fundingSubTypeDto the fundingSubTypeDto to create
    * @return the ResponseEntity with status 201 (Created) and with body the new fundingSubTypeDTO,
    *     or with status 400 (Bad Request) if the fundingSubType has already an ID
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
-  @PostMapping("/funding-sub-type")
+  @PostMapping("/funding-sub-types")
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingSubTypeDto> createFundingSubType(
       @Valid @RequestBody FundingSubTypeDto fundingSubTypeDto) throws URISyntaxException {
     log.debug("REST request to save FundingType : {}", fundingSubTypeDto);
     fundingSubTypeValidator.validate(fundingSubTypeDto);
-    if (fundingSubTypeDto.getUuid() != null) {
+    if (fundingSubTypeDto.getId() != null) {
       return ResponseEntity.badRequest().headers(HeaderUtil
           .createFailureAlert(ENTITY_NAME, "idexists",
-              "A new fundingSubType cannot already have an uuid")).body(null);
+              "A new fundingSubType cannot already have an id")).body(null);
     }
     FundingSubType fundingSubType = fundingSubTypeMapper.toEntity(fundingSubTypeDto);
     fundingSubType = fundingSubTypeService.save(fundingSubType);
     FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
-    return ResponseEntity.created(new URI("/api/funding-sub-type/" + result.getUuid()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getUuid().toString()))
+    return ResponseEntity.created(new URI("/api/funding-sub-types/" + result.getId()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
   /**
-   * PUT  /funding-sub-type : Updates an existing fundingType.
+   * PUT  /funding-sub-types : Updates an existing fundingSubType.
    *
    * @param fundingSubTypeDto the fundingSubTypeDto to update
    * @return the ResponseEntity with status 200 (OK) and with body the updated fundingSubTypeDto, or
@@ -107,13 +107,13 @@ public class FundingSubTypeResource {
    *     (Internal Server Error) if the fundingSubTypeDto couldn't be updated
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
-  @PutMapping("/funding-sub-type")
+  @PutMapping("/funding-sub-types")
   @PreAuthorize("hasAuthority('reference:add:modify:entities')")
   public ResponseEntity<FundingSubTypeDto> updateFundingSubType(
       @Valid @RequestBody FundingSubTypeDto fundingSubTypeDto) throws URISyntaxException {
     log.debug("REST request to update FundingSubType : {}", fundingSubTypeDto);
     fundingSubTypeValidator.validate(fundingSubTypeDto);
-    if (fundingSubTypeDto.getUuid() == null) {
+    if (fundingSubTypeDto.getId() == null) {
       return createFundingSubType(fundingSubTypeDto);
     }
     FundingSubType fundingSubType = fundingSubTypeMapper.toEntity(fundingSubTypeDto);
@@ -121,36 +121,36 @@ public class FundingSubTypeResource {
     FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseEntity.ok()
         .headers(
-            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getUuid().toString()))
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
   /**
-   * DELETE  /funding-sub-type/:uuid : delete the "uuid" fundingSubType.
+   * DELETE  /funding-sub-types/:id : delete the "id" fundingSubType.
    *
-   * @param uuid the uuid of the fundingSubTypeDto to delete
+   * @param id the id of the fundingSubTypeDto to delete
    * @return the ResponseEntity with status 200 (OK)
    */
-  @DeleteMapping("/funding-sub-type/{uuid}")
+  @DeleteMapping("/funding-sub-types/{id}")
   @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteFundingSubType(@PathVariable UUID uuid) {
-    log.debug("REST request to delete FundingSubType : {}", uuid.toString());
-    fundingSubTypeService.deleteById(uuid);
+  public ResponseEntity<Void> deleteFundingSubType(@PathVariable UUID id) {
+    log.debug("REST request to delete FundingSubType : {}", id.toString());
+    fundingSubTypeService.deleteById(id);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, uuid.toString())).build();
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
-   * GET  /funding-sub-type/:uuid : get the "uuid" fundingSubType.
+   * GET  /funding-sub-types/:id : get the "id" fundingSubType.
    *
-   * @param uuid the uuid of the fundingSubTypeDTO to retrieve
+   * @param id the id of the fundingSubTypeDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the fundingSubTypeDTO, or with
    *     status 404 (Not Found)
    */
-  @GetMapping("/funding-sub-type/{uuid}")
-  public ResponseEntity<FundingSubTypeDto> getFundingSubType(@PathVariable UUID uuid) {
-    log.debug("REST request to get FundingType : {}", uuid.toString());
-    FundingSubType fundingSubType = fundingSubTypeService.findById(uuid)
+  @GetMapping("/funding-sub-types/{id}")
+  public ResponseEntity<FundingSubTypeDto> getFundingSubType(@PathVariable UUID id) {
+    log.debug("REST request to get FundingType : {}", id.toString());
+    FundingSubType fundingSubType = fundingSubTypeService.findById(id)
         .orElse(null);
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingSubTypeDto));
@@ -159,8 +159,7 @@ public class FundingSubTypeResource {
   /**
    * GET  /funding-sub-types : get all funding sub types.
    *
-   * @param pageable the pagination information. Please note: if you want to sort by id, use uuid
-   *                 instead
+   * @param pageable the pagination information.
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
   @ApiOperation(value = "Lists funding sub types",

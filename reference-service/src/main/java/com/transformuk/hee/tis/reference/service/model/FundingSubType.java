@@ -30,7 +30,7 @@ public class FundingSubType implements Serializable {
       strategy = "org.hibernate.id.UUIDGenerator"
   )
   @Type(type = "org.hibernate.type.UUIDCharType")
-  private UUID uuid;
+  private UUID id;
 
   @NotNull
   @Column(name = "code", nullable = false)
