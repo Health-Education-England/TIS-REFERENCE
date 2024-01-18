@@ -26,10 +26,7 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,8 +51,6 @@ import uk.nhs.tis.StringConverter;
 public class FundingSubTypeResource {
 
   private static final String ENTITY_NAME = "fundingSubType";
-  private static final String FIELD_ID = "id";
-  private static final String FIELD_UUID = "uuid";
 
   private final FundingSubTypeMapper fundingSubTypeMapper;
   private final FundingSubTypeServiceImpl fundingSubTypeService;
@@ -90,16 +85,16 @@ public class FundingSubTypeResource {
       @Valid @RequestBody FundingSubTypeDto fundingSubTypeDto) throws URISyntaxException {
     log.debug("REST request to save FundingType : {}", fundingSubTypeDto);
     fundingSubTypeValidator.validate(fundingSubTypeDto);
-    if (fundingSubTypeDto.getId() != null || fundingSubTypeDto.getUuid() != null) {
+    if (fundingSubTypeDto.getId() != null ) {
       return ResponseEntity.badRequest().headers(HeaderUtil
           .createFailureAlert(ENTITY_NAME, "idexists",
-              "A new fundingSubType cannot already have an id or uuid")).body(null);
+              "A new fundingSubType cannot already have an id")).body(null);
     }
     FundingSubType fundingSubType = fundingSubTypeMapper.toEntity(fundingSubTypeDto);
     fundingSubType = fundingSubTypeService.save(fundingSubType);
     FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
-    return ResponseEntity.created(new URI("/api/funding-sub-types/" + result.getUuid()))
-        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getUuid().toString()))
+    return ResponseEntity.created(new URI("/api/funding-sub-types/" + result.getId()))
+        .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
@@ -118,7 +113,7 @@ public class FundingSubTypeResource {
       @Valid @RequestBody FundingSubTypeDto fundingSubTypeDto) throws URISyntaxException {
     log.debug("REST request to update FundingSubType : {}", fundingSubTypeDto);
     fundingSubTypeValidator.validate(fundingSubTypeDto);
-    if (fundingSubTypeDto.getUuid() == null && fundingSubTypeDto.getId() == null) {
+    if (fundingSubTypeDto.getId() == null) {
       return createFundingSubType(fundingSubTypeDto);
     }
     FundingSubType fundingSubType = fundingSubTypeMapper.toEntity(fundingSubTypeDto);
@@ -126,62 +121,45 @@ public class FundingSubTypeResource {
     FundingSubTypeDto result = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseEntity.ok()
         .headers(
-            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getUuid().toString()))
+            HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
   }
 
   /**
-   * DELETE  /funding-sub-types/:uuid : delete the "uuid" fundingSubType.
+   * DELETE  /funding-sub-types/:id : delete the "id" fundingSubType.
    *
-   * @param uuid the uuid of the fundingSubTypeDto to delete
+   * @param id the id of the fundingSubTypeDto to delete
    * @return the ResponseEntity with status 200 (OK)
    */
-  @DeleteMapping("/funding-sub-types/{uuid}")
+  @DeleteMapping("/funding-sub-types/{id}")
   @PreAuthorize("hasAuthority('reference:delete:entities')")
-  public ResponseEntity<Void> deleteFundingSubType(@PathVariable UUID uuid) {
-    log.debug("REST request to delete FundingSubType : {}", uuid.toString());
-    fundingSubTypeService.deleteById(uuid);
+  public ResponseEntity<Void> deleteFundingSubType(@PathVariable UUID id) {
+    log.debug("REST request to delete FundingSubType : {}", id.toString());
+    fundingSubTypeService.deleteById(id);
     return ResponseEntity.ok()
-        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, uuid.toString())).build();
+        .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
   }
 
   /**
-   * GET  /funding-sub-types/:uuid : get the "uuid" fundingSubType.
+   * GET  /funding-sub-types/:id : get the "id" fundingSubType.
    *
-   * @param uuid the uuid of the fundingSubTypeDTO to retrieve
+   * @param id the id of the fundingSubTypeDTO to retrieve
    * @return the ResponseEntity with status 200 (OK) and with body the fundingSubTypeDTO, or with
    *     status 404 (Not Found)
    */
-  @GetMapping("/funding-sub-types/{uuid}")
-  public ResponseEntity<FundingSubTypeDto> getFundingSubType(@PathVariable UUID uuid) {
-    log.debug("REST request to get FundingType : {}", uuid.toString());
-    FundingSubType fundingSubType = fundingSubTypeService.findById(uuid)
+  @GetMapping("/funding-sub-types/{id}")
+  public ResponseEntity<FundingSubTypeDto> getFundingSubType(@PathVariable UUID id) {
+    log.debug("REST request to get FundingType : {}", id.toString());
+    FundingSubType fundingSubType = fundingSubTypeService.findById(id)
         .orElse(null);
     FundingSubTypeDto fundingSubTypeDto = fundingSubTypeMapper.toDto(fundingSubType);
     return ResponseUtil.wrapOrNotFound(Optional.ofNullable(fundingSubTypeDto));
   }
 
-  private Sort overwriteSort(Sort sort) {
-    Optional<Order> optionalOrder = sort.stream().filter(o ->
-        o.getProperty().equalsIgnoreCase(FIELD_ID)
-    ).findFirst();
-    Sort newSort;
-    if (optionalOrder.isPresent()) {
-      newSort = Sort.by(optionalOrder.get().getDirection(), FIELD_UUID);
-    } else {
-      newSort = sort;
-    }
-    return newSort;
-  }
-
   /**
    * GET  /funding-sub-types : get all funding sub types.
    *
-   * @param sort sort property and direction for pagination.
-   * @param page current page number.
-   * @param size size of each page.
-   * @param searchQuery string to search for.
-   * @param columnFilterJson column filters.
+   * @param pageable the pagination information.
    * @return the ResponseEntity with status 200 (OK) and the list of colleges in body
    */
   @ApiOperation(value = "Lists funding sub types",
@@ -191,9 +169,7 @@ public class FundingSubTypeResource {
       @ApiResponse(code = 200, message = "funding sub types list")})
   @GetMapping("/funding-sub-types")
   public ResponseEntity<List<FundingSubTypeDto>> getAllFundingSubTypes(
-      @ApiParam Sort sort,
-      @ApiParam int page,
-      @ApiParam int size,
+      @ApiParam Pageable pageable,
       @ApiParam(value = "any wildcard string to be searched")
       @RequestParam(value = "searchQuery", required = false) String searchQuery,
       @ApiParam(value = "json object by column name and value. "
@@ -203,18 +179,17 @@ public class FundingSubTypeResource {
     log.info("REST request to get a page of funding types begin");
     searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
         .toString();
-    Pageable pageable = PageRequest.of(page, size, overwriteSort(sort));
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters = ColumnFilterUtil
         .getColumnFilters(columnFilterJson, filterEnumList);
-    Page<FundingSubType> pageDetail;
+    Page<FundingSubType> page;
     if (StringUtils.isEmpty(searchQuery) && StringUtils.isEmpty(columnFilterJson)) {
-      pageDetail = fundingSubTypeService.findAll(pageable);
+      page = fundingSubTypeService.findAll(pageable);
     } else {
-      pageDetail = fundingSubTypeService.advancedSearch(searchQuery, columnFilters, pageable);
+      page = fundingSubTypeService.advancedSearch(searchQuery, columnFilters, pageable);
     }
-    Page<FundingSubTypeDto> results = pageDetail.map(fundingSubTypeMapper::toDto);
-    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(pageDetail,
+    Page<FundingSubTypeDto> results = page.map(fundingSubTypeMapper::toDto);
+    HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page,
         "/api/funding-sub-types");
     return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
   }

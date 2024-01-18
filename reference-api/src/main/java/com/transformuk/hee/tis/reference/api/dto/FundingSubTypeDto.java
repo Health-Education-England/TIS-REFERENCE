@@ -14,8 +14,6 @@ public class FundingSubTypeDto implements Serializable {
 
   private UUID id;
 
-  private UUID uuid;
-
   @NotNull
   private String code;
 

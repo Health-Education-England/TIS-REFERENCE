@@ -61,7 +61,7 @@ public class AuditingAspect {
     classToPrimaryKeyMap.put("TrustDTO", "id");
     classToPrimaryKeyMap.put("SiteDTO", "id");
     classToPrimaryKeyMap.put("GradeDTO", "id");
-    classToPrimaryKeyMap.put("FundingSubTypeDto", "uuid");
+    classToPrimaryKeyMap.put("FundingSubTypeDto", "id");
   }
 
   @PostConstruct
