@@ -85,7 +85,7 @@ public class FundingSubTypeResource {
       @Valid @RequestBody FundingSubTypeDto fundingSubTypeDto) throws URISyntaxException {
     log.debug("REST request to save FundingType : {}", fundingSubTypeDto);
     fundingSubTypeValidator.validate(fundingSubTypeDto);
-    if (fundingSubTypeDto.getId() != null ) {
+    if (fundingSubTypeDto.getId() != null) {
       return ResponseEntity.badRequest().headers(HeaderUtil
           .createFailureAlert(ENTITY_NAME, "idexists",
               "A new fundingSubType cannot already have an id")).body(null);
