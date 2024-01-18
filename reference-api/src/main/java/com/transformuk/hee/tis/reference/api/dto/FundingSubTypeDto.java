@@ -12,6 +12,8 @@ import lombok.Data;
 @Data
 public class FundingSubTypeDto implements Serializable {
 
+  private UUID id;
+
   private UUID uuid;
 
   @NotNull
