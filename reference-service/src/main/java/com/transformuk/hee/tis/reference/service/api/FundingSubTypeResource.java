@@ -59,8 +59,8 @@ public class FundingSubTypeResource {
   /**
    * Constructor for FundingSubTypeResource.
    *
-   * @param fundingSubTypeMapper the mapper to convert between entity and dto
-   * @param fundingSubTypeService the service to handle business logic
+   * @param fundingSubTypeMapper    the mapper to convert between entity and dto
+   * @param fundingSubTypeService   the service to handle business logic
    * @param fundingSubTypeValidator the validator to validate user data
    */
   public FundingSubTypeResource(FundingSubTypeMapper fundingSubTypeMapper,
@@ -192,5 +192,21 @@ public class FundingSubTypeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page,
         "/api/funding-sub-types");
     return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
+  }
+
+  /**
+   * Get all fundingSubTypes for a fundingType.
+   *
+   * @param fundingTypeId the id of the fundingType to search
+   * @return a list of fundingSubType for the fundingType searched for
+   */
+  @GetMapping("/funding-types/{fundingTypeId}/funding-sub-types")
+  public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesForFundingType(
+      @PathVariable Long fundingTypeId) {
+    log.debug("REST request to get all sub types for a funding type");
+    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findSubTypesForFundingTypeId(
+        fundingTypeId);
+    List<FundingSubTypeDto> fundingSubTypeDtos = fundingSubTypeMapper.toDtos(fundingSubTypes);
+    return ResponseEntity.ok(fundingSubTypeDtos);
   }
 }

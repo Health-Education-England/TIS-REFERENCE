@@ -1,12 +1,12 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +21,7 @@ import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingSubTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -209,7 +210,6 @@ class FundingSubTypeResourceIntTest {
 
     // Get all the fundingSubTypeList
     restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types?sort=id,desc"))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(jsonPath("$.[*].id").value(hasItem(fundingSubType.getId().toString())))
@@ -261,5 +261,26 @@ class FundingSubTypeResourceIntTest {
   void getNonExistingFundingSubType() throws Exception {
     restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/{id}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesForFundingType() throws Exception {
+    FundingSubType fundingSubType1 = new FundingSubType();
+    fundingSubType1.setCode(UPDATED_CODE);
+    fundingSubType1.setLabel(UPDATED_LABEL);
+    fundingSubType1.setStatus(Status.CURRENT);
+    FundingType fundingType = fundingSubType.getFundingType();
+    fundingSubType1.setFundingType(fundingType);
+
+    fundingSubTypeRepository.saveAllAndFlush(Arrays.asList(fundingSubType, fundingSubType1));
+
+    restFundingSubTypeMockMvc.perform(
+            get("/api/funding-types/{id}/funding-sub-types", fundingType.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.length()").value(equalTo(2)))
+        .andExpect(jsonPath("$.[0].fundingType.id").value(fundingType.getId().intValue()))
+        .andExpect(jsonPath("$.[1].fundingType.id").value(fundingType.getId().intValue()));
   }
 }

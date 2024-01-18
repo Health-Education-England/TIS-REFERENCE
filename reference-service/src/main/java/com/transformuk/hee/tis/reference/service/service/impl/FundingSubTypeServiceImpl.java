@@ -36,4 +36,8 @@ public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingS
   protected JpaSpecificationExecutor<FundingSubType> getSpecificationExecutor() {
     return repository;
   }
+
+  public List<FundingSubType> findSubTypesForFundingTypeId(Long fundingTypeId) {
+    return repository.findAllByFundingTypeId(fundingTypeId);
+  }
 }
