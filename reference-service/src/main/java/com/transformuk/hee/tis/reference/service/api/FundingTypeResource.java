@@ -1,15 +1,19 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import com.google.common.collect.Lists;
+import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
+import com.transformuk.hee.tis.reference.service.model.FundingSubType;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingSubTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
+import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.jsonwebtoken.lang.Collections;
@@ -57,13 +61,19 @@ public class FundingTypeResource {
   private final FundingTypeRepository fundingTypeRepository;
   private final FundingTypeMapper fundingTypeMapper;
   private final FundingTypeServiceImpl fundingTypeService;
+  private final FundingSubTypeServiceImpl fundingSubTypeService;
+  private final FundingSubTypeMapper fundingSubTypeMapper;
 
   public FundingTypeResource(FundingTypeRepository fundingTypeRepository,
       FundingTypeMapper fundingTypeMapper,
-      FundingTypeServiceImpl fundingTypeService) {
+      FundingTypeServiceImpl fundingTypeService,
+      FundingSubTypeServiceImpl fundingSubTypeService,
+      FundingSubTypeMapper fundingSubTypeMapper) {
     this.fundingTypeRepository = fundingTypeRepository;
     this.fundingTypeMapper = fundingTypeMapper;
     this.fundingTypeService = fundingTypeService;
+    this.fundingSubTypeService = fundingSubTypeService;
+    this.fundingSubTypeMapper = fundingSubTypeMapper;
   }
 
   /**
@@ -251,5 +261,21 @@ public class FundingTypeResource {
     List<FundingTypeDTO> results = fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes);
     return ResponseEntity.ok()
         .body(results);
+  }
+
+  /**
+   * Get all fundingSubTypes for a fundingType.
+   *
+   * @param fundingTypeId the id of the fundingType to search
+   * @return a list of fundingSubType for the fundingType searched for
+   */
+  @GetMapping("/funding-types/{fundingTypeId}/funding-sub-types")
+  public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesForFundingType(
+      @PathVariable Long fundingTypeId) {
+    log.debug("REST request to get all sub types for a funding type");
+    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findSubTypesForFundingTypeId(
+        fundingTypeId);
+    List<FundingSubTypeDto> fundingSubTypeDtos = fundingSubTypeMapper.toDtos(fundingSubTypes);
+    return ResponseEntity.ok(fundingSubTypeDtos);
   }
 }

@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,12 +12,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
+import com.transformuk.hee.tis.reference.service.model.FundingSubType;
 import com.transformuk.hee.tis.reference.service.model.FundingType;
+import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
+import com.transformuk.hee.tis.reference.service.service.impl.FundingSubTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeServiceImpl;
+import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.Before;
@@ -55,8 +62,18 @@ public class FundingTypeResourceIntTest {
 
   @Autowired
   private FundingTypeMapper fundingTypeMapper;
+
   @Autowired
   private FundingTypeServiceImpl fundingTypeService;
+
+  @Autowired
+  private FundingSubTypeRepository fundingSubTypeRepository;
+
+  @Autowired
+  private FundingSubTypeServiceImpl fundingSubTypeService;
+
+  @Autowired
+  private FundingSubTypeMapper fundingSubTypeMapper;
 
   @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -92,7 +109,7 @@ public class FundingTypeResourceIntTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     FundingTypeResource fundingTypeResource = new FundingTypeResource(fundingTypeRepository,
-        fundingTypeMapper, fundingTypeService);
+        fundingTypeMapper, fundingTypeService, fundingSubTypeService, fundingSubTypeMapper);
     this.restFundingTypeMockMvc = MockMvcBuilders.standaloneSetup(fundingTypeResource)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -343,5 +360,32 @@ public class FundingTypeResourceIntTest {
   @Transactional
   public void equalsVerifier() throws Exception {
     TestUtil.equalsVerifier(FundingType.class);
+  }
+
+  @Test
+  @Transactional
+  public void getFundingSubTypesForFundingType() throws Exception {
+    fundingTypeRepository.saveAndFlush(fundingType);
+    FundingSubType fundingSubType = new FundingSubType();
+    fundingSubType.setCode(DEFAULT_CODE);
+    fundingSubType.setLabel(DEFAULT_LABEL);
+    fundingSubType.setStatus(Status.CURRENT);
+    fundingSubType.setFundingType(fundingType);
+    FundingSubType fundingSubType1 = new FundingSubType();
+    fundingSubType1.setCode(UPDATED_CODE);
+    fundingSubType1.setLabel(UPDATED_LABEL);
+    fundingSubType1.setStatus(Status.CURRENT);
+    FundingType fundingType = fundingSubType.getFundingType();
+    fundingSubType1.setFundingType(fundingType);
+
+    fundingSubTypeRepository.saveAllAndFlush(Arrays.asList(fundingSubType, fundingSubType1));
+
+    restFundingTypeMockMvc.perform(
+            get("/api/funding-types/{id}/funding-sub-types", fundingType.getId()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.length()").value(equalTo(2)))
+        .andExpect(jsonPath("$.[0].fundingType.id").value(fundingType.getId().intValue()))
+        .andExpect(jsonPath("$.[1].fundingType.id").value(fundingType.getId().intValue()));
   }
 }
