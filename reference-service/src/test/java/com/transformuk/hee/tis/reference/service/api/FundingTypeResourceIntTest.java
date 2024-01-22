@@ -51,10 +51,12 @@ public class FundingTypeResourceIntTest {
 
   private static final String DEFAULT_CODE = "AAAAAAAAAA";
   private static final String UPDATED_CODE = "BBBBBBBBBB";
+  private static final String INACTIVE_CODE = "CCCCCCCCCC";
   private static final String UNENCODED_CODE = "Te$t Code";
 
   private static final String DEFAULT_LABEL = "AAAAAAAAAA";
   private static final String UPDATED_LABEL = "BBBBBBBBBB";
+  private static final String INACTIVE_LABEL = "CCCCCCCCCC";
   private static final String UNENCODED_LABEL = "Te$t Label";
 
   @Autowired
@@ -365,20 +367,27 @@ public class FundingTypeResourceIntTest {
   @Test
   @Transactional
   public void getFundingSubTypesForFundingType() throws Exception {
-    fundingTypeRepository.saveAndFlush(fundingType);
+    fundingType = fundingTypeRepository.saveAndFlush(fundingType);
+
     FundingSubType fundingSubType = new FundingSubType();
     fundingSubType.setCode(DEFAULT_CODE);
     fundingSubType.setLabel(DEFAULT_LABEL);
     fundingSubType.setStatus(Status.CURRENT);
     fundingSubType.setFundingType(fundingType);
+
     FundingSubType fundingSubType1 = new FundingSubType();
     fundingSubType1.setCode(UPDATED_CODE);
     fundingSubType1.setLabel(UPDATED_LABEL);
     fundingSubType1.setStatus(Status.CURRENT);
-    FundingType fundingType = fundingSubType.getFundingType();
     fundingSubType1.setFundingType(fundingType);
 
-    fundingSubTypeRepository.saveAllAndFlush(Arrays.asList(fundingSubType, fundingSubType1));
+    FundingSubType fundingSubType2 = new FundingSubType();
+    fundingSubType2.setCode(INACTIVE_CODE);
+    fundingSubType2.setLabel(INACTIVE_LABEL);
+    fundingSubType2.setStatus(Status.INACTIVE);
+    fundingSubType2.setFundingType(fundingType);
+
+    fundingSubTypeRepository.saveAllAndFlush(Arrays.asList(fundingSubType, fundingSubType1, fundingSubType2));
 
     restFundingTypeMockMvc.perform(
             get("/api/funding-types/{id}/funding-sub-types", fundingType.getId()))

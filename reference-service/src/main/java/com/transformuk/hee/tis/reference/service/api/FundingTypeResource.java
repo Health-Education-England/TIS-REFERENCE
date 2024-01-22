@@ -264,17 +264,17 @@ public class FundingTypeResource {
   }
 
   /**
-   * Get all fundingSubTypes for a fundingType.
+   * Get all current fundingSubTypes for a fundingType.
    *
    * @param fundingTypeId the id of the fundingType to search
    * @return a list of fundingSubType for the fundingType searched for
    */
   @GetMapping("/funding-types/{fundingTypeId}/funding-sub-types")
-  public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesForFundingType(
+  public ResponseEntity<List<FundingSubTypeDto>> getCurrentFundingSubTypesForFundingType(
       @PathVariable Long fundingTypeId) {
     log.debug("REST request to get all sub types for a funding type");
-    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findSubTypesForFundingTypeId(
-        fundingTypeId);
+    List<FundingSubType> fundingSubTypes =
+        fundingSubTypeService.findCurrentSubTypesForFundingTypeId(fundingTypeId);
     List<FundingSubTypeDto> fundingSubTypeDtos = fundingSubTypeMapper.toDtos(fundingSubTypes);
     return ResponseEntity.ok(fundingSubTypeDtos);
   }
