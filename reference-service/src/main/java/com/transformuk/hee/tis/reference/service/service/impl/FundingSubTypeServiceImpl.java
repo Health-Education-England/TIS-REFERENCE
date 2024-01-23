@@ -1,5 +1,6 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
+import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.FundingSubType;
 import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
@@ -35,5 +36,9 @@ public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingS
   @Override
   protected JpaSpecificationExecutor<FundingSubType> getSpecificationExecutor() {
     return repository;
+  }
+
+  public List<FundingSubType> findCurrentSubTypesForFundingTypeId(Long fundingTypeId) {
+    return repository.findByStatusAndFundingTypeId(Status.CURRENT, fundingTypeId);
   }
 }

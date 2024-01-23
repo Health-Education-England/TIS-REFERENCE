@@ -59,8 +59,8 @@ public class FundingSubTypeResource {
   /**
    * Constructor for FundingSubTypeResource.
    *
-   * @param fundingSubTypeMapper the mapper to convert between entity and dto
-   * @param fundingSubTypeService the service to handle business logic
+   * @param fundingSubTypeMapper    the mapper to convert between entity and dto
+   * @param fundingSubTypeService   the service to handle business logic
    * @param fundingSubTypeValidator the validator to validate user data
    */
   public FundingSubTypeResource(FundingSubTypeMapper fundingSubTypeMapper,
