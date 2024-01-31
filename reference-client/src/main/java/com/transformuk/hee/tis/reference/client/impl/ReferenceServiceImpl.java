@@ -60,7 +60,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -437,9 +437,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<SiteDTO>>() {
               });
       return responseEntity.getBody();
-    } catch (HttpClientErrorException.NotFound e) {
-      LOG.info("Not found sites for ids [{}].", joinedIds);
-      return Collections.emptyList();
+    } catch (HttpStatusCodeException e) {
+      // We used HttpClientErrorException.NotFound which is added in springframework 5.
+      // But, generic upload service still uses springframework 4, and
+      // HttpClientErrorException.NotFound cannot be recognised there.
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+        LOG.info("Not found sites for ids [{}].", joinedIds);
+        return Collections.emptyList();
+      } else {
+        throw e;
+      }
     } catch (Exception e) {
       LOG.error(
           "Exception during find sites id in for ids [{}],"
@@ -536,9 +543,16 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<GradeDTO>>() {
               });
       return responseEntity.getBody();
-    } catch (HttpClientErrorException.NotFound e) {
-      LOG.info("Not found grades for ids [{}].", joinedIds);
-      return Collections.emptyList();
+    } catch (HttpStatusCodeException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+        // We used HttpClientErrorException.NotFound which is added in springframework 5.
+        // But, generic upload service still uses springframework 4, and
+        // HttpClientErrorException.NotFound cannot be recognised there.
+        LOG.info("Not found grades for ids [{}].", joinedIds);
+        return Collections.emptyList();
+      } else {
+        throw e;
+      }
     } catch (Exception e) {
       LOG.error(
           "Exception during find grade id in for ids [{}], "
