@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.client;
 import com.transformuk.hee.tis.client.ClientService;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GradeDTO;
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
@@ -121,6 +122,10 @@ public interface ReferenceService extends ClientService {
   List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs);
 
   List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels);
+
+  List<FundingSubTypeDto> findCurrentFundingSubTypesByLabels(Set<String> allLabel);
+
+  List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id);
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
