@@ -129,7 +129,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
   private static final String ASSESSMENT_TYPES_ENDPOINT = "/api/assessment-types";
 
-  private static final String labelJoiningCommaDivider = "\",\"";
+  private static final String LABEL_JOINING_COMMA_DIVIDER = "\",\"";
 
   private static String gradesJsonQuerystringURLEncoded;
   private static String gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded;
@@ -519,7 +519,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels) {
-    String joinedLabels = StringUtils.join(labels, labelJoiningCommaDivider);
+    String joinedLabels = StringUtils.join(labels, LABEL_JOINING_COMMA_DIVIDER);
     String url = serviceUrl + FIND_FUNDING_TYPES_ENDPOINT
         + labelJsonQuerystringURLEncoded.replace("PARAMETER_LABEL", urlEncode(joinedLabels));
     ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
@@ -596,13 +596,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs) {
-    String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, labelJoiningCommaDivider);
+    String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, LABEL_JOINING_COMMA_DIVIDER);
     return findTrustByTrustKnownAs(joinedTrustKnownAs);
   }
 
   @Override
   public List<FundingSubTypeDto> findCurrentFundingSubTypesByLabels(Set<String> allLabel) {
-    String joinedLabels = StringUtils.join(allLabel, labelJoiningCommaDivider);
+    String joinedLabels = StringUtils.join(allLabel, LABEL_JOINING_COMMA_DIVIDER);
     LOG.debug("calling findCurrentFundingSubTypesByLabel with {}.", joinedLabels);
     String url = serviceUrl + FIND_FUNDING_SUB_TYPES_ENDPOINT
         + fundingSubTypeLabelJsonQueryStringURLEncoded
@@ -620,7 +620,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     ResponseEntity<List<FundingSubTypeDto>> responseEntity = referenceRestTemplate.
         exchange(url, HttpMethod.GET, null,
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
-        });
+            });
     return responseEntity.getBody();
   }
 
