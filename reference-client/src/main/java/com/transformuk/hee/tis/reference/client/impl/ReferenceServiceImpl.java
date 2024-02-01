@@ -129,6 +129,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String ROLES_BY_ROLE_CATEGORY = "/api/roles/categories/";
   private static final String ASSESSMENT_TYPES_ENDPOINT = "/api/assessment-types";
 
+  private static final String labelJoiningCommaDivider = "\",\"";
+
   private static String gradesJsonQuerystringURLEncoded;
   private static String gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded;
   private static String labelJsonQuerystringURLEncoded;
@@ -517,7 +519,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels) {
-    String joinedLabels = StringUtils.join(labels, "\",\"");
+    String joinedLabels = StringUtils.join(labels, labelJoiningCommaDivider);
     String url = serviceUrl + FIND_FUNDING_TYPES_ENDPOINT
         + labelJsonQuerystringURLEncoded.replace("PARAMETER_LABEL", urlEncode(joinedLabels));
     ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
@@ -594,29 +596,30 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
 
   @Override
   public List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs) {
-    String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, "\",\"");
+    String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, labelJoiningCommaDivider);
     return findTrustByTrustKnownAs(joinedTrustKnownAs);
   }
 
   @Override
   public List<FundingSubTypeDto> findCurrentFundingSubTypesByLabels(Set<String> allLabel) {
-    String joinedLabels = StringUtils.join(allLabel, "\",\"");
+    String joinedLabels = StringUtils.join(allLabel, labelJoiningCommaDivider);
     LOG.debug("calling findCurrentFundingSubTypesByLabel with {}.", joinedLabels);
-    String url = serviceUrl + FIND_FUNDING_SUB_TYPES_ENDPOINT +
-        fundingSubTypeLabelJsonQueryStringURLEncoded
+    String url = serviceUrl + FIND_FUNDING_SUB_TYPES_ENDPOINT
+        + fundingSubTypeLabelJsonQueryStringURLEncoded
             .replace("PARAMETER_LABEL", urlEncode(joinedLabels));
     return referenceRestTemplate.exchange(url, HttpMethod.GET, null,
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
-            })
+          })
         .getBody();
   }
 
   @Override
   public List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id) {
-    String url = serviceUrl +
-        String.format(FIND_CURRENT_FUNDING_SUB_TYPES_FOR_FUNDING_TYPE_ENDPOINT, id.intValue());
+    String url = serviceUrl
+        + String.format(FIND_CURRENT_FUNDING_SUB_TYPES_FOR_FUNDING_TYPE_ENDPOINT, id.intValue());
     ResponseEntity<List<FundingSubTypeDto>> responseEntity = referenceRestTemplate.
-        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
+        exchange(url, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
         });
     return responseEntity.getBody();
   }
