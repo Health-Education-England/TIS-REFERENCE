@@ -9,6 +9,7 @@ import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
@@ -74,6 +75,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_FUNDING_TYPES_ENDPOINT = "/api/funding-types?columnFilters=";
+  private static final String FIND_CURRENT_FUNDING_SUB_TYPES_FOR_FUNDING_TYPE_ENDPOINT =
+      "/api/funding-types/%s/funding-sub-types";
   private static final String FIND_GRADES_ENDPOINT = "/api/grades?columnFilters=";
   private static final String FIND_GRADES_IN_ENDPOINT = "/api/grades/in/";
   private static final String FIND_GRADES_ID_IN_ENDPOINT = "/api/grades/ids/in";
@@ -83,6 +86,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/codes?codes=%s";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
+  private static final String FIND_FUNDING_SUB_TYPES_ENDPOINT =
+      "/api/funding-sub-types?columnFilters=";
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
@@ -131,6 +136,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String sitesKnownAsJsonQuerystringURLEncoded;
   private static String trustKnownAsJsonQuerystringURLEncoded;
   private static String statusCurrentUrlEncoded;
+  private static String fundingSubTypeLabelJsonQueryStringURLEncoded;
 
   static {
     try {
@@ -148,6 +154,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
           new URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustKnownAsJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
+      fundingSubTypeLabelJsonQueryStringURLEncoded = new URLCodec()
+          .encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -438,10 +446,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               });
       return responseEntity.getBody();
     } catch (HttpStatusCodeException e) {
-      // We used HttpClientErrorException.NotFound which is added in springframework 5.
-      // But, generic upload service still uses springframework 4, and
-      // HttpClientErrorException.NotFound cannot be recognised there.
-      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
         LOG.info("Not found sites for ids [{}].", joinedIds);
         return Collections.emptyList();
       } else {
@@ -544,10 +549,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               });
       return responseEntity.getBody();
     } catch (HttpStatusCodeException e) {
-      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-        // We used HttpClientErrorException.NotFound which is added in springframework 5.
-        // But, generic upload service still uses springframework 4, and
-        // HttpClientErrorException.NotFound cannot be recognised there.
+      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
         LOG.info("Not found grades for ids [{}].", joinedIds);
         return Collections.emptyList();
       } else {
@@ -594,6 +596,29 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs) {
     String joinedTrustKnownAs = StringUtils.join(allTrustKnownAs, "\",\"");
     return findTrustByTrustKnownAs(joinedTrustKnownAs);
+  }
+
+  @Override
+  public List<FundingSubTypeDto> findCurrentFundingSubTypesByLabels(Set<String> allLabel) {
+    String joinedLabels = StringUtils.join(allLabel, "\",\"");
+    LOG.debug("calling findCurrentFundingSubTypesByLabel with {}.", joinedLabels);
+    String url = serviceUrl + FIND_FUNDING_SUB_TYPES_ENDPOINT +
+        fundingSubTypeLabelJsonQueryStringURLEncoded
+            .replace("PARAMETER_LABEL", urlEncode(joinedLabels));
+    return referenceRestTemplate.exchange(url, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
+            })
+        .getBody();
+  }
+
+  @Override
+  public List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id) {
+    String url = serviceUrl +
+        String.format(FIND_CURRENT_FUNDING_SUB_TYPES_FOR_FUNDING_TYPE_ENDPOINT, id.intValue());
+    ResponseEntity<List<FundingSubTypeDto>> responseEntity = referenceRestTemplate.
+        exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
+        });
+    return responseEntity.getBody();
   }
 
   @Cacheable("localOffices")

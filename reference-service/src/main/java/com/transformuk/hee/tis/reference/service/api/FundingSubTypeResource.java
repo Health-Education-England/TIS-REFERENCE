@@ -176,7 +176,7 @@ public class FundingSubTypeResource {
           + "(Eg: columnFilters={ \"status\": [\"CURRENT\"]}\"")
       @RequestParam(value = "columnFilters", required = false) String columnFilterJson)
       throws IOException {
-    log.info("REST request to get a page of funding types begin");
+    log.info("REST request to get a page of funding sub types begin");
     searchQuery = StringConverter.getConverter(searchQuery).fromJson().decodeUrl().escapeForSql()
         .toString();
     List<Class> filterEnumList = Lists.newArrayList(Status.class);

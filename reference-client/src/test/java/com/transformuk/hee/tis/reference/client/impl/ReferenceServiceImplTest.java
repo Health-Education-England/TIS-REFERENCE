@@ -15,6 +15,8 @@ import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
+import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
 import com.transformuk.hee.tis.reference.api.dto.GenderDTO;
 import com.transformuk.hee.tis.reference.api.dto.GmcStatusDTO;
@@ -37,9 +39,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1623,5 +1627,64 @@ public class ReferenceServiceImplTest {
         REFERENCE_URL
             + "/api/leaving-reasons/match?columnFilters=%7B%22status%22%3A%5B%22CURRENT%22%5D%7D",
         HttpMethod.POST, requestEntity, responseType);
+  }
+
+  @Test
+  public void shouldGetCurrentFundingSubTypesForFundingType() {
+    // given
+    FundingTypeDTO fundingTypeDto = new FundingTypeDTO();
+    fundingTypeDto.setId(1L);
+    FundingSubTypeDto fundingSubTypeDto = new FundingSubTypeDto();
+    fundingSubTypeDto.setCode("code");
+    fundingSubTypeDto.setId(UUID.randomUUID());
+    fundingSubTypeDto.setLabel("label");
+    fundingSubTypeDto.setStatus(Status.CURRENT);
+
+    List<FundingSubTypeDto> expectedFundingSubTypeDtos = Arrays.asList(fundingSubTypeDto);
+    ResponseEntity<List<FundingSubTypeDto>> responseEntity = new ResponseEntity(
+        expectedFundingSubTypeDtos, HttpStatus.OK);
+    given(referenceRestTemplate
+        .exchange(anyString(), eq(HttpMethod.GET), isNull(RequestEntity.class),
+            any(ParameterizedTypeReference.class))).willReturn(responseEntity);
+
+    // When.
+    List<FundingSubTypeDto> fundingSubTypeDtos =
+        referenceServiceImpl.findCurrentFundingSubTypesForFundingTypeId(1L);
+
+    //then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL +
+            "/api/funding-types/1/funding-sub-types"), eq(HttpMethod.GET),
+        isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(expectedFundingSubTypeDtos, fundingSubTypeDtos);
+  }
+
+  @Test
+  public void shouldFindFundingSubTypesByLabel() {
+    // given
+    String label = "label";
+    FundingSubTypeDto fundingSubType = new FundingSubTypeDto();
+    fundingSubType.setLabel(label);
+    List<FundingSubTypeDto> fundingSubTypes = Arrays.asList(fundingSubType);
+
+    ResponseEntity<List<FundingSubTypeDto>> responseEntity = new ResponseEntity(fundingSubTypes,
+        HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<List<FundingSubTypeDto>>>any()))
+        .willReturn(responseEntity);
+
+    // when
+    Set<String> labelSet = new HashSet<>();
+    labelSet.add(label);
+    List<FundingSubTypeDto> respList = referenceServiceImpl
+        .findCurrentFundingSubTypesByLabels(labelSet);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL +
+            "/api/funding-sub-types?columnFilters="
+            + "%7B%22label%22%3A%5B%22label%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(fundingSubTypes, respList);
   }
 }
