@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 /**
  * A LocalOffice.
@@ -28,6 +29,7 @@ public class LocalOffice implements Serializable {
   private Long id;
 
   @Column(name = "uuid")
+  @Type(type = "org.hibernate.type.UUIDCharType")
   private UUID uuid;
 
   @NotNull

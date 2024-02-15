@@ -20,6 +20,7 @@ import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepositor
 import com.transformuk.hee.tis.reference.service.service.impl.SitesTrustsService;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeMapper;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class LocalOfficeResourceIntTest {
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
 
-  private static String[] localOfficeArray = new String[] {HENE_NAME, HENWL_NAME, HEKSS_NAME};
+  private static final String[] localOfficeArray = new String[] {HENE_NAME, HENWL_NAME, HEKSS_NAME};
   private LocalOffice searchLo;
 
   @Autowired
@@ -93,6 +94,7 @@ public class LocalOfficeResourceIntTest {
     localOffice.setAbbreviation(DEFAULT_ABBREVIATION);
     localOffice.setName(DEFAULT_NAME);
     localOffice.setPostAbbreviation(DEFAULT_POST_ABBREVIATION);
+    localOffice.setUuid(UUID.randomUUID());
     return localOffice;
   }
 
