@@ -37,20 +37,20 @@ import uk.nhs.tis.ObjectMapperUtil;
 @Aspect
 public class AuditingAspect {
 
-  private final static String REFERENCE_PREFIX = "reference_";
-  private final static String GET_PREFIX = "get";
-  private final static String DTO_POSTFIX = "DTO";
-  private final static String ETL_USERNAME = "consolidated_etl";
-  private final static String ID_KEY = "id";
-  private final static Logger LOG = LoggerFactory.getLogger(AuditingAspect.class);
+  private static final String REFERENCE_PREFIX = "reference_";
+  private static final String GET_PREFIX = "get";
+  private static final String DTO_POSTFIX = "DTO";
+  private static final String ETL_USERNAME = "consolidated_etl";
+  private static final String ID_KEY = "id";
+  private static final Logger LOG = LoggerFactory.getLogger(AuditingAspect.class);
 
   private final AuditEventRepository auditEventRepository;
 
   @Autowired
   private JsonPatchRepository rebaseTypeRepository;
-  private ConcurrentHashMap<String, String> classToPrimaryKeyMap = new ConcurrentHashMap<>();
-  private Map<String, Class> classToIdClass = new ConcurrentHashMap<>();
-  private ObjectMapper mapper = ObjectMapperUtil.createMapper();
+  private final ConcurrentHashMap<String, String> classToPrimaryKeyMap = new ConcurrentHashMap<>();
+  private final Map<String, Class> classToIdClass = new ConcurrentHashMap<>();
+  private final ObjectMapper mapper = ObjectMapperUtil.createMapper();
 
   public AuditingAspect(AuditEventRepository auditEventRepository) {
     this.auditEventRepository = auditEventRepository;
@@ -62,6 +62,8 @@ public class AuditingAspect {
     classToPrimaryKeyMap.put("SiteDTO", "id");
     classToPrimaryKeyMap.put("GradeDTO", "id");
     classToPrimaryKeyMap.put("FundingSubTypeDto", "id");
+    classToPrimaryKeyMap.put("LocalOfficeContactDto", "id");
+    classToPrimaryKeyMap.put("LocalOfficeContactTypeDto", "id");
   }
 
   @PostConstruct
@@ -70,6 +72,8 @@ public class AuditingAspect {
     classToIdClass.put("SiteDTO", Long.class);
     classToIdClass.put("GradeDTO", Long.class);
     classToIdClass.put("FundingSubTypeDto", UUID.class);
+    classToIdClass.put("LocalOfficeContactDto", UUID.class);
+    classToIdClass.put("LocalOfficeContactTypeDto", UUID.class);
   }
 
   /**
