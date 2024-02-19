@@ -60,7 +60,6 @@ public class LocalOfficeContactResource {
     this.validator = validator;
   }
 
-
   /**
    * POST : Create a new local office contact.
    *

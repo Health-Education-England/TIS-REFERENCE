@@ -26,17 +26,16 @@ import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeConta
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,19 +45,12 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @see LocalOfficeContactResource
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
-public class LocalOfficeContactResourceIntTest {
+class LocalOfficeContactResourceIntTest {
 
   private static final String DEFAULT_CONTACT = "contact@example.com";
   private static final String UPDATED_CONTACT = "new-contact@example.com";
-  private static final String DEFAULT_CODE = "AAAAAAAAAA";
-  private static final String UPDATED_CODE = "BBBBBBBBBB";
-  private static final String UNENCODED_CODE = "Te$t Code";
-
-  private static final String DEFAULT_LABEL = "AAAAAAAAAA";
-  private static final String UPDATED_LABEL = "BBBBBBBBBB";
-  private static final String UNENCODED_LABEL = "Te$t Label";
 
   @Autowired
   private LocalOfficeContactRepository repository;
@@ -131,8 +123,8 @@ public class LocalOfficeContactResourceIntTest {
     return entity;
   }
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     MockitoAnnotations.initMocks(this);
     LocalOfficeContactResource controller = new LocalOfficeContactResource(service, mapper,
         validator);
@@ -142,8 +134,8 @@ public class LocalOfficeContactResourceIntTest {
         .setMessageConverters(jacksonMessageConverter).build();
   }
 
-  @Before
-  public void initTest() {
+  @BeforeEach
+  void initTest() {
     entity = createEntity(em);
     entity.setContactType(contactTypeRepository.saveAndFlush(entity.getContactType()));
     entity.setLocalOffice(localOfficeRepository.saveAndFlush(entity.getLocalOffice()));
@@ -151,7 +143,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void createLocalOfficeContact() throws Exception {
+  void createLocalOfficeContact() throws Exception {
     int databaseSizeBeforeCreate = repository.findAll().size();
 
     // Create the LocalOfficeContact.
@@ -170,9 +162,9 @@ public class LocalOfficeContactResourceIntTest {
     assertThat(testLocalOfficeContact.getContactType()).isEqualTo(entity.getContactType());
   }
 
-  @Test(expected = DataIntegrityViolationException.class)
+  @Test
   @Transactional
-  public void createLocalOfficeContactWithDuplicateIndex() throws Exception {
+  void createLocalOfficeContactWithDuplicateIndex() throws Exception {
     // Create the LocalOfficeContactType.
     LocalOfficeContactDto dto = mapper.toDto(entity);
     mockMvc.perform(post("/api/local-office-contacts")
@@ -183,15 +175,12 @@ public class LocalOfficeContactResourceIntTest {
     mockMvc.perform(post("/api/local-office-contacts")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(dto)))
-        .andExpect(status().isCreated());
-
-    // The above insert will not fail until flushed.
-    repository.flush();
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   @Transactional
-  public void createLocalOfficeContactWithExistingId() throws Exception {
+  void createLocalOfficeContactWithExistingId() throws Exception {
     int databaseSizeBeforeCreate = repository.findAll().size();
 
     // Create the LocalOfficeContact with an existing ID.
@@ -211,7 +200,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void createLocalOfficeContactWithInvalidContact() throws Exception {
+  void createLocalOfficeContactWithInvalidContact() throws Exception {
     int databaseSizeBeforeCreate = repository.findAll().size();
 
     // Create the LocalOfficeContact with an invalid contact.
@@ -231,7 +220,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void checkContactTypeIsRequired() throws Exception {
+  void checkContactTypeIsRequired() throws Exception {
     int databaseSizeBeforeTest = repository.findAll().size();
     // Set the field null.
     entity.setContactType(null);
@@ -250,7 +239,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void checkLocalOfficeIsRequired() throws Exception {
+  void checkLocalOfficeIsRequired() throws Exception {
     int databaseSizeBeforeTest = repository.findAll().size();
     // Set the field null.
     entity.setLocalOffice(null);
@@ -269,7 +258,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getAllLocalOfficeContacts() throws Exception {
+  void getAllLocalOfficeContacts() throws Exception {
     // Initialize the database.
     repository.saveAndFlush(entity);
 
@@ -287,7 +276,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithColumnFilter() throws Exception {
+  void getLocalOfficeContactsWithColumnFilter() throws Exception {
     // Initialize the database.
     repository.saveAndFlush(entity);
 
@@ -314,7 +303,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithQueryMatchingContact() throws Exception {
+  void getLocalOfficeContactsWithQueryMatchingContact() throws Exception {
     // Initialize the database.
     LocalOfficeContact entity = createEntity(em, UUID.randomUUID().toString(),
         UUID.randomUUID().toString());
@@ -340,7 +329,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithQueryMatchingLocalOfficeAbbreviation() throws Exception {
+  void getLocalOfficeContactsWithQueryMatchingLocalOfficeAbbreviation() throws Exception {
     // Initialize the database.
     LocalOfficeContact entity = createEntity(em, UUID.randomUUID().toString(), "TSTABR");
     entity.setContactType(contactTypeRepository.saveAndFlush(entity.getContactType()));
@@ -363,7 +352,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithQueryMatchingLocalOfficeName() throws Exception {
+  void getLocalOfficeContactsWithQueryMatchingLocalOfficeName() throws Exception {
     // Initialize the database.
     LocalOfficeContact entity = createEntity(em, UUID.randomUUID().toString(),
         UUID.randomUUID().toString());
@@ -389,7 +378,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithQueryMatchingContactTypeCode() throws Exception {
+  void getLocalOfficeContactsWithQueryMatchingContactTypeCode() throws Exception {
     // Initialize the database.
     LocalOfficeContact entity = createEntity(em, "TSTCODE", UUID.randomUUID().toString());
     entity.setContactType(contactTypeRepository.saveAndFlush(entity.getContactType()));
@@ -412,7 +401,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContactsWithQueryMatchingContactTypeLabel() throws Exception {
+  void getLocalOfficeContactsWithQueryMatchingContactTypeLabel() throws Exception {
     // Initialize the database.
     LocalOfficeContact entity = createEntity(em, UUID.randomUUID().toString(),
         UUID.randomUUID().toString());
@@ -440,7 +429,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getLocalOfficeContact() throws Exception {
+  void getLocalOfficeContact() throws Exception {
     // Initialize the database.
     repository.saveAndFlush(entity);
 
@@ -457,7 +446,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void getNonExistingLocalOfficeContact() throws Exception {
+  void getNonExistingLocalOfficeContact() throws Exception {
     // Get the contact.
     mockMvc.perform(get("/api/local-office-contacts/{id}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
@@ -465,7 +454,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void updateLocalOfficeContact() throws Exception {
+  void updateLocalOfficeContact() throws Exception {
     // Initialize the database.
     repository.saveAndFlush(entity);
     int databaseSizeBeforeUpdate = repository.findAll().size();
@@ -503,7 +492,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void updateNonExistingLocalOfficeContact() throws Exception {
+  void updateNonExistingLocalOfficeContact() throws Exception {
     int databaseSizeBeforeUpdate = repository.findAll().size();
 
     // Create the LocalOfficeContact.
@@ -522,7 +511,7 @@ public class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
-  public void updateLocalOfficeContactWithInvalidContact() throws Exception {
+  void updateLocalOfficeContactWithInvalidContact() throws Exception {
     // Initialize the database.
     repository.saveAndFlush(entity);
     int databaseSizeBeforeUpdate = repository.findAll().size();
