@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactDto;
 import com.transformuk.hee.tis.reference.service.Application;
+import com.transformuk.hee.tis.reference.service.api.validation.LocalOfficeContactValidator;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
 import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
@@ -75,6 +76,9 @@ public class LocalOfficeContactResourceIntTest {
   private LocalOfficeContactServiceImpl service;
 
   @Autowired
+  private LocalOfficeContactValidator validator;
+
+  @Autowired
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
   @Autowired
@@ -130,7 +134,8 @@ public class LocalOfficeContactResourceIntTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    LocalOfficeContactResource controller = new LocalOfficeContactResource(service, mapper);
+    LocalOfficeContactResource controller = new LocalOfficeContactResource(service, mapper,
+        validator);
     this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setCustomArgumentResolvers(pageableArgumentResolver)
         .setControllerAdvice(exceptionTranslator)
@@ -191,6 +196,26 @@ public class LocalOfficeContactResourceIntTest {
 
     // Create the LocalOfficeContact with an existing ID.
     entity.setId(UUID.randomUUID());
+    LocalOfficeContactDto dto = mapper.toDto(entity);
+
+    // An entity with an existing ID cannot be created, so this API call must fail.
+    mockMvc.perform(post("/api/local-office-contacts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(dto)))
+        .andExpect(status().isBadRequest());
+
+    // Validate the Alice in the database.
+    List<LocalOfficeContact> entityList = repository.findAll();
+    assertThat(entityList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Test
+  @Transactional
+  public void createLocalOfficeContactWithInvalidContact() throws Exception {
+    int databaseSizeBeforeCreate = repository.findAll().size();
+
+    // Create the LocalOfficeContact with an invalid contact.
+    entity.setContact("invalid");
     LocalOfficeContactDto dto = mapper.toDto(entity);
 
     // An entity with an existing ID cannot be created, so this API call must fail.
@@ -485,6 +510,29 @@ public class LocalOfficeContactResourceIntTest {
     LocalOfficeContactDto dto = mapper.toDto(entity);
 
     // If the entity doesn't have an ID, it will cause a bad request.
+    mockMvc.perform(put("/api/local-office-contacts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(dto)))
+        .andExpect(status().isBadRequest());
+
+    // Validate the LocalOfficeContact in the database.
+    List<LocalOfficeContact> entityList = repository.findAll();
+    assertThat(entityList).hasSize(databaseSizeBeforeUpdate);
+  }
+
+  @Test
+  @Transactional
+  public void updateLocalOfficeContactWithInvalidContact() throws Exception {
+    // Initialize the database.
+    repository.saveAndFlush(entity);
+    int databaseSizeBeforeUpdate = repository.findAll().size();
+
+    // Update the contact.
+    LocalOfficeContact updatedEntity = repository.findById(entity.getId()).get();
+    updatedEntity.setContact("invalid");
+
+    LocalOfficeContactDto dto = mapper.toDto(updatedEntity);
+
     mockMvc.perform(put("/api/local-office-contacts")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(dto)))

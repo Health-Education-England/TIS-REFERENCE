@@ -9,6 +9,7 @@ import com.transformuk.hee.tis.reference.service.api.util.ColumnFilterUtil;
 import com.transformuk.hee.tis.reference.service.api.util.HeaderUtil;
 import com.transformuk.hee.tis.reference.service.api.util.PaginationUtil;
 import com.transformuk.hee.tis.reference.service.api.util.UrlDecoderUtil;
+import com.transformuk.hee.tis.reference.service.api.validation.LocalOfficeContactValidator;
 import com.transformuk.hee.tis.reference.service.model.ColumnFilter;
 import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
 import com.transformuk.hee.tis.reference.service.service.impl.LocalOfficeContactServiceImpl;
@@ -50,11 +51,13 @@ public class LocalOfficeContactResource {
 
   private final LocalOfficeContactServiceImpl service;
   private final LocalOfficeContactMapper mapper;
+  private final LocalOfficeContactValidator validator;
 
   public LocalOfficeContactResource(LocalOfficeContactServiceImpl service,
-      LocalOfficeContactMapper mapper) {
+      LocalOfficeContactMapper mapper, LocalOfficeContactValidator validator) {
     this.service = service;
     this.mapper = mapper;
+    this.validator = validator;
   }
 
 
@@ -72,6 +75,7 @@ public class LocalOfficeContactResource {
       @Validated(Create.class) @RequestBody LocalOfficeContactDto dto)
       throws URISyntaxException {
     log.debug("REST request to save LocalOfficeContact : {}", dto);
+    validator.validate(dto);
 
     LocalOfficeContact entity = mapper.toEntity(dto);
     entity = service.save(entity);
@@ -94,6 +98,7 @@ public class LocalOfficeContactResource {
   public ResponseEntity<LocalOfficeContactDto> updateLocalOfficeContact(
       @Validated(Update.class) @RequestBody LocalOfficeContactDto dto) {
     log.debug("REST request to update LocalOfficeContact : {}", dto);
+    validator.validate(dto);
 
     LocalOfficeContact entity = mapper.toEntity(dto);
     entity = service.save(entity);
