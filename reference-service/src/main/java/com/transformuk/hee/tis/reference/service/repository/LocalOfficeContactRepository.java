@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.repository;
 
 import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,4 +14,6 @@ import org.springframework.stereotype.Repository;
 public interface LocalOfficeContactRepository extends JpaRepository<LocalOfficeContact, UUID>,
     JpaSpecificationExecutor<LocalOfficeContact> {
 
+  List<LocalOfficeContact> findByContactTypeIdAndLocalOfficeUuid(UUID contactTypeId,
+      UUID localOfficeUuid);
 }
