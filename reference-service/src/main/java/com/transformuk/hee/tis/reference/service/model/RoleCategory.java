@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 /**
  * The representation of the RoleCategory entity.
@@ -35,6 +37,12 @@ public class RoleCategory implements Serializable {
   @OneToMany(mappedBy = "roleCategory", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Role> roles = new HashSet<>();
 
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+          name = "UUID",
+          strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  @Type(type = "org.hibernate.type.UUIDCharType")
   private UUID uuid;
 
   public RoleCategory() {

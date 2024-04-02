@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 /**
  * The representation of the Role entity.
@@ -30,6 +32,12 @@ public class Role implements Serializable {
   private Long id;
 
   @Column(name = "uuid")
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+          name = "UUID",
+          strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  @Type(type = "org.hibernate.type.UUIDCharType")
   private UUID uuid;
 
   @NotNull

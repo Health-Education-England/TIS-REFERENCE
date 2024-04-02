@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 /**
  * A ReligiousBelief.
@@ -28,6 +30,12 @@ public class ReligiousBelief implements Serializable {
   private Long id;
 
   @Column(name = "uuid")
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+          name = "UUID",
+          strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  @Type(type = "org.hibernate.type.UUIDCharType")
   private UUID uuid;
 
   @NotNull
