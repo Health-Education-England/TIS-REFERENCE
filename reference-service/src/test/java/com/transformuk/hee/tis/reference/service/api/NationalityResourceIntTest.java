@@ -52,8 +52,8 @@ public class NationalityResourceIntTest {
   private static final String UPDATED_COUNTRY_NUMBER = "BBBBBBBBBB";
   private static final String UNENCODED_COUNTRY_NUMBER = "CCCCCCCCCC";
 
-  private static final String DEFAULT_NATIONALITY = "AAAAAAAAAA";
-  private static final String UPDATED_NATIONALITY = "BBBBBBBBBB";
+  private static final String DEFAULT_NATIONALITY = "DEFAULT_NATIONALITY";
+  private static final String UPDATED_NATIONALITY = "UPDATED_NATIONALITY";
   private static final String UNENCODED_NATIONALITY = "Te$t Nationality";
 
   @Autowired
@@ -331,7 +331,7 @@ public class NationalityResourceIntTest {
 
     mockMvc.perform(post(EXISTS_ENDPOINT)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_NATIONALITY)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
   }
@@ -358,7 +358,7 @@ public class NationalityResourceIntTest {
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_NATIONALITY)))
         .andExpect(status().isOk())
         .andExpect(content().string("false"));
   }
@@ -373,7 +373,7 @@ public class NationalityResourceIntTest {
 
     mockMvc.perform(post(EXISTS_ENDPOINT + "?columnFilters=" + columnFilter)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_COUNTRY_NUMBER)))
+        .content(TestUtil.convertObjectToJsonBytes(DEFAULT_NATIONALITY)))
         .andExpect(status().isOk())
         .andExpect(content().string("true"));
   }
