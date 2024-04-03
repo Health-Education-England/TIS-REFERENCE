@@ -186,7 +186,7 @@ public class NationalityResource {
       throws IOException {
     code = getConverter(code).decodeUrl().toString();
     log.debug("REST request to check Nationality exists : {}", code);
-    Specification<Nationality> specs = Specification.where(isEqual("countryNumber", code));
+    Specification<Nationality> specs = Specification.where(isEqual("nationality", code));
 
     List<Class> filterEnumList = Lists.newArrayList(Status.class);
     List<ColumnFilter> columnFilters =
