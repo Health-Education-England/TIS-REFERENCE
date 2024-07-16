@@ -91,7 +91,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
-    private static final String FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT =
+  private static final String FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT =
       "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
@@ -635,7 +635,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getLocalOfficesByName with {}", owner);
     return referenceRestTemplate
         .exchange(
-            serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesByNameJsonQuerystringURLEncoded
+            serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT
+                + localOfficesByNameJsonQuerystringURLEncoded
                 .replace("PARAMETER_LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null,
             new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
             })
@@ -647,10 +648,11 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getLocalOfficesByAbbrev with {}", abbreviation);
     return referenceRestTemplate
         .exchange(
-                serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT + localOfficesByAbbrevJsonQuerystringURLEncoded
+                serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT
+                    + localOfficesByAbbrevJsonQuerystringURLEncoded
                     .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)), HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
-                })
+            new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
+            })
            .getBody();
     }
 
