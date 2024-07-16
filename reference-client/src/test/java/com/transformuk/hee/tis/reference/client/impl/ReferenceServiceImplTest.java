@@ -375,6 +375,33 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldFindLocalOfficesByAbbreviation() {
+    // given
+    String localOfficeAbbreviation = "abbrev";
+    LocalOfficeDTO localOfficeDTO = new LocalOfficeDTO();
+    localOfficeDTO.setAbbreviation(localOfficeAbbreviation);
+    List<LocalOfficeDTO> localOffices = Collections.singletonList(localOfficeDTO);
+
+    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices,
+            HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+            any(HttpMethod.class), isNull(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any()))
+            .willReturn(responseEntity);
+
+    // when
+    List<LocalOfficeDTO> respList = referenceServiceImpl
+            .findLocalOfficesByAbbrev(localOfficeAbbreviation);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+                    + "/api/local-offices?columnFilters=%7B%22abbreviation%22%3A%5B%22abbrev%22%5D%7D"),
+            eq(HttpMethod.GET), isNull(RequestEntity.class),
+            Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(localOffices, respList);
+  }
+
+  @Test
   public void shouldGetGradeExists() {
     // given
     HttpEntity<List<String>> requestEntity = new HttpEntity<>(ids);
