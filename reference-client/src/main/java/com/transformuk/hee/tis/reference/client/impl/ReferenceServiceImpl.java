@@ -650,11 +650,12 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         .exchange(
                 serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT
                     + localOfficesByAbbrevJsonQuerystringURLEncoded
-                    .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)), HttpMethod.GET, null,
+                    .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)),
+                HttpMethod.GET, null,
             new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
             })
            .getBody();
-    }
+  }
 
   @Override
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
