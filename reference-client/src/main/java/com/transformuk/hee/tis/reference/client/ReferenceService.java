@@ -131,6 +131,8 @@ public interface ReferenceService extends ClientService {
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
+  ResponseEntity<DBCDTO> getDBCByAbbr(String abbr);
+
   HttpStatus siteTrustMatch(String siteCode, String trustCode);
 
   Map<String, Boolean> gradeExists(List<String> Ids);

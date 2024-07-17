@@ -94,6 +94,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT =
       "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+  private static final String DBCS_ABBR_MAPPINGS_ENDPOINT = "/api/dbcs/abbr/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
@@ -660,6 +661,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   @Override
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
+    ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
+    return responseEntity;
+  }
+
+  @Override
+  public ResponseEntity<DBCDTO> getDBCByAbbr(String abbr) {
+    String url = serviceUrl + DBCS_ABBR_MAPPINGS_ENDPOINT + abbr;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
     return responseEntity;
   }

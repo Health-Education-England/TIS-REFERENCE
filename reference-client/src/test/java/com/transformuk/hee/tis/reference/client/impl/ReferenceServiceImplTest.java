@@ -68,6 +68,7 @@ public class ReferenceServiceImplTest {
   private static final double STANDARD_RATE_LIMIT = 50.0d;
   private static final double BULK_RATE_LIMIT = 5.0d;
   private static final String DBC = "1-DGBODY";
+  private static final String ABBR = "ABCDE";
   private static final String REFERENCE_URL = "http://localhost:8088/reference";
   private static final String TRUST_CODE = "RJ7";
   private static final String SITE_CODE = "RJ706";
@@ -103,6 +104,21 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate)
         .getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
+  }
+
+  @Test
+  public void shouldGetDBCByAbbr() {
+    // given
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/abbr/" + ABBR), any()))
+            .willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.getDBCByAbbr(ABBR);
+
+    // then
+    verify(referenceRestTemplate)
+            .getForEntity(eq(REFERENCE_URL + "/api/dbcs/abbr/" + ABBR), eq(DBCDTO.class));
   }
 
   @Test

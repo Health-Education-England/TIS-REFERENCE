@@ -16,6 +16,8 @@ public interface DBCRepository extends JpaRepository<DBC, Long>, JpaSpecificatio
 
   DBC findByDbc(String code);
 
+  DBC findByAbbr(String abbr);
+
   @Query("SELECT d from DBC d WHERE d.internal =:internal")
   List<DBC> findByInternal(@Param("internal") boolean internal);
 
