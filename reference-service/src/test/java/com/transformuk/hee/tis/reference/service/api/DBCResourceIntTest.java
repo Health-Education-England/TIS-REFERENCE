@@ -288,6 +288,21 @@ public class DBCResourceIntTest {
 
   @Test
   @Transactional
+  public void getDBCByAbbr() throws Exception {
+    // Initialize the database
+    dBCRepository.saveAndFlush(dBC);
+
+    // Get the dBC
+    restDBCMockMvc.perform(get("/api/dbcs/abbr/" + DEFAULT_ABBR))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.dbc").value(DEFAULT_DBC))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.abbr").value(DEFAULT_ABBR));
+  }
+
+  @Test
+  @Transactional
   public void getDBCByInternal() throws Exception {
     // Initialize the database with one internal and one external dbc
     DBC externalDbc = new DBC();
