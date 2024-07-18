@@ -119,6 +119,8 @@ public interface ReferenceService extends ClientService {
 
   List<LocalOfficeDTO> findLocalOfficesByName(String localOfficeName);
 
+  List<LocalOfficeDTO> findLocalOfficesByAbbrev(String abbreviation);
+
   List<TrustDTO> findCurrentTrustsByTrustKnownAsIn(Set<String> allTrustKnownAs);
 
   List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels);
@@ -128,6 +130,8 @@ public interface ReferenceService extends ClientService {
   List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id);
 
   ResponseEntity<DBCDTO> getDBCByCode(String code);
+
+  ResponseEntity<DBCDTO> getDBCByAbbr(String abbr);
 
   HttpStatus siteTrustMatch(String siteCode, String trustCode);
 

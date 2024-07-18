@@ -199,6 +199,21 @@ public class DBCResource {
   }
 
   /**
+   * GET /dbcs/abbr/:abbr : get the "abbr" dBC.
+   *
+   * @param abbr the abbreviation of the dBCDTO to retrieve
+   * @return the ResponseEntity with status 200 (OK) and with body the dBCDTO, or with status 404
+   * (Not Found)
+   */
+  @GetMapping("/dbcs/abbr/{abbr}")
+  public ResponseEntity<DBCDTO> getDBCByAbbr(@PathVariable String abbr) {
+    log.debug("REST request to get DBC by abbr: {}", abbr);
+    DBC dBC = dBCRepository.findByAbbr(abbr);
+    DBCDTO dBCDTO = dBCMapper.dBCToDBCDTO(dBC);
+    return ResponseUtil.wrapOrNotFound(Optional.ofNullable(dBCDTO));
+  }
+
+  /**
    * GET /dbcs/internal/:internal : get the "internal" dBC.
    *
    * @param internal the internal field of the dBCDTO to retrieve

@@ -91,7 +91,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
+  private static final String FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT =
+      "/api/local-offices?columnFilters=";
   private static final String DBCS_MAPPINGS_ENDPOINT = "/api/dbcs/code/";
+  private static final String DBCS_ABBR_MAPPINGS_ENDPOINT = "/api/dbcs/abbr/";
   private static final String TRUSTS_MAPPINGS_CODE_ENDPOINT = "/api/trusts/codeexists/";
   private static final String SITES_MAPPINGS_CODE_ENDPOINT = "/api/sites/codeexists/";
   private static final String SITE_TRUST_MATCH_ENDPOINT = "/api/sites/trustmatch/";
@@ -134,7 +137,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String gradesJsonQuerystringURLEncoded;
   private static String gradesCurrentPlacementAndTrainingJsonQuerystringURLEncoded;
   private static String labelJsonQuerystringURLEncoded;
-  private static String localOfficesJsonQuerystringURLEncoded;
+  private static String localOfficesByNameJsonQuerystringURLEncoded;
+  private static String localOfficesByAbbrevJsonQuerystringURLEncoded;
   private static String sitesKnownAsJsonQuerystringURLEncoded;
   private static String trustKnownAsJsonQuerystringURLEncoded;
   private static String statusCurrentUrlEncoded;
@@ -150,8 +154,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               + "\"trainingGrade\": [\"true\"]}");
       labelJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
-      localOfficesJsonQuerystringURLEncoded = new URLCodec()
+      localOfficesByNameJsonQuerystringURLEncoded = new URLCodec()
           .encode("{\"name\":[\"PARAMETER_LOCALOFFICENAME\"],\"status\":[\"CURRENT\"]}");
+      localOfficesByAbbrevJsonQuerystringURLEncoded = new URLCodec()
+          .encode("{\"abbreviation\":[\"PARAMETER_LOCALOFFICEABBREV\"]}");
       sitesKnownAsJsonQuerystringURLEncoded =
           new URLCodec().encode("{\"siteKnownAs\":[\"PARAMETER_NAME\"],\"status\":[\"CURRENT\"]}");
       trustKnownAsJsonQuerystringURLEncoded = new URLCodec()
@@ -630,7 +636,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getLocalOfficesByName with {}", owner);
     return referenceRestTemplate
         .exchange(
-            serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT + localOfficesJsonQuerystringURLEncoded
+            serviceUrl + FIND_LOCALOFFICES_BY_NAME_ENDPOINT
+                + localOfficesByNameJsonQuerystringURLEncoded
                 .replace("PARAMETER_LOCALOFFICENAME", urlEncode(owner)), HttpMethod.GET, null,
             new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
             })
@@ -638,8 +645,29 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
+  public List<LocalOfficeDTO> findLocalOfficesByAbbrev(String abbreviation) {
+    LOG.debug("calling getLocalOfficesByAbbrev with {}", abbreviation);
+    return referenceRestTemplate
+        .exchange(
+                serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT
+                    + localOfficesByAbbrevJsonQuerystringURLEncoded
+                    .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)),
+                HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
+            })
+           .getBody();
+  }
+
+  @Override
   public ResponseEntity<DBCDTO> getDBCByCode(String code) {
     String url = serviceUrl + DBCS_MAPPINGS_ENDPOINT + code;
+    ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
+    return responseEntity;
+  }
+
+  @Override
+  public ResponseEntity<DBCDTO> getDBCByAbbr(String abbr) {
+    String url = serviceUrl + DBCS_ABBR_MAPPINGS_ENDPOINT + abbr;
     ResponseEntity<DBCDTO> responseEntity = referenceRestTemplate.getForEntity(url, DBCDTO.class);
     return responseEntity;
   }

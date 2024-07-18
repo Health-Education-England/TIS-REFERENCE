@@ -68,6 +68,7 @@ public class ReferenceServiceImplTest {
   private static final double STANDARD_RATE_LIMIT = 50.0d;
   private static final double BULK_RATE_LIMIT = 5.0d;
   private static final String DBC = "1-DGBODY";
+  private static final String ABBR = "ABCDE";
   private static final String REFERENCE_URL = "http://localhost:8088/reference";
   private static final String TRUST_CODE = "RJ7";
   private static final String SITE_CODE = "RJ706";
@@ -103,6 +104,21 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate)
         .getForEntity(eq(REFERENCE_URL + "/api/dbcs/code/" + DBC), eq(DBCDTO.class));
+  }
+
+  @Test
+  public void shouldGetDBCByAbbr() {
+    // given
+    ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+    given(referenceRestTemplate.getForEntity(eq(REFERENCE_URL + "/api/dbcs/abbr/" + ABBR), any()))
+            .willReturn(responseEntity);
+
+    // when
+    referenceServiceImpl.getDBCByAbbr(ABBR);
+
+    // then
+    verify(referenceRestTemplate)
+            .getForEntity(eq(REFERENCE_URL + "/api/dbcs/abbr/" + ABBR), eq(DBCDTO.class));
   }
 
   @Test
@@ -369,6 +385,33 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
             + "/api/local-offices?columnFilters=%7B%22name%22%3A%5B%22localOfficeNameWithSpecialCharacters%40%21%C2%A3%26%C2%A3%24%25%40%2F%5C%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(localOffices, respList);
+  }
+
+  @Test
+  public void shouldFindLocalOfficesByAbbreviation() {
+    // given
+    String localOfficeAbbreviation = "abbrev";
+    LocalOfficeDTO localOfficeDTO = new LocalOfficeDTO();
+    localOfficeDTO.setAbbreviation(localOfficeAbbreviation);
+    List<LocalOfficeDTO> localOffices = Collections.singletonList(localOfficeDTO);
+
+    ResponseEntity<List<LocalOfficeDTO>> responseEntity = new ResponseEntity(localOffices,
+        HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<LocalOfficeDTO>>>any()))
+        .willReturn(responseEntity);
+
+    // when
+    List<LocalOfficeDTO> respList = referenceServiceImpl
+        .findLocalOfficesByAbbrev(localOfficeAbbreviation);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL
+            + "/api/local-offices?columnFilters=%7B%22abbreviation%22%3A%5B%22abbrev%22%5D%7D"),
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(localOffices, respList);
