@@ -1,12 +1,11 @@
 DROP TABLE IF EXISTS LocalOfficeNameMapping;
 
-CREATE TABLE LocalOfficeNameMapping
-  (
-     `uuid`       VARCHAR(36) NOT NULL,
-     `oldName`    VARCHAR(255) NULL,
-     `newName`    VARCHAR(255) NULL,
-     `reason`     VARCHAR(255) NULL,
-     PRIMARY KEY (`uuid``)
+CREATE TABLE `LocalOfficeNameMapping` (
+     `uuid`       varchar(36) NOT NULL,
+     `oldName`    varchar(255) NULL,
+     `newName`    varchar(255) NULL,
+     `reason`     varchar(255) NULL,
+     PRIMARY KEY (`uuid`)
   );
 
 INSERT INTO LocalOfficeNameMapping (`uuid`, `oldName`, `newName`, `reason`) VALUES
