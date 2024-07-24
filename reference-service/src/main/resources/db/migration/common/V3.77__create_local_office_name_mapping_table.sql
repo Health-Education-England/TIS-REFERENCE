@@ -2,14 +2,14 @@ DROP TABLE IF EXISTS LocalOfficeNameMapping;
 
 CREATE TABLE LocalOfficeNameMapping
   (
-     uuid       VARCHAR(36) NOT NULL,
-     oldName    VARCHAR(MAX) NULL,
-     newName    VARCHAR(MAX) NULL,
-     reason     VARCHAR(MAX) NULL,
-     PRIMARY KEY (uuid)
+     `uuid`       VARCHAR(36) NOT NULL,
+     `oldName`    VARCHAR(255) NULL,
+     `newName`    VARCHAR(255) NULL,
+     `reason`     VARCHAR(255) NULL,
+     PRIMARY KEY (`uuid``)
   );
 
-INSERT INTO LocalOfficeNameMapping (uuid, oldName, newName, reason) VALUES
+INSERT INTO LocalOfficeNameMapping (`uuid`, `oldName`, `newName`, `reason`) VALUES
 (uuid(), 'Health Education England Yorkshire and the Humber', 'Yorkshire and the Humber', "NHSE-MERGER"),
 (uuid(), 'Health Education England East Midlands', 'East Midlands', "NHSE-MERGER"),
 (uuid(), 'Health Education England East of England', 'East of England', "NHSE-MERGER"),
