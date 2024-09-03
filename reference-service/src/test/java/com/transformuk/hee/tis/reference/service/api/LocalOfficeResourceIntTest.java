@@ -56,9 +56,9 @@ public class LocalOfficeResourceIntTest {
   private static final String SEARCH_LOCAL_OFFICE_NAME = "SEARCHLO";
   private static final String UNENCODED_NAME = "Te$t Local Office";
 
-  private static final String HENE_NAME = "Health Education England North East";
-  private static final String HENWL_NAME = "Health Education England North West London";
-  private static final String HEKSS_NAME = "Health Education England Kent, Surrey and Sussex";
+  private static final String HENE_NAME = "North East";
+  private static final String HENWL_NAME = "North West London";
+  private static final String HEKSS_NAME = "Kent, Surrey and Sussex";
 
   private static final String DEFAULT_POST_ABBREVIATION = "AAA";
   private static final String UNENCODED_POST_ABBREVIATION = "CCC";
@@ -268,7 +268,7 @@ public class LocalOfficeResourceIntTest {
     int testID = 0; // initialise it in case no local office is found
     List<LocalOffice> allLocalOffices = localOfficeRepository.findAll();
     for (LocalOffice lo : allLocalOffices) {
-      if (lo.getName().equals("Health Education England North West London")) {
+      if (lo.getName().equals("North West London")) {
         testID = lo.getId().intValue();
         break;
       }
