@@ -22,9 +22,9 @@ public class DbcToLocalOfficeMapperTest {
     //Then
     assertThat(mapResult)
         .hasSize(3)
-        .contains("Health Education England North West London",
-            "Health Education England Kent, Surrey and Sussex",
-            "Health Education England North West");
+        .contains("North West London",
+            "Kent, Surrey and Sussex",
+            "North West");
   }
 
   @Test
