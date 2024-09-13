@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
-import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.FundingReason;
 import com.transformuk.hee.tis.reference.service.repository.FundingReasonRepository;
 import com.transformuk.hee.tis.reference.service.service.AbstractReferenceService;
