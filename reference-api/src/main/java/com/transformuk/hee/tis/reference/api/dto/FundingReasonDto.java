@@ -19,23 +19,5 @@ public class FundingReasonDto implements Serializable {
   private String reason;
 
   private Status status;
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    FundingReasonDto fundingReasonDto = (FundingReasonDto) o;
-
-    return Objects.equals(id, fundingReasonDto.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(id);
-  }
+  
 }
