@@ -19,5 +19,5 @@ public class FundingReasonDto implements Serializable {
   private String reason;
 
   private Status status;
-  
+
 }
