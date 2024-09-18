@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 import com.transformuk.hee.tis.reference.api.dto.AssessmentTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingReasonDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
@@ -1729,5 +1730,35 @@ public class ReferenceServiceImplTest {
         eq(HttpMethod.GET), isNull(RequestEntity.class),
         Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
     assertEquals(fundingSubTypes, respList);
+  }
+
+  @Test
+  public void shouldFindFundingReasonsByReason() {
+    // given
+    String reason = "reason";
+    FundingReasonDto fundingReason = new FundingReasonDto();
+    fundingReason.setReason(reason);
+    List<FundingReasonDto> fundingReasons = Arrays.asList(fundingReason);
+
+    ResponseEntity<List<FundingReasonDto>> responseEntity = new ResponseEntity(fundingReasons,
+        HttpStatus.OK);
+    given(referenceRestTemplate.exchange(anyString(),
+        any(HttpMethod.class), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<List<FundingSubTypeDto>>>any()))
+        .willReturn(responseEntity);
+
+    // when
+    Set<String> labelSet = new HashSet<>();
+    labelSet.add(reason);
+    List<FundingReasonDto> respList = referenceServiceImpl
+        .findCurrentFundingReasonsByReasonIn(labelSet);
+
+    // then
+    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL +
+            "/api/funding-reason?columnFilters="
+            + "%7B%22reason%22%3A%5B%22reason2%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+        eq(HttpMethod.GET), isNull(RequestEntity.class),
+        Matchers.<ParameterizedTypeReference<java.util.List<com.transformuk.hee.tis.reference.api.dto.SiteDTO>>>any());
+    assertEquals(fundingReason, respList);
   }
 }

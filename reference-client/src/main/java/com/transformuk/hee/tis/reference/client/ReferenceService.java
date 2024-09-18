@@ -129,6 +129,8 @@ public interface ReferenceService extends ClientService {
 
   List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id);
 
+  List<FundingReasonDto> findCurrentFundingReasonsByReasonIn(Set<String> reasons);
+
   ResponseEntity<DBCDTO> getDBCByCode(String code);
 
   ResponseEntity<DBCDTO> getDBCByAbbr(String abbr);
