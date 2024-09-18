@@ -169,7 +169,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
       fundingSubTypeLabelJsonQueryStringURLEncoded = new URLCodec()
           .encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
       fundingReasonJsonQueryStringURLEncoded = new URLCodec()
-          .encode("{\"label\":[\"PARAMETER_REASON\"],\"status\":[\"CURRENT\"]}");
+          .encode("{\"reason\":[\"PARAMETER_REASON\"],\"status\":[\"CURRENT\"]}");
       statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -641,7 +641,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     String joinedReasons = StringUtils.join(reasons, LABEL_JOINING_COMMA_DIVIDER);
     String url = serviceUrl + FIND_FUNDING_REASON_ENDPOINT
         + fundingReasonJsonQueryStringURLEncoded
-        .replace("PARAMETER_LABEL", urlEncode(joinedReasons));
+        .replace("PARAMETER_REASON", urlEncode(joinedReasons));
     ResponseEntity<List<FundingReasonDto>> responseEntity = referenceRestTemplate.exchange(url,
         HttpMethod.GET, null,
         new ParameterizedTypeReference<List<FundingReasonDto>>() {
