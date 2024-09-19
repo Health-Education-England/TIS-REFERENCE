@@ -12,7 +12,7 @@
 
   <groupId>com.transformuk.hee.tis</groupId>
   <artifactId>reference</artifactId>
-  <version>1.5.0</version>
+  <version>1.4.0</version>
   <packaging>pom</packaging>
 
   <name>HEE TIS REFERENCE</name>
