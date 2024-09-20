@@ -1744,7 +1744,7 @@ public class ReferenceServiceImplTest {
         HttpStatus.OK);
     given(referenceRestTemplate.exchange(anyString(),
         any(HttpMethod.class), isNull(RequestEntity.class),
-        Matchers.<ParameterizedTypeReference<List<FundingSubTypeDto>>>any()))
+        Matchers.<ParameterizedTypeReference<List<FundingReasonDto>>>any()))
         .willReturn(responseEntity);
 
     // when
