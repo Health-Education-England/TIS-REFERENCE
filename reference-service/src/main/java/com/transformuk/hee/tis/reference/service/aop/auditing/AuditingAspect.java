@@ -62,6 +62,7 @@ public class AuditingAspect {
     classToPrimaryKeyMap.put("SiteDTO", "id");
     classToPrimaryKeyMap.put("GradeDTO", "id");
     classToPrimaryKeyMap.put("FundingSubTypeDto", "id");
+    classToPrimaryKeyMap.put("FundingReasonDto", "id");
     classToPrimaryKeyMap.put("LocalOfficeContactDto", "id");
     classToPrimaryKeyMap.put("LocalOfficeContactTypeDto", "id");
   }
@@ -72,6 +73,7 @@ public class AuditingAspect {
     classToIdClass.put("SiteDTO", Long.class);
     classToIdClass.put("GradeDTO", Long.class);
     classToIdClass.put("FundingSubTypeDto", UUID.class);
+    classToIdClass.put("FundingReasonDto", UUID.class);
     classToIdClass.put("LocalOfficeContactDto", UUID.class);
     classToIdClass.put("LocalOfficeContactTypeDto", UUID.class);
   }
