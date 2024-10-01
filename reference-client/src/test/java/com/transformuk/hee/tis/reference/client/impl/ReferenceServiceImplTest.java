@@ -1754,11 +1754,11 @@ public class ReferenceServiceImplTest {
         .findCurrentFundingReasonsByReasonIn(labelSet);
 
     // then
-    verify(referenceRestTemplate).exchange(eq(REFERENCE_URL +
+    verify(referenceRestTemplate).exchange(REFERENCE_URL +
             "/api/funding-reason?columnFilters="
-            + "%7B%22reason%22%3A%5B%22reason%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
-        eq(HttpMethod.GET), eq(null),
-        eq(new ParameterizedTypeReference<List<FundingReasonDto>>() {}));
+            + "%7B%22reason%22%3A%5B%22reason%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D",
+        HttpMethod.GET, null,
+        new ParameterizedTypeReference<List<FundingReasonDto>>() {});
     assertEquals(fundingReason, respList.get(0));
   }
 }
