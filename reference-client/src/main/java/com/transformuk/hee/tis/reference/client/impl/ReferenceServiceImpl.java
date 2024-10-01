@@ -9,6 +9,7 @@ import com.transformuk.hee.tis.reference.api.dto.CurriculumSubTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.DBCDTO;
 import com.transformuk.hee.tis.reference.api.dto.EthnicOriginDTO;
 import com.transformuk.hee.tis.reference.api.dto.FundingIssueDTO;
+import com.transformuk.hee.tis.reference.api.dto.FundingReasonDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingSubTypeDto;
 import com.transformuk.hee.tis.reference.api.dto.FundingTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.GdcStatusDTO;
@@ -88,6 +89,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
   private static final String FIND_FUNDING_SUB_TYPES_ENDPOINT =
       "/api/funding-sub-types?columnFilters=";
+  private static final String FIND_FUNDING_REASON_ENDPOINT =
+      "/api/funding-reason?columnFilters=";
   private static final String FIND_TRUST_BY_ID_ENDPOINT = "/api/trusts/";
   private static final String FIND_LOCALOFFICES_BY_NAME_ENDPOINT =
       "/api/local-offices?columnFilters=";
@@ -143,6 +146,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static String trustKnownAsJsonQuerystringURLEncoded;
   private static String statusCurrentUrlEncoded;
   private static String fundingSubTypeLabelJsonQueryStringURLEncoded;
+  private static String fundingReasonJsonQueryStringURLEncoded;
 
   static {
     try {
@@ -164,6 +168,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
           .encode("{\"trustKnownAs\":[\"PARAMETER_TRUSTKNOWNAS\"],\"status\":[\"CURRENT\"]}");
       fundingSubTypeLabelJsonQueryStringURLEncoded = new URLCodec()
           .encode("{\"label\":[\"PARAMETER_LABEL\"],\"status\":[\"CURRENT\"]}");
+      fundingReasonJsonQueryStringURLEncoded = new URLCodec()
+          .encode("{\"reason\":[\"PARAMETER_REASON\"],\"status\":[\"CURRENT\"]}");
       statusCurrentUrlEncoded = new URLCodec().encode("{\"status\":[\"CURRENT\"]}");
     } catch (EncoderException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -612,10 +618,10 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling findCurrentFundingSubTypesByLabel with {}.", joinedLabels);
     String url = serviceUrl + FIND_FUNDING_SUB_TYPES_ENDPOINT
         + fundingSubTypeLabelJsonQueryStringURLEncoded
-            .replace("PARAMETER_LABEL", urlEncode(joinedLabels));
+        .replace("PARAMETER_LABEL", urlEncode(joinedLabels));
     return referenceRestTemplate.exchange(url, HttpMethod.GET, null,
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
-          })
+            })
         .getBody();
   }
 
@@ -627,6 +633,19 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
         exchange(url, HttpMethod.GET, null,
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
             });
+    return responseEntity.getBody();
+  }
+
+  @Override
+  public List<FundingReasonDto> findCurrentFundingReasonsByReasonIn(Set<String> reasons) {
+    String joinedReasons = StringUtils.join(reasons, LABEL_JOINING_COMMA_DIVIDER);
+    String url = serviceUrl + FIND_FUNDING_REASON_ENDPOINT
+        + fundingReasonJsonQueryStringURLEncoded
+        .replace("PARAMETER_REASON", urlEncode(joinedReasons));
+    ResponseEntity<List<FundingReasonDto>> responseEntity = referenceRestTemplate.exchange(url,
+        HttpMethod.GET, null,
+        new ParameterizedTypeReference<List<FundingReasonDto>>() {
+        });
     return responseEntity.getBody();
   }
 
@@ -649,13 +668,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     LOG.debug("calling getLocalOfficesByAbbrev with {}", abbreviation);
     return referenceRestTemplate
         .exchange(
-                serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT
-                    + localOfficesByAbbrevJsonQuerystringURLEncoded
-                    .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)),
-                HttpMethod.GET, null,
+            serviceUrl + FIND_LOCALOFFICES_BY_ABBREV_ENDPOINT
+                + localOfficesByAbbrevJsonQuerystringURLEncoded
+                .replace("PARAMETER_LOCALOFFICEABBREV", urlEncode(abbreviation)),
+            HttpMethod.GET, null,
             new ParameterizedTypeReference<List<LocalOfficeDTO>>() {
             })
-           .getBody();
+        .getBody();
   }
 
   @Override
