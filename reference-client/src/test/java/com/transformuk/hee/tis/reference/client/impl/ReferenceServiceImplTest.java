@@ -1756,7 +1756,7 @@ public class ReferenceServiceImplTest {
     // then
     verify(referenceRestTemplate).exchange(eq(REFERENCE_URL +
             "/api/funding-reason?columnFilters="
-            + "%7B%22reason%22%3A%5B%22reason2%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
+            + "%7B%22reason%22%3A%5B%22reason%22%5D%2C%22status%22%3A%5B%22CURRENT%22%5D%7D"),
         eq(HttpMethod.GET), eq(null),
         eq(new ParameterizedTypeReference<List<FundingReasonDto>>() {}));
     assertEquals(fundingReason, respList.get(0));
