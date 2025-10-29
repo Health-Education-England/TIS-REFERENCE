@@ -36,7 +36,7 @@ jobs:
         run: echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)" >> $GITHUB_ENV
 
       - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
+        uses: whelk-io/maven-settings-xml-action@v22
         with:
           servers: '[{ "id": "codeartifact", "username": "aws", "password": "${env.CODEARTIFACT_AUTH_TOKEN}" }]'
           repositories: '[{ "id": "codeartifact", "url": "https://hee-430723991443.d.codeartifact.eu-west-1.amazonaws.com/maven/Health-Education-England/" }]'
@@ -45,7 +45,7 @@ jobs:
         run: mvn install -DskipTests
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: app-jar
           path: reference-*/target/*.jar
@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: build-artifacts
 
@@ -114,7 +114,7 @@ jobs:
         run: echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)" >> $GITHUB_ENV
 
       - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
+        uses: whelk-io/maven-settings-xml-action@v22
         with:
           servers: '[{ "id": "codeartifact", "username": "aws", "password": "${env.CODEARTIFACT_AUTH_TOKEN}" }]'
           repositories: '[{ "id": "codeartifact", "url": "https://hee-430723991443.d.codeartifact.eu-west-1.amazonaws.com/maven/Health-Education-England/" }]'
