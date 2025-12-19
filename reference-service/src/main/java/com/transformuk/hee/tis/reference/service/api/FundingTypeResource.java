@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -121,9 +120,16 @@ public class FundingTypeResource {
     if (fundingTypeDTO.getId() == null) {
       return createFundingType(fundingTypeDTO);
     }
-    FundingType fundingTypeFromDb = fundingTypeRepository.findById(fundingTypeDTO.getId())
-        .orElseThrow(() -> new EntityNotFoundException(
-            "FundingType not found for id: " + fundingTypeDTO.getId()));
+
+    Optional<FundingType> optionalFundingType = fundingTypeRepository.findById(
+        fundingTypeDTO.getId());
+    if (optionalFundingType.isEmpty()) {
+      return ResponseEntity.badRequest().headers(HeaderUtil
+              .createFailureAlert(ENTITY_NAME, "id_not_found",
+                  "Cannot update FundingType. FundingType with given id not found"))
+          .body(null);
+    }
+    FundingType fundingTypeFromDb = optionalFundingType.get();
     // map the changes and set into the entity from db
     fundingTypeMapper.updateFundingTypeFromDto(fundingTypeDTO, fundingTypeFromDb);
     fundingTypeFromDb = fundingTypeRepository.save(fundingTypeFromDb);

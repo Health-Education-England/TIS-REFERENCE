@@ -338,6 +338,19 @@ public class FundingTypeResourceIntTest {
 
   @Test
   @Transactional
+  public void updateFundingTypeShouldThrowExceptionWhenNotFound() throws Exception {
+    FundingTypeDTO fundingTypeDto = fundingTypeMapper
+        .fundingTypeToFundingTypeDTO(fundingType);
+    fundingTypeDto.setId(2222L); // non-existing id
+
+    restFundingTypeMockMvc.perform(put("/api/funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(fundingTypeDto)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @Transactional
   public void updateNonExistingFundingType() throws Exception {
     int databaseSizeBeforeUpdate = fundingTypeRepository.findAll().size();
 
