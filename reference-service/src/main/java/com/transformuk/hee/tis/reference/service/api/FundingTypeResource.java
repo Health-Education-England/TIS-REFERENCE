@@ -120,9 +120,20 @@ public class FundingTypeResource {
     if (fundingTypeDTO.getId() == null) {
       return createFundingType(fundingTypeDTO);
     }
-    FundingType fundingType = fundingTypeMapper.fundingTypeDTOToFundingType(fundingTypeDTO);
-    fundingType = fundingTypeRepository.save(fundingType);
-    FundingTypeDTO result = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
+
+    Optional<FundingType> optionalFundingType = fundingTypeRepository.findById(
+        fundingTypeDTO.getId());
+    if (optionalFundingType.isEmpty()) {
+      return ResponseEntity.badRequest().headers(HeaderUtil
+              .createFailureAlert(ENTITY_NAME, "id_not_found",
+                  "Cannot update FundingType. FundingType with given id not found"))
+          .body(null);
+    }
+    FundingType fundingTypeFromDb = optionalFundingType.get();
+    // map the changes and set into the entity from db
+    fundingTypeMapper.updateFundingTypeFromDto(fundingTypeDTO, fundingTypeFromDb);
+    fundingTypeFromDb = fundingTypeRepository.save(fundingTypeFromDb);
+    FundingTypeDTO result = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingTypeFromDb);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
         .body(result);
