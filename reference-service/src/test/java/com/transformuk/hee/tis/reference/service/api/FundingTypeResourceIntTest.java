@@ -24,7 +24,9 @@ import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeService
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,6 +106,14 @@ public class FundingTypeResourceIntTest {
     fundingType.setCode(DEFAULT_CODE);
     fundingType.setLabel(DEFAULT_LABEL);
     fundingType.setAllowDetails(false);
+
+    FundingSubType fundingSubType = new FundingSubType();
+    fundingSubType.setCode(DEFAULT_CODE);
+    fundingSubType.setLabel(DEFAULT_LABEL);
+    fundingSubType.setFundingType(fundingType);
+    Set<FundingSubType> subTypes = new HashSet<>();
+    subTypes.add(fundingSubType);
+    fundingType.setFundingSubTypes(subTypes);
     return fundingType;
   }
 
@@ -320,6 +330,10 @@ public class FundingTypeResourceIntTest {
     FundingType testFundingType = fundingTypeList.get(fundingTypeList.size() - 1);
     assertThat(testFundingType.getCode()).isEqualTo(UPDATED_CODE);
     assertThat(testFundingType.getLabel()).isEqualTo(UPDATED_LABEL);
+    assertThat(testFundingType.getFundingSubTypes()).hasSize(1);
+    FundingSubType testFundingSubType = testFundingType.getFundingSubTypes().iterator().next();
+    assertThat(testFundingSubType.getCode()).isEqualTo(DEFAULT_CODE);
+    assertThat(testFundingSubType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
 
   @Test
