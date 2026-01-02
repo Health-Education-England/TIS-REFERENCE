@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -185,10 +186,12 @@ public class FundingTypeResource {
    * @param id the id of the fundingTypeDTO to delete
    * @return the ResponseEntity with status 200 (OK)
    */
+  @Transactional
   @DeleteMapping("/funding-types/{id}")
   @PreAuthorize("hasAuthority('reference:delete:entities')")
   public ResponseEntity<Void> deleteFundingType(@PathVariable Long id) {
     log.debug("REST request to delete FundingType : {}", id);
+    fundingSubTypeService.deleteByFundingTypeId(id);
     fundingTypeRepository.deleteById(id);
     return ResponseEntity.ok()
         .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

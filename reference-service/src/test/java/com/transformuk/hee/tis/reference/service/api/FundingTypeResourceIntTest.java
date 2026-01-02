@@ -346,7 +346,16 @@ public class FundingTypeResourceIntTest {
   public void deleteFundingType() throws Exception {
     // Initialize the database
     fundingTypeRepository.saveAndFlush(fundingType);
-    int databaseSizeBeforeDelete = fundingTypeRepository.findAll().size();
+
+    FundingSubType fundingSubType = new FundingSubType();
+    fundingSubType.setCode(DEFAULT_CODE);
+    fundingSubType.setLabel(DEFAULT_LABEL);
+    fundingSubType.setStatus(Status.CURRENT);
+    fundingSubType.setFundingType(fundingType);
+    fundingSubTypeRepository.saveAndFlush(fundingSubType);
+
+    int dbSizeBeforeDeleteFundingType = fundingTypeRepository.findAll().size();
+    int dbSizeBeforeDeleteFundingSubType = fundingSubTypeRepository.findAll().size();
 
     // Get the fundingType
     restFundingTypeMockMvc.perform(delete("/api/funding-types/{id}", fundingType.getId())
@@ -355,7 +364,9 @@ public class FundingTypeResourceIntTest {
 
     // Validate the database is empty
     List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
-    assertThat(fundingTypeList).hasSize(databaseSizeBeforeDelete - 1);
+    assertThat(fundingTypeList).hasSize(dbSizeBeforeDeleteFundingType - 1);
+    List<FundingSubType> fundingSubTypeList = fundingSubTypeRepository.findAll();
+    assertThat(fundingSubTypeList).hasSize(dbSizeBeforeDeleteFundingSubType - 1);
   }
 
   @Test
