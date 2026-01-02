@@ -20,7 +20,6 @@ import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingSubTypeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.FundingSubTypeServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

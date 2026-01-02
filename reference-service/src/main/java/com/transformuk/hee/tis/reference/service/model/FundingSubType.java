@@ -44,7 +44,7 @@ public class FundingSubType implements Serializable {
   @Column(name = "status")
   private Status status;
 
-  @ManyToOne(targetEntity = FundingType.class)
+  @ManyToOne
   @JoinColumn(name = "parentId", referencedColumnName = "id")
   private FundingType fundingType;
 }

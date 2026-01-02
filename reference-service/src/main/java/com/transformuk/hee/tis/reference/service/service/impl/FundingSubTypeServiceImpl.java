@@ -41,4 +41,8 @@ public class FundingSubTypeServiceImpl extends AbstractReferenceService<FundingS
   public List<FundingSubType> findCurrentSubTypesForFundingTypeId(Long fundingTypeId) {
     return repository.findByStatusAndFundingTypeId(Status.CURRENT, fundingTypeId);
   }
+
+  public void deleteByFundingTypeId(Long fundingTypeId) {
+    repository.deleteByFundingTypeId(fundingTypeId);
+  }
 }
