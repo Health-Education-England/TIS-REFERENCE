@@ -8,12 +8,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Flyway configuration
+ * Configuration for Flyway database migrations.
  */
 @Slf4j
 @Configuration
 public class FlywayConfig {
 
+  /**
+   * Override the default Flyway migration strategy, optionally repairing migrations.
+   *
+   * @param repairEnabled whether to validate and repair before migration
+   * @return a FlywayMigrationStrategy that optionally repairs failed migrations
+   */
   @Bean
   public FlywayMigrationStrategy repairThenMigrateStrategy(
       @Value("${application.flyway.repair}") boolean repairEnabled) {
