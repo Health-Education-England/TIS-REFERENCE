@@ -16,14 +16,14 @@ ADD COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 ALTER TABLE `Site`
 MODIFY `siteCode` VARCHAR(255);
 
---make trust code nullable
+-- make trust code nullable
 ALTER TABLE `Site`
 MODIFY `trustCode` VARCHAR(255);
 
 ALTER TABLE `Site`
 ADD COLUMN `trustId` bigint(20);
 
----
+-- -- --
 
 ALTER TABLE `Trust`
 DROP PRIMARY KEY;
@@ -37,7 +37,7 @@ ADD COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 ALTER TABLE `Trust`
 MODIFY `code` VARCHAR(255);
 
----
+-- -- --
 
 ALTER TABLE `Grade`
 DROP PRIMARY KEY;
@@ -54,7 +54,7 @@ MODIFY `abbreviation` VARCHAR(255);
 ALTER TABLE `Grade`
 ADD COLUMN `intrepidId` VARCHAR(255);
 
----
+-- -- --
 
 ALTER TABLE `MedicalSchool`
 DROP index `code`;

@@ -1,6 +1,5 @@
 package com.transformuk.hee.tis.reference.service;
 
-import com.transformuk.hee.tis.reference.service.config.ApplicationProperties;
 import com.transformuk.hee.tis.reference.service.config.DefaultProfileUtil;
 import io.github.jhipster.config.JHipsterConstants;
 import io.github.jhipster.config.metrics.PrometheusRegistry;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.metrics.orm.jpa.HibernateMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -25,7 +23,6 @@ import org.springframework.core.env.Environment;
 @ComponentScan
 @EnableAutoConfiguration(exclude = {HibernateMetricsAutoConfiguration.class,
     PrometheusRegistry.class})
-@EnableConfigurationProperties({ApplicationProperties.class})
 @PropertySource({"classpath:/config/application.yml",
     "classpath:/config/profileclientapplication.properties"})
 public class Application {
@@ -69,7 +66,8 @@ public class Application {
   /**
    * Initializes reference.
    * <p>
-   * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
+   * Spring profiles can be configured with a program arguments
+   * --spring.profiles.active=your-active-profile
    * <p>
    * You can find more information on how profiles work with JHipster on <a
    * href="http://jhipster.github.io/profiles/">http://jhipster.github.io/profiles/</a>.
