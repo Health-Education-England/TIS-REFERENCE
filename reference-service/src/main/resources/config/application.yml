@@ -163,6 +163,8 @@ jhipster:
 # ===================================================================
 
 application:
+  flyway:
+    repair: ${FLYWAY_REPAIR:false}
 
 sentry:
   dsn: ${SENTRY_DSN:}
