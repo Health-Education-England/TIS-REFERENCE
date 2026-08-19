@@ -19,7 +19,7 @@ public interface FundingSubTypeRepository extends JpaRepository<FundingSubType, 
   void deleteByFundingTypeId(Long fundingTypeId);
 
   /**
-   * Find all FundingSubTypes by a list of ids
+   * Find all FundingSubTypes by a list of ids.
    *
    * @param ids the list of ids to find
    * @return the list of FundingSubTypes found

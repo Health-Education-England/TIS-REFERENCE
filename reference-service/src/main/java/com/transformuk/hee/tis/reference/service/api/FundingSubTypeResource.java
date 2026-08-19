@@ -202,8 +202,7 @@ public class FundingSubTypeResource {
    * Ignores malformed or not found fundingSubtype ids
    *
    * @param ids the ids to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of fundingSubtypeDto,
-   * or empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of fundingSubtypeDto
    */
   @GetMapping("/funding-sub-types/ids/in")
   public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesByIds(
