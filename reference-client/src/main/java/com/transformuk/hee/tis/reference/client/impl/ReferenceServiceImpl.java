@@ -42,6 +42,7 @@ import com.transformuk.hee.tis.reference.api.dto.TrainingNumberTypeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TrustDTO;
 import com.transformuk.hee.tis.reference.client.ReferenceService;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,6 +85,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final String FIND_SITES_BY_NAME_ENDPOINT = "/api/sites?columnFilters=";
   private static final String FIND_SITES_IN_ENDPOINT = "/api/sites/in/";
   private static final String FIND_SITES_ID_IN_ENDPOINT = "/api/sites/ids/in";
+  private static final String FIND_FUNDING_SUBTYPES_ID_IN_ENDPOINT = "/api/funding-sub-types/ids/in";
   private static final String FIND_ROLE_IN_ENDPOINT = "/api/roles/codes?codes=%s";
   private static final String FIND_ALL_LOCAL_OFFICE_ENDPOINT = "/api/local-offices";
   private static final String FIND_TRUSTS_ENDPOINT = "/api/trusts?columnFilters=";
@@ -451,7 +453,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<SiteDTO> findSitesIdIn(Set<Long> ids) {
     String url = serviceUrl + FIND_SITES_ID_IN_ENDPOINT;
     String joinedIds = StringUtils.join(ids, ",");
-    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))
         .queryParam("ids", joinedIds);
     try {
       ResponseEntity<List<SiteDTO>> responseEntity = referenceRestTemplate.
@@ -554,7 +556,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   public List<GradeDTO> findGradesIdIn(Set<Long> ids) {
     String url = serviceUrl + FIND_GRADES_ID_IN_ENDPOINT;
     String joinedIds = StringUtils.join(ids, ",");
-    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))
         .queryParam("ids", joinedIds);
     try {
       ResponseEntity<List<GradeDTO>> responseEntity = referenceRestTemplate.
@@ -623,6 +625,34 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
             })
         .getBody();
+  }
+
+  @Override
+  public List<FundingSubTypeDto> findFundingSubtypesIdIn(Set<String> ids) {
+    String url = serviceUrl + FIND_FUNDING_SUBTYPES_ID_IN_ENDPOINT;
+    String joinedIds = StringUtils.join(ids, ",");
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))
+        .queryParam("ids", joinedIds);
+    try {
+      ResponseEntity<List<FundingSubTypeDto>> responseEntity = referenceRestTemplate.
+          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
+              new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
+              });
+      return responseEntity.getBody();
+    } catch (HttpStatusCodeException e) {
+      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+        LOG.info("Not found funding subtypes for ids [{}].", joinedIds);
+        return Collections.emptyList();
+      } else {
+        throw e;
+      }
+    } catch (Exception e) {
+      LOG.error(
+          "Exception during find funding subtypes id in for ids [{}], "
+              + "returning empty list. Here's the error message:",
+          joinedIds, e);
+      return Collections.emptyList();
+    }
   }
 
   @Override

@@ -214,6 +214,64 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
+  public void shouldFindFundingSubtypesIdIn() {
+    // given
+    Set<String> ids = Sets.newHashSet("id1", "id2");
+    List<FundingSubTypeDto> fundingSubTypes = new ArrayList<>();
+    ResponseEntity<List<FundingSubTypeDto>> responseEntity =
+        new ResponseEntity(fundingSubTypes, HttpStatus.OK);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willReturn(responseEntity);
+
+    // when
+    List<FundingSubTypeDto> respList = referenceServiceImpl.findFundingSubtypesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(fundingSubTypes, respList);
+  }
+
+  @Test
+  public void shouldHandleNotFoundWhenFindFundingSubtypesIdIn() {
+    // given
+    Set<String> ids = Sets.newHashSet("id1", "id2");
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "not found", null, null,
+            null));
+
+    // when
+    List<FundingSubTypeDto> respList = referenceServiceImpl.findFundingSubtypesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
+  }
+
+  @Test
+  public void shouldHandleOtherExceptionWhenFindFundingSubtypesIdIn() {
+    // given
+    Set<String> ids = Sets.newHashSet("id1", "id2");
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(new RuntimeException("an expected exception"));
+
+    // when
+    List<FundingSubTypeDto> respList = referenceServiceImpl.findFundingSubtypesIdIn(ids);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
+  }
+
+  @Test
   public void shouldFindSiteByName() {
     // given
     String siteNameWithSpecialCharacters = "siteNameWithSpecialCharacters@!£&£$%@/\\";

@@ -260,4 +260,27 @@ class FundingSubTypeResourceIntTest {
     restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/{id}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldIgnoreMalformedIds() throws Exception {
+    // Initialize the database
+    fundingSubType = fundingSubTypeRepository.saveAndFlush(fundingSubType);
+
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in")
+            .param("ids", fundingSubType.getId().toString(), "not-a-uuid"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(fundingSubType.getId().toString())))
+        .andExpect(jsonPath("$.length()").value(1));
+  }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnEmptyListWhenNoIdsProvided() throws Exception {
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().json("[]"));
+  }
 }
