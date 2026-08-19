@@ -292,4 +292,14 @@ class FundingSubTypeResourceIntTest {
             .param("ids", fundingSubType.getId().toString(), "not-a-uuid"))
         .andExpect(status().isInternalServerError());
   }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnEmptyListWhenEmptyStringIdProvided() throws Exception {
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in")
+            .param("ids", ""))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().json("[]"));
+  }
 }
