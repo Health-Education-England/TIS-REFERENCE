@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -192,5 +194,24 @@ public class FundingSubTypeResource {
     HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page,
         "/api/funding-sub-types");
     return new ResponseEntity<>(results.getContent(), headers, HttpStatus.OK);
+  }
+
+  /**
+   * GET  /funding-sub-types/ids/in : get fundingSubtype by a list of ids in query param.
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of fundingSubtypeDto
+   */
+  @GetMapping("/funding-sub-types/ids/in")
+  public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesByIds(
+      @RequestParam List<UUID> ids) {
+    log.debug("REST request to get a list of fundingSubtypes by ids");
+
+    if (CollectionUtils.isEmpty(ids)) {
+      return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findByIds(ids);
+    return ResponseEntity.ok(fundingSubTypeMapper.toDtos(fundingSubTypes));
   }
 }

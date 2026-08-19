@@ -260,4 +260,46 @@ class FundingSubTypeResourceIntTest {
     restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/{id}", UUID.randomUUID()))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnResultsWhenValidIdsProvided() throws Exception {
+    // Initialize the database
+    fundingSubType = fundingSubTypeRepository.saveAndFlush(fundingSubType);
+
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in")
+            .param("ids", fundingSubType.getId().toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.[*].id").value(hasItem(fundingSubType.getId().toString())))
+        .andExpect(jsonPath("$.length()").value(1));
+  }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnErrorWhenNoIdsProvided() throws Exception {
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in"))
+        .andExpect(status().isInternalServerError());
+  }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnErrorWhenInvalidIdProvided() throws Exception {
+    // Initialize the database
+    fundingSubType = fundingSubTypeRepository.saveAndFlush(fundingSubType);
+
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in")
+            .param("ids", fundingSubType.getId().toString(), "not-a-uuid"))
+        .andExpect(status().isInternalServerError());
+  }
+
+  @Test
+  @Transactional
+  void getFundingSubTypesByIdsShouldReturnEmptyListWhenEmptyStringIdProvided() throws Exception {
+    restFundingSubTypeMockMvc.perform(get("/api/funding-sub-types/ids/in")
+            .param("ids", ""))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().json("[]"));
+  }
 }
