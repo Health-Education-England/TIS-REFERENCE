@@ -78,7 +78,7 @@ public interface ReferenceService extends ClientService {
   List<GradeDTO> findGradesIdIn(Set<Long> ids);
 
   /**
-   * Find the fundingSubtpe given the Ids. This does one API call and one SQL call to retrieve all
+   * Find the fundingSubtype given the Ids. This does one API call and one SQL call to retrieve all
    * the fundingSubtypes.
    *
    * @param ids the fundingSubtype ids to look for

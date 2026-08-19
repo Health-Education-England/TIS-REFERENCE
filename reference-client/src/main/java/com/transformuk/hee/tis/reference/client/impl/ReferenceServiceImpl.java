@@ -565,6 +565,13 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<GradeDTO>>() {
               });
       return responseEntity.getBody();
+    } catch (HttpStatusCodeException e) {
+      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+        LOG.info("Not found grades for ids [{}].", joinedIds);
+        return Collections.emptyList();
+      } else {
+        throw e;
+      }
     } catch (Exception e) {
       LOG.error(
           "Exception during find grade id in for ids [{}], "
@@ -633,13 +640,6 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
               new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
               });
       return responseEntity.getBody();
-    } catch (HttpStatusCodeException e) {
-      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-        LOG.info("Not found funding subtypes for ids [{}].", joinedIds);
-        return Collections.emptyList();
-      } else {
-        throw e;
-      }
     } catch (Exception e) {
       LOG.error(
           "Exception during find funding subtypes id in for ids [{}], "
