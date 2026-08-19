@@ -21,10 +21,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -199,37 +198,20 @@ public class FundingSubTypeResource {
 
   /**
    * GET  /funding-sub-types/ids/in : get fundingSubtype by a list of ids in query param.
-   * Ignores malformed or not found fundingSubtype ids
    *
    * @param ids the ids to search by
    * @return the ResponseEntity with status 200 (OK) and with body the list of fundingSubtypeDto
    */
   @GetMapping("/funding-sub-types/ids/in")
   public ResponseEntity<List<FundingSubTypeDto>> getFundingSubTypesByIds(
-      @RequestParam(required = false) List<String> ids) {
+      @RequestParam List<UUID> ids) {
     log.debug("REST request to get a list of fundingSubtypes by ids");
-    List<UUID> validIds = Optional.ofNullable(ids)
-        .orElse(Collections.emptyList())
-        .stream()
-        .map(this::parseUuidSafely)
-        .filter(Objects::nonNull)
-        .distinct()
-        .collect(Collectors.toList());
 
-    if (validIds.isEmpty()) {
+    if (CollectionUtils.isEmpty(ids)) {
       return ResponseEntity.ok(Collections.emptyList());
     }
 
-    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findByIds(validIds);
+    List<FundingSubType> fundingSubTypes = fundingSubTypeService.findByIds(ids);
     return ResponseEntity.ok(fundingSubTypeMapper.toDtos(fundingSubTypes));
-  }
-
-  private UUID parseUuidSafely(String id) {
-    try {
-      return UUID.fromString(id);
-    } catch (IllegalArgumentException ex) {
-      log.debug("Ignoring malformed fundingSubType id: {}", id);
-      return null;
-    }
   }
 }
