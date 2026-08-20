@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang3.StringUtils;
@@ -629,7 +630,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   }
 
   @Override
-  public List<FundingSubTypeDto> findFundingSubtypesIdIn(Set<String> ids) {
+  public List<FundingSubTypeDto> findFundingSubtypesIdIn(Set<UUID> ids) {
     String url = serviceUrl + FIND_FUNDING_SUBTYPES_ID_IN_ENDPOINT;
     String joinedIds = StringUtils.join(ids, ",");
     UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))

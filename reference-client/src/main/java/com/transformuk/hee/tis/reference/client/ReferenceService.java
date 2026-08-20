@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -84,7 +85,7 @@ public interface ReferenceService extends ClientService {
    * @param ids the fundingSubtype ids to look for
    * @return the found fundingSubtypes or an empty list
    */
-  List<FundingSubTypeDto> findFundingSubtypesIdIn(Set<String> ids);
+  List<FundingSubTypeDto> findFundingSubtypesIdIn(Set<UUID> ids);
 
   /**
    * Find the grades given the name. This does one API call and one SQL call to retrieve all the
