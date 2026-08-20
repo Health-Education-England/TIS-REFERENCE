@@ -74,6 +74,8 @@ public class ReferenceServiceImplTest {
   private static final String TRUST_CODE = "RJ7";
   private static final String SITE_CODE = "RJ706";
   private static final String UNKNOWN_CODE = "XXX";
+  private static final UUID UUID_1 = UUID.randomUUID();
+  private static final UUID UUID_2 = UUID.randomUUID();
 
   private final List<String> ids = Lists.newArrayList("SSL", "ADL");
   private final List<String> medicalSchoolValues = Lists
@@ -216,7 +218,7 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldFindFundingSubtypesIdIn() {
     // given
-    Set<String> idSet = Sets.newHashSet("id1", "id2");
+    Set<UUID> idSet = Sets.newHashSet(UUID_1, UUID_2);
     List<FundingSubTypeDto> fundingSubTypes = new ArrayList<>();
     ResponseEntity<List<FundingSubTypeDto>> responseEntity =
         new ResponseEntity(fundingSubTypes, HttpStatus.OK);
@@ -237,7 +239,7 @@ public class ReferenceServiceImplTest {
   @Test
   public void shouldHandleExceptionWhenFindFundingSubtypesIdIn() {
     // given
-    Set<String> idSet = Sets.newHashSet("id1", "id2");
+    Set<UUID> idSet = Sets.newHashSet(UUID_1, UUID_2);
     given(referenceRestTemplate
         .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
             any(ParameterizedTypeReference.class)))
