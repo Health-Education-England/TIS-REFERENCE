@@ -96,7 +96,7 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/sites")
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('site:add:modify:entities')")
   public ResponseEntity<SiteDTO> createSite(@Validated(Create.class) @RequestBody SiteDTO siteDTO)
       throws URISyntaxException {
     log.debug("REST request to save Site : {}", siteDTO);
@@ -125,7 +125,7 @@ public class SiteResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/sites")
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('site:add:modify:entities')")
   public ResponseEntity<SiteDTO> updateSite(@Validated(Update.class) @RequestBody SiteDTO siteDTO) {
     log.debug("REST request to update Site : {}", siteDTO);
     siteValidator.validate(siteDTO);
