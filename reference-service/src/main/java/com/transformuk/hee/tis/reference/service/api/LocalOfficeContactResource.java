@@ -69,7 +69,7 @@ public class LocalOfficeContactResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect.
    */
   @PostMapping
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('local-office-contact:add:modify:entities')")
   public ResponseEntity<LocalOfficeContactDto> createLocalOfficeContact(
       @Validated(Create.class) @RequestBody LocalOfficeContactDto dto)
       throws URISyntaxException {
@@ -93,7 +93,7 @@ public class LocalOfficeContactResource {
    * the contact couldn't be updated.
    */
   @PutMapping
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('local-office-contact:add:modify:entities')")
   public ResponseEntity<LocalOfficeContactDto> updateLocalOfficeContact(
       @Validated(Update.class) @RequestBody LocalOfficeContactDto dto) {
     log.debug("REST request to update LocalOfficeContact : {}", dto);
