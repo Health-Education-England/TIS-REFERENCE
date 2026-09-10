@@ -93,7 +93,7 @@ public class TrustResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PostMapping("/trusts")
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('trust:add:modify:entities')")
   public ResponseEntity<TrustDTO> createTrust(@Valid @RequestBody TrustDTO trustDTO)
       throws URISyntaxException {
     log.debug("REST request to save Trust : {}", trustDTO);
@@ -123,7 +123,7 @@ public class TrustResource {
    * @throws URISyntaxException if the Location URI syntax is incorrect
    */
   @PutMapping("/trusts")
-  @PreAuthorize("hasAuthority('reference:add:modify:entities')")
+  @PreAuthorize("hasAuthority('trust:add:modify:entities')")
   public ResponseEntity<TrustDTO> updateTrust(@RequestBody TrustDTO trustDTO)
       throws URISyntaxException {
     log.debug("REST request to update Trust : {}", trustDTO);
