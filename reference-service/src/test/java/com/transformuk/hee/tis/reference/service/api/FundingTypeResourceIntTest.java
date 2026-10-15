@@ -2,6 +2,7 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -285,6 +286,28 @@ public class FundingTypeResourceIntTest {
         .andExpect(jsonPath("$.id").value(fundingType.getId().intValue()))
         .andExpect(jsonPath("$.code").value(DEFAULT_CODE.toString()))
         .andExpect(jsonPath("$.label").value(DEFAULT_LABEL.toString()));
+  }
+
+  @Test
+  @Transactional
+  public void getFundingTypesByIds() throws Exception {
+    // Initialize the database
+    fundingTypeRepository.saveAndFlush(fundingType);
+
+    FundingType fundingType2 = createEntity(em);
+    fundingType2.setCode(UPDATED_CODE);
+    fundingType2.setLabel(UPDATED_LABEL);
+    fundingTypeRepository.saveAndFlush(fundingType2);
+
+    // Get the funding types by ids
+    restFundingTypeMockMvc.perform(get("/api/funding-types/ids/in")
+        .param("ids", fundingType.getId().toString(), fundingType2.getId().toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.length()").value(equalTo(2)))
+        .andExpect(jsonPath("$.[*].id").value(hasItems(
+            fundingType.getId().intValue(), fundingType2.getId().intValue())))
+        .andExpect(jsonPath("$.[*].code").value(hasItems(DEFAULT_CODE, UPDATED_CODE)));
   }
 
   @Test

@@ -35,4 +35,14 @@ public class FundingTypeServiceImpl extends AbstractReferenceService<FundingType
   protected JpaSpecificationExecutor<FundingType> getSpecificationExecutor() {
     return repository;
   }
+
+  /**
+   * Finds a list of FundingType by their ids.
+   *
+   * @param ids the list of ids to search by
+   * @return the list of FundingType found by the ids
+   */
+  public List<FundingType> findByIds(List<Long> ids) {
+    return repository.findAllById(ids);
+  }
 }
