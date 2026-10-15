@@ -637,8 +637,8 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
     UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))
         .queryParam("ids", joinedIds);
     try {
-      ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate.
-          exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
+      ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
+          .exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
               new ParameterizedTypeReference<>() {
               });
       return responseEntity.getBody();

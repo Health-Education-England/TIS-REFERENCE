@@ -185,8 +185,8 @@ public class FundingTypeResource {
    * GET  /funding-types/ids/in : get funding types by a list of ids in query param.
    *
    * @param ids the ids to search by
-   * @return the ResponseEntity with status 200 (OK) and with body the list of FundingTypeDTO, or
-   * empty list
+   * @return the ResponseEntity with status 200 (OK) and with body the list of FundingTypeDTO,
+   *     or empty list
    */
   @ApiOperation("Get a list of funding types by id")
   @GetMapping("/funding-types/ids/in")

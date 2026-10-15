@@ -312,6 +312,17 @@ public class FundingTypeResourceIntTest {
 
   @Test
   @Transactional
+  public void getFundingTypesByIdsShouldReturnEmptyListWhenEmptyStringIdProvided()
+      throws Exception {
+    restFundingTypeMockMvc.perform(get("/api/funding-types/ids/in")
+        .param("ids", ""))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().json("[]"));
+  }
+
+  @Test
+  @Transactional
   public void getNonExistingFundingType() throws Exception {
     // Get the fundingType
     restFundingTypeMockMvc.perform(get("/api/funding-types/{id}", Long.MAX_VALUE))
