@@ -188,7 +188,7 @@ public class FundingTypeResource {
    * @return the ResponseEntity with status 200 (OK) and with body the list of FundingTypeDTO,
    *     or empty list
    */
-  @ApiOperation("Get a list of funding types by id")
+  @ApiOperation("Get a list of funding types by ids")
   @GetMapping("/funding-types/ids/in")
   public ResponseEntity<List<FundingTypeDTO>> getFundingTypesByIds(
       @RequestParam List<Long> ids) {
