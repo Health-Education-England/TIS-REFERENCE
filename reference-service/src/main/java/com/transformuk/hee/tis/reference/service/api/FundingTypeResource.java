@@ -16,7 +16,6 @@ import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeService
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import io.github.jhipster.web.util.ResponseUtil;
-import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -24,6 +23,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -181,6 +182,27 @@ public class FundingTypeResource {
   }
 
   /**
+   * GET  /funding-types/ids/in : get funding types by a list of ids in query param.
+   *
+   * @param ids the ids to search by
+   * @return the ResponseEntity with status 200 (OK) and with body the list of FundingTypeDTO,
+   *     or empty list
+   */
+  @ApiOperation("Get a list of funding types by ids")
+  @GetMapping("/funding-types/ids/in")
+  public ResponseEntity<List<FundingTypeDTO>> getFundingTypesByIds(
+      @RequestParam List<Long> ids) {
+    log.debug("REST request to find a list of FundingTypes by ids");
+
+    if (CollectionUtils.isEmpty(ids)) {
+      return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    List<FundingType> fundingTypes = fundingTypeService.findByIds(ids);
+    return ResponseEntity.ok(fundingTypeMapper.fundingTypesToFundingTypeDTOs(fundingTypes));
+  }
+
+  /**
    * DELETE  /funding-types/:id : delete the "id" fundingType.
    *
    * @param id the id of the fundingTypeDTO to delete
@@ -210,12 +232,12 @@ public class FundingTypeResource {
   public ResponseEntity<List<FundingTypeDTO>> bulkCreateFundingType(
       @Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk save FundingTypeDTOs : {}", fundingTypeDTOS);
-    if (!Collections.isEmpty(fundingTypeDTOS)) {
+    if (!CollectionUtils.isEmpty(fundingTypeDTOS)) {
       List<Long> entityIds = fundingTypeDTOS.stream()
           .filter(fundingTypeDTO -> fundingTypeDTO.getId() != null)
           .map(fundingTypeDTO -> fundingTypeDTO.getId())
           .collect(Collectors.toList());
-      if (!Collections.isEmpty(entityIds)) {
+      if (!CollectionUtils.isEmpty(entityIds)) {
         return ResponseEntity.badRequest().headers(HeaderUtil
             .createFailureAlert(StringUtils.join(entityIds, ","), "ids.exist",
                 "A new fundingTypes cannot already have an ID")).body(null);
@@ -243,14 +265,14 @@ public class FundingTypeResource {
   public ResponseEntity<List<FundingTypeDTO>> bulkUpdateFundingType(
       @Valid @RequestBody List<FundingTypeDTO> fundingTypeDTOS) throws URISyntaxException {
     log.debug("REST request to bulk update AssessmentTypesDTO : {}", fundingTypeDTOS);
-    if (Collections.isEmpty(fundingTypeDTOS)) {
+    if (CollectionUtils.isEmpty(fundingTypeDTOS)) {
       return ResponseEntity.badRequest()
           .headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "request.body.empty",
               "The request body for this end point cannot be empty")).body(null);
-    } else if (!Collections.isEmpty(fundingTypeDTOS)) {
+    } else {
       List<FundingTypeDTO> entitiesWithNoId = fundingTypeDTOS.stream()
           .filter(ft -> ft.getId() == null).collect(Collectors.toList());
-      if (!Collections.isEmpty(entitiesWithNoId)) {
+      if (!CollectionUtils.isEmpty(entitiesWithNoId)) {
         return ResponseEntity.badRequest()
             .headers(HeaderUtil.createFailureAlert(StringUtils.join(entitiesWithNoId, ","),
                 "bulk.update.failed.noId",

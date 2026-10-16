@@ -136,6 +136,8 @@ public interface ReferenceService extends ClientService {
 
   List<FundingTypeDTO> findCurrentFundingTypesByLabelIn(Set<String> labels);
 
+  List<FundingTypeDTO> findFundingTypesIdIn(Set<Long> ids);
+
   List<FundingSubTypeDto> findCurrentFundingSubTypesByLabels(Set<String> allLabel);
 
   List<FundingSubTypeDto> findCurrentFundingSubTypesForFundingTypeId(Long id);

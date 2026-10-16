@@ -1,9 +1,8 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.transformuk.hee.tis.reference.api.enums.Status;
 import com.transformuk.hee.tis.reference.service.model.LocalOffice;
@@ -53,7 +52,7 @@ public class SitesTrustsServiceTest {
   public void shouldSearchSites() {
     // given
     Page<Site> emptyPage = new PageImpl<>(EMPTY_SITE_LIST);
-    given(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
+    when(siteRepository.findBySearchString(SEARCH_STRING, LIMIT)).thenReturn(emptyPage);
 
     // when
     List<Site> sites = service.searchSites(SEARCH_STRING);
@@ -65,7 +64,7 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldReturnAllSitesIfSearchStringIsNullOrEmpty() {
     // given
-    given(siteRepository.findAll()).willReturn(EMPTY_SITE_LIST);
+    when(siteRepository.findAll()).thenReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSites("");
@@ -77,8 +76,8 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrust() {
     // given
-    given(siteRepository.findBySearchStringAndTrustCode(TRUST_CODE, SEARCH_STRING, LIMIT))
-        .willReturn(EMPTY_SITE_LIST);
+    when(siteRepository.findBySearchStringAndTrustCode(TRUST_CODE, SEARCH_STRING, LIMIT))
+        .thenReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, SEARCH_STRING);
@@ -90,7 +89,7 @@ public class SitesTrustsServiceTest {
   @Test
   public void shouldSearchSitesWithInATrustForEmptyOrNullSearchString() {
     // given
-    given(siteRepository.findByTrustCode(TRUST_CODE, LIMIT)).willReturn(EMPTY_SITE_LIST);
+    when(siteRepository.findByTrustCode(TRUST_CODE, LIMIT)).thenReturn(EMPTY_SITE_LIST);
 
     // when
     List<Site> sites = service.searchSitesWithinTrust(TRUST_CODE, "");
@@ -103,7 +102,7 @@ public class SitesTrustsServiceTest {
   public void shouldGetTrustWithGivenCode() {
     // given
     Trust trust = new Trust();
-    given(trustRepository.findByCode(TRUST_CODE)).willReturn(trust);
+    when(trustRepository.findByCode(TRUST_CODE)).thenReturn(trust);
 
     // when
     Trust actualTrust = service.getTrustByCode(TRUST_CODE);
@@ -116,7 +115,7 @@ public class SitesTrustsServiceTest {
   public void shouldGetTrustsWithGivenCodeAndStatus() {
     // given
     Trust trust = new Trust();
-    given(trustRepository.findByCodeAndStatus(TRUST_CODE, Status.CURRENT)).willReturn(
+    when(trustRepository.findByCodeAndStatus(TRUST_CODE, Status.CURRENT)).thenReturn(
         Lists.newArrayList(trust));
 
     // when
@@ -130,7 +129,7 @@ public class SitesTrustsServiceTest {
   public void shouldSearchTrusts() {
     // given
     Page<Trust> emptyPage = new PageImpl<>(EMPTY_TRUST_LIST);
-    given(trustRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
+    when(trustRepository.findBySearchString(SEARCH_STRING, LIMIT)).thenReturn(emptyPage);
 
     // when
     List<Trust> trusts = service.searchTrusts(SEARCH_STRING);
@@ -153,8 +152,8 @@ public class SitesTrustsServiceTest {
   public void shouldGetLocalOfficeWithGivenAbbreviation() {
     // given
     LocalOffice localOffice = new LocalOffice();
-    given(localOfficeRepository.findByAbbreviation(LOCAL_OFFICE_ABBREVIATION))
-        .willReturn(localOffice);
+    when(localOfficeRepository.findByAbbreviation(LOCAL_OFFICE_ABBREVIATION))
+        .thenReturn(localOffice);
 
     // when
     LocalOffice actualLocalOffice = service.getLocalOfficeByAbbreviation(LOCAL_OFFICE_ABBREVIATION);
@@ -167,7 +166,7 @@ public class SitesTrustsServiceTest {
   public void shouldSearchLocalOffices() {
     // given
     Page<LocalOffice> emptyPage = new PageImpl<>(EMPTY_LO_LIST);
-    given(localOfficeRepository.findBySearchString(SEARCH_STRING, LIMIT)).willReturn(emptyPage);
+    when(localOfficeRepository.findBySearchString(SEARCH_STRING, LIMIT)).thenReturn(emptyPage);
 
     // when
     List<LocalOffice> localOffices = service.searchLocalOffices(SEARCH_STRING);

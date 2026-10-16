@@ -3,6 +3,7 @@ package com.transformuk.hee.tis.reference.service.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,6 +25,7 @@ import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeService
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.Before;
@@ -289,6 +291,39 @@ public class FundingTypeResourceIntTest {
 
   @Test
   @Transactional
+  public void getFundingTypesByIds() throws Exception {
+    // Initialize the database
+    fundingTypeRepository.saveAndFlush(fundingType);
+
+    FundingType fundingType2 = createEntity(em);
+    fundingType2.setCode(UPDATED_CODE);
+    fundingType2.setLabel(UPDATED_LABEL);
+    fundingTypeRepository.saveAndFlush(fundingType2);
+
+    // Get the funding types by ids
+    restFundingTypeMockMvc.perform(get("/api/funding-types/ids/in")
+        .param("ids", fundingType.getId().toString(), fundingType2.getId().toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.length()").value(equalTo(2)))
+        .andExpect(jsonPath("$.[*].id").value(hasItems(
+            fundingType.getId().intValue(), fundingType2.getId().intValue())))
+        .andExpect(jsonPath("$.[*].code").value(hasItems(DEFAULT_CODE, UPDATED_CODE)));
+  }
+
+  @Test
+  @Transactional
+  public void getFundingTypesByIdsShouldReturnEmptyListWhenEmptyStringIdProvided()
+      throws Exception {
+    restFundingTypeMockMvc.perform(get("/api/funding-types/ids/in")
+        .param("ids", ""))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().json("[]"));
+  }
+
+  @Test
+  @Transactional
   public void getNonExistingFundingType() throws Exception {
     // Get the fundingType
     restFundingTypeMockMvc.perform(get("/api/funding-types/{id}", Long.MAX_VALUE))
@@ -367,6 +402,84 @@ public class FundingTypeResourceIntTest {
     assertThat(fundingTypeList).hasSize(dbSizeBeforeDeleteFundingType - 1);
     List<FundingSubType> fundingSubTypeList = fundingSubTypeRepository.findAll();
     assertThat(fundingSubTypeList).hasSize(dbSizeBeforeDeleteFundingSubType - 1);
+  }
+
+  @Test
+  @Transactional
+  public void bulkCreateFundingTypesWithEmptyListShouldReturnEmptyList() throws Exception {
+    int databaseSizeBeforeCreate = fundingTypeRepository.findAll().size();
+
+    restFundingTypeMockMvc.perform(post("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.emptyList())))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Test
+  @Transactional
+  public void bulkCreateFundingTypesWithExistingIdShouldReturnBadRequest() throws Exception {
+    int databaseSizeBeforeCreate = fundingTypeRepository.findAll().size();
+
+    FundingTypeDTO fundingTypeWithId = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
+    fundingTypeWithId.setId(1L);
+
+    FundingType fundingType2 = createEntity(em);
+    FundingTypeDTO fundingTypeWithoutId = fundingTypeMapper
+        .fundingTypeToFundingTypeDTO(fundingType2);
+
+    List<FundingTypeDTO> fundingTypeDtos = Arrays.asList(fundingTypeWithId, fundingTypeWithoutId);
+
+    restFundingTypeMockMvc.perform(post("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(fundingTypeDtos)))
+        .andExpect(status().isBadRequest());
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Test
+  @Transactional
+  public void bulkUpdateFundingTypesWithEmptyListShouldReturnBadRequest() throws Exception {
+    int databaseSizeBeforeUpdate = fundingTypeRepository.findAll().size();
+
+    restFundingTypeMockMvc.perform(put("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.emptyList())))
+        .andExpect(status().isBadRequest());
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeUpdate);
+  }
+
+  @Test
+  @Transactional
+  public void bulkUpdateFundingTypesWithNoIdShouldReturnBadRequest() throws Exception {
+    fundingTypeRepository.saveAndFlush(fundingType);
+    int databaseSizeBeforeUpdate = fundingTypeRepository.findAll().size();
+
+    FundingTypeDTO fundingTypeWithId = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
+    fundingTypeWithId.setLabel(UPDATED_LABEL);
+
+    FundingType fundingType2 = createEntity(em);
+    FundingTypeDTO fundingTypeWithoutId = fundingTypeMapper
+        .fundingTypeToFundingTypeDTO(fundingType2);
+
+    List<FundingTypeDTO> fundingTypeDtos = Arrays.asList(fundingTypeWithId, fundingTypeWithoutId);
+
+    restFundingTypeMockMvc.perform(put("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(fundingTypeDtos)))
+        .andExpect(status().isBadRequest());
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeUpdate);
+    FundingType unchangedFundingType = fundingTypeRepository.getById(fundingType.getId());
+    assertThat(unchangedFundingType.getLabel()).isEqualTo(DEFAULT_LABEL);
   }
 
   @Test

@@ -78,6 +78,7 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
   private static final Logger LOG = LoggerFactory.getLogger(ReferenceServiceImpl.class);
   private static final Map<Class, ParameterizedTypeReference> classToParamTypeRefMap;
   private static final String FIND_FUNDING_TYPES_ENDPOINT = "/api/funding-types?columnFilters=";
+  private static final String FIND_FUNDING_TYPES_ID_IN_ENDPOINT = "/api/funding-types/ids/in";
   private static final String FIND_CURRENT_FUNDING_SUB_TYPES_FOR_FUNDING_TYPE_ENDPOINT =
       "/api/funding-types/%s/funding-sub-types";
   private static final String FIND_GRADES_ENDPOINT = "/api/grades?columnFilters=";
@@ -627,6 +628,27 @@ public class ReferenceServiceImpl extends AbstractClientService implements Refer
             new ParameterizedTypeReference<List<FundingSubTypeDto>>() {
             })
         .getBody();
+  }
+
+  @Override
+  public List<FundingTypeDTO> findFundingTypesIdIn(Set<Long> ids) {
+    String url = serviceUrl + FIND_FUNDING_TYPES_ID_IN_ENDPOINT;
+    String joinedIds = StringUtils.join(ids, ",");
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(URI.create(url))
+        .queryParam("ids", joinedIds);
+    try {
+      ResponseEntity<List<FundingTypeDTO>> responseEntity = referenceRestTemplate
+          .exchange(uriBuilder.build().encode().toUri(), HttpMethod.GET, null,
+              new ParameterizedTypeReference<>() {
+              });
+      return responseEntity.getBody();
+    } catch (Exception e) {
+      LOG.error(
+          "Exception during find funding types id in for ids [{}], "
+              + "returning empty list. Here's the error message:",
+          joinedIds, e);
+      return Collections.emptyList();
+    }
   }
 
   @Override

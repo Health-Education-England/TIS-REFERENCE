@@ -76,6 +76,8 @@ public class ReferenceServiceImplTest {
   private static final String UNKNOWN_CODE = "XXX";
   private static final UUID UUID_1 = UUID.randomUUID();
   private static final UUID UUID_2 = UUID.randomUUID();
+  private static final Long ID_1 = 1L;
+  private static final Long ID_2 = 2L;
 
   private final List<String> ids = Lists.newArrayList("SSL", "ADL");
   private final List<String> medicalSchoolValues = Lists
@@ -1801,5 +1803,44 @@ public class ReferenceServiceImplTest {
         HttpMethod.GET, null,
         new ParameterizedTypeReference<List<FundingReasonDto>>() {});
     assertEquals(fundingReason, respList.get(0));
+  }
+
+  @Test
+  public void shouldFindFundingTypesIdIn() {
+    // given
+    Set<Long> idSet = Sets.newHashSet(ID_1, ID_2);
+    List<FundingTypeDTO> fundingTypes = new ArrayList<>();
+    ResponseEntity<List<FundingTypeDTO>> responseEntity =
+        new ResponseEntity(fundingTypes, HttpStatus.OK);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willReturn(responseEntity);
+
+    // when
+    List<FundingTypeDTO> respList = referenceServiceImpl.findFundingTypesIdIn(idSet);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(fundingTypes, respList);
+  }
+
+  @Test
+  public void shouldHandleExceptionWhenFindFundingTypesIdIn() {
+    // given
+    Set<Long> idSet = Sets.newHashSet(ID_1, ID_2);
+    given(referenceRestTemplate
+        .exchange(any(URI.class), eq(HttpMethod.GET), eq(null),
+            any(ParameterizedTypeReference.class)))
+        .willThrow(new RuntimeException("Don't panic! this is an expected exception"));
+
+    // when
+    List<FundingTypeDTO> respList = referenceServiceImpl.findFundingTypesIdIn(idSet);
+
+    // then
+    verify(referenceRestTemplate).exchange(any(URI.class),
+        eq(HttpMethod.GET), isNull(RequestEntity.class), any(ParameterizedTypeReference.class));
+    assertEquals(0, respList.size());
   }
 }
