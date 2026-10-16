@@ -2,8 +2,8 @@ package com.transformuk.hee.tis.reference.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,6 +25,7 @@ import com.transformuk.hee.tis.reference.service.service.impl.FundingTypeService
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingSubTypeMapper;
 import com.transformuk.hee.tis.reference.service.service.mapper.FundingTypeMapper;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.Before;
@@ -401,6 +402,44 @@ public class FundingTypeResourceIntTest {
     assertThat(fundingTypeList).hasSize(dbSizeBeforeDeleteFundingType - 1);
     List<FundingSubType> fundingSubTypeList = fundingSubTypeRepository.findAll();
     assertThat(fundingSubTypeList).hasSize(dbSizeBeforeDeleteFundingSubType - 1);
+  }
+
+  @Test
+  @Transactional
+  public void bulkCreateFundingTypesWithEmptyListShouldReturnEmptyList() throws Exception {
+    int databaseSizeBeforeCreate = fundingTypeRepository.findAll().size();
+
+    restFundingTypeMockMvc.perform(post("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(Collections.emptyList())))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeCreate);
+  }
+
+  @Test
+  @Transactional
+  public void bulkCreateFundingTypesWithExistingIdShouldReturnBadRequest() throws Exception {
+    int databaseSizeBeforeCreate = fundingTypeRepository.findAll().size();
+
+    FundingTypeDTO fundingTypeWithId = fundingTypeMapper.fundingTypeToFundingTypeDTO(fundingType);
+    fundingTypeWithId.setId(1L);
+
+    FundingType fundingType2 = createEntity(em);
+    FundingTypeDTO fundingTypeWithoutId = fundingTypeMapper
+        .fundingTypeToFundingTypeDTO(fundingType2);
+
+    List<FundingTypeDTO> fundingTypeDTOS = Arrays.asList(fundingTypeWithId, fundingTypeWithoutId);
+
+    restFundingTypeMockMvc.perform(post("/api/bulk-funding-types")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(fundingTypeDTOS)))
+        .andExpect(status().isBadRequest());
+
+    List<FundingType> fundingTypeList = fundingTypeRepository.findAll();
+    assertThat(fundingTypeList).hasSize(databaseSizeBeforeCreate);
   }
 
   @Test

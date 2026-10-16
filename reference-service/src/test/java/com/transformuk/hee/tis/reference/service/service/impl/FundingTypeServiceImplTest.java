@@ -1,8 +1,8 @@
 package com.transformuk.hee.tis.reference.service.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.transformuk.hee.tis.reference.service.model.FundingType;
 import com.transformuk.hee.tis.reference.service.repository.FundingTypeRepository;
@@ -34,7 +34,7 @@ class FundingTypeServiceImplTest {
     fundingType2.setId(2L);
     List<FundingType> expected = Arrays.asList(fundingType1, fundingType2);
 
-    given(repository.findAllById(ids)).willReturn(expected);
+    when(repository.findAllById(ids)).thenReturn(expected);
 
     // when
     List<FundingType> result = service.findByIds(ids);
