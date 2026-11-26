@@ -57,12 +57,16 @@ public class LocalOfficeContactValidator {
 
     // Do not allow inserting a duplicate contact.
     if (dto.getId() == null) {
-      List<LocalOfficeContact> existingContacts = repository.findByContactTypeIdAndLocalOfficeUuid(
-          dto.getContactType().getId(), dto.getLocalOffice().getUuid());
+      List<LocalOfficeContact> existingContacts =
+          repository.findByContactTypeIdAndLocalOfficeUuidAndTraineeTypeId(
+              dto.getContactType().getId(), dto.getLocalOffice().getUuid(),
+              dto.getTraineeType().getId());
 
       if (!existingContacts.isEmpty()) {
-        String message = String.format("A '%s' contact already exists for the '%s' Local Office.",
-            dto.getContactType().getLabel(), dto.getLocalOffice().getName());
+        String message = String.format(
+            "A '%s' contact already exists for the '%s' Local Office and '%s' trainee type.",
+            dto.getContactType().getLabel(), dto.getLocalOffice().getName(),
+            dto.getTraineeType().getLabel());
         log.warn(message);
         throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
       }

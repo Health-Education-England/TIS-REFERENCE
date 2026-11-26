@@ -65,6 +65,7 @@ public class AuditingAspect {
     classToPrimaryKeyMap.put("FundingReasonDto", "id");
     classToPrimaryKeyMap.put("LocalOfficeContactDto", "id");
     classToPrimaryKeyMap.put("LocalOfficeContactTypeDto", "id");
+    classToPrimaryKeyMap.put("TraineeTypeDto", "id");
   }
 
   @PostConstruct
@@ -76,6 +77,7 @@ public class AuditingAspect {
     classToIdClass.put("FundingReasonDto", UUID.class);
     classToIdClass.put("LocalOfficeContactDto", UUID.class);
     classToIdClass.put("LocalOfficeContactTypeDto", UUID.class);
+    classToIdClass.put("TraineeTypeDto", UUID.class);
   }
 
   /**

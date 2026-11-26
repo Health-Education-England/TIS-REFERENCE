@@ -14,6 +14,6 @@ import org.springframework.stereotype.Repository;
 public interface LocalOfficeContactRepository extends JpaRepository<LocalOfficeContact, UUID>,
     JpaSpecificationExecutor<LocalOfficeContact> {
 
-  List<LocalOfficeContact> findByContactTypeIdAndLocalOfficeUuid(UUID contactTypeId,
-      UUID localOfficeUuid);
+  List<LocalOfficeContact> findByContactTypeIdAndLocalOfficeUuidAndTraineeTypeId(
+      UUID contactTypeId, UUID localOfficeUuid, UUID traineeTypeId);
 }
