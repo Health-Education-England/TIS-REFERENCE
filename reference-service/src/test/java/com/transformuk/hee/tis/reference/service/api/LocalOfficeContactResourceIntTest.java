@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactDto;
+import com.transformuk.hee.tis.reference.api.dto.TraineeTypeDto;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.api.validation.LocalOfficeContactValidator;
 import com.transformuk.hee.tis.reference.service.exception.ExceptionTranslator;
@@ -24,6 +25,7 @@ import com.transformuk.hee.tis.reference.service.repository.LocalOfficeContactTy
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeRepository;
 import com.transformuk.hee.tis.reference.service.service.impl.LocalOfficeContactServiceImpl;
 import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeContactMapper;
+import com.transformuk.hee.tis.reference.service.service.mapper.TraineeTypeMapper;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -67,6 +69,9 @@ class LocalOfficeContactResourceIntTest {
 
   @Autowired
   private LocalOfficeContactMapper mapper;
+
+  @Autowired
+  private TraineeTypeMapper traineeTypeMapper;
 
   @Autowired
   private LocalOfficeContactServiceImpl service;
@@ -202,6 +207,35 @@ class LocalOfficeContactResourceIntTest {
 
   @Test
   @Transactional
+  void createLocalOfficeContactWithSameContactTypeAndLocalOfficeForDifferentTraineeType()
+      throws Exception {
+    repository.saveAndFlush(entity);
+    int databaseSizeBeforeCreate = repository.findAll().size();
+
+    LocalOfficeContactDto dto = mapper.toDto(entity);
+    dto.setId(null);
+    dto.setContact(UPDATED_CONTACT);
+    TraineeType foundation = findTraineeType(em, FOUNDATION);
+    dto.setTraineeType(traineeTypeMapper.toDto(foundation));
+
+    mockMvc.perform(post("/api/local-office-contacts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(dto)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.traineeType.code").value(FOUNDATION));
+    repository.flush();
+
+    List<LocalOfficeContact> entityList = repository.findAll();
+    assertThat(entityList).hasSize(databaseSizeBeforeCreate + 1);
+    assertThat(entityList)
+        .filteredOn(contact -> contact.getLocalOffice().equals(entity.getLocalOffice())
+            && contact.getContactType().equals(entity.getContactType()))
+        .extracting(contact -> contact.getTraineeType().getCode())
+        .containsExactlyInAnyOrder(SPECIALTY, FOUNDATION);
+  }
+
+  @Test
+  @Transactional
   void createLocalOfficeContactWithExistingId() throws Exception {
     int databaseSizeBeforeCreate = repository.findAll().size();
 
@@ -295,6 +329,45 @@ class LocalOfficeContactResourceIntTest {
 
     List<LocalOfficeContact> entityList = repository.findAll();
     assertThat(entityList).hasSize(databaseSizeBeforeTest);
+  }
+
+  @Test
+  @Transactional
+  void createLocalOfficeContactWithoutTraineeTypeId() throws Exception {
+    int databaseSizeBeforeTest = repository.findAll().size();
+
+    LocalOfficeContactDto dto = mapper.toDto(entity);
+    dto.setTraineeType(new TraineeTypeDto());
+
+    mockMvc.perform(post("/api/local-office-contacts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("Trainee Type ID is required."));
+
+    List<LocalOfficeContact> entityList = repository.findAll();
+    assertThat(entityList).hasSize(databaseSizeBeforeTest);
+  }
+
+  @Test
+  @Transactional
+  void updateLocalOfficeContactWithoutTraineeTypeId() throws Exception {
+    repository.saveAndFlush(entity);
+    TraineeType originalTraineeType = entity.getTraineeType();
+
+    LocalOfficeContactDto dto = mapper.toDto(entity);
+    dto.setContact(UPDATED_CONTACT);
+    dto.setTraineeType(new TraineeTypeDto());
+
+    mockMvc.perform(put("/api/local-office-contacts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("Trainee Type ID is required."));
+
+    LocalOfficeContact testContact = repository.findById(entity.getId()).get();
+    assertThat(testContact.getContact()).isEqualTo(DEFAULT_CONTACT);
+    assertThat(testContact.getTraineeType()).isEqualTo(originalTraineeType);
   }
 
   @Test

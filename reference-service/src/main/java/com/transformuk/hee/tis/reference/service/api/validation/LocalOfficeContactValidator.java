@@ -45,6 +45,13 @@ public class LocalOfficeContactValidator {
   public void validate(LocalOfficeContactDto dto) {
     log.debug("Validating local office contact: {}", dto);
 
+    // A trainee type without an ID cannot be associated, so would fail when persisted.
+    if (dto.getTraineeType() == null || dto.getTraineeType().getId() == null) {
+      String message = "Trainee Type ID is required.";
+      log.warn(message);
+      throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
+    }
+
     // Validate that the contact is a valid email address or HTTPS based URL.
     String contact = dto.getContact();
     boolean isValid = emailValidator.isValid(contact, null) || urlValidator.isValid(contact, null);

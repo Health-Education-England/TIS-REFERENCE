@@ -17,9 +17,12 @@ import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeContactRepository;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -46,11 +49,8 @@ class LocalOfficeContactValidatorTest {
       "https://valid.tis.nhs.uk/sub"
   })
   void shouldBeValidWhenAnEmailOrUrlAndUnique(String contact) {
-    LocalOfficeContactDto dto = new LocalOfficeContactDto();
+    LocalOfficeContactDto dto = createContactDto(TRAINEE_TYPE_ID);
     dto.setContact(contact);
-    dto.setContactType(new LocalOfficeContactTypeDto());
-    dto.setLocalOffice(new LocalOfficeDTO());
-    dto.setTraineeType(new TraineeTypeDto());
 
     when(repository.findByContactTypeIdAndLocalOfficeUuidAndTraineeTypeId(any(), any(), any()))
         .thenReturn(Collections.emptyList());
@@ -67,17 +67,42 @@ class LocalOfficeContactValidatorTest {
       "invalid"
   })
   void shouldNotBeValidWhenNotAnEmailOrUrl(String contact) {
-    LocalOfficeContactDto dto = new LocalOfficeContactDto();
+    LocalOfficeContactDto dto = createContactDto(TRAINEE_TYPE_ID);
     dto.setContact(contact);
-    dto.setContactType(new LocalOfficeContactTypeDto());
-    dto.setLocalOffice(new LocalOfficeDTO());
-    dto.setTraineeType(new TraineeTypeDto());
 
     CustomParameterizedException exception = assertThrows(CustomParameterizedException.class,
         () -> validator.validate(dto));
 
     assertThat("Unexpected message.", exception.getMessage(), is(
         String.format("Contact '%s' was not a valid Email or HTTPS URL.", contact)));
+  }
+
+  @ParameterizedTest
+  @MethodSource("missingTraineeTypeIds")
+  void shouldNotBeValidWhenTraineeTypeIdMissing(UUID contactId, TraineeTypeDto traineeType) {
+    LocalOfficeContactDto dto = createContactDto(TRAINEE_TYPE_ID);
+    dto.setId(contactId);
+    dto.setTraineeType(traineeType);
+
+    CustomParameterizedException exception = assertThrows(CustomParameterizedException.class,
+        () -> validator.validate(dto));
+
+    assertThat("Unexpected message.", exception.getMessage(), is("Trainee Type ID is required."));
+  }
+
+  private static Stream<Arguments> missingTraineeTypeIds() {
+    TraineeTypeDto traineeTypeWithoutId = new TraineeTypeDto();
+    traineeTypeWithoutId.setCode("FOUNDATION");
+    traineeTypeWithoutId.setLabel("Foundation");
+
+    return Stream.of(
+        Arguments.of(null, null),
+        Arguments.of(null, new TraineeTypeDto()),
+        Arguments.of(null, traineeTypeWithoutId),
+        Arguments.of(UUID.randomUUID(), null),
+        Arguments.of(UUID.randomUUID(), new TraineeTypeDto()),
+        Arguments.of(UUID.randomUUID(), traineeTypeWithoutId)
+    );
   }
 
   @Test
