@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactDto;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactTypeDto;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.api.dto.TraineeTypeDto;
 import com.transformuk.hee.tis.reference.service.Application;
 import com.transformuk.hee.tis.reference.service.api.validation.LocalOfficeContactValidator;
@@ -28,10 +30,15 @@ import com.transformuk.hee.tis.reference.service.service.mapper.LocalOfficeConta
 import com.transformuk.hee.tis.reference.service.service.mapper.TraineeTypeMapper;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -331,43 +338,72 @@ class LocalOfficeContactResourceIntTest {
     assertThat(entityList).hasSize(databaseSizeBeforeTest);
   }
 
-  @Test
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("missingIdentifiers")
   @Transactional
-  void createLocalOfficeContactWithoutTraineeTypeId() throws Exception {
+  void createLocalOfficeContactWithMissingAssociationIdentifier(String scenario,
+      Consumer<LocalOfficeContactDto> removeIdentifier, String expectedMessage) throws Exception {
     int databaseSizeBeforeTest = repository.findAll().size();
 
     LocalOfficeContactDto dto = mapper.toDto(entity);
-    dto.setTraineeType(new TraineeTypeDto());
+    removeIdentifier.accept(dto);
 
     mockMvc.perform(post("/api/local-office-contacts")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(dto)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.message").value("Trainee Type ID is required."));
+        .andExpect(jsonPath("$.message").value(expectedMessage));
 
     List<LocalOfficeContact> entityList = repository.findAll();
     assertThat(entityList).hasSize(databaseSizeBeforeTest);
   }
 
-  @Test
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("missingIdentifiers")
   @Transactional
-  void updateLocalOfficeContactWithoutTraineeTypeId() throws Exception {
+  void updateLocalOfficeContactWithMissingAssociationIdentifier(String scenario,
+      Consumer<LocalOfficeContactDto> removeIdentifier, String expectedMessage) throws Exception {
     repository.saveAndFlush(entity);
+    LocalOffice originalLocalOffice = entity.getLocalOffice();
+    LocalOfficeContactType originalContactType = entity.getContactType();
     TraineeType originalTraineeType = entity.getTraineeType();
 
     LocalOfficeContactDto dto = mapper.toDto(entity);
     dto.setContact(UPDATED_CONTACT);
-    dto.setTraineeType(new TraineeTypeDto());
+    removeIdentifier.accept(dto);
 
     mockMvc.perform(put("/api/local-office-contacts")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(dto)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.message").value("Trainee Type ID is required."));
+        .andExpect(jsonPath("$.message").value(expectedMessage));
 
     LocalOfficeContact testContact = repository.findById(entity.getId()).get();
     assertThat(testContact.getContact()).isEqualTo(DEFAULT_CONTACT);
+    assertThat(testContact.getLocalOffice()).isEqualTo(originalLocalOffice);
+    assertThat(testContact.getContactType()).isEqualTo(originalContactType);
     assertThat(testContact.getTraineeType()).isEqualTo(originalTraineeType);
+  }
+
+  private static Stream<Arguments> missingIdentifiers() {
+    String localOfficeMessage = "Local Office ID and UUID are required.";
+    return Stream.of(
+        Arguments.of("empty local office",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setLocalOffice(new LocalOfficeDTO()),
+            localOfficeMessage),
+        Arguments.of("local office without ID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getLocalOffice().setId(null),
+            localOfficeMessage),
+        Arguments.of("local office without UUID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getLocalOffice().setUuid(null),
+            localOfficeMessage),
+        Arguments.of("empty contact type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setContactType(
+                new LocalOfficeContactTypeDto()), "Contact Type ID is required."),
+        Arguments.of("empty trainee type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setTraineeType(new TraineeTypeDto()),
+            "Trainee Type ID is required.")
+    );
   }
 
   @Test

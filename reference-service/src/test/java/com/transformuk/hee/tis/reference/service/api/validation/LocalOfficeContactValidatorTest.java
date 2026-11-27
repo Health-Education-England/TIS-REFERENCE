@@ -17,6 +17,7 @@ import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
 import com.transformuk.hee.tis.reference.service.repository.LocalOfficeContactRepository;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class LocalOfficeContactValidatorTest {
 
   private static final UUID CONTACT_TYPE_ID = UUID.randomUUID();
+  private static final Long LOCAL_OFFICE_ID = 1L;
   private static final UUID LOCAL_OFFICE_UUID = UUID.randomUUID();
   private static final UUID TRAINEE_TYPE_ID = UUID.randomUUID();
 
@@ -77,32 +79,59 @@ class LocalOfficeContactValidatorTest {
         String.format("Contact '%s' was not a valid Email or HTTPS URL.", contact)));
   }
 
-  @ParameterizedTest
-  @MethodSource("missingTraineeTypeIds")
-  void shouldNotBeValidWhenTraineeTypeIdMissing(UUID contactId, TraineeTypeDto traineeType) {
+  @ParameterizedTest(name = "{0}, update={1}")
+  @MethodSource("missingIdentifiers")
+  void shouldNotBeValidWhenAssociationIdentifierMissing(String scenario, boolean isUpdate,
+      Consumer<LocalOfficeContactDto> removeIdentifier, String expectedMessage) {
     LocalOfficeContactDto dto = createContactDto(TRAINEE_TYPE_ID);
-    dto.setId(contactId);
-    dto.setTraineeType(traineeType);
+    dto.setId(isUpdate ? UUID.randomUUID() : null);
+    removeIdentifier.accept(dto);
 
     CustomParameterizedException exception = assertThrows(CustomParameterizedException.class,
         () -> validator.validate(dto));
 
-    assertThat("Unexpected message.", exception.getMessage(), is("Trainee Type ID is required."));
+    assertThat("Unexpected message.", exception.getMessage(), is(expectedMessage));
   }
 
-  private static Stream<Arguments> missingTraineeTypeIds() {
-    TraineeTypeDto traineeTypeWithoutId = new TraineeTypeDto();
-    traineeTypeWithoutId.setCode("FOUNDATION");
-    traineeTypeWithoutId.setLabel("Foundation");
+  private static Stream<Arguments> missingIdentifiers() {
+    String localOfficeMessage = "Local Office ID and UUID are required.";
+    String contactTypeMessage = "Contact Type ID is required.";
+    String traineeTypeMessage = "Trainee Type ID is required.";
 
-    return Stream.of(
-        Arguments.of(null, null),
-        Arguments.of(null, new TraineeTypeDto()),
-        Arguments.of(null, traineeTypeWithoutId),
-        Arguments.of(UUID.randomUUID(), null),
-        Arguments.of(UUID.randomUUID(), new TraineeTypeDto()),
-        Arguments.of(UUID.randomUUID(), traineeTypeWithoutId)
+    Stream<Arguments> scenarios = Stream.of(
+        Arguments.of("null local office",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setLocalOffice(null), localOfficeMessage),
+        Arguments.of("empty local office",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setLocalOffice(new LocalOfficeDTO()),
+            localOfficeMessage),
+        Arguments.of("local office without ID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getLocalOffice().setId(null),
+            localOfficeMessage),
+        Arguments.of("local office without UUID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getLocalOffice().setUuid(null),
+            localOfficeMessage),
+        Arguments.of("null contact type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setContactType(null), contactTypeMessage),
+        Arguments.of("empty contact type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setContactType(
+                new LocalOfficeContactTypeDto()), contactTypeMessage),
+        Arguments.of("contact type without ID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getContactType().setId(null),
+            contactTypeMessage),
+        Arguments.of("null trainee type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setTraineeType(null), traineeTypeMessage),
+        Arguments.of("empty trainee type",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.setTraineeType(new TraineeTypeDto()),
+            traineeTypeMessage),
+        Arguments.of("trainee type without ID",
+            (Consumer<LocalOfficeContactDto>) dto -> dto.getTraineeType().setId(null),
+            traineeTypeMessage)
     );
+
+    return scenarios.flatMap(args -> Stream.of(false, true).map(isUpdate -> {
+      Object[] values = args.get();
+      return Arguments.of(values[0], isUpdate, values[1], values[2]);
+    }));
   }
 
   @Test
@@ -152,6 +181,7 @@ class LocalOfficeContactValidatorTest {
     contactType.setLabel("TYPE_LABEL");
 
     LocalOfficeDTO localOffice = new LocalOfficeDTO();
+    localOffice.setId(LOCAL_OFFICE_ID);
     localOffice.setUuid(LOCAL_OFFICE_UUID);
     localOffice.setName("LO_NAME");
 

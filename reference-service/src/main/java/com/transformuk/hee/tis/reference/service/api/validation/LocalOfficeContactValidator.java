@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api.validation;
 
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactDto;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedException;
 import com.transformuk.hee.tis.reference.service.exception.ErrorConstants;
 import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
@@ -45,12 +46,15 @@ public class LocalOfficeContactValidator {
   public void validate(LocalOfficeContactDto dto) {
     log.debug("Validating local office contact: {}", dto);
 
-    // A trainee type without an ID cannot be associated, so would fail when persisted.
-    if (dto.getTraineeType() == null || dto.getTraineeType().getId() == null) {
-      String message = "Trainee Type ID is required.";
-      log.warn(message);
-      throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
-    }
+    // Associations are persisted by reference, so they fail if their identifiers are missing.
+    // The local office needs both: its ID identifies the entity and its UUID is the join column.
+    LocalOfficeDTO localOffice = dto.getLocalOffice();
+    requireIdentifier(localOffice != null && localOffice.getId() != null
+        && localOffice.getUuid() != null, "Local Office ID and UUID are required.");
+    requireIdentifier(dto.getContactType() != null && dto.getContactType().getId() != null,
+        "Contact Type ID is required.");
+    requireIdentifier(dto.getTraineeType() != null && dto.getTraineeType().getId() != null,
+        "Trainee Type ID is required.");
 
     // Validate that the contact is a valid email address or HTTPS based URL.
     String contact = dto.getContact();
@@ -77,6 +81,13 @@ public class LocalOfficeContactValidator {
         log.warn(message);
         throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
       }
+    }
+  }
+
+  private void requireIdentifier(boolean present, String message) {
+    if (!present) {
+      log.warn(message);
+      throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
     }
   }
 }
