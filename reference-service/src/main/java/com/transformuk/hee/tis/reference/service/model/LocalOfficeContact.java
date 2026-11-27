@@ -40,5 +40,11 @@ public class LocalOfficeContact implements Serializable {
   @JoinColumn(name = "contactTypeId", referencedColumnName = "id", nullable = false)
   private LocalOfficeContactType contactType;
 
+  // all existing contacts must have been given a trainee type.
+  @NotNull
+  @ManyToOne
+  @JoinColumn(name = "traineeTypeId", referencedColumnName = "id", nullable = false)
+  private TraineeType traineeType;
+
   private String contact;
 }

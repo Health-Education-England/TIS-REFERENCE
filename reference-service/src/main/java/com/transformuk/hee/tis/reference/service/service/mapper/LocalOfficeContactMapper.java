@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
  * Mapper for the entity LocalOfficeContact and its DTO LocalOfficeContactDto.
  */
 @Mapper(componentModel = "spring", uses = {LocalOfficeMapper.class,
-    LocalOfficeContactTypeMapper.class})
+    LocalOfficeContactTypeMapper.class, TraineeTypeMapper.class})
 public interface LocalOfficeContactMapper {
 
   LocalOfficeContactDto toDto(LocalOfficeContact entity);

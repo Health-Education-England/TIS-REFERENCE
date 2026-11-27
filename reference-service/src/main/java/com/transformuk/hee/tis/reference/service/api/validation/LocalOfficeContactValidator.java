@@ -1,6 +1,7 @@
 package com.transformuk.hee.tis.reference.service.api.validation;
 
 import com.transformuk.hee.tis.reference.api.dto.LocalOfficeContactDto;
+import com.transformuk.hee.tis.reference.api.dto.LocalOfficeDTO;
 import com.transformuk.hee.tis.reference.service.exception.CustomParameterizedException;
 import com.transformuk.hee.tis.reference.service.exception.ErrorConstants;
 import com.transformuk.hee.tis.reference.service.model.LocalOfficeContact;
@@ -45,6 +46,16 @@ public class LocalOfficeContactValidator {
   public void validate(LocalOfficeContactDto dto) {
     log.debug("Validating local office contact: {}", dto);
 
+    // Associations are persisted by reference, so they fail if their identifiers are missing.
+    // The local office needs both: its ID identifies the entity and its UUID is the join column.
+    LocalOfficeDTO localOffice = dto.getLocalOffice();
+    requireIdentifier(localOffice != null && localOffice.getId() != null
+        && localOffice.getUuid() != null, "Local Office ID and UUID are required.");
+    requireIdentifier(dto.getContactType() != null && dto.getContactType().getId() != null,
+        "Contact Type ID is required.");
+    requireIdentifier(dto.getTraineeType() != null && dto.getTraineeType().getId() != null,
+        "Trainee Type ID is required.");
+
     // Validate that the contact is a valid email address or HTTPS based URL.
     String contact = dto.getContact();
     boolean isValid = emailValidator.isValid(contact, null) || urlValidator.isValid(contact, null);
@@ -57,15 +68,26 @@ public class LocalOfficeContactValidator {
 
     // Do not allow inserting a duplicate contact.
     if (dto.getId() == null) {
-      List<LocalOfficeContact> existingContacts = repository.findByContactTypeIdAndLocalOfficeUuid(
-          dto.getContactType().getId(), dto.getLocalOffice().getUuid());
+      List<LocalOfficeContact> existingContacts =
+          repository.findByContactTypeIdAndLocalOfficeUuidAndTraineeTypeId(
+              dto.getContactType().getId(), dto.getLocalOffice().getUuid(),
+              dto.getTraineeType().getId());
 
       if (!existingContacts.isEmpty()) {
-        String message = String.format("A '%s' contact already exists for the '%s' Local Office.",
-            dto.getContactType().getLabel(), dto.getLocalOffice().getName());
+        String message = String.format(
+            "A '%s' contact already exists for the '%s' Local Office and '%s' trainee type.",
+            dto.getContactType().getLabel(), dto.getLocalOffice().getName(),
+            dto.getTraineeType().getLabel());
         log.warn(message);
         throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
       }
+    }
+  }
+
+  private void requireIdentifier(boolean present, String message) {
+    if (!present) {
+      log.warn(message);
+      throw new CustomParameterizedException(message, ErrorConstants.ERR_VALIDATION);
     }
   }
 }

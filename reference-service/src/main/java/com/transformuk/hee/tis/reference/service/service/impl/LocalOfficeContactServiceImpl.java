@@ -26,7 +26,7 @@ public class LocalOfficeContactServiceImpl extends
   @Override
   protected List<String> getSearchFields() {
     return Arrays.asList("contact", "localOffice.abbreviation", "localOffice.name",
-        "contactType.code", "contactType.label");
+        "contactType.code", "contactType.label", "traineeType.code", "traineeType.label");
   }
 
   @Override

@@ -23,5 +23,8 @@ public class LocalOfficeContactDto {
   @NotNull(message = "Contact Type is required", groups = {Update.class, Create.class})
   private LocalOfficeContactTypeDto contactType;
 
+  @NotNull(message = "Trainee Type is required", groups = {Update.class, Create.class})
+  private TraineeTypeDto traineeType;
+
   private String contact;
 }
